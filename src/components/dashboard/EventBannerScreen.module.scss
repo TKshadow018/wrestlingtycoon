@@ -1,0 +1,352 @@
+@keyframes overlayFadeIn {
+  from {
+    background: #000;
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes titleReveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 0% 0 0);
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes widthExpand {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes ctaPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(243, 159, 97, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(243, 159, 97, 0);
+  }
+}
+
+@keyframes scanlineScroll {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 100%;
+  }
+}
+
+// ─── Overlay ──────────────────────────────────────────────────────────────────
+
+.overlay {
+  align-items: center;
+  background: radial-gradient(ellipse at 60% 0%, rgba(243, 159, 97, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse at 10% 90%, rgba(37, 161, 155, 0.12) 0%, transparent 50%),
+    linear-gradient(160deg, #060b12 0%, #0a1320 60%, #0b1222 100%);
+  display: flex;
+  flex-direction: column;
+  inset: 0;
+  justify-content: center;
+  min-height: 100vh;
+  opacity: 0;
+  overflow: hidden;
+  position: fixed;
+  transition: opacity 0.35s ease;
+  z-index: 300;
+}
+
+.overlayVisible {
+  animation: overlayFadeIn 0.5s ease forwards;
+  opacity: 1;
+}
+
+// Scanline texture
+.scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.07) 3px,
+    rgba(0, 0, 0, 0.07) 4px
+  );
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+  animation: scanlineScroll 12s linear infinite;
+}
+
+// ─── Content ──────────────────────────────────────────────────────────────────
+
+.content {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin: 0 auto;
+  max-width: 860px;
+  padding: 3rem 2rem;
+  position: relative;
+  width: 100%;
+  z-index: 2;
+}
+
+// ─── Animation helpers ────────────────────────────────────────────────────────
+
+.animate1 {
+  animation: slideInLeft 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.animate2 {
+  animation: titleReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+.animate3 {
+  animation: fadeUp 0.5s ease 0.7s both;
+}
+
+.animate4 {
+  animation: fadeUp 0.5s ease 0.9s both;
+}
+
+.animate5 {
+  animation: fadeUp 0.5s ease 1.05s both;
+}
+
+.animate6 {
+  animation: fadeUp 0.55s ease 1.2s both;
+}
+
+// ─── Type badge ───────────────────────────────────────────────────────────────
+
+.typeBadge {
+  background: rgba(243, 159, 97, 0.14);
+  border: 1px solid rgba(243, 159, 97, 0.45);
+  border-radius: 4px;
+  color: var(--accent-copper);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  opacity: 0;
+  padding: 0.28rem 0.8rem;
+  text-transform: uppercase;
+}
+
+// ─── Event name ───────────────────────────────────────────────────────────────
+
+.eventName {
+  color: var(--text-main);
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  margin: 0;
+  opacity: 0;
+  text-transform: uppercase;
+  text-shadow: 0 4px 32px rgba(243, 159, 97, 0.18), 0 0 80px rgba(37, 161, 155, 0.12);
+}
+
+// ─── Date ─────────────────────────────────────────────────────────────────────
+
+.eventDate {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  margin: 0;
+  opacity: 0;
+  text-transform: uppercase;
+}
+
+// ─── Divider ──────────────────────────────────────────────────────────────────
+
+.divider {
+  background: linear-gradient(
+    90deg,
+    var(--accent-copper) 0%,
+    rgba(37, 161, 155, 0.6) 60%,
+    transparent 100%
+  );
+  height: 2px;
+  opacity: 0;
+  transform-origin: left;
+  width: 100%;
+}
+
+// ─── Section label ────────────────────────────────────────────────────────────
+
+.sectionLabel {
+  color: var(--text-faint);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  margin: 0 0 0.6rem;
+  text-transform: uppercase;
+}
+
+// ─── Champions ────────────────────────────────────────────────────────────────
+
+.champsSection {
+  opacity: 0;
+  width: 100%;
+}
+
+.champsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.champCard {
+  align-items: center;
+  background: rgba(9, 14, 21, 0.75);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.55rem 0.8rem;
+}
+
+.beltImg {
+  height: 52px;
+  object-fit: contain;
+  width: 52px;
+}
+
+.champInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.beltName {
+  color: var(--text-faint);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.holderRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.holderChip {
+  align-items: center;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.holderAvatar {
+  border-radius: 50%;
+  height: 32px;
+  object-fit: cover;
+  width: 32px;
+}
+
+.holderName {
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+// ─── Sponsors ─────────────────────────────────────────────────────────────────
+
+.sponsorsSection {
+  opacity: 0;
+  width: 100%;
+}
+
+.sponsorChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.sponsorChip {
+  background: rgba(37, 161, 155, 0.1);
+  border: 1px solid rgba(37, 161, 155, 0.3);
+  border-radius: 4px;
+  color: rgba(37, 161, 155, 0.9);
+  font-size: 0.73rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0.22rem 0.7rem;
+  text-transform: uppercase;
+}
+
+// ─── CTA ──────────────────────────────────────────────────────────────────────
+
+.ctaRow {
+  margin-top: 1rem;
+  opacity: 0;
+}
+
+.setupBtn {
+  animation: ctaPulse 2.2s ease 1.8s infinite;
+  background: var(--accent-copper);
+  border: 0;
+  border-radius: 6px;
+  color: #1a0e00;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 0.7rem 2.8rem;
+  text-transform: uppercase;
+  transition: background 0.15s, transform 0.12s;
+
+  &:hover {
+    background: #f8b47a;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

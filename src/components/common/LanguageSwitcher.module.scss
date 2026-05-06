@@ -1,0 +1,20 @@
+.languageSwitcher {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.65rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  select {
+    background: rgba(11, 18, 27, 0.85);
+    border: 1px solid var(--line-soft);
+    border-radius: 999px;
+    color: var(--text-main);
+    font-size: 0.78rem;
+    letter-spacing: 0.07em;
+    outline: none;
+    padding: 0.45rem 0.95rem;
+    text-transform: uppercase;
+  }
+}

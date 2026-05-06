@@ -1,0 +1,89 @@
+.moduleBody {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.kpiGrid,
+.summaryGrid {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+
+  article {
+    background: rgba(8, 13, 20, 0.8);
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+    padding: 0.75rem;
+
+    p,
+    h4,
+    h5 {
+      margin: 0;
+    }
+
+    p {
+      color: var(--text-faint);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h4,
+    h5 {
+      font-family: var(--font-display);
+      margin-top: 0.35rem;
+    }
+
+    h4 {
+      font-size: 1.2rem;
+    }
+
+    h5 {
+      font-size: 1.05rem;
+    }
+  }
+}
+
+.ledgerList {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.ledgerRow {
+  align-items: center;
+  background: rgba(8, 13, 20, 0.8);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto;
+  padding: 0.7rem;
+
+  p,
+  small {
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.84rem;
+  }
+
+  small {
+    color: var(--text-faint);
+    font-size: 0.75rem;
+  }
+}
+
+.emptyState {
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.positive {
+  color: #72e0b3;
+}
+
+.negative {
+  color: #ff9b9b;
+}

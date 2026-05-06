@@ -1,0 +1,752 @@
+[
+  {
+    "id": "wrestler-female-001",
+    "name": "Ayesha Rahman",
+    "dob": "1984-07-23",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 9799,
+      "per_match_salary": 1764,
+      "additional_bonus": 3136
+    },
+    "popularity": 47,
+    "has_money_amount": 28467,
+    "wrestling_ability": {
+      "strength": 60,
+      "technics": 49,
+      "high_fly_ability": 93,
+      "leg_stamina": 93,
+      "body_stamina": 72,
+      "head_stamina": 52
+    },
+    "signature_moves": [
+      "Running Bulldog",
+      "Flying Lariat"
+    ],
+    "finisher_moves": [
+      "Skyfall Cutter"
+    ],
+    "image_url": "/people/wrestler/female/1.png"
+  },
+  {
+    "id": "wrestler-female-002",
+    "name": "Nusrat Jahan",
+    "dob": "2005-02-07",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 8773,
+      "per_match_salary": 1579,
+      "additional_bonus": 2807
+    },
+    "popularity": 73,
+    "has_money_amount": 181034,
+    "wrestling_ability": {
+      "strength": 44,
+      "technics": 94,
+      "high_fly_ability": 86,
+      "leg_stamina": 55,
+      "body_stamina": 68,
+      "head_stamina": 70
+    },
+    "signature_moves": [
+      "Dragon Screw",
+      "Spinebuster"
+    ],
+    "finisher_moves": [
+      "Iron Lock Driver"
+    ],
+    "image_url": "/people/wrestler/female/2.png"
+  },
+  {
+    "id": "wrestler-female-003",
+    "name": "Farzana Suchi",
+    "dob": "2002-12-18",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 6456,
+      "per_match_salary": 1162,
+      "additional_bonus": 2066
+    },
+    "popularity": 41,
+    "has_money_amount": 201882,
+    "wrestling_ability": {
+      "strength": 77,
+      "technics": 39,
+      "high_fly_ability": 42,
+      "leg_stamina": 82,
+      "body_stamina": 87,
+      "head_stamina": 58
+    },
+    "signature_moves": [
+      "Suplex Driver",
+      "Snap DDT"
+    ],
+    "finisher_moves": [
+      "Crimson Spear"
+    ],
+    "image_url": "/people/wrestler/female/3.png"
+  },
+  {
+    "id": "wrestler-female-004",
+    "name": "Sadia Islam",
+    "dob": "1992-03-23",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 11793,
+      "per_match_salary": 2123,
+      "additional_bonus": 3774
+    },
+    "popularity": 87,
+    "has_money_amount": 15642,
+    "wrestling_ability": {
+      "strength": 97,
+      "technics": 65,
+      "high_fly_ability": 75,
+      "leg_stamina": 93,
+      "body_stamina": 68,
+      "head_stamina": 62
+    },
+    "signature_moves": [
+      "Flying Lariat",
+      "Backbreaker Combo"
+    ],
+    "finisher_moves": [
+      "Thunder Bomb"
+    ],
+    "image_url": "/people/wrestler/female/4.png"
+  },
+  {
+    "id": "wrestler-female-005",
+    "name": "Nasmiha Ahmed Eka",
+    "dob": "2002-04-02",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 17276,
+      "per_match_salary": 3110,
+      "additional_bonus": 5528
+    },
+    "popularity": 52,
+    "has_money_amount": 82642,
+    "wrestling_ability": {
+      "strength": 83,
+      "technics": 53,
+      "high_fly_ability": 75,
+      "leg_stamina": 93,
+      "body_stamina": 83,
+      "head_stamina": 57
+    },
+    "signature_moves": [
+      "Spinebuster",
+      "Step-Up Enzuigiri"
+    ],
+    "finisher_moves": [
+      "Phoenix Clash"
+    ],
+    "image_url": "/people/wrestler/female/5.png"
+  },
+  {
+    "id": "wrestler-female-006",
+    "name": "Ahona Sikdar",
+    "dob": "2007-12-05",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 5207,
+      "per_match_salary": 937,
+      "additional_bonus": 1666
+    },
+    "popularity": 68,
+    "has_money_amount": 25102,
+    "wrestling_ability": {
+      "strength": 44,
+      "technics": 56,
+      "high_fly_ability": 92,
+      "leg_stamina": 60,
+      "body_stamina": 88,
+      "head_stamina": 63
+    },
+    "signature_moves": [
+      "Snap DDT",
+      "Tilt-a-Whirl Slam"
+    ],
+    "finisher_moves": [
+      "Midnight Submission"
+    ],
+    "image_url": "/people/wrestler/female/6.png"
+  },
+  {
+    "id": "wrestler-female-007",
+    "name": "Moushumi Akter",
+    "dob": "2004-04-15",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 6276,
+      "per_match_salary": 1130,
+      "additional_bonus": 2008
+    },
+    "popularity": 59,
+    "has_money_amount": 193022,
+    "wrestling_ability": {
+      "strength": 47,
+      "technics": 63,
+      "high_fly_ability": 31,
+      "leg_stamina": 68,
+      "body_stamina": 60,
+      "head_stamina": 62
+    },
+    "signature_moves": [
+      "Backbreaker Combo",
+      "German Suplex"
+    ],
+    "finisher_moves": [
+      "Titan Drop"
+    ],
+    "image_url": "/people/wrestler/female/7.png"
+  },
+  {
+    "id": "wrestler-female-008",
+    "name": "Rumana Sultana",
+    "dob": "1999-09-18",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 8828,
+      "per_match_salary": 1589,
+      "additional_bonus": 2825
+    },
+    "popularity": 60,
+    "has_money_amount": 18597,
+    "wrestling_ability": {
+      "strength": 50,
+      "technics": 76,
+      "high_fly_ability": 45,
+      "leg_stamina": 61,
+      "body_stamina": 74,
+      "head_stamina": 67
+    },
+    "signature_moves": [
+      "Step-Up Enzuigiri",
+      "Running Bulldog"
+    ],
+    "finisher_moves": [
+      "Royal Knee"
+    ],
+    "image_url": "/people/wrestler/female/8.png"
+  },
+  {
+    "id": "wrestler-female-009",
+    "name": "Nabila Karim",
+    "dob": "1997-03-02",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 12418,
+      "per_match_salary": 2235,
+      "additional_bonus": 3974
+    },
+    "popularity": 83,
+    "has_money_amount": 202627,
+    "wrestling_ability": {
+      "strength": 83,
+      "technics": 52,
+      "high_fly_ability": 50,
+      "leg_stamina": 71,
+      "body_stamina": 53,
+      "head_stamina": 52
+    },
+    "signature_moves": [
+      "Tilt-a-Whirl Slam",
+      "Dragon Screw"
+    ],
+    "finisher_moves": [
+      "Cyclone Kick"
+    ],
+    "image_url": "/people/wrestler/female/9.png"
+  },
+  {
+    "id": "wrestler-female-010",
+    "name": "Mayra Gita (MaGi)",
+    "dob": "1985-11-01",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 9675,
+      "per_match_salary": 1742,
+      "additional_bonus": 3096
+    },
+    "popularity": 56,
+    "has_money_amount": 51881,
+    "wrestling_ability": {
+      "strength": 44,
+      "technics": 63,
+      "high_fly_ability": 75,
+      "leg_stamina": 49,
+      "body_stamina": 57,
+      "head_stamina": 79
+    },
+    "signature_moves": [
+      "German Suplex",
+      "Suplex Driver"
+    ],
+    "finisher_moves": [
+      "Final Verdict"
+    ],
+    "image_url": "/people/wrestler/female/10.png"
+  },
+  {
+    "id": "wrestler-female-011",
+    "name": "Labiba Noor",
+    "dob": "2006-07-29",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 18798,
+      "per_match_salary": 3384,
+      "additional_bonus": 6015
+    },
+    "popularity": 42,
+    "has_money_amount": 35822,
+    "wrestling_ability": {
+      "strength": 66,
+      "technics": 49,
+      "high_fly_ability": 75,
+      "leg_stamina": 83,
+      "body_stamina": 56,
+      "head_stamina": 80
+    },
+    "signature_moves": [
+      "Running Bulldog",
+      "Flying Lariat"
+    ],
+    "finisher_moves": [
+      "Skyfall Cutter"
+    ],
+    "image_url": "/people/wrestler/female/11.png"
+  },
+  {
+    "id": "wrestler-female-012",
+    "name": "Ishrat Jahan Queen",
+    "dob": "1998-08-14",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 17776,
+      "per_match_salary": 3200,
+      "additional_bonus": 5688
+    },
+    "popularity": 57,
+    "has_money_amount": 124914,
+    "wrestling_ability": {
+      "strength": 76,
+      "technics": 63,
+      "high_fly_ability": 51,
+      "leg_stamina": 91,
+      "body_stamina": 59,
+      "head_stamina": 53
+    },
+    "signature_moves": [
+      "Dragon Screw",
+      "Spinebuster"
+    ],
+    "finisher_moves": [
+      "Iron Lock Driver"
+    ],
+    "image_url": "/people/wrestler/female/12.png"
+  },
+  {
+    "id": "wrestler-female-013",
+    "name": "Ditpi Kumari Arunachal",
+    "dob": "1995-07-06",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 16590,
+      "per_match_salary": 2986,
+      "additional_bonus": 5309
+    },
+    "popularity": 70,
+    "has_money_amount": 177590,
+    "wrestling_ability": {
+      "strength": 59,
+      "technics": 75,
+      "high_fly_ability": 33,
+      "leg_stamina": 58,
+      "body_stamina": 55,
+      "head_stamina": 68
+    },
+    "signature_moves": [
+      "Suplex Driver",
+      "Snap DDT"
+    ],
+    "finisher_moves": [
+      "Crimson Spear"
+    ],
+    "image_url": "/people/wrestler/female/13.png"
+  },
+  {
+    "id": "wrestler-female-014",
+    "name": "Stardust Angelica",
+    "dob": "2004-02-26",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 8105,
+      "per_match_salary": 1459,
+      "additional_bonus": 2594
+    },
+    "popularity": 90,
+    "has_money_amount": 38571,
+    "wrestling_ability": {
+      "strength": 49,
+      "technics": 52,
+      "high_fly_ability": 47,
+      "leg_stamina": 62,
+      "body_stamina": 52,
+      "head_stamina": 66
+    },
+    "signature_moves": [
+      "Flying Lariat",
+      "Backbreaker Combo"
+    ],
+    "finisher_moves": [
+      "Thunder Bomb"
+    ],
+    "image_url": "/people/wrestler/female/14.png"
+  },
+  {
+    "id": "wrestler-female-015",
+    "name": "Aliceent Angel",
+    "dob": "2006-11-04",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 13972,
+      "per_match_salary": 2515,
+      "additional_bonus": 4471
+    },
+    "popularity": 61,
+    "has_money_amount": 213578,
+    "wrestling_ability": {
+      "strength": 91,
+      "technics": 83,
+      "high_fly_ability": 32,
+      "leg_stamina": 66,
+      "body_stamina": 81,
+      "head_stamina": 78
+    },
+    "signature_moves": [
+      "Spinebuster",
+      "Step-Up Enzuigiri"
+    ],
+    "finisher_moves": [
+      "Phoenix Clash"
+    ],
+    "image_url": "/people/wrestler/female/15.png"
+  },
+  {
+    "id": "wrestler-female-016",
+    "name": "Afreen Chowdhury Maya",
+    "dob": "1996-12-03",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 11226,
+      "per_match_salary": 2021,
+      "additional_bonus": 3592
+    },
+    "popularity": 58,
+    "has_money_amount": 203275,
+    "wrestling_ability": {
+      "strength": 78,
+      "technics": 59,
+      "high_fly_ability": 47,
+      "leg_stamina": 84,
+      "body_stamina": 50,
+      "head_stamina": 86
+    },
+    "signature_moves": [
+      "Snap DDT",
+      "Tilt-a-Whirl Slam"
+    ],
+    "finisher_moves": [
+      "Midnight Submission"
+    ],
+    "image_url": "/people/wrestler/female/16.png"
+  },
+  {
+    "id": "wrestler-female-017",
+    "name": "Ambia Aktar",
+    "dob": "1995-10-24",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 13105,
+      "per_match_salary": 2359,
+      "additional_bonus": 4194
+    },
+    "popularity": 67,
+    "has_money_amount": 215038,
+    "wrestling_ability": {
+      "strength": 58,
+      "technics": 65,
+      "high_fly_ability": 56,
+      "leg_stamina": 65,
+      "body_stamina": 68,
+      "head_stamina": 59
+    },
+    "signature_moves": [
+      "Backbreaker Combo",
+      "German Suplex"
+    ],
+    "finisher_moves": [
+      "Titan Drop"
+    ],
+    "image_url": "/people/wrestler/female/17.png"
+  },
+  {
+    "id": "wrestler-female-018",
+    "name": "Freya Ingrid",
+    "dob": "2004-09-18",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 6990,
+      "per_match_salary": 1258,
+      "additional_bonus": 2237
+    },
+    "popularity": 44,
+    "has_money_amount": 135096,
+    "wrestling_ability": {
+      "strength": 50,
+      "technics": 82,
+      "high_fly_ability": 53,
+      "leg_stamina": 63,
+      "body_stamina": 83,
+      "head_stamina": 87
+    },
+    "signature_moves": [
+      "Step-Up Enzuigiri",
+      "Running Bulldog"
+    ],
+    "finisher_moves": [
+      "Royal Knee"
+    ],
+    "image_url": "/people/wrestler/female/18.png"
+  },
+  {
+    "id": "wrestler-female-019",
+    "name": "Sharmin Nahar",
+    "dob": "1996-05-19",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 18843,
+      "per_match_salary": 3392,
+      "additional_bonus": 6030
+    },
+    "popularity": 46,
+    "has_money_amount": 120725,
+    "wrestling_ability": {
+      "strength": 73,
+      "technics": 77,
+      "high_fly_ability": 45,
+      "leg_stamina": 75,
+      "body_stamina": 51,
+      "head_stamina": 54
+    },
+    "signature_moves": [
+      "Tilt-a-Whirl Slam",
+      "Dragon Screw"
+    ],
+    "finisher_moves": [
+      "Cyclone Kick"
+    ],
+    "image_url": "/people/wrestler/female/19.png"
+  },
+  {
+    "id": "wrestler-female-020",
+    "name": "Rukaiya Sultana",
+    "dob": "1995-02-20",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 12070,
+      "per_match_salary": 2173,
+      "additional_bonus": 3862
+    },
+    "popularity": 95,
+    "has_money_amount": 56085,
+    "wrestling_ability": {
+      "strength": 91,
+      "technics": 92,
+      "high_fly_ability": 85,
+      "leg_stamina": 68,
+      "body_stamina": 50,
+      "head_stamina": 45
+    },
+    "signature_moves": [
+      "German Suplex",
+      "Suplex Driver"
+    ],
+    "finisher_moves": [
+      "Final Verdict"
+    ],
+    "image_url": "/people/wrestler/female/20.png"
+  },
+  {
+    "id": "wrestler-female-021",
+    "name": "Tanisha Zahan",
+    "dob": "1986-05-10",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 17811,
+      "per_match_salary": 3206,
+      "additional_bonus": 5700
+    },
+    "popularity": 43,
+    "has_money_amount": 161397,
+    "wrestling_ability": {
+      "strength": 53,
+      "technics": 47,
+      "high_fly_ability": 95,
+      "leg_stamina": 63,
+      "body_stamina": 68,
+      "head_stamina": 67
+    },
+    "signature_moves": [
+      "Running Bulldog",
+      "Flying Lariat"
+    ],
+    "finisher_moves": [
+      "Skyfall Cutter"
+    ],
+    "image_url": "/people/wrestler/female/21.png"
+  },
+  {
+    "id": "wrestler-female-022",
+    "name": "Pinolope Parker",
+    "dob": "1989-12-27",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 16486,
+      "per_match_salary": 2967,
+      "additional_bonus": 5276
+    },
+    "popularity": 45,
+    "has_money_amount": 21799,
+    "wrestling_ability": {
+      "strength": 69,
+      "technics": 88,
+      "high_fly_ability": 95,
+      "leg_stamina": 86,
+      "body_stamina": 74,
+      "head_stamina": 63
+    },
+    "signature_moves": [
+      "Dragon Screw",
+      "Spinebuster"
+    ],
+    "finisher_moves": [
+      "Iron Lock Driver"
+    ],
+    "image_url": "/people/wrestler/female/22.png"
+  },
+  {
+    "id": "wrestler-female-023",
+    "name": "Erika Elizabeth",
+    "dob": "2001-10-09",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 14248,
+      "per_match_salary": 2565,
+      "additional_bonus": 4559
+    },
+    "popularity": 80,
+    "has_money_amount": 95293,
+    "wrestling_ability": {
+      "strength": 89,
+      "technics": 75,
+      "high_fly_ability": 97,
+      "leg_stamina": 56,
+      "body_stamina": 62,
+      "head_stamina": 85
+    },
+    "signature_moves": [
+      "Suplex Driver",
+      "Snap DDT"
+    ],
+    "finisher_moves": [
+      "Crimson Spear"
+    ],
+    "image_url": "/people/wrestler/female/23.png"
+  },
+  {
+    "id": "wrestler-female-024",
+    "name": "Bad Girl Bella",
+    "dob": "1988-09-18",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 17598,
+      "per_match_salary": 3168,
+      "additional_bonus": 5631
+    },
+    "popularity": 44,
+    "has_money_amount": 11291,
+    "wrestling_ability": {
+      "strength": 71,
+      "technics": 61,
+      "high_fly_ability": 65,
+      "leg_stamina": 52,
+      "body_stamina": 91,
+      "head_stamina": 70
+    },
+    "signature_moves": [
+      "Flying Lariat",
+      "Backbreaker Combo"
+    ],
+    "finisher_moves": [
+      "Thunder Bomb"
+    ],
+    "image_url": "/people/wrestler/female/24.png"
+  },
+  {
+    "id": "wrestler-female-025",
+    "name": "Lily Hanson",
+    "dob": "1993-07-18",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 16228,
+      "per_match_salary": 2921,
+      "additional_bonus": 5193
+    },
+    "popularity": 65,
+    "has_money_amount": 34740,
+    "wrestling_ability": {
+      "strength": 40,
+      "technics": 60,
+      "high_fly_ability": 62,
+      "leg_stamina": 80,
+      "body_stamina": 82,
+      "head_stamina": 88
+    },
+    "signature_moves": [
+      "Spinebuster",
+      "Step-Up Enzuigiri"
+    ],
+    "finisher_moves": [
+      "Phoenix Clash"
+    ],
+    "image_url": "/people/wrestler/female/25.png"
+  }
+]

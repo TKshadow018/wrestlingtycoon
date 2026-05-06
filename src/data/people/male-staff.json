@@ -1,0 +1,112 @@
+[
+  {
+    "id": "staff-male-001",
+    "name": "Yakub Misra",
+    "dob": "1988-10-23",
+    "gender": "male",
+    "role": "staff",
+    "staff_department": "medical",
+    "salary_demand": {
+      "monthly_wage": 3191,
+      "per_match_salary": 574,
+      "additional_bonus": 1021
+    },
+    "popularity": 13,
+    "has_money_amount": 22534,
+    "staff_ability": {
+      "reliability": 93,
+      "pressure_handling": 82,
+      "teamwork": 92,
+      "technical_skill": 87
+    },
+    "image_url": "/people/staff/male/1.png"
+  },
+  {
+    "id": "staff-male-002",
+    "name": "Labib Rahman",
+    "dob": "2000-02-19",
+    "gender": "male",
+    "role": "staff",
+    "staff_department": "production",
+    "salary_demand": {
+      "monthly_wage": 8030,
+      "per_match_salary": 1445,
+      "additional_bonus": 2570
+    },
+    "popularity": 58,
+    "has_money_amount": 33746,
+    "staff_ability": {
+      "reliability": 76,
+      "pressure_handling": 83,
+      "teamwork": 66,
+      "technical_skill": 64
+    },
+    "image_url": "/people/staff/male/2.png"
+  },
+  {
+    "id": "staff-male-003",
+    "name": "Mason Valerina",
+    "dob": "1985-10-04",
+    "gender": "male",
+    "role": "staff",
+    "staff_department": "security",
+    "salary_demand": {
+      "monthly_wage": 3058,
+      "per_match_salary": 550,
+      "additional_bonus": 979
+    },
+    "popularity": 47,
+    "has_money_amount": 24235,
+    "staff_ability": {
+      "reliability": 61,
+      "pressure_handling": 87,
+      "teamwork": 86,
+      "technical_skill": 65
+    },
+    "image_url": "/people/staff/male/3.png"
+  },
+  {
+    "id": "staff-male-004",
+    "name": "Nadir Elahi",
+    "dob": "2003-05-19",
+    "gender": "male",
+    "role": "staff",
+    "staff_department": "creative",
+    "salary_demand": {
+      "monthly_wage": 9748,
+      "per_match_salary": 1755,
+      "additional_bonus": 3119
+    },
+    "popularity": 60,
+    "has_money_amount": 15126,
+    "staff_ability": {
+      "reliability": 78,
+      "pressure_handling": 84,
+      "teamwork": 63,
+      "technical_skill": 64
+    },
+    "image_url": "/people/staff/male/4.png"
+  },
+  {
+    "id": "staff-male-005",
+    "name": "Owen Santos",
+    "dob": "1999-01-19",
+    "gender": "male",
+    "role": "staff",
+    "staff_department": "logistics",
+    "salary_demand": {
+      "monthly_wage": 8308,
+      "per_match_salary": 1495,
+      "additional_bonus": 2659
+    },
+    "popularity": 35,
+    "has_money_amount": 54694,
+    "staff_ability": {
+      "reliability": 65,
+      "pressure_handling": 80,
+      "teamwork": 76,
+      "technical_skill": 77
+    },
+    "image_url": "/people/staff/male/5.png"
+  }
+]

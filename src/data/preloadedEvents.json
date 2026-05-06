@@ -1,0 +1,106 @@
+[
+  {
+    "id": "ban-ppv-01",
+    "event_name": "Nobo Lorai",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "14 January",
+    "image_url": "/Events/Nobo lorai.png"
+  },
+  {
+    "id": "ban-ppv-02",
+    "event_name": "Rokto Rong Moncho",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "16 February",
+    "image_url": "/Events/Rokto rong moncho.png"
+  },
+  {
+    "id": "ban-ppv-03",
+    "event_name": "Khela Hobe",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "15 March",
+    "image_url": "/Events/Khela hobe.png"
+  },
+  {
+    "id": "ban-ppv-04",
+    "event_name": "Moha Judhho",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "13 April",
+    "image_url": "/Events/Moha judhho.png"
+  },
+  {
+    "id": "ban-ppv-05",
+    "event_name": "Put Koira Dimu",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "18 May",
+    "image_url": "/Events/Put Koira Dimu.png"
+  },
+  {
+    "id": "ban-ppv-06",
+    "event_name": "Dhor Pakor",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "16 June",
+    "image_url": "/Events/Dhor pakor.png"
+  },
+  {
+    "id": "ban-ppv-07",
+    "event_name": "Agun Jhor",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "14 July",
+    "image_url": "/Events/Agun Jhor.png"
+  },
+  {
+    "id": "ban-ppv-08",
+    "event_name": "Juddho Mela",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "18 August",
+    "image_url": "/Events/Juddho Mela.png"
+  },
+  {
+    "id": "ban-ppv-09",
+    "event_name": "Kopa Samsu",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "15 September",
+    "image_url": "/Events/Kopa Samsu.png"
+  },
+  {
+    "id": "ban-ppv-10",
+    "event_name": "Jhorer Raat",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "13 October",
+    "image_url": "/Events/Jhorer Raat.png"
+  },
+  {
+    "id": "ban-ppv-11",
+    "event_name": "Shesh Dour",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "17 November",
+    "image_url": "/Events/Shesh Dour.png"
+  },
+  {
+    "id": "ban-ppv-12",
+    "event_name": "Bishal Dhamaka",
+    "event_type": "ppv",
+    "event_reputation": 86,
+    "event_date": "14 December",
+    "image_url": "/Events/Bishal Dhamaka.png"
+  },
+  {
+    "id": "ban-mega-01",
+    "event_name": "Chud Ling Pong",
+    "event_type": "megaLive",
+    "event_reputation": 96,
+    "event_date": "26 December",
+    "image_url": "/Events/Chud ling pong.png"
+  }
+]

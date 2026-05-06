@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /saveGames/{slot} {
+      allow read, write: if
+        slot is string &&
+        slot.size() > 0 &&
+        slot.size() <= 64 &&
+        (
+          request.resource == null ||
+          (
+            request.resource.data.slot is string &&
+            request.resource.data.slot == slot &&
+            request.resource.data.updatedAt is int &&
+            request.resource.data.snapshot is map
+          )
+        );
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

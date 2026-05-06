@@ -1,0 +1,377 @@
+[
+  {
+    "id": "wrestler-legend-male-001",
+    "name": "Adam Cole",
+    "dob": "1989-07-05",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 24800,
+      "per_match_salary": 4600,
+      "additional_bonus": 8400
+    },
+    "popularity": 87,
+    "has_money_amount": 1950000,
+    "wrestling_ability": {
+      "strength": 74,
+      "technics": 92,
+      "high_fly_ability": 83,
+      "leg_stamina": 88,
+      "body_stamina": 85,
+      "head_stamina": 84
+    },
+    "signature_moves": ["Superkick", "Ushigoroshi"],
+    "finisher_moves": ["Panama Sunrise"],
+    "image_url": "/people/wrestler/legendsMale/adam cole.png"
+  },
+  {
+    "id": "wrestler-legend-male-002",
+    "name": "Aleister Black",
+    "dob": "1985-05-19",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 23000,
+      "per_match_salary": 4300,
+      "additional_bonus": 7600
+    },
+    "popularity": 82,
+    "has_money_amount": 1800000,
+    "wrestling_ability": {
+      "strength": 78,
+      "technics": 90,
+      "high_fly_ability": 76,
+      "leg_stamina": 86,
+      "body_stamina": 84,
+      "head_stamina": 86
+    },
+    "signature_moves": ["Meteora", "Springboard Moonsault"],
+    "finisher_moves": ["Black Mass"],
+    "image_url": "/people/wrestler/legendsMale/alester black.png"
+  },
+  {
+    "id": "wrestler-legend-male-003",
+    "name": "Angelico",
+    "dob": "1987-07-07",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 16400,
+      "per_match_salary": 3000,
+      "additional_bonus": 5200
+    },
+    "popularity": 68,
+    "has_money_amount": 780000,
+    "wrestling_ability": {
+      "strength": 63,
+      "technics": 82,
+      "high_fly_ability": 90,
+      "leg_stamina": 81,
+      "body_stamina": 77,
+      "head_stamina": 75
+    },
+    "signature_moves": ["Flying Crossbody", "Corkscrew Plancha"],
+    "finisher_moves": ["Navarro Death Roll"],
+    "image_url": "/people/wrestler/legendsMale/anhelico.png"
+  },
+  {
+    "id": "wrestler-legend-male-004",
+    "name": "Bo Dallas",
+    "dob": "1990-05-25",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 14000,
+      "per_match_salary": 2600,
+      "additional_bonus": 4300
+    },
+    "popularity": 63,
+    "has_money_amount": 620000,
+    "wrestling_ability": {
+      "strength": 71,
+      "technics": 75,
+      "high_fly_ability": 64,
+      "leg_stamina": 80,
+      "body_stamina": 79,
+      "head_stamina": 76
+    },
+    "signature_moves": ["Running Clothesline", "Body Slam"],
+    "finisher_moves": ["Bo-Dog"],
+    "image_url": "/people/wrestler/legendsMale/bo dallas.png"
+  },
+  {
+    "id": "wrestler-legend-male-005",
+    "name": "Bray Wyatt",
+    "dob": "1987-05-23",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 32000,
+      "per_match_salary": 5900,
+      "additional_bonus": 11000
+    },
+    "popularity": 94,
+    "has_money_amount": 3200000,
+    "wrestling_ability": {
+      "strength": 86,
+      "technics": 88,
+      "high_fly_ability": 62,
+      "leg_stamina": 89,
+      "body_stamina": 91,
+      "head_stamina": 90
+    },
+    "signature_moves": ["Uranage", "Senton"],
+    "finisher_moves": ["Sister Abigail"],
+    "image_url": "/people/wrestler/legendsMale/bray wyatt.png"
+  },
+  {
+    "id": "wrestler-legend-male-006",
+    "name": "Brock Lesnar",
+    "dob": "1977-07-12",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 42000,
+      "per_match_salary": 8000,
+      "additional_bonus": 15000
+    },
+    "popularity": 96,
+    "has_money_amount": 6800000,
+    "wrestling_ability": {
+      "strength": 99,
+      "technics": 82,
+      "high_fly_ability": 35,
+      "leg_stamina": 86,
+      "body_stamina": 94,
+      "head_stamina": 92
+    },
+    "signature_moves": ["German Suplex", "Knee Lift"],
+    "finisher_moves": ["F-5"],
+    "image_url": "/people/wrestler/legendsMale/brock lesner.png"
+  },
+  {
+    "id": "wrestler-legend-male-007",
+    "name": "CM Punk",
+    "dob": "1978-10-26",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 34000,
+      "per_match_salary": 6300,
+      "additional_bonus": 11500
+    },
+    "popularity": 95,
+    "has_money_amount": 5200000,
+    "wrestling_ability": {
+      "strength": 74,
+      "technics": 94,
+      "high_fly_ability": 79,
+      "leg_stamina": 88,
+      "body_stamina": 85,
+      "head_stamina": 89
+    },
+    "signature_moves": ["Running Knee", "Neckbreaker"],
+    "finisher_moves": ["Go To Sleep"],
+    "image_url": "/people/wrestler/legendsMale/c m punk.png"
+  },
+  {
+    "id": "wrestler-legend-male-008",
+    "name": "Drew McIntyre",
+    "dob": "1985-06-06",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 30500,
+      "per_match_salary": 5700,
+      "additional_bonus": 9800
+    },
+    "popularity": 92,
+    "has_money_amount": 3600000,
+    "wrestling_ability": {
+      "strength": 93,
+      "technics": 84,
+      "high_fly_ability": 55,
+      "leg_stamina": 90,
+      "body_stamina": 91,
+      "head_stamina": 87
+    },
+    "signature_moves": ["Belly-to-Belly Suplex", "Glasgow Kiss"],
+    "finisher_moves": ["Claymore Kick"],
+    "image_url": "/people/wrestler/legendsMale/drew.png"
+  },
+  {
+    "id": "wrestler-legend-male-009",
+    "name": "Edge",
+    "dob": "1973-10-30",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 29000,
+      "per_match_salary": 5300,
+      "additional_bonus": 9100
+    },
+    "popularity": 93,
+    "has_money_amount": 4300000,
+    "wrestling_ability": {
+      "strength": 76,
+      "technics": 90,
+      "high_fly_ability": 68,
+      "leg_stamina": 83,
+      "body_stamina": 82,
+      "head_stamina": 88
+    },
+    "signature_moves": ["Edge-o-Matic", "Impaler DDT"],
+    "finisher_moves": ["Spear"],
+    "image_url": "/people/wrestler/legendsMale/edge.png"
+  },
+  {
+    "id": "wrestler-legend-male-010",
+    "name": "Kane",
+    "dob": "1967-04-26",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 25500,
+      "per_match_salary": 4700,
+      "additional_bonus": 8300
+    },
+    "popularity": 90,
+    "has_money_amount": 4100000,
+    "wrestling_ability": {
+      "strength": 97,
+      "technics": 73,
+      "high_fly_ability": 30,
+      "leg_stamina": 78,
+      "body_stamina": 88,
+      "head_stamina": 86
+    },
+    "signature_moves": ["Sidewalk Slam", "Uppercut"],
+    "finisher_moves": ["Chokeslam"],
+    "image_url": "/people/wrestler/legendsMale/kane.png"
+  },
+  {
+    "id": "wrestler-legend-male-011",
+    "name": "Pentagon Jr",
+    "dob": "1985-02-26",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 23800,
+      "per_match_salary": 4400,
+      "additional_bonus": 7600
+    },
+    "popularity": 84,
+    "has_money_amount": 1700000,
+    "wrestling_ability": {
+      "strength": 79,
+      "technics": 90,
+      "high_fly_ability": 74,
+      "leg_stamina": 87,
+      "body_stamina": 84,
+      "head_stamina": 86
+    },
+    "signature_moves": ["Backstabber", "Superkick"],
+    "finisher_moves": ["Package Piledriver"],
+    "image_url": "/people/wrestler/legendsMale/pentagonJr.png"
+  },
+  {
+    "id": "wrestler-legend-male-012",
+    "name": "Roman Reigns",
+    "dob": "1985-05-25",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 39000,
+      "per_match_salary": 7300,
+      "additional_bonus": 13500
+    },
+    "popularity": 98,
+    "has_money_amount": 7400000,
+    "wrestling_ability": {
+      "strength": 95,
+      "technics": 86,
+      "high_fly_ability": 52,
+      "leg_stamina": 91,
+      "body_stamina": 93,
+      "head_stamina": 92
+    },
+    "signature_moves": ["Superman Punch", "Drive-By Dropkick"],
+    "finisher_moves": ["Spear"],
+    "image_url": "/people/wrestler/legendsMale/roman reigns.png"
+  },
+  {
+    "id": "wrestler-legend-male-013",
+    "name": "Sheamus",
+    "dob": "1978-01-28",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 25000,
+      "per_match_salary": 4600,
+      "additional_bonus": 8100
+    },
+    "popularity": 86,
+    "has_money_amount": 2800000,
+    "wrestling_ability": {
+      "strength": 92,
+      "technics": 79,
+      "high_fly_ability": 42,
+      "leg_stamina": 87,
+      "body_stamina": 90,
+      "head_stamina": 84
+    },
+    "signature_moves": ["Irish Curse Backbreaker", "Knee Lift"],
+    "finisher_moves": ["Brogue Kick"],
+    "image_url": "/people/wrestler/legendsMale/sheamus.png"
+  },
+  {
+    "id": "wrestler-legend-male-014",
+    "name": "The Undertaker",
+    "dob": "1965-03-24",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 35000,
+      "per_match_salary": 6900,
+      "additional_bonus": 12800
+    },
+    "popularity": 99,
+    "has_money_amount": 9100000,
+    "wrestling_ability": {
+      "strength": 96,
+      "technics": 88,
+      "high_fly_ability": 38,
+      "leg_stamina": 80,
+      "body_stamina": 89,
+      "head_stamina": 94
+    },
+    "signature_moves": ["Old School", "Snake Eyes"],
+    "finisher_moves": ["Tombstone Piledriver"],
+    "image_url": "/people/wrestler/legendsMale/undertaker.png"
+  },
+  {
+    "id": "wrestler-legend-male-015",
+    "name": "Vladimir Kozlov",
+    "dob": "1979-04-27",
+    "gender": "male",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 13200,
+      "per_match_salary": 2450,
+      "additional_bonus": 4100
+    },
+    "popularity": 60,
+    "has_money_amount": 540000,
+    "wrestling_ability": {
+      "strength": 90,
+      "technics": 65,
+      "high_fly_ability": 22,
+      "leg_stamina": 78,
+      "body_stamina": 85,
+      "head_stamina": 80
+    },
+    "signature_moves": ["Headbutt", "Powerslam"],
+    "finisher_moves": ["Iron Curtain Slam"],
+    "image_url": "/people/wrestler/legendsMale/vladimir kozlov.png"
+  }
+]

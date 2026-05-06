@@ -1,0 +1,3096 @@
+{
+  "meta": {
+    "generated_at": "2026-04-29T02:36:08.368Z",
+    "schema_version": 1,
+    "counts": {
+      "wrestler": {
+        "male": 50,
+        "female": 25
+      },
+      "referee": {
+        "male": 5,
+        "female": 3
+      },
+      "manager": {
+        "male": 5,
+        "female": 5
+      },
+      "announcer": {
+        "male": 5,
+        "female": 5
+      },
+      "staff": {
+        "male": 5,
+        "female": 5
+      }
+    }
+  },
+  "wrestlers": [
+    {
+      "id": "wrestler-male-001",
+      "name": "Aiden Storm",
+      "dob": "1991-04-18",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 4138,
+        "per_match_salary": 745,
+        "additional_bonus": 1324
+      },
+      "popularity": 67,
+      "has_money_amount": 126611,
+      "wrestling_ability": {
+        "strength": 91,
+        "technics": 50,
+        "high_fly_ability": 59,
+        "leg_stamina": 86,
+        "body_stamina": 68,
+        "head_stamina": 70
+      },
+      "signature_moves": [
+        "Running Bulldog",
+        "Flying Lariat"
+      ],
+      "finisher_moves": [
+        "Skyfall Cutter"
+      ],
+      "image_url": "/people/wrestler/male/01.png"
+    },
+    {
+      "id": "wrestler-male-002",
+      "name": "Blake Steele",
+      "dob": "1996-03-17",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 17172,
+        "per_match_salary": 3091,
+        "additional_bonus": 5495
+      },
+      "popularity": 54,
+      "has_money_amount": 191411,
+      "wrestling_ability": {
+        "strength": 56,
+        "technics": 60,
+        "high_fly_ability": 45,
+        "leg_stamina": 88,
+        "body_stamina": 91,
+        "head_stamina": 52
+      },
+      "signature_moves": [
+        "Dragon Screw",
+        "Spinebuster"
+      ],
+      "finisher_moves": [
+        "Iron Lock Driver"
+      ],
+      "image_url": "/people/wrestler/male/02.png"
+    },
+    {
+      "id": "wrestler-male-003",
+      "name": "Carter Vale",
+      "dob": "1993-02-17",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 19534,
+        "per_match_salary": 3516,
+        "additional_bonus": 6251
+      },
+      "popularity": 85,
+      "has_money_amount": 35595,
+      "wrestling_ability": {
+        "strength": 48,
+        "technics": 62,
+        "high_fly_ability": 91,
+        "leg_stamina": 80,
+        "body_stamina": 74,
+        "head_stamina": 65
+      },
+      "signature_moves": [
+        "Suplex Driver",
+        "Snap DDT"
+      ],
+      "finisher_moves": [
+        "Crimson Spear"
+      ],
+      "image_url": "/people/wrestler/male/03.png"
+    },
+    {
+      "id": "wrestler-male-004",
+      "name": "Damon Mercer",
+      "dob": "1991-08-06",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 14488,
+        "per_match_salary": 2608,
+        "additional_bonus": 4636
+      },
+      "popularity": 55,
+      "has_money_amount": 88888,
+      "wrestling_ability": {
+        "strength": 80,
+        "technics": 76,
+        "high_fly_ability": 68,
+        "leg_stamina": 92,
+        "body_stamina": 76,
+        "head_stamina": 81
+      },
+      "signature_moves": [
+        "Flying Lariat",
+        "Backbreaker Combo"
+      ],
+      "finisher_moves": [
+        "Thunder Bomb"
+      ],
+      "image_url": "/people/wrestler/male/04.png"
+    },
+    {
+      "id": "wrestler-male-005",
+      "name": "Ethan Santos",
+      "dob": "2001-02-26",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 10702,
+        "per_match_salary": 1926,
+        "additional_bonus": 3425
+      },
+      "popularity": 78,
+      "has_money_amount": 27055,
+      "wrestling_ability": {
+        "strength": 53,
+        "technics": 85,
+        "high_fly_ability": 69,
+        "leg_stamina": 86,
+        "body_stamina": 53,
+        "head_stamina": 65
+      },
+      "signature_moves": [
+        "Spinebuster",
+        "Step-Up Enzuigiri"
+      ],
+      "finisher_moves": [
+        "Phoenix Clash"
+      ],
+      "image_url": "/people/wrestler/male/05.png"
+    },
+    {
+      "id": "wrestler-male-006",
+      "name": "Felix Khan",
+      "dob": "2005-07-05",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 18284,
+        "per_match_salary": 3291,
+        "additional_bonus": 5851
+      },
+      "popularity": 89,
+      "has_money_amount": 159530,
+      "wrestling_ability": {
+        "strength": 57,
+        "technics": 45,
+        "high_fly_ability": 30,
+        "leg_stamina": 91,
+        "body_stamina": 88,
+        "head_stamina": 90
+      },
+      "signature_moves": [
+        "Snap DDT",
+        "Tilt-a-Whirl Slam"
+      ],
+      "finisher_moves": [
+        "Midnight Submission"
+      ],
+      "image_url": "/people/wrestler/male/06.png"
+    },
+    {
+      "id": "wrestler-male-007",
+      "name": "Gavin Brooks",
+      "dob": "2001-03-13",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 17997,
+        "per_match_salary": 3239,
+        "additional_bonus": 5759
+      },
+      "popularity": 83,
+      "has_money_amount": 24712,
+      "wrestling_ability": {
+        "strength": 81,
+        "technics": 43,
+        "high_fly_ability": 36,
+        "leg_stamina": 74,
+        "body_stamina": 94,
+        "head_stamina": 71
+      },
+      "signature_moves": [
+        "Backbreaker Combo",
+        "German Suplex"
+      ],
+      "finisher_moves": [
+        "Titan Drop"
+      ],
+      "image_url": "/people/wrestler/male/07.png"
+    },
+    {
+      "id": "wrestler-male-008",
+      "name": "Hayden Blaze",
+      "dob": "1989-09-16",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 11798,
+        "per_match_salary": 2124,
+        "additional_bonus": 3775
+      },
+      "popularity": 49,
+      "has_money_amount": 76232,
+      "wrestling_ability": {
+        "strength": 54,
+        "technics": 92,
+        "high_fly_ability": 97,
+        "leg_stamina": 54,
+        "body_stamina": 93,
+        "head_stamina": 76
+      },
+      "signature_moves": [
+        "Step-Up Enzuigiri",
+        "Running Bulldog"
+      ],
+      "finisher_moves": [
+        "Royal Knee"
+      ],
+      "image_url": "/people/wrestler/male/08.png"
+    },
+    {
+      "id": "wrestler-male-009",
+      "name": "Isaac Cross",
+      "dob": "1986-11-20",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 7495,
+        "per_match_salary": 1349,
+        "additional_bonus": 2398
+      },
+      "popularity": 41,
+      "has_money_amount": 103471,
+      "wrestling_ability": {
+        "strength": 68,
+        "technics": 49,
+        "high_fly_ability": 68,
+        "leg_stamina": 83,
+        "body_stamina": 52,
+        "head_stamina": 51
+      },
+      "signature_moves": [
+        "Tilt-a-Whirl Slam",
+        "Dragon Screw"
+      ],
+      "finisher_moves": [
+        "Cyclone Kick"
+      ],
+      "image_url": "/people/wrestler/male/09.png"
+    },
+    {
+      "id": "wrestler-male-010",
+      "name": "Jasper Monroe",
+      "dob": "1991-09-27",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 12301,
+        "per_match_salary": 2214,
+        "additional_bonus": 3936
+      },
+      "popularity": 69,
+      "has_money_amount": 8670,
+      "wrestling_ability": {
+        "strength": 78,
+        "technics": 46,
+        "high_fly_ability": 79,
+        "leg_stamina": 53,
+        "body_stamina": 75,
+        "head_stamina": 91
+      },
+      "signature_moves": [
+        "German Suplex",
+        "Suplex Driver"
+      ],
+      "finisher_moves": [
+        "Final Verdict"
+      ],
+      "image_url": "/people/wrestler/male/10.png"
+    },
+    {
+      "id": "wrestler-male-011",
+      "name": "Kai Hawk",
+      "dob": "2004-03-28",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 8863,
+        "per_match_salary": 1595,
+        "additional_bonus": 2836
+      },
+      "popularity": 55,
+      "has_money_amount": 65936,
+      "wrestling_ability": {
+        "strength": 43,
+        "technics": 39,
+        "high_fly_ability": 42,
+        "leg_stamina": 68,
+        "body_stamina": 55,
+        "head_stamina": 61
+      },
+      "signature_moves": [
+        "Running Bulldog",
+        "Flying Lariat"
+      ],
+      "finisher_moves": [
+        "Skyfall Cutter"
+      ],
+      "image_url": "/people/wrestler/male/11.png"
+    },
+    {
+      "id": "wrestler-male-012",
+      "name": "Liam Cole",
+      "dob": "2002-01-16",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 15614,
+        "per_match_salary": 2811,
+        "additional_bonus": 4996
+      },
+      "popularity": 47,
+      "has_money_amount": 88160,
+      "wrestling_ability": {
+        "strength": 61,
+        "technics": 56,
+        "high_fly_ability": 31,
+        "leg_stamina": 84,
+        "body_stamina": 96,
+        "head_stamina": 90
+      },
+      "signature_moves": [
+        "Dragon Screw",
+        "Spinebuster"
+      ],
+      "finisher_moves": [
+        "Iron Lock Driver"
+      ],
+      "image_url": "/people/wrestler/male/12.png"
+    },
+    {
+      "id": "wrestler-male-013",
+      "name": "Mason Silva",
+      "dob": "1986-12-28",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 17923,
+        "per_match_salary": 3226,
+        "additional_bonus": 5735
+      },
+      "popularity": 35,
+      "has_money_amount": 119154,
+      "wrestling_ability": {
+        "strength": 74,
+        "technics": 82,
+        "high_fly_ability": 68,
+        "leg_stamina": 92,
+        "body_stamina": 53,
+        "head_stamina": 85
+      },
+      "signature_moves": [
+        "Suplex Driver",
+        "Snap DDT"
+      ],
+      "finisher_moves": [
+        "Crimson Spear"
+      ],
+      "image_url": "/people/wrestler/male/13.png"
+    },
+    {
+      "id": "wrestler-male-014",
+      "name": "Noah Rhodes",
+      "dob": "1992-09-17",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 10737,
+        "per_match_salary": 1933,
+        "additional_bonus": 3436
+      },
+      "popularity": 76,
+      "has_money_amount": 191843,
+      "wrestling_ability": {
+        "strength": 53,
+        "technics": 82,
+        "high_fly_ability": 67,
+        "leg_stamina": 57,
+        "body_stamina": 80,
+        "head_stamina": 50
+      },
+      "signature_moves": [
+        "Flying Lariat",
+        "Backbreaker Combo"
+      ],
+      "finisher_moves": [
+        "Thunder Bomb"
+      ],
+      "image_url": "/people/wrestler/male/14.png"
+    },
+    {
+      "id": "wrestler-male-015",
+      "name": "Owen Knight",
+      "dob": "1998-06-27",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 11853,
+        "per_match_salary": 2134,
+        "additional_bonus": 3793
+      },
+      "popularity": 69,
+      "has_money_amount": 45775,
+      "wrestling_ability": {
+        "strength": 44,
+        "technics": 74,
+        "high_fly_ability": 30,
+        "leg_stamina": 56,
+        "body_stamina": 93,
+        "head_stamina": 65
+      },
+      "signature_moves": [
+        "Spinebuster",
+        "Step-Up Enzuigiri"
+      ],
+      "finisher_moves": [
+        "Phoenix Clash"
+      ],
+      "image_url": "/people/wrestler/male/15.png"
+    },
+    {
+      "id": "wrestler-male-016",
+      "name": "Parker Reign",
+      "dob": "2000-11-09",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 18392,
+        "per_match_salary": 3311,
+        "additional_bonus": 5885
+      },
+      "popularity": 55,
+      "has_money_amount": 155006,
+      "wrestling_ability": {
+        "strength": 91,
+        "technics": 44,
+        "high_fly_ability": 38,
+        "leg_stamina": 82,
+        "body_stamina": 74,
+        "head_stamina": 88
+      },
+      "signature_moves": [
+        "Snap DDT",
+        "Tilt-a-Whirl Slam"
+      ],
+      "finisher_moves": [
+        "Midnight Submission"
+      ],
+      "image_url": "/people/wrestler/male/16.png"
+    },
+    {
+      "id": "wrestler-male-017",
+      "name": "Quinn Frost",
+      "dob": "2000-12-24",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 6595,
+        "per_match_salary": 1187,
+        "additional_bonus": 2110
+      },
+      "popularity": 92,
+      "has_money_amount": 42468,
+      "wrestling_ability": {
+        "strength": 62,
+        "technics": 97,
+        "high_fly_ability": 48,
+        "leg_stamina": 85,
+        "body_stamina": 80,
+        "head_stamina": 72
+      },
+      "signature_moves": [
+        "Backbreaker Combo",
+        "German Suplex"
+      ],
+      "finisher_moves": [
+        "Titan Drop"
+      ],
+      "image_url": "/people/wrestler/male/17.png"
+    },
+    {
+      "id": "wrestler-male-018",
+      "name": "Ryan Drake",
+      "dob": "2001-12-28",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 15274,
+        "per_match_salary": 2749,
+        "additional_bonus": 4888
+      },
+      "popularity": 45,
+      "has_money_amount": 104818,
+      "wrestling_ability": {
+        "strength": 87,
+        "technics": 82,
+        "high_fly_ability": 92,
+        "leg_stamina": 79,
+        "body_stamina": 76,
+        "head_stamina": 54
+      },
+      "signature_moves": [
+        "Step-Up Enzuigiri",
+        "Running Bulldog"
+      ],
+      "finisher_moves": [
+        "Royal Knee"
+      ],
+      "image_url": "/people/wrestler/male/18.png"
+    },
+    {
+      "id": "wrestler-male-019",
+      "name": "Sawyer Stone",
+      "dob": "2000-09-28",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 11779,
+        "per_match_salary": 2120,
+        "additional_bonus": 3769
+      },
+      "popularity": 56,
+      "has_money_amount": 155952,
+      "wrestling_ability": {
+        "strength": 88,
+        "technics": 84,
+        "high_fly_ability": 51,
+        "leg_stamina": 69,
+        "body_stamina": 75,
+        "head_stamina": 78
+      },
+      "signature_moves": [
+        "Tilt-a-Whirl Slam",
+        "Dragon Screw"
+      ],
+      "finisher_moves": [
+        "Cyclone Kick"
+      ],
+      "image_url": "/people/wrestler/male/19.png"
+    },
+    {
+      "id": "wrestler-male-020",
+      "name": "Tyler Mills",
+      "dob": "1986-02-22",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 15120,
+        "per_match_salary": 2722,
+        "additional_bonus": 4838
+      },
+      "popularity": 95,
+      "has_money_amount": 142936,
+      "wrestling_ability": {
+        "strength": 94,
+        "technics": 71,
+        "high_fly_ability": 47,
+        "leg_stamina": 70,
+        "body_stamina": 58,
+        "head_stamina": 74
+      },
+      "signature_moves": [
+        "German Suplex",
+        "Suplex Driver"
+      ],
+      "finisher_moves": [
+        "Final Verdict"
+      ],
+      "image_url": "/people/wrestler/male/20.png"
+    },
+    {
+      "id": "wrestler-male-021",
+      "name": "Umar Storm",
+      "dob": "1993-01-06",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 4978,
+        "per_match_salary": 896,
+        "additional_bonus": 1593
+      },
+      "popularity": 61,
+      "has_money_amount": 52292,
+      "wrestling_ability": {
+        "strength": 90,
+        "technics": 93,
+        "high_fly_ability": 53,
+        "leg_stamina": 60,
+        "body_stamina": 51,
+        "head_stamina": 79
+      },
+      "signature_moves": [
+        "Running Bulldog",
+        "Flying Lariat"
+      ],
+      "finisher_moves": [
+        "Skyfall Cutter"
+      ],
+      "image_url": "/people/wrestler/male/21.png"
+    },
+    {
+      "id": "wrestler-male-022",
+      "name": "Victor Steele",
+      "dob": "1985-01-27",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 17486,
+        "per_match_salary": 3147,
+        "additional_bonus": 5596
+      },
+      "popularity": 85,
+      "has_money_amount": 13586,
+      "wrestling_ability": {
+        "strength": 92,
+        "technics": 44,
+        "high_fly_ability": 81,
+        "leg_stamina": 48,
+        "body_stamina": 82,
+        "head_stamina": 89
+      },
+      "signature_moves": [
+        "Dragon Screw",
+        "Spinebuster"
+      ],
+      "finisher_moves": [
+        "Iron Lock Driver"
+      ],
+      "image_url": "/people/wrestler/male/22.png"
+    },
+    {
+      "id": "wrestler-male-023",
+      "name": "Wyatt Vale",
+      "dob": "1987-07-18",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 4031,
+        "per_match_salary": 726,
+        "additional_bonus": 1290
+      },
+      "popularity": 87,
+      "has_money_amount": 66141,
+      "wrestling_ability": {
+        "strength": 61,
+        "technics": 52,
+        "high_fly_ability": 33,
+        "leg_stamina": 69,
+        "body_stamina": 83,
+        "head_stamina": 87
+      },
+      "signature_moves": [
+        "Suplex Driver",
+        "Snap DDT"
+      ],
+      "finisher_moves": [
+        "Crimson Spear"
+      ],
+      "image_url": "/people/wrestler/male/23.png"
+    },
+    {
+      "id": "wrestler-male-024",
+      "name": "Xander Mercer",
+      "dob": "2004-08-10",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 6850,
+        "per_match_salary": 1233,
+        "additional_bonus": 2192
+      },
+      "popularity": 84,
+      "has_money_amount": 89783,
+      "wrestling_ability": {
+        "strength": 77,
+        "technics": 55,
+        "high_fly_ability": 88,
+        "leg_stamina": 83,
+        "body_stamina": 90,
+        "head_stamina": 45
+      },
+      "signature_moves": [
+        "Flying Lariat",
+        "Backbreaker Combo"
+      ],
+      "finisher_moves": [
+        "Thunder Bomb"
+      ],
+      "image_url": "/people/wrestler/male/24.png"
+    },
+    {
+      "id": "wrestler-male-025",
+      "name": "Yusuf Santos",
+      "dob": "1989-06-25",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 11975,
+        "per_match_salary": 2156,
+        "additional_bonus": 3832
+      },
+      "popularity": 42,
+      "has_money_amount": 192311,
+      "wrestling_ability": {
+        "strength": 65,
+        "technics": 41,
+        "high_fly_ability": 82,
+        "leg_stamina": 48,
+        "body_stamina": 59,
+        "head_stamina": 54
+      },
+      "signature_moves": [
+        "Spinebuster",
+        "Step-Up Enzuigiri"
+      ],
+      "finisher_moves": [
+        "Phoenix Clash"
+      ],
+      "image_url": "/people/wrestler/male/25.png"
+    },
+    {
+      "id": "wrestler-male-026",
+      "name": "Zane Khan",
+      "dob": "1990-08-11",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 17600,
+        "per_match_salary": 3168,
+        "additional_bonus": 5632
+      },
+      "popularity": 53,
+      "has_money_amount": 14778,
+      "wrestling_ability": {
+        "strength": 66,
+        "technics": 70,
+        "high_fly_ability": 76,
+        "leg_stamina": 90,
+        "body_stamina": 86,
+        "head_stamina": 51
+      },
+      "signature_moves": [
+        "Snap DDT",
+        "Tilt-a-Whirl Slam"
+      ],
+      "finisher_moves": [
+        "Midnight Submission"
+      ],
+      "image_url": "/people/wrestler/male/26.png"
+    },
+    {
+      "id": "wrestler-male-027",
+      "name": "Aiden Brooks",
+      "dob": "1993-08-12",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 16072,
+        "per_match_salary": 2893,
+        "additional_bonus": 5143
+      },
+      "popularity": 68,
+      "has_money_amount": 45161,
+      "wrestling_ability": {
+        "strength": 67,
+        "technics": 41,
+        "high_fly_ability": 90,
+        "leg_stamina": 87,
+        "body_stamina": 94,
+        "head_stamina": 79
+      },
+      "signature_moves": [
+        "Backbreaker Combo",
+        "German Suplex"
+      ],
+      "finisher_moves": [
+        "Titan Drop"
+      ],
+      "image_url": "/people/wrestler/male/27.png"
+    },
+    {
+      "id": "wrestler-male-028",
+      "name": "Blake Blaze",
+      "dob": "2004-06-01",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 6220,
+        "per_match_salary": 1120,
+        "additional_bonus": 1990
+      },
+      "popularity": 53,
+      "has_money_amount": 153351,
+      "wrestling_ability": {
+        "strength": 41,
+        "technics": 77,
+        "high_fly_ability": 85,
+        "leg_stamina": 49,
+        "body_stamina": 87,
+        "head_stamina": 53
+      },
+      "signature_moves": [
+        "Step-Up Enzuigiri",
+        "Running Bulldog"
+      ],
+      "finisher_moves": [
+        "Royal Knee"
+      ],
+      "image_url": "/people/wrestler/male/28.png"
+    },
+    {
+      "id": "wrestler-male-029",
+      "name": "Carter Cross",
+      "dob": "2000-06-21",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 10176,
+        "per_match_salary": 1832,
+        "additional_bonus": 3256
+      },
+      "popularity": 78,
+      "has_money_amount": 155328,
+      "wrestling_ability": {
+        "strength": 42,
+        "technics": 79,
+        "high_fly_ability": 50,
+        "leg_stamina": 90,
+        "body_stamina": 53,
+        "head_stamina": 67
+      },
+      "signature_moves": [
+        "Tilt-a-Whirl Slam",
+        "Dragon Screw"
+      ],
+      "finisher_moves": [
+        "Cyclone Kick"
+      ],
+      "image_url": "/people/wrestler/male/29.png"
+    },
+    {
+      "id": "wrestler-male-030",
+      "name": "Damon Monroe",
+      "dob": "1998-12-23",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 15917,
+        "per_match_salary": 2865,
+        "additional_bonus": 5093
+      },
+      "popularity": 38,
+      "has_money_amount": 209084,
+      "wrestling_ability": {
+        "strength": 77,
+        "technics": 76,
+        "high_fly_ability": 68,
+        "leg_stamina": 61,
+        "body_stamina": 92,
+        "head_stamina": 73
+      },
+      "signature_moves": [
+        "German Suplex",
+        "Suplex Driver"
+      ],
+      "finisher_moves": [
+        "Final Verdict"
+      ],
+      "image_url": "/people/wrestler/male/30.png"
+    },
+    {
+      "id": "wrestler-male-031",
+      "name": "Ethan Hawk",
+      "dob": "2002-06-02",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 3039,
+        "per_match_salary": 547,
+        "additional_bonus": 972
+      },
+      "popularity": 49,
+      "has_money_amount": 174925,
+      "wrestling_ability": {
+        "strength": 62,
+        "technics": 61,
+        "high_fly_ability": 63,
+        "leg_stamina": 52,
+        "body_stamina": 63,
+        "head_stamina": 61
+      },
+      "signature_moves": [
+        "Running Bulldog",
+        "Flying Lariat"
+      ],
+      "finisher_moves": [
+        "Skyfall Cutter"
+      ],
+      "image_url": "/people/wrestler/male/01.png"
+    },
+    {
+      "id": "wrestler-male-032",
+      "name": "Felix Cole",
+      "dob": "1984-02-20",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 8758,
+        "per_match_salary": 1576,
+        "additional_bonus": 2803
+      },
+      "popularity": 63,
+      "has_money_amount": 82781,
+      "wrestling_ability": {
+        "strength": 73,
+        "technics": 58,
+        "high_fly_ability": 30,
+        "leg_stamina": 73,
+        "body_stamina": 56,
+        "head_stamina": 55
+      },
+      "signature_moves": [
+        "Dragon Screw",
+        "Spinebuster"
+      ],
+      "finisher_moves": [
+        "Iron Lock Driver"
+      ],
+      "image_url": "/people/wrestler/male/02.png"
+    },
+    {
+      "id": "wrestler-male-033",
+      "name": "Gavin Silva",
+      "dob": "2001-11-06",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 19139,
+        "per_match_salary": 3445,
+        "additional_bonus": 6124
+      },
+      "popularity": 89,
+      "has_money_amount": 30505,
+      "wrestling_ability": {
+        "strength": 45,
+        "technics": 47,
+        "high_fly_ability": 32,
+        "leg_stamina": 77,
+        "body_stamina": 67,
+        "head_stamina": 64
+      },
+      "signature_moves": [
+        "Suplex Driver",
+        "Snap DDT"
+      ],
+      "finisher_moves": [
+        "Crimson Spear"
+      ],
+      "image_url": "/people/wrestler/male/03.png"
+    },
+    {
+      "id": "wrestler-male-034",
+      "name": "Hayden Rhodes",
+      "dob": "1989-10-05",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 7284,
+        "per_match_salary": 1311,
+        "additional_bonus": 2331
+      },
+      "popularity": 71,
+      "has_money_amount": 115683,
+      "wrestling_ability": {
+        "strength": 98,
+        "technics": 61,
+        "high_fly_ability": 89,
+        "leg_stamina": 92,
+        "body_stamina": 52,
+        "head_stamina": 76
+      },
+      "signature_moves": [
+        "Flying Lariat",
+        "Backbreaker Combo"
+      ],
+      "finisher_moves": [
+        "Thunder Bomb"
+      ],
+      "image_url": "/people/wrestler/male/04.png"
+    },
+    {
+      "id": "wrestler-male-035",
+      "name": "Isaac Knight",
+      "dob": "1985-07-15",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 4507,
+        "per_match_salary": 811,
+        "additional_bonus": 1442
+      },
+      "popularity": 56,
+      "has_money_amount": 20682,
+      "wrestling_ability": {
+        "strength": 75,
+        "technics": 46,
+        "high_fly_ability": 91,
+        "leg_stamina": 84,
+        "body_stamina": 78,
+        "head_stamina": 49
+      },
+      "signature_moves": [
+        "Spinebuster",
+        "Step-Up Enzuigiri"
+      ],
+      "finisher_moves": [
+        "Phoenix Clash"
+      ],
+      "image_url": "/people/wrestler/male/05.png"
+    },
+    {
+      "id": "wrestler-male-036",
+      "name": "Jasper Reign",
+      "dob": "1989-02-17",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 18036,
+        "per_match_salary": 3246,
+        "additional_bonus": 5772
+      },
+      "popularity": 45,
+      "has_money_amount": 56361,
+      "wrestling_ability": {
+        "strength": 60,
+        "technics": 85,
+        "high_fly_ability": 77,
+        "leg_stamina": 93,
+        "body_stamina": 73,
+        "head_stamina": 60
+      },
+      "signature_moves": [
+        "Snap DDT",
+        "Tilt-a-Whirl Slam"
+      ],
+      "finisher_moves": [
+        "Midnight Submission"
+      ],
+      "image_url": "/people/wrestler/male/06.png"
+    },
+    {
+      "id": "wrestler-male-037",
+      "name": "Kai Frost",
+      "dob": "2004-04-09",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 19204,
+        "per_match_salary": 3457,
+        "additional_bonus": 6145
+      },
+      "popularity": 47,
+      "has_money_amount": 145242,
+      "wrestling_ability": {
+        "strength": 64,
+        "technics": 62,
+        "high_fly_ability": 81,
+        "leg_stamina": 89,
+        "body_stamina": 79,
+        "head_stamina": 46
+      },
+      "signature_moves": [
+        "Backbreaker Combo",
+        "German Suplex"
+      ],
+      "finisher_moves": [
+        "Titan Drop"
+      ],
+      "image_url": "/people/wrestler/male/07.png"
+    },
+    {
+      "id": "wrestler-male-038",
+      "name": "Liam Drake",
+      "dob": "1984-09-24",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 18762,
+        "per_match_salary": 3377,
+        "additional_bonus": 6004
+      },
+      "popularity": 46,
+      "has_money_amount": 110416,
+      "wrestling_ability": {
+        "strength": 66,
+        "technics": 83,
+        "high_fly_ability": 76,
+        "leg_stamina": 57,
+        "body_stamina": 68,
+        "head_stamina": 56
+      },
+      "signature_moves": [
+        "Step-Up Enzuigiri",
+        "Running Bulldog"
+      ],
+      "finisher_moves": [
+        "Royal Knee"
+      ],
+      "image_url": "/people/wrestler/male/08.png"
+    },
+    {
+      "id": "wrestler-male-039",
+      "name": "Mason Stone",
+      "dob": "1990-06-24",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 3782,
+        "per_match_salary": 681,
+        "additional_bonus": 1210
+      },
+      "popularity": 44,
+      "has_money_amount": 161878,
+      "wrestling_ability": {
+        "strength": 70,
+        "technics": 70,
+        "high_fly_ability": 32,
+        "leg_stamina": 72,
+        "body_stamina": 64,
+        "head_stamina": 77
+      },
+      "signature_moves": [
+        "Tilt-a-Whirl Slam",
+        "Dragon Screw"
+      ],
+      "finisher_moves": [
+        "Cyclone Kick"
+      ],
+      "image_url": "/people/wrestler/male/09.png"
+    },
+    {
+      "id": "wrestler-male-040",
+      "name": "Noah Mills",
+      "dob": "1991-09-12",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 18002,
+        "per_match_salary": 3240,
+        "additional_bonus": 5761
+      },
+      "popularity": 58,
+      "has_money_amount": 6926,
+      "wrestling_ability": {
+        "strength": 96,
+        "technics": 49,
+        "high_fly_ability": 90,
+        "leg_stamina": 77,
+        "body_stamina": 69,
+        "head_stamina": 56
+      },
+      "signature_moves": [
+        "German Suplex",
+        "Suplex Driver"
+      ],
+      "finisher_moves": [
+        "Final Verdict"
+      ],
+      "image_url": "/people/wrestler/male/10.png"
+    },
+    {
+      "id": "wrestler-male-041",
+      "name": "Owen Storm",
+      "dob": "1997-07-23",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 17217,
+        "per_match_salary": 3099,
+        "additional_bonus": 5509
+      },
+      "popularity": 76,
+      "has_money_amount": 98350,
+      "wrestling_ability": {
+        "strength": 81,
+        "technics": 94,
+        "high_fly_ability": 93,
+        "leg_stamina": 67,
+        "body_stamina": 60,
+        "head_stamina": 61
+      },
+      "signature_moves": [
+        "Running Bulldog",
+        "Flying Lariat"
+      ],
+      "finisher_moves": [
+        "Skyfall Cutter"
+      ],
+      "image_url": "/people/wrestler/male/11.png"
+    },
+    {
+      "id": "wrestler-male-042",
+      "name": "Parker Steele",
+      "dob": "2001-03-28",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 16223,
+        "per_match_salary": 2920,
+        "additional_bonus": 5191
+      },
+      "popularity": 81,
+      "has_money_amount": 186448,
+      "wrestling_ability": {
+        "strength": 54,
+        "technics": 90,
+        "high_fly_ability": 94,
+        "leg_stamina": 66,
+        "body_stamina": 76,
+        "head_stamina": 49
+      },
+      "signature_moves": [
+        "Dragon Screw",
+        "Spinebuster"
+      ],
+      "finisher_moves": [
+        "Iron Lock Driver"
+      ],
+      "image_url": "/people/wrestler/male/12.png"
+    },
+    {
+      "id": "wrestler-male-043",
+      "name": "Quinn Vale",
+      "dob": "1994-01-25",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 10884,
+        "per_match_salary": 1959,
+        "additional_bonus": 3483
+      },
+      "popularity": 57,
+      "has_money_amount": 79727,
+      "wrestling_ability": {
+        "strength": 90,
+        "technics": 61,
+        "high_fly_ability": 33,
+        "leg_stamina": 92,
+        "body_stamina": 95,
+        "head_stamina": 53
+      },
+      "signature_moves": [
+        "Suplex Driver",
+        "Snap DDT"
+      ],
+      "finisher_moves": [
+        "Crimson Spear"
+      ],
+      "image_url": "/people/wrestler/male/13.png"
+    },
+    {
+      "id": "wrestler-male-044",
+      "name": "Ryan Mercer",
+      "dob": "1990-02-14",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 15954,
+        "per_match_salary": 2872,
+        "additional_bonus": 5105
+      },
+      "popularity": 37,
+      "has_money_amount": 10273,
+      "wrestling_ability": {
+        "strength": 95,
+        "technics": 55,
+        "high_fly_ability": 81,
+        "leg_stamina": 76,
+        "body_stamina": 78,
+        "head_stamina": 83
+      },
+      "signature_moves": [
+        "Flying Lariat",
+        "Backbreaker Combo"
+      ],
+      "finisher_moves": [
+        "Thunder Bomb"
+      ],
+      "image_url": "/people/wrestler/male/14.png"
+    },
+    {
+      "id": "wrestler-male-045",
+      "name": "Sawyer Santos",
+      "dob": "1999-05-07",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 9954,
+        "per_match_salary": 1792,
+        "additional_bonus": 3185
+      },
+      "popularity": 64,
+      "has_money_amount": 60370,
+      "wrestling_ability": {
+        "strength": 67,
+        "technics": 81,
+        "high_fly_ability": 89,
+        "leg_stamina": 93,
+        "body_stamina": 84,
+        "head_stamina": 76
+      },
+      "signature_moves": [
+        "Spinebuster",
+        "Step-Up Enzuigiri"
+      ],
+      "finisher_moves": [
+        "Phoenix Clash"
+      ],
+      "image_url": "/people/wrestler/male/15.png"
+    },
+    {
+      "id": "wrestler-male-046",
+      "name": "Tyler Khan",
+      "dob": "1986-02-07",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 20074,
+        "per_match_salary": 3613,
+        "additional_bonus": 6424
+      },
+      "popularity": 69,
+      "has_money_amount": 202297,
+      "wrestling_ability": {
+        "strength": 51,
+        "technics": 85,
+        "high_fly_ability": 30,
+        "leg_stamina": 85,
+        "body_stamina": 55,
+        "head_stamina": 84
+      },
+      "signature_moves": [
+        "Snap DDT",
+        "Tilt-a-Whirl Slam"
+      ],
+      "finisher_moves": [
+        "Midnight Submission"
+      ],
+      "image_url": "/people/wrestler/male/16.png"
+    },
+    {
+      "id": "wrestler-male-047",
+      "name": "Umar Brooks",
+      "dob": "1985-06-13",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 15321,
+        "per_match_salary": 2758,
+        "additional_bonus": 4903
+      },
+      "popularity": 53,
+      "has_money_amount": 127849,
+      "wrestling_ability": {
+        "strength": 64,
+        "technics": 44,
+        "high_fly_ability": 63,
+        "leg_stamina": 59,
+        "body_stamina": 84,
+        "head_stamina": 58
+      },
+      "signature_moves": [
+        "Backbreaker Combo",
+        "German Suplex"
+      ],
+      "finisher_moves": [
+        "Titan Drop"
+      ],
+      "image_url": "/people/wrestler/male/17.png"
+    },
+    {
+      "id": "wrestler-male-048",
+      "name": "Victor Blaze",
+      "dob": "2005-09-11",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 20323,
+        "per_match_salary": 3658,
+        "additional_bonus": 6503
+      },
+      "popularity": 67,
+      "has_money_amount": 189250,
+      "wrestling_ability": {
+        "strength": 93,
+        "technics": 88,
+        "high_fly_ability": 60,
+        "leg_stamina": 84,
+        "body_stamina": 62,
+        "head_stamina": 88
+      },
+      "signature_moves": [
+        "Step-Up Enzuigiri",
+        "Running Bulldog"
+      ],
+      "finisher_moves": [
+        "Royal Knee"
+      ],
+      "image_url": "/people/wrestler/male/18.png"
+    },
+    {
+      "id": "wrestler-male-049",
+      "name": "Wyatt Cross",
+      "dob": "1985-09-19",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 6620,
+        "per_match_salary": 1192,
+        "additional_bonus": 2118
+      },
+      "popularity": 65,
+      "has_money_amount": 97280,
+      "wrestling_ability": {
+        "strength": 92,
+        "technics": 58,
+        "high_fly_ability": 39,
+        "leg_stamina": 84,
+        "body_stamina": 57,
+        "head_stamina": 79
+      },
+      "signature_moves": [
+        "Tilt-a-Whirl Slam",
+        "Dragon Screw"
+      ],
+      "finisher_moves": [
+        "Cyclone Kick"
+      ],
+      "image_url": "/people/wrestler/male/19.png"
+    },
+    {
+      "id": "wrestler-male-050",
+      "name": "Xander Monroe",
+      "dob": "2005-07-02",
+      "gender": "male",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 10383,
+        "per_match_salary": 1869,
+        "additional_bonus": 3323
+      },
+      "popularity": 87,
+      "has_money_amount": 84545,
+      "wrestling_ability": {
+        "strength": 88,
+        "technics": 51,
+        "high_fly_ability": 62,
+        "leg_stamina": 68,
+        "body_stamina": 59,
+        "head_stamina": 61
+      },
+      "signature_moves": [
+        "German Suplex",
+        "Suplex Driver"
+      ],
+      "finisher_moves": [
+        "Final Verdict"
+      ],
+      "image_url": "/people/wrestler/male/20.png"
+    },
+    {
+      "id": "wrestler-female-001",
+      "name": "Ava Storm",
+      "dob": "1984-07-23",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 9799,
+        "per_match_salary": 1764,
+        "additional_bonus": 3136
+      },
+      "popularity": 47,
+      "has_money_amount": 28467,
+      "wrestling_ability": {
+        "strength": 60,
+        "technics": 49,
+        "high_fly_ability": 93,
+        "leg_stamina": 93,
+        "body_stamina": 72,
+        "head_stamina": 52
+      },
+      "signature_moves": [
+        "Running Bulldog",
+        "Flying Lariat"
+      ],
+      "finisher_moves": [
+        "Skyfall Cutter"
+      ],
+      "image_url": "/people/wrestler/female/01.png"
+    },
+    {
+      "id": "wrestler-female-002",
+      "name": "Bianca Steele",
+      "dob": "1985-02-07",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 8773,
+        "per_match_salary": 1579,
+        "additional_bonus": 2807
+      },
+      "popularity": 73,
+      "has_money_amount": 181034,
+      "wrestling_ability": {
+        "strength": 44,
+        "technics": 94,
+        "high_fly_ability": 86,
+        "leg_stamina": 55,
+        "body_stamina": 68,
+        "head_stamina": 70
+      },
+      "signature_moves": [
+        "Dragon Screw",
+        "Spinebuster"
+      ],
+      "finisher_moves": [
+        "Iron Lock Driver"
+      ],
+      "image_url": "/people/wrestler/female/02.png"
+    },
+    {
+      "id": "wrestler-female-003",
+      "name": "Chloe Vale",
+      "dob": "1986-05-18",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 6456,
+        "per_match_salary": 1162,
+        "additional_bonus": 2066
+      },
+      "popularity": 41,
+      "has_money_amount": 201882,
+      "wrestling_ability": {
+        "strength": 77,
+        "technics": 39,
+        "high_fly_ability": 42,
+        "leg_stamina": 82,
+        "body_stamina": 87,
+        "head_stamina": 58
+      },
+      "signature_moves": [
+        "Suplex Driver",
+        "Snap DDT"
+      ],
+      "finisher_moves": [
+        "Crimson Spear"
+      ],
+      "image_url": "/people/wrestler/female/03.png"
+    },
+    {
+      "id": "wrestler-female-004",
+      "name": "Diana Mercer",
+      "dob": "1992-03-23",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 11793,
+        "per_match_salary": 2123,
+        "additional_bonus": 3774
+      },
+      "popularity": 87,
+      "has_money_amount": 15642,
+      "wrestling_ability": {
+        "strength": 97,
+        "technics": 65,
+        "high_fly_ability": 75,
+        "leg_stamina": 93,
+        "body_stamina": 68,
+        "head_stamina": 62
+      },
+      "signature_moves": [
+        "Flying Lariat",
+        "Backbreaker Combo"
+      ],
+      "finisher_moves": [
+        "Thunder Bomb"
+      ],
+      "image_url": "/people/wrestler/female/04.png"
+    },
+    {
+      "id": "wrestler-female-005",
+      "name": "Eva Santos",
+      "dob": "2002-04-02",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 17276,
+        "per_match_salary": 3110,
+        "additional_bonus": 5528
+      },
+      "popularity": 52,
+      "has_money_amount": 82642,
+      "wrestling_ability": {
+        "strength": 83,
+        "technics": 53,
+        "high_fly_ability": 75,
+        "leg_stamina": 93,
+        "body_stamina": 83,
+        "head_stamina": 57
+      },
+      "signature_moves": [
+        "Spinebuster",
+        "Step-Up Enzuigiri"
+      ],
+      "finisher_moves": [
+        "Phoenix Clash"
+      ],
+      "image_url": "/people/wrestler/female/05.png"
+    },
+    {
+      "id": "wrestler-female-006",
+      "name": "Freya Khan",
+      "dob": "1986-12-05",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 5207,
+        "per_match_salary": 937,
+        "additional_bonus": 1666
+      },
+      "popularity": 68,
+      "has_money_amount": 25102,
+      "wrestling_ability": {
+        "strength": 44,
+        "technics": 56,
+        "high_fly_ability": 92,
+        "leg_stamina": 60,
+        "body_stamina": 88,
+        "head_stamina": 63
+      },
+      "signature_moves": [
+        "Snap DDT",
+        "Tilt-a-Whirl Slam"
+      ],
+      "finisher_moves": [
+        "Midnight Submission"
+      ],
+      "image_url": "/people/wrestler/female/06.png"
+    },
+    {
+      "id": "wrestler-female-007",
+      "name": "Grace Brooks",
+      "dob": "2004-04-25",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 6276,
+        "per_match_salary": 1130,
+        "additional_bonus": 2008
+      },
+      "popularity": 59,
+      "has_money_amount": 193022,
+      "wrestling_ability": {
+        "strength": 47,
+        "technics": 63,
+        "high_fly_ability": 31,
+        "leg_stamina": 68,
+        "body_stamina": 60,
+        "head_stamina": 62
+      },
+      "signature_moves": [
+        "Backbreaker Combo",
+        "German Suplex"
+      ],
+      "finisher_moves": [
+        "Titan Drop"
+      ],
+      "image_url": "/people/wrestler/female/07.png"
+    },
+    {
+      "id": "wrestler-female-008",
+      "name": "Hana Blaze",
+      "dob": "1999-09-18",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 8828,
+        "per_match_salary": 1589,
+        "additional_bonus": 2825
+      },
+      "popularity": 60,
+      "has_money_amount": 18597,
+      "wrestling_ability": {
+        "strength": 50,
+        "technics": 76,
+        "high_fly_ability": 45,
+        "leg_stamina": 61,
+        "body_stamina": 74,
+        "head_stamina": 67
+      },
+      "signature_moves": [
+        "Step-Up Enzuigiri",
+        "Running Bulldog"
+      ],
+      "finisher_moves": [
+        "Royal Knee"
+      ],
+      "image_url": "/people/wrestler/female/08.png"
+    },
+    {
+      "id": "wrestler-female-009",
+      "name": "Isla Cross",
+      "dob": "1997-03-02",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 12418,
+        "per_match_salary": 2235,
+        "additional_bonus": 3974
+      },
+      "popularity": 83,
+      "has_money_amount": 202627,
+      "wrestling_ability": {
+        "strength": 83,
+        "technics": 52,
+        "high_fly_ability": 50,
+        "leg_stamina": 71,
+        "body_stamina": 53,
+        "head_stamina": 52
+      },
+      "signature_moves": [
+        "Tilt-a-Whirl Slam",
+        "Dragon Screw"
+      ],
+      "finisher_moves": [
+        "Cyclone Kick"
+      ],
+      "image_url": "/people/wrestler/female/09.png"
+    },
+    {
+      "id": "wrestler-female-010",
+      "name": "Jade Monroe",
+      "dob": "1985-11-01",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 9675,
+        "per_match_salary": 1742,
+        "additional_bonus": 3096
+      },
+      "popularity": 56,
+      "has_money_amount": 51881,
+      "wrestling_ability": {
+        "strength": 44,
+        "technics": 63,
+        "high_fly_ability": 75,
+        "leg_stamina": 49,
+        "body_stamina": 57,
+        "head_stamina": 79
+      },
+      "signature_moves": [
+        "German Suplex",
+        "Suplex Driver"
+      ],
+      "finisher_moves": [
+        "Final Verdict"
+      ],
+      "image_url": "/people/wrestler/female/10.png"
+    },
+    {
+      "id": "wrestler-female-011",
+      "name": "Kiara Hawk",
+      "dob": "1987-02-09",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 18798,
+        "per_match_salary": 3384,
+        "additional_bonus": 6015
+      },
+      "popularity": 42,
+      "has_money_amount": 35822,
+      "wrestling_ability": {
+        "strength": 66,
+        "technics": 49,
+        "high_fly_ability": 75,
+        "leg_stamina": 83,
+        "body_stamina": 56,
+        "head_stamina": 80
+      },
+      "signature_moves": [
+        "Running Bulldog",
+        "Flying Lariat"
+      ],
+      "finisher_moves": [
+        "Skyfall Cutter"
+      ],
+      "image_url": "/people/wrestler/female/11.png"
+    },
+    {
+      "id": "wrestler-female-012",
+      "name": "Luna Cole",
+      "dob": "1990-08-14",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 17776,
+        "per_match_salary": 3200,
+        "additional_bonus": 5688
+      },
+      "popularity": 57,
+      "has_money_amount": 124914,
+      "wrestling_ability": {
+        "strength": 76,
+        "technics": 63,
+        "high_fly_ability": 51,
+        "leg_stamina": 91,
+        "body_stamina": 59,
+        "head_stamina": 53
+      },
+      "signature_moves": [
+        "Dragon Screw",
+        "Spinebuster"
+      ],
+      "finisher_moves": [
+        "Iron Lock Driver"
+      ],
+      "image_url": "/people/wrestler/female/12.png"
+    },
+    {
+      "id": "wrestler-female-013",
+      "name": "Maya Silva",
+      "dob": "1995-07-06",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 16590,
+        "per_match_salary": 2986,
+        "additional_bonus": 5309
+      },
+      "popularity": 70,
+      "has_money_amount": 177590,
+      "wrestling_ability": {
+        "strength": 59,
+        "technics": 75,
+        "high_fly_ability": 33,
+        "leg_stamina": 58,
+        "body_stamina": 55,
+        "head_stamina": 68
+      },
+      "signature_moves": [
+        "Suplex Driver",
+        "Snap DDT"
+      ],
+      "finisher_moves": [
+        "Crimson Spear"
+      ],
+      "image_url": "/people/wrestler/female/13.png"
+    },
+    {
+      "id": "wrestler-female-014",
+      "name": "Nora Rhodes",
+      "dob": "1994-02-26",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 8105,
+        "per_match_salary": 1459,
+        "additional_bonus": 2594
+      },
+      "popularity": 90,
+      "has_money_amount": 38571,
+      "wrestling_ability": {
+        "strength": 49,
+        "technics": 52,
+        "high_fly_ability": 47,
+        "leg_stamina": 62,
+        "body_stamina": 52,
+        "head_stamina": 66
+      },
+      "signature_moves": [
+        "Flying Lariat",
+        "Backbreaker Combo"
+      ],
+      "finisher_moves": [
+        "Thunder Bomb"
+      ],
+      "image_url": "/people/wrestler/female/14.png"
+    },
+    {
+      "id": "wrestler-female-015",
+      "name": "Olivia Knight",
+      "dob": "1997-01-04",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 13972,
+        "per_match_salary": 2515,
+        "additional_bonus": 4471
+      },
+      "popularity": 61,
+      "has_money_amount": 213578,
+      "wrestling_ability": {
+        "strength": 91,
+        "technics": 83,
+        "high_fly_ability": 32,
+        "leg_stamina": 66,
+        "body_stamina": 81,
+        "head_stamina": 78
+      },
+      "signature_moves": [
+        "Spinebuster",
+        "Step-Up Enzuigiri"
+      ],
+      "finisher_moves": [
+        "Phoenix Clash"
+      ],
+      "image_url": "/people/wrestler/female/15.png"
+    },
+    {
+      "id": "wrestler-female-016",
+      "name": "Priya Reign",
+      "dob": "2002-12-03",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 11226,
+        "per_match_salary": 2021,
+        "additional_bonus": 3592
+      },
+      "popularity": 58,
+      "has_money_amount": 203275,
+      "wrestling_ability": {
+        "strength": 78,
+        "technics": 59,
+        "high_fly_ability": 47,
+        "leg_stamina": 84,
+        "body_stamina": 50,
+        "head_stamina": 86
+      },
+      "signature_moves": [
+        "Snap DDT",
+        "Tilt-a-Whirl Slam"
+      ],
+      "finisher_moves": [
+        "Midnight Submission"
+      ],
+      "image_url": "/people/wrestler/female/16.png"
+    },
+    {
+      "id": "wrestler-female-017",
+      "name": "Queenie Frost",
+      "dob": "2005-10-24",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 13105,
+        "per_match_salary": 2359,
+        "additional_bonus": 4194
+      },
+      "popularity": 67,
+      "has_money_amount": 215038,
+      "wrestling_ability": {
+        "strength": 58,
+        "technics": 65,
+        "high_fly_ability": 56,
+        "leg_stamina": 65,
+        "body_stamina": 68,
+        "head_stamina": 59
+      },
+      "signature_moves": [
+        "Backbreaker Combo",
+        "German Suplex"
+      ],
+      "finisher_moves": [
+        "Titan Drop"
+      ],
+      "image_url": "/people/wrestler/female/17.png"
+    },
+    {
+      "id": "wrestler-female-018",
+      "name": "Rhea Drake",
+      "dob": "1997-09-18",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 6990,
+        "per_match_salary": 1258,
+        "additional_bonus": 2237
+      },
+      "popularity": 44,
+      "has_money_amount": 135096,
+      "wrestling_ability": {
+        "strength": 50,
+        "technics": 82,
+        "high_fly_ability": 53,
+        "leg_stamina": 63,
+        "body_stamina": 83,
+        "head_stamina": 87
+      },
+      "signature_moves": [
+        "Step-Up Enzuigiri",
+        "Running Bulldog"
+      ],
+      "finisher_moves": [
+        "Royal Knee"
+      ],
+      "image_url": "/people/wrestler/female/18.png"
+    },
+    {
+      "id": "wrestler-female-019",
+      "name": "Sara Stone",
+      "dob": "1996-05-19",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 18843,
+        "per_match_salary": 3392,
+        "additional_bonus": 6030
+      },
+      "popularity": 46,
+      "has_money_amount": 120725,
+      "wrestling_ability": {
+        "strength": 73,
+        "technics": 77,
+        "high_fly_ability": 45,
+        "leg_stamina": 75,
+        "body_stamina": 51,
+        "head_stamina": 54
+      },
+      "signature_moves": [
+        "Tilt-a-Whirl Slam",
+        "Dragon Screw"
+      ],
+      "finisher_moves": [
+        "Cyclone Kick"
+      ],
+      "image_url": "/people/wrestler/female/19.png"
+    },
+    {
+      "id": "wrestler-female-020",
+      "name": "Tessa Mills",
+      "dob": "1995-02-20",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 12070,
+        "per_match_salary": 2173,
+        "additional_bonus": 3862
+      },
+      "popularity": 95,
+      "has_money_amount": 56085,
+      "wrestling_ability": {
+        "strength": 91,
+        "technics": 92,
+        "high_fly_ability": 85,
+        "leg_stamina": 68,
+        "body_stamina": 50,
+        "head_stamina": 45
+      },
+      "signature_moves": [
+        "German Suplex",
+        "Suplex Driver"
+      ],
+      "finisher_moves": [
+        "Final Verdict"
+      ],
+      "image_url": "/people/wrestler/female/20.png"
+    },
+    {
+      "id": "wrestler-female-021",
+      "name": "Uma Storm",
+      "dob": "1986-05-10",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 17811,
+        "per_match_salary": 3206,
+        "additional_bonus": 5700
+      },
+      "popularity": 43,
+      "has_money_amount": 161397,
+      "wrestling_ability": {
+        "strength": 53,
+        "technics": 47,
+        "high_fly_ability": 95,
+        "leg_stamina": 63,
+        "body_stamina": 68,
+        "head_stamina": 67
+      },
+      "signature_moves": [
+        "Running Bulldog",
+        "Flying Lariat"
+      ],
+      "finisher_moves": [
+        "Skyfall Cutter"
+      ],
+      "image_url": "/people/wrestler/female/21.png"
+    },
+    {
+      "id": "wrestler-female-022",
+      "name": "Vera Steele",
+      "dob": "1989-12-27",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 16486,
+        "per_match_salary": 2967,
+        "additional_bonus": 5276
+      },
+      "popularity": 45,
+      "has_money_amount": 21799,
+      "wrestling_ability": {
+        "strength": 69,
+        "technics": 88,
+        "high_fly_ability": 95,
+        "leg_stamina": 86,
+        "body_stamina": 74,
+        "head_stamina": 63
+      },
+      "signature_moves": [
+        "Dragon Screw",
+        "Spinebuster"
+      ],
+      "finisher_moves": [
+        "Iron Lock Driver"
+      ],
+      "image_url": "/people/wrestler/female/22.png"
+    },
+    {
+      "id": "wrestler-female-023",
+      "name": "Willow Vale",
+      "dob": "2001-10-09",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 14248,
+        "per_match_salary": 2565,
+        "additional_bonus": 4559
+      },
+      "popularity": 80,
+      "has_money_amount": 95293,
+      "wrestling_ability": {
+        "strength": 89,
+        "technics": 75,
+        "high_fly_ability": 97,
+        "leg_stamina": 56,
+        "body_stamina": 62,
+        "head_stamina": 85
+      },
+      "signature_moves": [
+        "Suplex Driver",
+        "Snap DDT"
+      ],
+      "finisher_moves": [
+        "Crimson Spear"
+      ],
+      "image_url": "/people/wrestler/female/23.png"
+    },
+    {
+      "id": "wrestler-female-024",
+      "name": "Xena Mercer",
+      "dob": "1988-09-18",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 17598,
+        "per_match_salary": 3168,
+        "additional_bonus": 5631
+      },
+      "popularity": 44,
+      "has_money_amount": 11291,
+      "wrestling_ability": {
+        "strength": 71,
+        "technics": 61,
+        "high_fly_ability": 65,
+        "leg_stamina": 52,
+        "body_stamina": 91,
+        "head_stamina": 70
+      },
+      "signature_moves": [
+        "Flying Lariat",
+        "Backbreaker Combo"
+      ],
+      "finisher_moves": [
+        "Thunder Bomb"
+      ],
+      "image_url": "/people/wrestler/female/24.png"
+    },
+    {
+      "id": "wrestler-female-025",
+      "name": "Yara Santos",
+      "dob": "1993-07-18",
+      "gender": "female",
+      "role": "wrestler",
+      "salary_demand": {
+        "monthly_wage": 16228,
+        "per_match_salary": 2921,
+        "additional_bonus": 5193
+      },
+      "popularity": 65,
+      "has_money_amount": 34740,
+      "wrestling_ability": {
+        "strength": 40,
+        "technics": 60,
+        "high_fly_ability": 62,
+        "leg_stamina": 80,
+        "body_stamina": 82,
+        "head_stamina": 88
+      },
+      "signature_moves": [
+        "Spinebuster",
+        "Step-Up Enzuigiri"
+      ],
+      "finisher_moves": [
+        "Phoenix Clash"
+      ],
+      "image_url": "/people/wrestler/female/25.png"
+    }
+  ],
+  "referees": [
+    {
+      "id": "referee-male-001",
+      "name": "Wyatt Storm",
+      "dob": "1993-02-28",
+      "gender": "male",
+      "role": "referee",
+      "salary_demand": {
+        "monthly_wage": 5715,
+        "per_match_salary": 1029,
+        "additional_bonus": 1829
+      },
+      "popularity": 33,
+      "has_money_amount": 40744,
+      "officiating_ability": {
+        "rule_knowledge": 90,
+        "decision_speed": 56,
+        "positioning": 77,
+        "composure": 67
+      },
+      "image_url": "/people/referee/01.png"
+    },
+    {
+      "id": "referee-male-002",
+      "name": "Xander Steele",
+      "dob": "1980-04-17",
+      "gender": "male",
+      "role": "referee",
+      "salary_demand": {
+        "monthly_wage": 4111,
+        "per_match_salary": 740,
+        "additional_bonus": 1316
+      },
+      "popularity": 50,
+      "has_money_amount": 62655,
+      "officiating_ability": {
+        "rule_knowledge": 59,
+        "decision_speed": 69,
+        "positioning": 54,
+        "composure": 65
+      },
+      "image_url": "/people/referee/02.png"
+    },
+    {
+      "id": "referee-male-003",
+      "name": "Yusuf Vale",
+      "dob": "1997-05-19",
+      "gender": "male",
+      "role": "referee",
+      "salary_demand": {
+        "monthly_wage": 7182,
+        "per_match_salary": 1293,
+        "additional_bonus": 2298
+      },
+      "popularity": 65,
+      "has_money_amount": 26544,
+      "officiating_ability": {
+        "rule_knowledge": 83,
+        "decision_speed": 68,
+        "positioning": 72,
+        "composure": 70
+      },
+      "image_url": "/people/referee/03.png"
+    },
+    {
+      "id": "referee-male-004",
+      "name": "Zane Mercer",
+      "dob": "1987-07-10",
+      "gender": "male",
+      "role": "referee",
+      "salary_demand": {
+        "monthly_wage": 4707,
+        "per_match_salary": 847,
+        "additional_bonus": 1506
+      },
+      "popularity": 31,
+      "has_money_amount": 24280,
+      "officiating_ability": {
+        "rule_knowledge": 95,
+        "decision_speed": 76,
+        "positioning": 74,
+        "composure": 71
+      },
+      "image_url": "/people/referee/04.png"
+    },
+    {
+      "id": "referee-male-005",
+      "name": "Aiden Santos",
+      "dob": "1990-03-04",
+      "gender": "male",
+      "role": "referee",
+      "salary_demand": {
+        "monthly_wage": 3267,
+        "per_match_salary": 588,
+        "additional_bonus": 1045
+      },
+      "popularity": 20,
+      "has_money_amount": 14214,
+      "officiating_ability": {
+        "rule_knowledge": 93,
+        "decision_speed": 65,
+        "positioning": 72,
+        "composure": 81
+      },
+      "image_url": "/people/referee/05.png"
+    },
+    {
+      "id": "referee-female-001",
+      "name": "Willow Storm",
+      "dob": "1996-12-09",
+      "gender": "female",
+      "role": "referee",
+      "salary_demand": {
+        "monthly_wage": 4880,
+        "per_match_salary": 878,
+        "additional_bonus": 1562
+      },
+      "popularity": 32,
+      "has_money_amount": 34847,
+      "officiating_ability": {
+        "rule_knowledge": 85,
+        "decision_speed": 64,
+        "positioning": 61,
+        "composure": 73
+      },
+      "image_url": "/people/referee/01.png"
+    },
+    {
+      "id": "referee-female-002",
+      "name": "Xena Steele",
+      "dob": "1979-10-24",
+      "gender": "female",
+      "role": "referee",
+      "salary_demand": {
+        "monthly_wage": 4790,
+        "per_match_salary": 862,
+        "additional_bonus": 1533
+      },
+      "popularity": 22,
+      "has_money_amount": 77872,
+      "officiating_ability": {
+        "rule_knowledge": 95,
+        "decision_speed": 74,
+        "positioning": 79,
+        "composure": 96
+      },
+      "image_url": "/people/referee/02.png"
+    },
+    {
+      "id": "referee-female-003",
+      "name": "Yara Vale",
+      "dob": "1999-05-02",
+      "gender": "female",
+      "role": "referee",
+      "salary_demand": {
+        "monthly_wage": 8479,
+        "per_match_salary": 1526,
+        "additional_bonus": 2713
+      },
+      "popularity": 69,
+      "has_money_amount": 49412,
+      "officiating_ability": {
+        "rule_knowledge": 69,
+        "decision_speed": 63,
+        "positioning": 57,
+        "composure": 77
+      },
+      "image_url": "/people/referee/03.png"
+    }
+  ],
+  "managers": [
+    {
+      "id": "manager-male-001",
+      "name": "Sawyer Storm",
+      "dob": "1977-02-05",
+      "gender": "male",
+      "role": "manager",
+      "salary_demand": {
+        "monthly_wage": 6738,
+        "per_match_salary": 1213,
+        "additional_bonus": 2156
+      },
+      "popularity": 35,
+      "has_money_amount": 60446,
+      "management_ability": {
+        "charisma": 81,
+        "negotiation": 89,
+        "promo_skill": 95,
+        "strategy": 54
+      },
+      "image_url": "/people/staff/manager-01.png"
+    },
+    {
+      "id": "manager-male-002",
+      "name": "Tyler Steele",
+      "dob": "1987-02-22",
+      "gender": "male",
+      "role": "manager",
+      "salary_demand": {
+        "monthly_wage": 7258,
+        "per_match_salary": 1306,
+        "additional_bonus": 2323
+      },
+      "popularity": 60,
+      "has_money_amount": 66305,
+      "management_ability": {
+        "charisma": 92,
+        "negotiation": 52,
+        "promo_skill": 67,
+        "strategy": 55
+      },
+      "image_url": "/people/staff/manager-02.png"
+    },
+    {
+      "id": "manager-male-003",
+      "name": "Umar Vale",
+      "dob": "1994-09-17",
+      "gender": "male",
+      "role": "manager",
+      "salary_demand": {
+        "monthly_wage": 3389,
+        "per_match_salary": 610,
+        "additional_bonus": 1084
+      },
+      "popularity": 51,
+      "has_money_amount": 39746,
+      "management_ability": {
+        "charisma": 79,
+        "negotiation": 79,
+        "promo_skill": 48,
+        "strategy": 76
+      },
+      "image_url": "/people/staff/manager-03.png"
+    },
+    {
+      "id": "manager-male-004",
+      "name": "Victor Mercer",
+      "dob": "1991-01-21",
+      "gender": "male",
+      "role": "manager",
+      "salary_demand": {
+        "monthly_wage": 7125,
+        "per_match_salary": 1283,
+        "additional_bonus": 2280
+      },
+      "popularity": 36,
+      "has_money_amount": 36107,
+      "management_ability": {
+        "charisma": 57,
+        "negotiation": 68,
+        "promo_skill": 86,
+        "strategy": 50
+      },
+      "image_url": "/people/staff/manager-04.png"
+    },
+    {
+      "id": "manager-male-005",
+      "name": "Wyatt Santos",
+      "dob": "1979-11-23",
+      "gender": "male",
+      "role": "manager",
+      "salary_demand": {
+        "monthly_wage": 6460,
+        "per_match_salary": 1163,
+        "additional_bonus": 2067
+      },
+      "popularity": 76,
+      "has_money_amount": 9936,
+      "management_ability": {
+        "charisma": 80,
+        "negotiation": 92,
+        "promo_skill": 52,
+        "strategy": 48
+      },
+      "image_url": "/people/staff/manager-05.png"
+    },
+    {
+      "id": "manager-female-001",
+      "name": "Sara Storm",
+      "dob": "1998-09-03",
+      "gender": "female",
+      "role": "manager",
+      "salary_demand": {
+        "monthly_wage": 9682,
+        "per_match_salary": 1743,
+        "additional_bonus": 3098
+      },
+      "popularity": 48,
+      "has_money_amount": 67551,
+      "management_ability": {
+        "charisma": 67,
+        "negotiation": 76,
+        "promo_skill": 68,
+        "strategy": 90
+      },
+      "image_url": "/people/staff/manager-01.png"
+    },
+    {
+      "id": "manager-female-002",
+      "name": "Tessa Steele",
+      "dob": "1978-02-07",
+      "gender": "female",
+      "role": "manager",
+      "salary_demand": {
+        "monthly_wage": 6632,
+        "per_match_salary": 1194,
+        "additional_bonus": 2122
+      },
+      "popularity": 39,
+      "has_money_amount": 36580,
+      "management_ability": {
+        "charisma": 94,
+        "negotiation": 80,
+        "promo_skill": 52,
+        "strategy": 52
+      },
+      "image_url": "/people/staff/manager-02.png"
+    },
+    {
+      "id": "manager-female-003",
+      "name": "Uma Vale",
+      "dob": "1987-11-09",
+      "gender": "female",
+      "role": "manager",
+      "salary_demand": {
+        "monthly_wage": 8356,
+        "per_match_salary": 1504,
+        "additional_bonus": 2674
+      },
+      "popularity": 25,
+      "has_money_amount": 54451,
+      "management_ability": {
+        "charisma": 87,
+        "negotiation": 96,
+        "promo_skill": 88,
+        "strategy": 64
+      },
+      "image_url": "/people/staff/manager-03.png"
+    },
+    {
+      "id": "manager-female-004",
+      "name": "Vera Mercer",
+      "dob": "1979-12-17",
+      "gender": "female",
+      "role": "manager",
+      "salary_demand": {
+        "monthly_wage": 5553,
+        "per_match_salary": 1000,
+        "additional_bonus": 1777
+      },
+      "popularity": 69,
+      "has_money_amount": 95366,
+      "management_ability": {
+        "charisma": 66,
+        "negotiation": 57,
+        "promo_skill": 79,
+        "strategy": 85
+      },
+      "image_url": "/people/staff/manager-04.png"
+    },
+    {
+      "id": "manager-female-005",
+      "name": "Willow Santos",
+      "dob": "1979-03-24",
+      "gender": "female",
+      "role": "manager",
+      "salary_demand": {
+        "monthly_wage": 9918,
+        "per_match_salary": 1785,
+        "additional_bonus": 3174
+      },
+      "popularity": 60,
+      "has_money_amount": 55732,
+      "management_ability": {
+        "charisma": 76,
+        "negotiation": 51,
+        "promo_skill": 63,
+        "strategy": 94
+      },
+      "image_url": "/people/staff/manager-05.png"
+    }
+  ],
+  "announcers": [
+    {
+      "id": "announcer-male-001",
+      "name": "Owen Storm",
+      "dob": "2001-01-14",
+      "gender": "male",
+      "role": "announcer",
+      "salary_demand": {
+        "monthly_wage": 7313,
+        "per_match_salary": 1316,
+        "additional_bonus": 2340
+      },
+      "popularity": 52,
+      "has_money_amount": 18282,
+      "broadcast_ability": {
+        "voice_quality": 53,
+        "hype_delivery": 68,
+        "diction": 69,
+        "ring_knowledge": 66
+      },
+      "image_url": "/people/announcer/01.png"
+    },
+    {
+      "id": "announcer-male-002",
+      "name": "Parker Steele",
+      "dob": "1991-05-21",
+      "gender": "male",
+      "role": "announcer",
+      "salary_demand": {
+        "monthly_wage": 6941,
+        "per_match_salary": 1249,
+        "additional_bonus": 2221
+      },
+      "popularity": 79,
+      "has_money_amount": 28108,
+      "broadcast_ability": {
+        "voice_quality": 76,
+        "hype_delivery": 78,
+        "diction": 64,
+        "ring_knowledge": 94
+      },
+      "image_url": "/people/announcer/02.png"
+    },
+    {
+      "id": "announcer-male-003",
+      "name": "Quinn Vale",
+      "dob": "1984-07-05",
+      "gender": "male",
+      "role": "announcer",
+      "salary_demand": {
+        "monthly_wage": 3850,
+        "per_match_salary": 693,
+        "additional_bonus": 1232
+      },
+      "popularity": 47,
+      "has_money_amount": 30588,
+      "broadcast_ability": {
+        "voice_quality": 82,
+        "hype_delivery": 68,
+        "diction": 62,
+        "ring_knowledge": 50
+      },
+      "image_url": "/people/announcer/03.png"
+    },
+    {
+      "id": "announcer-male-004",
+      "name": "Ryan Mercer",
+      "dob": "1985-04-09",
+      "gender": "male",
+      "role": "announcer",
+      "salary_demand": {
+        "monthly_wage": 6422,
+        "per_match_salary": 1156,
+        "additional_bonus": 2055
+      },
+      "popularity": 46,
+      "has_money_amount": 42506,
+      "broadcast_ability": {
+        "voice_quality": 98,
+        "hype_delivery": 85,
+        "diction": 62,
+        "ring_knowledge": 72
+      },
+      "image_url": "/people/announcer/04.png"
+    },
+    {
+      "id": "announcer-male-005",
+      "name": "Sawyer Santos",
+      "dob": "1999-11-01",
+      "gender": "male",
+      "role": "announcer",
+      "salary_demand": {
+        "monthly_wage": 5576,
+        "per_match_salary": 1004,
+        "additional_bonus": 1784
+      },
+      "popularity": 72,
+      "has_money_amount": 89050,
+      "broadcast_ability": {
+        "voice_quality": 84,
+        "hype_delivery": 60,
+        "diction": 80,
+        "ring_knowledge": 91
+      },
+      "image_url": "/people/announcer/05.png"
+    },
+    {
+      "id": "announcer-female-001",
+      "name": "Olivia Storm",
+      "dob": "1993-10-14",
+      "gender": "female",
+      "role": "announcer",
+      "salary_demand": {
+        "monthly_wage": 5615,
+        "per_match_salary": 1011,
+        "additional_bonus": 1797
+      },
+      "popularity": 70,
+      "has_money_amount": 76685,
+      "broadcast_ability": {
+        "voice_quality": 79,
+        "hype_delivery": 66,
+        "diction": 63,
+        "ring_knowledge": 43
+      },
+      "image_url": "/people/announcer/01.png"
+    },
+    {
+      "id": "announcer-female-002",
+      "name": "Priya Steele",
+      "dob": "1983-01-25",
+      "gender": "female",
+      "role": "announcer",
+      "salary_demand": {
+        "monthly_wage": 2431,
+        "per_match_salary": 438,
+        "additional_bonus": 778
+      },
+      "popularity": 42,
+      "has_money_amount": 90618,
+      "broadcast_ability": {
+        "voice_quality": 65,
+        "hype_delivery": 91,
+        "diction": 71,
+        "ring_knowledge": 74
+      },
+      "image_url": "/people/announcer/02.png"
+    },
+    {
+      "id": "announcer-female-003",
+      "name": "Queenie Vale",
+      "dob": "1977-02-09",
+      "gender": "female",
+      "role": "announcer",
+      "salary_demand": {
+        "monthly_wage": 5995,
+        "per_match_salary": 1079,
+        "additional_bonus": 1918
+      },
+      "popularity": 58,
+      "has_money_amount": 9781,
+      "broadcast_ability": {
+        "voice_quality": 97,
+        "hype_delivery": 94,
+        "diction": 70,
+        "ring_knowledge": 60
+      },
+      "image_url": "/people/announcer/03.png"
+    },
+    {
+      "id": "announcer-female-004",
+      "name": "Rhea Mercer",
+      "dob": "1990-08-13",
+      "gender": "female",
+      "role": "announcer",
+      "salary_demand": {
+        "monthly_wage": 7619,
+        "per_match_salary": 1371,
+        "additional_bonus": 2438
+      },
+      "popularity": 78,
+      "has_money_amount": 12176,
+      "broadcast_ability": {
+        "voice_quality": 86,
+        "hype_delivery": 81,
+        "diction": 80,
+        "ring_knowledge": 90
+      },
+      "image_url": "/people/announcer/04.png"
+    },
+    {
+      "id": "announcer-female-005",
+      "name": "Sara Santos",
+      "dob": "1992-05-03",
+      "gender": "female",
+      "role": "announcer",
+      "salary_demand": {
+        "monthly_wage": 5584,
+        "per_match_salary": 1005,
+        "additional_bonus": 1787
+      },
+      "popularity": 62,
+      "has_money_amount": 51976,
+      "broadcast_ability": {
+        "voice_quality": 65,
+        "hype_delivery": 70,
+        "diction": 67,
+        "ring_knowledge": 81
+      },
+      "image_url": "/people/announcer/05.png"
+    }
+  ],
+  "staff": [
+    {
+      "id": "staff-male-001",
+      "name": "Kai Storm",
+      "dob": "1988-10-23",
+      "gender": "male",
+      "role": "staff",
+      "staff_department": "medical",
+      "salary_demand": {
+        "monthly_wage": 3191,
+        "per_match_salary": 574,
+        "additional_bonus": 1021
+      },
+      "popularity": 13,
+      "has_money_amount": 22534,
+      "staff_ability": {
+        "reliability": 93,
+        "pressure_handling": 82,
+        "teamwork": 92,
+        "technical_skill": 87
+      },
+      "image_url": "/people/staff/medical-01.png"
+    },
+    {
+      "id": "staff-male-002",
+      "name": "Liam Steele",
+      "dob": "2000-02-19",
+      "gender": "male",
+      "role": "staff",
+      "staff_department": "production",
+      "salary_demand": {
+        "monthly_wage": 8030,
+        "per_match_salary": 1445,
+        "additional_bonus": 2570
+      },
+      "popularity": 58,
+      "has_money_amount": 33746,
+      "staff_ability": {
+        "reliability": 76,
+        "pressure_handling": 83,
+        "teamwork": 66,
+        "technical_skill": 64
+      },
+      "image_url": "/people/staff/production-02.png"
+    },
+    {
+      "id": "staff-male-003",
+      "name": "Mason Vale",
+      "dob": "1985-10-04",
+      "gender": "male",
+      "role": "staff",
+      "staff_department": "security",
+      "salary_demand": {
+        "monthly_wage": 3058,
+        "per_match_salary": 550,
+        "additional_bonus": 979
+      },
+      "popularity": 47,
+      "has_money_amount": 24235,
+      "staff_ability": {
+        "reliability": 61,
+        "pressure_handling": 87,
+        "teamwork": 86,
+        "technical_skill": 65
+      },
+      "image_url": "/people/staff/security-03.png"
+    },
+    {
+      "id": "staff-male-004",
+      "name": "Noah Mercer",
+      "dob": "2003-05-19",
+      "gender": "male",
+      "role": "staff",
+      "staff_department": "creative",
+      "salary_demand": {
+        "monthly_wage": 9748,
+        "per_match_salary": 1755,
+        "additional_bonus": 3119
+      },
+      "popularity": 60,
+      "has_money_amount": 15126,
+      "staff_ability": {
+        "reliability": 78,
+        "pressure_handling": 84,
+        "teamwork": 63,
+        "technical_skill": 64
+      },
+      "image_url": "/people/staff/creative-04.png"
+    },
+    {
+      "id": "staff-male-005",
+      "name": "Owen Santos",
+      "dob": "1999-01-19",
+      "gender": "male",
+      "role": "staff",
+      "staff_department": "logistics",
+      "salary_demand": {
+        "monthly_wage": 8308,
+        "per_match_salary": 1495,
+        "additional_bonus": 2659
+      },
+      "popularity": 35,
+      "has_money_amount": 54694,
+      "staff_ability": {
+        "reliability": 65,
+        "pressure_handling": 80,
+        "teamwork": 76,
+        "technical_skill": 77
+      },
+      "image_url": "/people/staff/logistics-05.png"
+    },
+    {
+      "id": "staff-female-001",
+      "name": "Kiara Storm",
+      "dob": "1983-05-28",
+      "gender": "female",
+      "role": "staff",
+      "staff_department": "medical",
+      "salary_demand": {
+        "monthly_wage": 5411,
+        "per_match_salary": 974,
+        "additional_bonus": 1732
+      },
+      "popularity": 60,
+      "has_money_amount": 48398,
+      "staff_ability": {
+        "reliability": 90,
+        "pressure_handling": 78,
+        "teamwork": 58,
+        "technical_skill": 53
+      },
+      "image_url": "/people/staff/medical-01.png"
+    },
+    {
+      "id": "staff-female-002",
+      "name": "Luna Steele",
+      "dob": "1999-02-11",
+      "gender": "female",
+      "role": "staff",
+      "staff_department": "production",
+      "salary_demand": {
+        "monthly_wage": 5198,
+        "per_match_salary": 936,
+        "additional_bonus": 1663
+      },
+      "popularity": 56,
+      "has_money_amount": 11907,
+      "staff_ability": {
+        "reliability": 80,
+        "pressure_handling": 80,
+        "teamwork": 54,
+        "technical_skill": 80
+      },
+      "image_url": "/people/staff/production-02.png"
+    },
+    {
+      "id": "staff-female-003",
+      "name": "Maya Vale",
+      "dob": "1980-06-14",
+      "gender": "female",
+      "role": "staff",
+      "staff_department": "security",
+      "salary_demand": {
+        "monthly_wage": 5069,
+        "per_match_salary": 912,
+        "additional_bonus": 1622
+      },
+      "popularity": 43,
+      "has_money_amount": 56407,
+      "staff_ability": {
+        "reliability": 55,
+        "pressure_handling": 79,
+        "teamwork": 73,
+        "technical_skill": 56
+      },
+      "image_url": "/people/staff/security-03.png"
+    },
+    {
+      "id": "staff-female-004",
+      "name": "Nora Mercer",
+      "dob": "1987-08-02",
+      "gender": "female",
+      "role": "staff",
+      "staff_department": "creative",
+      "salary_demand": {
+        "monthly_wage": 8390,
+        "per_match_salary": 1510,
+        "additional_bonus": 2685
+      },
+      "popularity": 39,
+      "has_money_amount": 19832,
+      "staff_ability": {
+        "reliability": 92,
+        "pressure_handling": 48,
+        "teamwork": 93,
+        "technical_skill": 94
+      },
+      "image_url": "/people/staff/creative-04.png"
+    },
+    {
+      "id": "staff-female-005",
+      "name": "Olivia Santos",
+      "dob": "1989-07-03",
+      "gender": "female",
+      "role": "staff",
+      "staff_department": "logistics",
+      "salary_demand": {
+        "monthly_wage": 7848,
+        "per_match_salary": 1413,
+        "additional_bonus": 2511
+      },
+      "popularity": 23,
+      "has_money_amount": 25812,
+      "staff_ability": {
+        "reliability": 94,
+        "pressure_handling": 55,
+        "teamwork": 65,
+        "technical_skill": 53
+      },
+      "image_url": "/people/staff/logistics-05.png"
+    }
+  ]
+}

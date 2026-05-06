@@ -1,0 +1,112 @@
+[
+  {
+    "id": "staff-female-001",
+    "name": "Kionika Das",
+    "dob": "1983-05-28",
+    "gender": "female",
+    "role": "staff",
+    "staff_department": "medical",
+    "salary_demand": {
+      "monthly_wage": 5411,
+      "per_match_salary": 974,
+      "additional_bonus": 1732
+    },
+    "popularity": 60,
+    "has_money_amount": 48398,
+    "staff_ability": {
+      "reliability": 90,
+      "pressure_handling": 78,
+      "teamwork": 58,
+      "technical_skill": 53
+    },
+    "image_url": "/people/staff/female/1.png"
+  },
+  {
+    "id": "staff-female-002",
+    "name": "Luna Chakrabarti",
+    "dob": "2007-02-11",
+    "gender": "female",
+    "role": "staff",
+    "staff_department": "production",
+    "salary_demand": {
+      "monthly_wage": 5198,
+      "per_match_salary": 936,
+      "additional_bonus": 1663
+    },
+    "popularity": 56,
+    "has_money_amount": 11907,
+    "staff_ability": {
+      "reliability": 80,
+      "pressure_handling": 80,
+      "teamwork": 54,
+      "technical_skill": 80
+    },
+    "image_url": "/people/staff/female/2.png"
+  },
+  {
+    "id": "staff-female-003",
+    "name": "Martina Valerika",
+    "dob": "1990-06-14",
+    "gender": "female",
+    "role": "staff",
+    "staff_department": "security",
+    "salary_demand": {
+      "monthly_wage": 5069,
+      "per_match_salary": 912,
+      "additional_bonus": 1622
+    },
+    "popularity": 43,
+    "has_money_amount": 56407,
+    "staff_ability": {
+      "reliability": 55,
+      "pressure_handling": 79,
+      "teamwork": 73,
+      "technical_skill": 56
+    },
+    "image_url": "/people/staff/female/3.png"
+  },
+  {
+    "id": "staff-female-004",
+    "name": "Nora Jackson",
+    "dob": "1987-08-02",
+    "gender": "female",
+    "role": "staff",
+    "staff_department": "creative",
+    "salary_demand": {
+      "monthly_wage": 8390,
+      "per_match_salary": 1510,
+      "additional_bonus": 2685
+    },
+    "popularity": 39,
+    "has_money_amount": 19832,
+    "staff_ability": {
+      "reliability": 92,
+      "pressure_handling": 48,
+      "teamwork": 93,
+      "technical_skill": 94
+    },
+    "image_url": "/people/staff/female/4.png"
+  },
+  {
+    "id": "staff-female-005",
+    "name": "Olivia Smith",
+    "dob": "2008-07-03",
+    "gender": "female",
+    "role": "staff",
+    "staff_department": "logistics",
+    "salary_demand": {
+      "monthly_wage": 7848,
+      "per_match_salary": 1413,
+      "additional_bonus": 2511
+    },
+    "popularity": 23,
+    "has_money_amount": 25812,
+    "staff_ability": {
+      "reliability": 94,
+      "pressure_handling": 55,
+      "teamwork": 65,
+      "technical_skill": 53
+    },
+    "image_url": "/people/staff/female/5.png"
+  }
+]

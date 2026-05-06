@@ -1,0 +1,361 @@
+.moduleBody {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.headerRow {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  justify-content: space-between;
+
+  p {
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+}
+
+.filterRow {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+}
+
+.filterField {
+  display: grid;
+  gap: 0.35rem;
+
+  span {
+    color: var(--text-faint);
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  select {
+    background: rgba(8, 13, 20, 0.85);
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    color: var(--text-main);
+    padding: 0.65rem 0.8rem;
+  }
+}
+
+.candidateGrid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.candidateCard {
+  background: rgba(8, 13, 20, 0.8);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.8rem;
+
+  h4,
+  p {
+    margin: 0;
+  }
+
+  h4 {
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
+  }
+
+  p {
+    color: var(--text-faint);
+    font-size: 0.82rem;
+    margin-top: 0.2rem;
+  }
+
+  button {
+    background: linear-gradient(135deg, #bd5d2b, #f39f61);
+    border: 0;
+    border-radius: 10px;
+    color: #121212;
+    cursor: pointer;
+    font-size: 0.78rem;
+    letter-spacing: 0.07em;
+    margin-top: 0.7rem;
+    padding: 0.55rem 0.7rem;
+    text-transform: uppercase;
+    width: 100%;
+
+    &:disabled {
+      background: rgba(88, 98, 112, 0.6);
+      color: #cdd6df;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.candidateImage {
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.identityRow {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.tierBadge {
+  background: rgba(37, 161, 155, 0.16);
+  border: 1px solid rgba(37, 161, 155, 0.35);
+  border-radius: 999px;
+  color: var(--text-main);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  padding: 0.28rem 0.55rem;
+  text-transform: uppercase;
+}
+
+.actionRow {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+}
+
+.secondaryAction {
+  background: rgba(15, 123, 114, 0.2) !important;
+  border: 1px solid rgba(37, 161, 155, 0.6) !important;
+  color: var(--text-main) !important;
+}
+
+.quickHireAction {
+  background: linear-gradient(135deg, #bd5d2b, #f39f61) !important;
+  color: #121212 !important;
+}
+
+.modalOverlay {
+  align-items: center;
+  background: rgba(2, 6, 12, 0.72);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1rem;
+  position: fixed;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: linear-gradient(180deg, rgba(11, 17, 26, 0.98), rgba(7, 11, 18, 0.98));
+  border: 1px solid var(--line-soft);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+  max-width: 760px;
+  width: min(100%, 760px);
+}
+
+.modalHeader {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--line-soft);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+
+  h3,
+  p {
+    margin: 0;
+  }
+
+  p {
+    color: var(--text-faint);
+    margin-top: 0.25rem;
+  }
+}
+
+.closeButton {
+  background: transparent;
+  border: 0;
+  color: var(--text-main);
+  cursor: pointer;
+  font-size: 1.6rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.modalBody {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(280px, 1.1fr);
+  padding: 1.1rem;
+}
+
+.offerPanel,
+.offerForm {
+  background: rgba(10, 16, 25, 0.86);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+
+  h4,
+  p {
+    margin: 0;
+  }
+
+  h4 {
+    font-size: 0.9rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  p {
+    color: var(--text-faint);
+  }
+}
+
+.offerField {
+  display: grid;
+  gap: 0.35rem;
+
+  span {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  input,
+  select {
+    background: rgba(8, 13, 20, 0.9);
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    color: var(--text-main);
+    padding: 0.7rem 0.8rem;
+  }
+
+  small {
+    color: var(--text-faint);
+    font-size: 0.72rem;
+  }
+}
+
+.benefitsFieldset {
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+
+  legend {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    padding: 0 0.35rem;
+    text-transform: uppercase;
+  }
+
+  label {
+    align-items: center;
+    display: flex;
+    gap: 0.45rem;
+  }
+
+  span {
+    color: var(--text-main);
+    font-size: 0.8rem;
+  }
+}
+
+.successMessage,
+.errorMessage {
+  border-radius: 10px;
+  font-size: 0.82rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.successMessage {
+  background: rgba(37, 161, 155, 0.14);
+  border: 1px solid rgba(37, 161, 155, 0.35);
+  color: #c6fffb !important;
+}
+
+.errorMessage {
+  background: rgba(154, 58, 58, 0.16);
+  border: 1px solid rgba(194, 83, 83, 0.34);
+  color: #ffc7c7 !important;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.modalPrimaryButton,
+.modalSecondaryButton {
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  letter-spacing: 0.07em;
+  min-width: 140px;
+  padding: 0.75rem 0.95rem;
+  text-transform: uppercase;
+
+  &:disabled {
+    background: rgba(88, 98, 112, 0.6);
+    color: #cdd6df;
+    cursor: not-allowed;
+  }
+}
+
+.modalPrimaryButton {
+  background: linear-gradient(135deg, #bd5d2b, #f39f61);
+  color: #121212;
+}
+
+.modalSecondaryButton {
+  background: rgba(15, 123, 114, 0.2);
+  border: 1px solid rgba(37, 161, 155, 0.6);
+  color: var(--text-main);
+}
+
+@media (max-width: 1280px) {
+  .candidateGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .candidateGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .candidateGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .modalBody {
+    grid-template-columns: 1fr;
+  }
+
+  .modalActions {
+    flex-direction: column;
+  }
+
+  .modalPrimaryButton,
+  .modalSecondaryButton {
+    width: 100%;
+  }
+}

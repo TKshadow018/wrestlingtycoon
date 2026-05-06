@@ -1,0 +1,291 @@
+.moduleBody {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.emptyState {
+  color: var(--text-faint);
+  margin: 0;
+  margin-top: 1rem;
+}
+
+.titleCard {
+  background: radial-gradient(circle at center, rgba(14, 22, 34, 0.95), rgba(7, 11, 18, 0.95));
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  min-height: 320px;
+  overflow: hidden;
+  padding: 0.85rem;
+  position: relative;
+}
+
+.titleVisual {
+  border-radius: 10px;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.titleVisualDoubles {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  height: 100%;
+}
+
+.holderSlot {
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.holderImage {
+  border-radius: 10px;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.noHolder {
+  align-items: center;
+  background: rgba(9, 14, 21, 0.95);
+  border-radius: 10px;
+  color: var(--text-faint);
+  display: flex;
+  font-size: 0.86rem;
+  height: 100%;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.titleImage {
+  bottom: 0.6rem;
+  border-radius: 10px;
+  display: block;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.6));
+  height: 44%;
+  object-fit: contain;
+  position: absolute;
+  right: 0.6rem;
+  width: 44%;
+  z-index: 1;
+}
+
+.titleImageOnHolder {
+  bottom: 0.4rem;
+  border-radius: 10px;
+  display: block;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.62));
+  height: 48%;
+  object-fit: contain;
+  position: absolute;
+  right: 0.35rem;
+  width: 48%;
+  z-index: 1;
+}
+
+.titleOverlay {
+  background: linear-gradient(180deg, rgba(6, 11, 18, 0.08), rgba(6, 11, 18, 0.88));
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  inset: 0.85rem;
+  justify-content: space-between;
+  padding: 0.9rem;
+  pointer-events: none;
+  position: absolute;
+
+  button {
+    align-self: flex-end;
+    pointer-events: auto;
+  }
+}
+
+.titleActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
+.titleInfo {
+  h4 {
+    font-size: 1.14rem;
+    margin: 0;
+  }
+
+  p {
+    margin: 0.22rem 0 0;
+    color: var(--text-faint);
+    font-size: 0.86rem;
+  }
+
+  h4,
+  p {
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.activateButton,
+.deactivateButton,
+.historyButton {
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  padding: 0.5rem 0.7rem;
+  text-transform: uppercase;
+}
+
+.activateButton {
+  background: linear-gradient(135deg, #43aa61, #7ad17f);
+  color: #0f1c11;
+}
+
+.deactivateButton {
+  background: linear-gradient(135deg, #bd5d2b, #f39f61);
+  color: #1d130e;
+}
+
+.historyButton {
+  background: linear-gradient(135deg, #345a8f, #6d93cb);
+  color: #edf4ff;
+}
+
+.historyOverlay {
+  align-items: center;
+  background: rgba(1, 4, 10, 0.78);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 140;
+}
+
+.historyPanel {
+  background: rgba(9, 14, 24, 0.98);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  display: grid;
+  gap: 0.75rem;
+  max-height: 82vh;
+  overflow-y: auto;
+  padding: 1rem;
+  width: min(820px, 94vw);
+}
+
+.historyHeader {
+  align-items: center;
+  display: flex;
+  gap: 0.6rem;
+  justify-content: space-between;
+
+  h4 {
+    margin: 0;
+  }
+
+  button {
+    background: transparent;
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    color: var(--text-main);
+    cursor: pointer;
+    font-size: 0.72rem;
+    letter-spacing: 0.07em;
+    padding: 0.35rem 0.6rem;
+    text-transform: uppercase;
+  }
+}
+
+.historySubtitle {
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.historyList {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.historyEntry {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.65rem;
+
+  p {
+    color: #f0b33d;
+    font-size: 0.76rem;
+    font-weight: 600;
+    margin: 0;
+  }
+}
+
+.historyHoldersGrid {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.historyHolderCard {
+  align-items: center;
+  background: rgba(8, 13, 20, 0.88);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.3rem;
+  justify-items: center;
+  padding: 0.4rem;
+
+  img {
+    border-radius: 8px;
+    height: 86px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  span {
+    color: var(--text-main);
+    font-size: 0.74rem;
+    text-align: center;
+  }
+}
+
+.historyEmpty {
+  color: var(--text-faint);
+  margin: 0;
+}
+
+@media (max-width: 680px) {
+  .titleCard {
+    min-height: 260px;
+  }
+
+  .titleVisualDoubles {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+
+  .titleImage {
+    height: 40%;
+    width: 40%;
+  }
+
+  .titleImageOnHolder {
+    height: 40%;
+    width: 40%;
+  }
+
+  .activateButton,
+  .deactivateButton,
+  .historyButton {
+    font-size: 0.68rem;
+    padding: 0.42rem 0.6rem;
+  }
+}

@@ -1,0 +1,107 @@
+[
+  {
+    "id": "manager-female-001",
+    "name": "Elin Svensson",
+    "dob": "1983-09-03",
+    "gender": "female",
+    "role": "manager",
+    "salary_demand": {
+      "monthly_wage": 9682,
+      "per_match_salary": 1743,
+      "additional_bonus": 3098
+    },
+    "popularity": 48,
+    "has_money_amount": 67551,
+    "management_ability": {
+      "charisma": 67,
+      "negotiation": 76,
+      "promo_skill": 68,
+      "strategy": 90
+    },
+    "image_url": "/people/manager/female/1.png"
+  },
+  {
+    "id": "manager-female-002",
+    "name": "Turna Banerjee",
+    "dob": "2006-04-07",
+    "gender": "female",
+    "role": "manager",
+    "salary_demand": {
+      "monthly_wage": 6632,
+      "per_match_salary": 1194,
+      "additional_bonus": 2122
+    },
+    "popularity": 39,
+    "has_money_amount": 36580,
+    "management_ability": {
+      "charisma": 94,
+      "negotiation": 80,
+      "promo_skill": 52,
+      "strategy": 52
+    },
+    "image_url": "/people/manager/female/2.png"
+  },
+  {
+    "id": "manager-female-003",
+    "name": "Unnati Kaur",
+    "dob": "1987-11-09",
+    "gender": "female",
+    "role": "manager",
+    "salary_demand": {
+      "monthly_wage": 8356,
+      "per_match_salary": 1504,
+      "additional_bonus": 2674
+    },
+    "popularity": 25,
+    "has_money_amount": 54451,
+    "management_ability": {
+      "charisma": 87,
+      "negotiation": 96,
+      "promo_skill": 88,
+      "strategy": 64
+    },
+    "image_url": "/people/manager/female/3.png"
+  },
+  {
+    "id": "manager-female-004",
+    "name": "Hosina Minami",
+    "dob": "1979-12-17",
+    "gender": "female",
+    "role": "manager",
+    "salary_demand": {
+      "monthly_wage": 5553,
+      "per_match_salary": 1000,
+      "additional_bonus": 1777
+    },
+    "popularity": 69,
+    "has_money_amount": 95366,
+    "management_ability": {
+      "charisma": 66,
+      "negotiation": 57,
+      "promo_skill": 79,
+      "strategy": 85
+    },
+    "image_url": "/people/manager/female/4.png"
+  },
+  {
+    "id": "manager-female-005",
+    "name": "Maimuna Rahman",
+    "dob": "1998-03-24",
+    "gender": "female",
+    "role": "manager",
+    "salary_demand": {
+      "monthly_wage": 9918,
+      "per_match_salary": 1785,
+      "additional_bonus": 3174
+    },
+    "popularity": 60,
+    "has_money_amount": 55732,
+    "management_ability": {
+      "charisma": 76,
+      "negotiation": 51,
+      "promo_skill": 63,
+      "strategy": 94
+    },
+    "image_url": "/people/manager/female/5.png"
+  }
+]

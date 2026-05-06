@@ -1,0 +1,107 @@
+[
+  {
+    "id": "announcer-male-001",
+    "name": "Owen Storm",
+    "dob": "2001-01-14",
+    "gender": "male",
+    "role": "announcer",
+    "salary_demand": {
+      "monthly_wage": 7313,
+      "per_match_salary": 1316,
+      "additional_bonus": 2340
+    },
+    "popularity": 52,
+    "has_money_amount": 18282,
+    "broadcast_ability": {
+      "voice_quality": 53,
+      "hype_delivery": 68,
+      "diction": 69,
+      "ring_knowledge": 66
+    },
+    "image_url": "/people/announcer/male/1.png"
+  },
+  {
+    "id": "announcer-male-002",
+    "name": "Parker Steele",
+    "dob": "1991-05-21",
+    "gender": "male",
+    "role": "announcer",
+    "salary_demand": {
+      "monthly_wage": 6941,
+      "per_match_salary": 1249,
+      "additional_bonus": 2221
+    },
+    "popularity": 79,
+    "has_money_amount": 28108,
+    "broadcast_ability": {
+      "voice_quality": 76,
+      "hype_delivery": 78,
+      "diction": 64,
+      "ring_knowledge": 94
+    },
+    "image_url": "/people/announcer/male/2.png"
+  },
+  {
+    "id": "announcer-male-003",
+    "name": "Quinn Vale",
+    "dob": "1984-07-05",
+    "gender": "male",
+    "role": "announcer",
+    "salary_demand": {
+      "monthly_wage": 3850,
+      "per_match_salary": 693,
+      "additional_bonus": 1232
+    },
+    "popularity": 47,
+    "has_money_amount": 30588,
+    "broadcast_ability": {
+      "voice_quality": 82,
+      "hype_delivery": 68,
+      "diction": 62,
+      "ring_knowledge": 50
+    },
+    "image_url": "/people/announcer/male/3.png"
+  },
+  {
+    "id": "announcer-male-004",
+    "name": "Ryan Mercer",
+    "dob": "1985-04-09",
+    "gender": "male",
+    "role": "announcer",
+    "salary_demand": {
+      "monthly_wage": 6422,
+      "per_match_salary": 1156,
+      "additional_bonus": 2055
+    },
+    "popularity": 46,
+    "has_money_amount": 42506,
+    "broadcast_ability": {
+      "voice_quality": 98,
+      "hype_delivery": 85,
+      "diction": 62,
+      "ring_knowledge": 72
+    },
+    "image_url": "/people/announcer/male/4.png"
+  },
+  {
+    "id": "announcer-male-005",
+    "name": "Sawyer Santos",
+    "dob": "1999-11-01",
+    "gender": "male",
+    "role": "announcer",
+    "salary_demand": {
+      "monthly_wage": 5576,
+      "per_match_salary": 1004,
+      "additional_bonus": 1784
+    },
+    "popularity": 72,
+    "has_money_amount": 89050,
+    "broadcast_ability": {
+      "voice_quality": 84,
+      "hype_delivery": 60,
+      "diction": 80,
+      "ring_knowledge": 91
+    },
+    "image_url": "/people/announcer/male/5.png"
+  }
+]

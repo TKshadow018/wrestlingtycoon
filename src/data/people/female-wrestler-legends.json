@@ -1,0 +1,302 @@
+[
+  {
+    "id": "wrestler-legend-female-001",
+    "name": "Aalyah Gutierrez",
+    "dob": "2001-08-20",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 9200,
+      "per_match_salary": 1650,
+      "additional_bonus": 3000
+    },
+    "popularity": 55,
+    "has_money_amount": 280000,
+    "wrestling_ability": {
+      "strength": 58,
+      "technics": 66,
+      "high_fly_ability": 63,
+      "leg_stamina": 76,
+      "body_stamina": 72,
+      "head_stamina": 71
+    },
+    "signature_moves": ["Dropkick", "Tilt-a-Whirl Headscissors"],
+    "finisher_moves": ["Sunset Bomb"],
+    "image_url": "/people/wrestler/legendsFemale/aalyah gutierrez.png"
+  },
+  {
+    "id": "wrestler-legend-female-002",
+    "name": "Alexa Bliss",
+    "dob": "1991-08-09",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 26500,
+      "per_match_salary": 5000,
+      "additional_bonus": 9000
+    },
+    "popularity": 92,
+    "has_money_amount": 4100000,
+    "wrestling_ability": {
+      "strength": 62,
+      "technics": 84,
+      "high_fly_ability": 77,
+      "leg_stamina": 85,
+      "body_stamina": 80,
+      "head_stamina": 86
+    },
+    "signature_moves": ["Insult to Injury", "Dropkick"],
+    "finisher_moves": ["Twisted Bliss"],
+    "image_url": "/people/wrestler/legendsFemale/alexaBliss.png"
+  },
+  {
+    "id": "wrestler-legend-female-003",
+    "name": "Candice LeRae",
+    "dob": "1985-09-29",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 21000,
+      "per_match_salary": 3900,
+      "additional_bonus": 7000
+    },
+    "popularity": 80,
+    "has_money_amount": 1500000,
+    "wrestling_ability": {
+      "strength": 65,
+      "technics": 89,
+      "high_fly_ability": 82,
+      "leg_stamina": 87,
+      "body_stamina": 81,
+      "head_stamina": 84
+    },
+    "signature_moves": ["Step-Up Enzuigiri", "Springboard Splash"],
+    "finisher_moves": ["Wicked Stepsister"],
+    "image_url": "/people/wrestler/legendsFemale/Candice LeRae.png"
+  },
+  {
+    "id": "wrestler-legend-female-004",
+    "name": "Eva Marie",
+    "dob": "1984-09-19",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 15500,
+      "per_match_salary": 2850,
+      "additional_bonus": 5000
+    },
+    "popularity": 67,
+    "has_money_amount": 980000,
+    "wrestling_ability": {
+      "strength": 60,
+      "technics": 62,
+      "high_fly_ability": 55,
+      "leg_stamina": 74,
+      "body_stamina": 71,
+      "head_stamina": 73
+    },
+    "signature_moves": ["Running Knee", "Hair Whip"],
+    "finisher_moves": ["Sliced Red"],
+    "image_url": "/people/wrestler/legendsFemale/eva.png"
+  },
+  {
+    "id": "wrestler-legend-female-005",
+    "name": "Kaitlyn",
+    "dob": "1986-10-07",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 14600,
+      "per_match_salary": 2700,
+      "additional_bonus": 4700
+    },
+    "popularity": 69,
+    "has_money_amount": 720000,
+    "wrestling_ability": {
+      "strength": 79,
+      "technics": 68,
+      "high_fly_ability": 48,
+      "leg_stamina": 80,
+      "body_stamina": 82,
+      "head_stamina": 77
+    },
+    "signature_moves": ["Spear", "Backbreaker"],
+    "finisher_moves": ["Gutwrench Lift"],
+    "image_url": "/people/wrestler/legendsFemale/kaitlyn.png"
+  },
+  {
+    "id": "wrestler-legend-female-006",
+    "name": "Kelly Kelly",
+    "dob": "1987-01-15",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 15000,
+      "per_match_salary": 2750,
+      "additional_bonus": 4900
+    },
+    "popularity": 74,
+    "has_money_amount": 1300000,
+    "wrestling_ability": {
+      "strength": 56,
+      "technics": 64,
+      "high_fly_ability": 72,
+      "leg_stamina": 79,
+      "body_stamina": 73,
+      "head_stamina": 75
+    },
+    "signature_moves": ["Crossbody", "Bulldog"],
+    "finisher_moves": ["K2"],
+    "image_url": "/people/wrestler/legendsFemale/kelly.png"
+  },
+  {
+    "id": "wrestler-legend-female-007",
+    "name": "Lana",
+    "dob": "1985-03-24",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 13800,
+      "per_match_salary": 2500,
+      "additional_bonus": 4300
+    },
+    "popularity": 71,
+    "has_money_amount": 980000,
+    "wrestling_ability": {
+      "strength": 54,
+      "technics": 60,
+      "high_fly_ability": 52,
+      "leg_stamina": 72,
+      "body_stamina": 70,
+      "head_stamina": 71
+    },
+    "signature_moves": ["Roundhouse Kick", "Neckbreaker"],
+    "finisher_moves": ["Lana Lock"],
+    "image_url": "/people/wrestler/legendsFemale/lana.png"
+  },
+  {
+    "id": "wrestler-legend-female-008",
+    "name": "Maryse",
+    "dob": "1983-01-21",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 16800,
+      "per_match_salary": 3100,
+      "additional_bonus": 5400
+    },
+    "popularity": 78,
+    "has_money_amount": 2100000,
+    "wrestling_ability": {
+      "strength": 58,
+      "technics": 67,
+      "high_fly_ability": 59,
+      "leg_stamina": 74,
+      "body_stamina": 76,
+      "head_stamina": 78
+    },
+    "signature_moves": ["French Kiss DDT", "Drop Toe Hold"],
+    "finisher_moves": ["Maryse DT"],
+    "image_url": "/people/wrestler/legendsFemale/Maryse.png"
+  },
+  {
+    "id": "wrestler-legend-female-009",
+    "name": "Nikki Bella",
+    "dob": "1983-11-21",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 29000,
+      "per_match_salary": 5400,
+      "additional_bonus": 9800
+    },
+    "popularity": 93,
+    "has_money_amount": 4500000,
+    "wrestling_ability": {
+      "strength": 78,
+      "technics": 81,
+      "high_fly_ability": 63,
+      "leg_stamina": 86,
+      "body_stamina": 84,
+      "head_stamina": 87
+    },
+    "signature_moves": ["Forearm Smash", "Springboard Enzuigiri"],
+    "finisher_moves": ["Rack Attack"],
+    "image_url": "/people/wrestler/legendsFemale/nikki.png"
+  },
+  {
+    "id": "wrestler-legend-female-010",
+    "name": "Paige",
+    "dob": "1992-08-17",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 23500,
+      "per_match_salary": 4300,
+      "additional_bonus": 7600
+    },
+    "popularity": 88,
+    "has_money_amount": 2400000,
+    "wrestling_ability": {
+      "strength": 70,
+      "technics": 88,
+      "high_fly_ability": 67,
+      "leg_stamina": 84,
+      "body_stamina": 82,
+      "head_stamina": 86
+    },
+    "signature_moves": ["Knee Strike", "Rope-Hung Kick"],
+    "finisher_moves": ["Rampage DDT"],
+    "image_url": "/people/wrestler/legendsFemale/paige.png"
+  },
+  {
+    "id": "wrestler-legend-female-011",
+    "name": "Sarah Logan",
+    "dob": "1993-09-10",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 17000,
+      "per_match_salary": 3200,
+      "additional_bonus": 5600
+    },
+    "popularity": 73,
+    "has_money_amount": 860000,
+    "wrestling_ability": {
+      "strength": 74,
+      "technics": 75,
+      "high_fly_ability": 58,
+      "leg_stamina": 82,
+      "body_stamina": 83,
+      "head_stamina": 80
+    },
+    "signature_moves": ["Running Crossbody", "Knee Trembler"],
+    "finisher_moves": ["Kentucky Knee"],
+    "image_url": "/people/wrestler/legendsFemale/sarah.png"
+  },
+  {
+    "id": "wrestler-legend-female-012",
+    "name": "Xia Brookside",
+    "dob": "1998-10-05",
+    "gender": "female",
+    "role": "wrestler",
+    "salary_demand": {
+      "monthly_wage": 14200,
+      "per_match_salary": 2600,
+      "additional_bonus": 4500
+    },
+    "popularity": 70,
+    "has_money_amount": 610000,
+    "wrestling_ability": {
+      "strength": 59,
+      "technics": 78,
+      "high_fly_ability": 74,
+      "leg_stamina": 81,
+      "body_stamina": 76,
+      "head_stamina": 77
+    },
+    "signature_moves": ["Dropkick", "Bulldog"],
+    "finisher_moves": ["Brookside Bomb"],
+    "image_url": "/people/wrestler/legendsFemale/Xia Brookside.png"
+  }
+]

@@ -1,0 +1,7562 @@
+[
+  {
+    "id": "SP-001",
+    "company_name": "Crown Belt Group 1-1",
+    "reputation": 35,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-002",
+    "company_name": "Legacy Championship Partners 1-2",
+    "reputation": 36,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-003",
+    "company_name": "Summit Honor Ventures 1-3",
+    "reputation": 37,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-004",
+    "company_name": "Iron Gold Collective 1-4",
+    "reputation": 38,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-005",
+    "company_name": "Apex Banner Holdings 1-5",
+    "reputation": 39,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-006",
+    "company_name": "Prestige Crest Alliance 1-6",
+    "reputation": 40,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-007",
+    "company_name": "Royal Throne Group 1-7",
+    "reputation": 41,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-008",
+    "company_name": "Prime Legacy Partners 1-8",
+    "reputation": 42,
+    "category": "title",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-009",
+    "company_name": "Victory Dominion Ventures 1-9",
+    "reputation": 43,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-010",
+    "company_name": "Titan Title Collective 1-10",
+    "reputation": 44,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-011",
+    "company_name": "Dynasty Belt Holdings 1-11",
+    "reputation": 45,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-012",
+    "company_name": "Champion Championship Alliance 1-12",
+    "reputation": 46,
+    "category": "title",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-013",
+    "company_name": "Heritage Gold Ventures 2-1",
+    "reputation": 49,
+    "category": "title",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-014",
+    "company_name": "Noble Banner Collective 2-2",
+    "reputation": 50,
+    "category": "title",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-015",
+    "company_name": "Grand Crest Holdings 2-3",
+    "reputation": 51,
+    "category": "title",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-016",
+    "company_name": "Elite Throne Alliance 2-4",
+    "reputation": 52,
+    "category": "title",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-017",
+    "company_name": "Crown Legacy Group 2-5",
+    "reputation": 53,
+    "category": "title",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-018",
+    "company_name": "Legacy Dominion Partners 2-6",
+    "reputation": 54,
+    "category": "title",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-019",
+    "company_name": "Summit Title Ventures 2-7",
+    "reputation": 55,
+    "category": "title",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-020",
+    "company_name": "Iron Belt Collective 2-8",
+    "reputation": 56,
+    "category": "title",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-021",
+    "company_name": "Apex Championship Holdings 2-9",
+    "reputation": 57,
+    "category": "title",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-022",
+    "company_name": "Prestige Honor Alliance 2-10",
+    "reputation": 58,
+    "category": "title",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-023",
+    "company_name": "Royal Gold Group 2-11",
+    "reputation": 49,
+    "category": "title",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-024",
+    "company_name": "Prime Banner Partners 2-12",
+    "reputation": 50,
+    "category": "title",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-025",
+    "company_name": "Victory Throne Holdings 3-1",
+    "reputation": 59,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-026",
+    "company_name": "Titan Legacy Alliance 3-2",
+    "reputation": 60,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-027",
+    "company_name": "Dynasty Dominion Group 3-3",
+    "reputation": 61,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-028",
+    "company_name": "Champion Title Partners 3-4",
+    "reputation": 62,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-029",
+    "company_name": "Heritage Belt Ventures 3-5",
+    "reputation": 63,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-030",
+    "company_name": "Noble Championship Collective 3-6",
+    "reputation": 64,
+    "category": "title",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-031",
+    "company_name": "Grand Honor Holdings 3-7",
+    "reputation": 65,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-032",
+    "company_name": "Elite Gold Alliance 3-8",
+    "reputation": 66,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-033",
+    "company_name": "Crown Banner Group 3-9",
+    "reputation": 67,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-034",
+    "company_name": "Legacy Crest Partners 3-10",
+    "reputation": 68,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-035",
+    "company_name": "Summit Throne Ventures 3-11",
+    "reputation": 59,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-036",
+    "company_name": "Iron Legacy Collective 3-12",
+    "reputation": 60,
+    "category": "title",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-037",
+    "company_name": "Apex Title Group 4-1",
+    "reputation": 69,
+    "category": "title",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-038",
+    "company_name": "Prestige Belt Partners 4-2",
+    "reputation": 70,
+    "category": "title",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-039",
+    "company_name": "Royal Championship Ventures 4-3",
+    "reputation": 71,
+    "category": "title",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-040",
+    "company_name": "Prime Honor Collective 4-4",
+    "reputation": 72,
+    "category": "title",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-041",
+    "company_name": "Victory Gold Holdings 4-5",
+    "reputation": 73,
+    "category": "title",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-042",
+    "company_name": "Titan Banner Alliance 4-6",
+    "reputation": 74,
+    "category": "title",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-043",
+    "company_name": "Dynasty Crest Group 4-7",
+    "reputation": 75,
+    "category": "title",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-044",
+    "company_name": "Champion Throne Partners 4-8",
+    "reputation": 76,
+    "category": "title",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-045",
+    "company_name": "Heritage Legacy Ventures 4-9",
+    "reputation": 77,
+    "category": "title",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-046",
+    "company_name": "Noble Dominion Collective 4-10",
+    "reputation": 78,
+    "category": "title",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-047",
+    "company_name": "Grand Title Holdings 4-11",
+    "reputation": 69,
+    "category": "title",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-048",
+    "company_name": "Elite Belt Alliance 4-12",
+    "reputation": 70,
+    "category": "title",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-049",
+    "company_name": "Crown Honor Ventures 5-1",
+    "reputation": 79,
+    "category": "title",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-050",
+    "company_name": "Legacy Gold Collective 5-2",
+    "reputation": 80,
+    "category": "title",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-051",
+    "company_name": "Summit Banner Holdings 5-3",
+    "reputation": 81,
+    "category": "title",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-052",
+    "company_name": "Iron Crest Alliance 5-4",
+    "reputation": 82,
+    "category": "title",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-053",
+    "company_name": "Apex Throne Group 5-5",
+    "reputation": 83,
+    "category": "title",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-054",
+    "company_name": "Prestige Legacy Partners 5-6",
+    "reputation": 84,
+    "category": "title",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-055",
+    "company_name": "Royal Dominion Ventures 5-7",
+    "reputation": 85,
+    "category": "title",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-056",
+    "company_name": "Prime Title Collective 5-8",
+    "reputation": 86,
+    "category": "title",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-057",
+    "company_name": "Victory Belt Holdings 5-9",
+    "reputation": 87,
+    "category": "title",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-058",
+    "company_name": "Titan Championship Alliance 5-10",
+    "reputation": 79,
+    "category": "title",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-059",
+    "company_name": "Dynasty Honor Group 5-11",
+    "reputation": 80,
+    "category": "title",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-060",
+    "company_name": "Champion Gold Partners 5-12",
+    "reputation": 81,
+    "category": "title",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-061",
+    "company_name": "Heritage Crest Holdings 6-1",
+    "reputation": 88,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-062",
+    "company_name": "Noble Throne Alliance 6-2",
+    "reputation": 89,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-063",
+    "company_name": "Grand Legacy Group 6-3",
+    "reputation": 90,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-064",
+    "company_name": "Elite Dominion Partners 6-4",
+    "reputation": 91,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-065",
+    "company_name": "Crown Title Ventures 6-5",
+    "reputation": 92,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-066",
+    "company_name": "Legacy Belt Collective 6-6",
+    "reputation": 93,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-067",
+    "company_name": "Summit Championship Holdings 6-7",
+    "reputation": 94,
+    "category": "title",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-068",
+    "company_name": "Iron Honor Alliance 6-8",
+    "reputation": 88,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-069",
+    "company_name": "Apex Gold Group 6-9",
+    "reputation": 89,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-070",
+    "company_name": "Prestige Banner Partners 6-10",
+    "reputation": 90,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-071",
+    "company_name": "Royal Crest Ventures 6-11",
+    "reputation": 91,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-072",
+    "company_name": "Prime Throne Collective 6-12",
+    "reputation": 92,
+    "category": "title",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-073",
+    "company_name": "Victory Dominion Group 7-1",
+    "reputation": 95,
+    "category": "title",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-074",
+    "company_name": "Titan Title Partners 7-2",
+    "reputation": 96,
+    "category": "title",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-075",
+    "company_name": "Dynasty Belt Ventures 7-3",
+    "reputation": 97,
+    "category": "title",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-076",
+    "company_name": "Champion Championship Collective 7-4",
+    "reputation": 98,
+    "category": "title",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-077",
+    "company_name": "Heritage Honor Holdings 7-5",
+    "reputation": 99,
+    "category": "title",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-078",
+    "company_name": "Noble Gold Alliance 7-6",
+    "reputation": 100,
+    "category": "title",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-079",
+    "company_name": "Grand Banner Group 7-7",
+    "reputation": 95,
+    "category": "title",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-080",
+    "company_name": "Elite Crest Partners 7-8",
+    "reputation": 96,
+    "category": "title",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-081",
+    "company_name": "Crown Throne Ventures 7-9",
+    "reputation": 97,
+    "category": "title",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-082",
+    "company_name": "Legacy Legacy Collective 7-10",
+    "reputation": 98,
+    "category": "title",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-083",
+    "company_name": "Summit Dominion Holdings 7-11",
+    "reputation": 99,
+    "category": "title",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-084",
+    "company_name": "Iron Title Alliance 7-12",
+    "reputation": 100,
+    "category": "title",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-085",
+    "company_name": "Ringside Circuit Works 1-1",
+    "reputation": 38,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-086",
+    "company_name": "Canvas Mat Systems 1-2",
+    "reputation": 39,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-087",
+    "company_name": "Turnbuckle Stage Collective 1-3",
+    "reputation": 40,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-088",
+    "company_name": "Bell Ring Studios 1-4",
+    "reputation": 41,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-089",
+    "company_name": "Octane Combat Supply 1-5",
+    "reputation": 42,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-090",
+    "company_name": "Main Event Platform Partners 1-6",
+    "reputation": 43,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-091",
+    "company_name": "Pinnacle Production Works 1-7",
+    "reputation": 44,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-092",
+    "company_name": "Cornerpost Showcase Systems 1-8",
+    "reputation": 45,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-093",
+    "company_name": "Arena Deck Collective 1-9",
+    "reputation": 46,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-094",
+    "company_name": "Spotlight Arena Studios 1-10",
+    "reputation": 47,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-095",
+    "company_name": "Impact Circuit Supply 1-11",
+    "reputation": 48,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-096",
+    "company_name": "Centerline Mat Partners 1-12",
+    "reputation": 35,
+    "category": "ring",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-097",
+    "company_name": "Hardcam Ring Collective 2-1",
+    "reputation": 52,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-098",
+    "company_name": "Pyro Combat Studios 2-2",
+    "reputation": 53,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-099",
+    "company_name": "Spot Platform Supply 2-3",
+    "reputation": 54,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-100",
+    "company_name": "Ringside Production Partners 2-4",
+    "reputation": 55,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-101",
+    "company_name": "Canvas Showcase Works 2-5",
+    "reputation": 56,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-102",
+    "company_name": "Turnbuckle Deck Systems 2-6",
+    "reputation": 57,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-103",
+    "company_name": "Bell Arena Collective 2-7",
+    "reputation": 58,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-104",
+    "company_name": "Octane Circuit Studios 2-8",
+    "reputation": 49,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-105",
+    "company_name": "Main Event Mat Supply 2-9",
+    "reputation": 50,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-106",
+    "company_name": "Pinnacle Stage Partners 2-10",
+    "reputation": 51,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-107",
+    "company_name": "Cornerpost Ring Works 2-11",
+    "reputation": 52,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-108",
+    "company_name": "Arena Combat Systems 2-12",
+    "reputation": 53,
+    "category": "ring",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-109",
+    "company_name": "Spotlight Production Supply 3-1",
+    "reputation": 62,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-110",
+    "company_name": "Impact Showcase Partners 3-2",
+    "reputation": 63,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-111",
+    "company_name": "Centerline Deck Works 3-3",
+    "reputation": 64,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-112",
+    "company_name": "Hardcam Arena Systems 3-4",
+    "reputation": 65,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-113",
+    "company_name": "Pyro Circuit Collective 3-5",
+    "reputation": 66,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-114",
+    "company_name": "Spot Mat Studios 3-6",
+    "reputation": 67,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-115",
+    "company_name": "Ringside Stage Supply 3-7",
+    "reputation": 68,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-116",
+    "company_name": "Canvas Ring Partners 3-8",
+    "reputation": 59,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-117",
+    "company_name": "Turnbuckle Combat Works 3-9",
+    "reputation": 60,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-118",
+    "company_name": "Bell Platform Systems 3-10",
+    "reputation": 61,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-119",
+    "company_name": "Octane Production Collective 3-11",
+    "reputation": 62,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-120",
+    "company_name": "Main Event Showcase Studios 3-12",
+    "reputation": 63,
+    "category": "ring",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-121",
+    "company_name": "Pinnacle Arena Works 4-1",
+    "reputation": 72,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-122",
+    "company_name": "Cornerpost Circuit Systems 4-2",
+    "reputation": 73,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-123",
+    "company_name": "Arena Mat Collective 4-3",
+    "reputation": 74,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-124",
+    "company_name": "Spotlight Stage Studios 4-4",
+    "reputation": 75,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-125",
+    "company_name": "Impact Ring Supply 4-5",
+    "reputation": 76,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-126",
+    "company_name": "Centerline Combat Partners 4-6",
+    "reputation": 77,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-127",
+    "company_name": "Hardcam Platform Works 4-7",
+    "reputation": 78,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-128",
+    "company_name": "Pyro Production Systems 4-8",
+    "reputation": 69,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-129",
+    "company_name": "Spot Showcase Collective 4-9",
+    "reputation": 70,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-130",
+    "company_name": "Ringside Deck Studios 4-10",
+    "reputation": 71,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-131",
+    "company_name": "Canvas Arena Supply 4-11",
+    "reputation": 72,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-132",
+    "company_name": "Turnbuckle Circuit Partners 4-12",
+    "reputation": 73,
+    "category": "ring",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-133",
+    "company_name": "Bell Stage Collective 5-1",
+    "reputation": 82,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-134",
+    "company_name": "Octane Ring Studios 5-2",
+    "reputation": 83,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-135",
+    "company_name": "Main Event Combat Supply 5-3",
+    "reputation": 84,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-136",
+    "company_name": "Pinnacle Platform Partners 5-4",
+    "reputation": 85,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-137",
+    "company_name": "Cornerpost Production Works 5-5",
+    "reputation": 86,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-138",
+    "company_name": "Arena Showcase Systems 5-6",
+    "reputation": 87,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-139",
+    "company_name": "Spotlight Deck Collective 5-7",
+    "reputation": 79,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-140",
+    "company_name": "Impact Arena Studios 5-8",
+    "reputation": 80,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-141",
+    "company_name": "Centerline Circuit Supply 5-9",
+    "reputation": 81,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-142",
+    "company_name": "Hardcam Mat Partners 5-10",
+    "reputation": 82,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-143",
+    "company_name": "Pyro Stage Works 5-11",
+    "reputation": 83,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-144",
+    "company_name": "Spot Ring Systems 5-12",
+    "reputation": 84,
+    "category": "ring",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-145",
+    "company_name": "Ringside Platform Supply 6-1",
+    "reputation": 91,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-146",
+    "company_name": "Canvas Production Partners 6-2",
+    "reputation": 92,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-147",
+    "company_name": "Turnbuckle Showcase Works 6-3",
+    "reputation": 93,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-148",
+    "company_name": "Bell Deck Systems 6-4",
+    "reputation": 94,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-149",
+    "company_name": "Octane Arena Collective 6-5",
+    "reputation": 88,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-150",
+    "company_name": "Main Event Circuit Studios 6-6",
+    "reputation": 89,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-151",
+    "company_name": "Pinnacle Mat Supply 6-7",
+    "reputation": 90,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-152",
+    "company_name": "Cornerpost Stage Partners 6-8",
+    "reputation": 91,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-153",
+    "company_name": "Arena Ring Works 6-9",
+    "reputation": 92,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-154",
+    "company_name": "Spotlight Combat Systems 6-10",
+    "reputation": 93,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-155",
+    "company_name": "Impact Platform Collective 6-11",
+    "reputation": 94,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-156",
+    "company_name": "Centerline Production Studios 6-12",
+    "reputation": 88,
+    "category": "ring",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-157",
+    "company_name": "Hardcam Deck Works 7-1",
+    "reputation": 98,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-158",
+    "company_name": "Pyro Arena Systems 7-2",
+    "reputation": 99,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-159",
+    "company_name": "Spot Circuit Collective 7-3",
+    "reputation": 100,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-160",
+    "company_name": "Ringside Mat Studios 7-4",
+    "reputation": 95,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-161",
+    "company_name": "Canvas Stage Supply 7-5",
+    "reputation": 96,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-162",
+    "company_name": "Turnbuckle Ring Partners 7-6",
+    "reputation": 97,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-163",
+    "company_name": "Bell Combat Works 7-7",
+    "reputation": 98,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-164",
+    "company_name": "Octane Platform Systems 7-8",
+    "reputation": 99,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-165",
+    "company_name": "Main Event Production Collective 7-9",
+    "reputation": 100,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-166",
+    "company_name": "Pinnacle Showcase Studios 7-10",
+    "reputation": 95,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-167",
+    "company_name": "Cornerpost Deck Supply 7-11",
+    "reputation": 96,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-168",
+    "company_name": "Arena Arena Partners 7-12",
+    "reputation": 97,
+    "category": "ring",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-169",
+    "company_name": "Prime Time Broadcast Media 1-1",
+    "reputation": 41,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-170",
+    "company_name": "Headline Show Partners 1-2",
+    "reputation": 42,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-171",
+    "company_name": "Grandstand Live Studios 1-3",
+    "reputation": 43,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-172",
+    "company_name": "Mainline Special Ventures 1-4",
+    "reputation": 44,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-173",
+    "company_name": "Supercard Card Network 1-5",
+    "reputation": 45,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-174",
+    "company_name": "Peak Night Presentation Group 1-6",
+    "reputation": 46,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-175",
+    "company_name": "Crown Hour Experience Media 1-7",
+    "reputation": 47,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-176",
+    "company_name": "Livewire Night Partners 1-8",
+    "reputation": 48,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-177",
+    "company_name": "Thunderline Events Studios 1-9",
+    "reputation": 35,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-178",
+    "company_name": "Gold Slot Broadcast Ventures 1-10",
+    "reputation": 36,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-179",
+    "company_name": "Prime Time Show Network 1-11",
+    "reputation": 37,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-180",
+    "company_name": "Headline Live Group 1-12",
+    "reputation": 38,
+    "category": "eventMain",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-181",
+    "company_name": "Grandstand Card Studios 2-1",
+    "reputation": 55,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-182",
+    "company_name": "Mainline Presentation Ventures 2-2",
+    "reputation": 56,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-183",
+    "company_name": "Supercard Experience Network 2-3",
+    "reputation": 57,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-184",
+    "company_name": "Peak Night Night Group 2-4",
+    "reputation": 58,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-185",
+    "company_name": "Crown Hour Events Media 2-5",
+    "reputation": 49,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-186",
+    "company_name": "Livewire Broadcast Partners 2-6",
+    "reputation": 50,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-187",
+    "company_name": "Thunderline Show Studios 2-7",
+    "reputation": 51,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-188",
+    "company_name": "Gold Slot Live Ventures 2-8",
+    "reputation": 52,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-189",
+    "company_name": "Prime Time Special Network 2-9",
+    "reputation": 53,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-190",
+    "company_name": "Headline Card Group 2-10",
+    "reputation": 54,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-191",
+    "company_name": "Grandstand Presentation Media 2-11",
+    "reputation": 55,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-192",
+    "company_name": "Mainline Experience Partners 2-12",
+    "reputation": 56,
+    "category": "eventMain",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-193",
+    "company_name": "Supercard Events Network 3-1",
+    "reputation": 65,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-194",
+    "company_name": "Peak Night Broadcast Group 3-2",
+    "reputation": 66,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-195",
+    "company_name": "Crown Hour Show Media 3-3",
+    "reputation": 67,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-196",
+    "company_name": "Livewire Live Partners 3-4",
+    "reputation": 68,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-197",
+    "company_name": "Thunderline Special Studios 3-5",
+    "reputation": 59,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-198",
+    "company_name": "Gold Slot Card Ventures 3-6",
+    "reputation": 60,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-199",
+    "company_name": "Prime Time Presentation Network 3-7",
+    "reputation": 61,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-200",
+    "company_name": "Headline Experience Group 3-8",
+    "reputation": 62,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-201",
+    "company_name": "Grandstand Night Media 3-9",
+    "reputation": 63,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-202",
+    "company_name": "Mainline Events Partners 3-10",
+    "reputation": 64,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-203",
+    "company_name": "Supercard Broadcast Studios 3-11",
+    "reputation": 65,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-204",
+    "company_name": "Peak Night Show Ventures 3-12",
+    "reputation": 66,
+    "category": "eventMain",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-205",
+    "company_name": "Crown Hour Special Media 4-1",
+    "reputation": 75,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-206",
+    "company_name": "Livewire Card Partners 4-2",
+    "reputation": 76,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-207",
+    "company_name": "Thunderline Presentation Studios 4-3",
+    "reputation": 77,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-208",
+    "company_name": "Gold Slot Experience Ventures 4-4",
+    "reputation": 78,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-209",
+    "company_name": "Prime Time Night Network 4-5",
+    "reputation": 69,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-210",
+    "company_name": "Headline Events Group 4-6",
+    "reputation": 70,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-211",
+    "company_name": "Grandstand Broadcast Media 4-7",
+    "reputation": 71,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-212",
+    "company_name": "Mainline Show Partners 4-8",
+    "reputation": 72,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-213",
+    "company_name": "Supercard Live Studios 4-9",
+    "reputation": 73,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-214",
+    "company_name": "Peak Night Special Ventures 4-10",
+    "reputation": 74,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-215",
+    "company_name": "Crown Hour Card Network 4-11",
+    "reputation": 75,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-216",
+    "company_name": "Livewire Presentation Group 4-12",
+    "reputation": 76,
+    "category": "eventMain",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-217",
+    "company_name": "Thunderline Night Studios 5-1",
+    "reputation": 85,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-218",
+    "company_name": "Gold Slot Events Ventures 5-2",
+    "reputation": 86,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-219",
+    "company_name": "Prime Time Broadcast Network 5-3",
+    "reputation": 87,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-220",
+    "company_name": "Headline Show Group 5-4",
+    "reputation": 79,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-221",
+    "company_name": "Grandstand Live Media 5-5",
+    "reputation": 80,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-222",
+    "company_name": "Mainline Special Partners 5-6",
+    "reputation": 81,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-223",
+    "company_name": "Supercard Card Studios 5-7",
+    "reputation": 82,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-224",
+    "company_name": "Peak Night Presentation Ventures 5-8",
+    "reputation": 83,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-225",
+    "company_name": "Crown Hour Experience Network 5-9",
+    "reputation": 84,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-226",
+    "company_name": "Livewire Night Group 5-10",
+    "reputation": 85,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-227",
+    "company_name": "Thunderline Events Media 5-11",
+    "reputation": 86,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-228",
+    "company_name": "Gold Slot Broadcast Partners 5-12",
+    "reputation": 87,
+    "category": "eventMain",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-229",
+    "company_name": "Prime Time Live Network 6-1",
+    "reputation": 94,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-230",
+    "company_name": "Headline Special Group 6-2",
+    "reputation": 88,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-231",
+    "company_name": "Grandstand Card Media 6-3",
+    "reputation": 89,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-232",
+    "company_name": "Mainline Presentation Partners 6-4",
+    "reputation": 90,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-233",
+    "company_name": "Supercard Experience Studios 6-5",
+    "reputation": 91,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-234",
+    "company_name": "Peak Night Night Ventures 6-6",
+    "reputation": 92,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-235",
+    "company_name": "Crown Hour Events Network 6-7",
+    "reputation": 93,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-236",
+    "company_name": "Livewire Broadcast Group 6-8",
+    "reputation": 94,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-237",
+    "company_name": "Thunderline Show Media 6-9",
+    "reputation": 88,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-238",
+    "company_name": "Gold Slot Live Partners 6-10",
+    "reputation": 89,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-239",
+    "company_name": "Prime Time Special Studios 6-11",
+    "reputation": 90,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-240",
+    "company_name": "Headline Card Ventures 6-12",
+    "reputation": 91,
+    "category": "eventMain",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-241",
+    "company_name": "Grandstand Experience Media 7-1",
+    "reputation": 95,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-242",
+    "company_name": "Mainline Night Partners 7-2",
+    "reputation": 96,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-243",
+    "company_name": "Supercard Events Studios 7-3",
+    "reputation": 97,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-244",
+    "company_name": "Peak Night Broadcast Ventures 7-4",
+    "reputation": 98,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-245",
+    "company_name": "Crown Hour Show Network 7-5",
+    "reputation": 99,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-246",
+    "company_name": "Livewire Live Group 7-6",
+    "reputation": 100,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-247",
+    "company_name": "Thunderline Special Media 7-7",
+    "reputation": 95,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-248",
+    "company_name": "Gold Slot Card Partners 7-8",
+    "reputation": 96,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-249",
+    "company_name": "Prime Time Presentation Studios 7-9",
+    "reputation": 97,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-250",
+    "company_name": "Headline Experience Ventures 7-10",
+    "reputation": 98,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-251",
+    "company_name": "Grandstand Night Network 7-11",
+    "reputation": 99,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-252",
+    "company_name": "Mainline Events Group 7-12",
+    "reputation": 100,
+    "category": "eventMain",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-253",
+    "company_name": "Rookie Night Showcase Media 1-1",
+    "reputation": 44,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-254",
+    "company_name": "Warmup Live Partners 1-2",
+    "reputation": 45,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-255",
+    "company_name": "Undercard Card House 1-3",
+    "reputation": 46,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-256",
+    "company_name": "Regional Series Studios 1-4",
+    "reputation": 47,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-257",
+    "company_name": "Backlot Sessions Network 1-5",
+    "reputation": 48,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-258",
+    "company_name": "Spotlight Broadcast Group 1-6",
+    "reputation": 35,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-259",
+    "company_name": "Rising Star Experience Media 1-7",
+    "reputation": 36,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-260",
+    "company_name": "Breakout Events Partners 1-8",
+    "reputation": 37,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-261",
+    "company_name": "Roadside Showcase House 1-9",
+    "reputation": 38,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-262",
+    "company_name": "Small Hall Live Studios 1-10",
+    "reputation": 39,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-263",
+    "company_name": "Rookie Night Card Network 1-11",
+    "reputation": 40,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-264",
+    "company_name": "Warmup Series Group 1-12",
+    "reputation": 41,
+    "category": "eventMinor",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-265",
+    "company_name": "Undercard Broadcast House 2-1",
+    "reputation": 58,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-266",
+    "company_name": "Regional Experience Studios 2-2",
+    "reputation": 49,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-267",
+    "company_name": "Backlot Events Network 2-3",
+    "reputation": 50,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-268",
+    "company_name": "Spotlight Showcase Group 2-4",
+    "reputation": 51,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-269",
+    "company_name": "Rising Star Live Media 2-5",
+    "reputation": 52,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-270",
+    "company_name": "Breakout Card Partners 2-6",
+    "reputation": 53,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-271",
+    "company_name": "Roadside Series House 2-7",
+    "reputation": 54,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-272",
+    "company_name": "Small Hall Sessions Studios 2-8",
+    "reputation": 55,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-273",
+    "company_name": "Rookie Night Broadcast Network 2-9",
+    "reputation": 56,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-274",
+    "company_name": "Warmup Experience Group 2-10",
+    "reputation": 57,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-275",
+    "company_name": "Undercard Events Media 2-11",
+    "reputation": 58,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-276",
+    "company_name": "Regional Showcase Partners 2-12",
+    "reputation": 49,
+    "category": "eventMinor",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-277",
+    "company_name": "Backlot Card Network 3-1",
+    "reputation": 68,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-278",
+    "company_name": "Spotlight Series Group 3-2",
+    "reputation": 59,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-279",
+    "company_name": "Rising Star Sessions Media 3-3",
+    "reputation": 60,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-280",
+    "company_name": "Breakout Broadcast Partners 3-4",
+    "reputation": 61,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-281",
+    "company_name": "Roadside Experience House 3-5",
+    "reputation": 62,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-282",
+    "company_name": "Small Hall Events Studios 3-6",
+    "reputation": 63,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-283",
+    "company_name": "Rookie Night Showcase Network 3-7",
+    "reputation": 64,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-284",
+    "company_name": "Warmup Live Group 3-8",
+    "reputation": 65,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-285",
+    "company_name": "Undercard Card Media 3-9",
+    "reputation": 66,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-286",
+    "company_name": "Regional Series Partners 3-10",
+    "reputation": 67,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-287",
+    "company_name": "Backlot Sessions House 3-11",
+    "reputation": 68,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-288",
+    "company_name": "Spotlight Broadcast Studios 3-12",
+    "reputation": 59,
+    "category": "eventMinor",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-289",
+    "company_name": "Rising Star Events Media 4-1",
+    "reputation": 78,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-290",
+    "company_name": "Breakout Showcase Partners 4-2",
+    "reputation": 69,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-291",
+    "company_name": "Roadside Live House 4-3",
+    "reputation": 70,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-292",
+    "company_name": "Small Hall Card Studios 4-4",
+    "reputation": 71,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-293",
+    "company_name": "Rookie Night Series Network 4-5",
+    "reputation": 72,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-294",
+    "company_name": "Warmup Sessions Group 4-6",
+    "reputation": 73,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-295",
+    "company_name": "Undercard Broadcast Media 4-7",
+    "reputation": 74,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-296",
+    "company_name": "Regional Experience Partners 4-8",
+    "reputation": 75,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-297",
+    "company_name": "Backlot Events House 4-9",
+    "reputation": 76,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-298",
+    "company_name": "Spotlight Showcase Studios 4-10",
+    "reputation": 77,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-299",
+    "company_name": "Rising Star Live Network 4-11",
+    "reputation": 78,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-300",
+    "company_name": "Breakout Card Group 4-12",
+    "reputation": 69,
+    "category": "eventMinor",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-301",
+    "company_name": "Roadside Sessions House 5-1",
+    "reputation": 79,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-302",
+    "company_name": "Small Hall Broadcast Studios 5-2",
+    "reputation": 80,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-303",
+    "company_name": "Rookie Night Experience Network 5-3",
+    "reputation": 81,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-304",
+    "company_name": "Warmup Events Group 5-4",
+    "reputation": 82,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-305",
+    "company_name": "Undercard Showcase Media 5-5",
+    "reputation": 83,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-306",
+    "company_name": "Regional Live Partners 5-6",
+    "reputation": 84,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-307",
+    "company_name": "Backlot Card House 5-7",
+    "reputation": 85,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-308",
+    "company_name": "Spotlight Series Studios 5-8",
+    "reputation": 86,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-309",
+    "company_name": "Rising Star Sessions Network 5-9",
+    "reputation": 87,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-310",
+    "company_name": "Breakout Broadcast Group 5-10",
+    "reputation": 79,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-311",
+    "company_name": "Roadside Experience Media 5-11",
+    "reputation": 80,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-312",
+    "company_name": "Small Hall Events Partners 5-12",
+    "reputation": 81,
+    "category": "eventMinor",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-313",
+    "company_name": "Rookie Night Live Network 6-1",
+    "reputation": 90,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-314",
+    "company_name": "Warmup Card Group 6-2",
+    "reputation": 91,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-315",
+    "company_name": "Undercard Series Media 6-3",
+    "reputation": 92,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-316",
+    "company_name": "Regional Sessions Partners 6-4",
+    "reputation": 93,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-317",
+    "company_name": "Backlot Broadcast House 6-5",
+    "reputation": 94,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-318",
+    "company_name": "Spotlight Experience Studios 6-6",
+    "reputation": 88,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-319",
+    "company_name": "Rising Star Events Network 6-7",
+    "reputation": 89,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-320",
+    "company_name": "Breakout Showcase Group 6-8",
+    "reputation": 90,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-321",
+    "company_name": "Roadside Live Media 6-9",
+    "reputation": 91,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-322",
+    "company_name": "Small Hall Card Partners 6-10",
+    "reputation": 92,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-323",
+    "company_name": "Rookie Night Series House 6-11",
+    "reputation": 93,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-324",
+    "company_name": "Warmup Sessions Studios 6-12",
+    "reputation": 94,
+    "category": "eventMinor",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-325",
+    "company_name": "Undercard Experience Media 7-1",
+    "reputation": 98,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-326",
+    "company_name": "Regional Events Partners 7-2",
+    "reputation": 99,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-327",
+    "company_name": "Backlot Showcase House 7-3",
+    "reputation": 100,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-328",
+    "company_name": "Spotlight Live Studios 7-4",
+    "reputation": 95,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-329",
+    "company_name": "Rising Star Card Network 7-5",
+    "reputation": 96,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Tech",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-330",
+    "company_name": "Breakout Series Group 7-6",
+    "reputation": 97,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Media",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-331",
+    "company_name": "Roadside Sessions Media 7-7",
+    "reputation": 98,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Performance",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-332",
+    "company_name": "Small Hall Broadcast Partners 7-8",
+    "reputation": 99,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Combat",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-333",
+    "company_name": "Rookie Night Experience House 7-9",
+    "reputation": 100,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Entertainment",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-334",
+    "company_name": "Warmup Events Studios 7-10",
+    "reputation": 95,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Luxury",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-335",
+    "company_name": "Undercard Showcase Network 7-11",
+    "reputation": 96,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Community",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-336",
+    "company_name": "Regional Live Group 7-12",
+    "reputation": 97,
+    "category": "eventMinor",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Lifestyle",
+    "is_event_only": true
+  },
+  {
+    "id": "SP-337",
+    "company_name": "Titan Thread Uniform Studio 1-1",
+    "reputation": 47,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-338",
+    "company_name": "Victory Wear Attire Collective 1-2",
+    "reputation": 48,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-339",
+    "company_name": "Flex Forge Gear Supply 1-3",
+    "reputation": 35,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-340",
+    "company_name": "Arena Fit Wardrobe Lab 1-4",
+    "reputation": 36,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-341",
+    "company_name": "Iron Stitch Threads Co 1-5",
+    "reputation": 37,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-342",
+    "company_name": "Prime Stitch Outfit Works 1-6",
+    "reputation": 38,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-343",
+    "company_name": "Motion Cloth Tailor Studio 1-7",
+    "reputation": 39,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-344",
+    "company_name": "Elite Gear Apparel Collective 1-8",
+    "reputation": 40,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-345",
+    "company_name": "Ringline Uniform Supply 1-9",
+    "reputation": 41,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-346",
+    "company_name": "Combat Loom Attire Lab 1-10",
+    "reputation": 42,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-347",
+    "company_name": "Titan Thread Gear Co 1-11",
+    "reputation": 43,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-348",
+    "company_name": "Victory Wear Wardrobe Works 1-12",
+    "reputation": 44,
+    "category": "dress",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-349",
+    "company_name": "Flex Forge Outfit Supply 2-1",
+    "reputation": 51,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-350",
+    "company_name": "Arena Fit Tailor Lab 2-2",
+    "reputation": 52,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-351",
+    "company_name": "Iron Stitch Apparel Co 2-3",
+    "reputation": 53,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-352",
+    "company_name": "Prime Stitch Uniform Works 2-4",
+    "reputation": 54,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-353",
+    "company_name": "Motion Cloth Attire Studio 2-5",
+    "reputation": 55,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-354",
+    "company_name": "Elite Gear Gear Collective 2-6",
+    "reputation": 56,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-355",
+    "company_name": "Ringline Wardrobe Supply 2-7",
+    "reputation": 57,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-356",
+    "company_name": "Combat Loom Threads Lab 2-8",
+    "reputation": 58,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-357",
+    "company_name": "Titan Thread Outfit Co 2-9",
+    "reputation": 49,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-358",
+    "company_name": "Victory Wear Tailor Works 2-10",
+    "reputation": 50,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-359",
+    "company_name": "Flex Forge Apparel Studio 2-11",
+    "reputation": 51,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-360",
+    "company_name": "Arena Fit Uniform Collective 2-12",
+    "reputation": 52,
+    "category": "dress",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-361",
+    "company_name": "Iron Stitch Gear Co 3-1",
+    "reputation": 61,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-362",
+    "company_name": "Prime Stitch Wardrobe Works 3-2",
+    "reputation": 62,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-363",
+    "company_name": "Motion Cloth Threads Studio 3-3",
+    "reputation": 63,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-364",
+    "company_name": "Elite Gear Outfit Collective 3-4",
+    "reputation": 64,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-365",
+    "company_name": "Ringline Tailor Supply 3-5",
+    "reputation": 65,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-366",
+    "company_name": "Combat Loom Apparel Lab 3-6",
+    "reputation": 66,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-367",
+    "company_name": "Titan Thread Uniform Co 3-7",
+    "reputation": 67,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-368",
+    "company_name": "Victory Wear Attire Works 3-8",
+    "reputation": 68,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-369",
+    "company_name": "Flex Forge Gear Studio 3-9",
+    "reputation": 59,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-370",
+    "company_name": "Arena Fit Wardrobe Collective 3-10",
+    "reputation": 60,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-371",
+    "company_name": "Iron Stitch Threads Supply 3-11",
+    "reputation": 61,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-372",
+    "company_name": "Prime Stitch Outfit Lab 3-12",
+    "reputation": 62,
+    "category": "dress",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-373",
+    "company_name": "Motion Cloth Apparel Studio 4-1",
+    "reputation": 71,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-374",
+    "company_name": "Elite Gear Uniform Collective 4-2",
+    "reputation": 72,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-375",
+    "company_name": "Ringline Attire Supply 4-3",
+    "reputation": 73,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-376",
+    "company_name": "Combat Loom Gear Lab 4-4",
+    "reputation": 74,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-377",
+    "company_name": "Titan Thread Wardrobe Co 4-5",
+    "reputation": 75,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-378",
+    "company_name": "Victory Wear Threads Works 4-6",
+    "reputation": 76,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-379",
+    "company_name": "Flex Forge Outfit Studio 4-7",
+    "reputation": 77,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-380",
+    "company_name": "Arena Fit Tailor Collective 4-8",
+    "reputation": 78,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-381",
+    "company_name": "Iron Stitch Apparel Supply 4-9",
+    "reputation": 69,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-382",
+    "company_name": "Prime Stitch Uniform Lab 4-10",
+    "reputation": 70,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-383",
+    "company_name": "Motion Cloth Attire Co 4-11",
+    "reputation": 71,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-384",
+    "company_name": "Elite Gear Gear Works 4-12",
+    "reputation": 72,
+    "category": "dress",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-385",
+    "company_name": "Ringline Threads Supply 5-1",
+    "reputation": 82,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-386",
+    "company_name": "Combat Loom Outfit Lab 5-2",
+    "reputation": 83,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-387",
+    "company_name": "Titan Thread Tailor Co 5-3",
+    "reputation": 84,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-388",
+    "company_name": "Victory Wear Apparel Works 5-4",
+    "reputation": 85,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-389",
+    "company_name": "Flex Forge Uniform Studio 5-5",
+    "reputation": 86,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-390",
+    "company_name": "Arena Fit Attire Collective 5-6",
+    "reputation": 87,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-391",
+    "company_name": "Iron Stitch Gear Supply 5-7",
+    "reputation": 79,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-392",
+    "company_name": "Prime Stitch Wardrobe Lab 5-8",
+    "reputation": 80,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-393",
+    "company_name": "Motion Cloth Threads Co 5-9",
+    "reputation": 81,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-394",
+    "company_name": "Elite Gear Outfit Works 5-10",
+    "reputation": 82,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-395",
+    "company_name": "Ringline Tailor Studio 5-11",
+    "reputation": 83,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-396",
+    "company_name": "Combat Loom Apparel Collective 5-12",
+    "reputation": 84,
+    "category": "dress",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-397",
+    "company_name": "Titan Thread Attire Co 6-1",
+    "reputation": 93,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-398",
+    "company_name": "Victory Wear Gear Works 6-2",
+    "reputation": 94,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-399",
+    "company_name": "Flex Forge Wardrobe Studio 6-3",
+    "reputation": 88,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-400",
+    "company_name": "Arena Fit Threads Collective 6-4",
+    "reputation": 89,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-401",
+    "company_name": "Iron Stitch Outfit Supply 6-5",
+    "reputation": 90,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-402",
+    "company_name": "Prime Stitch Tailor Lab 6-6",
+    "reputation": 91,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-403",
+    "company_name": "Motion Cloth Apparel Co 6-7",
+    "reputation": 92,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-404",
+    "company_name": "Elite Gear Uniform Works 6-8",
+    "reputation": 93,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-405",
+    "company_name": "Ringline Attire Studio 6-9",
+    "reputation": 94,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-406",
+    "company_name": "Combat Loom Gear Collective 6-10",
+    "reputation": 88,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-407",
+    "company_name": "Titan Thread Wardrobe Supply 6-11",
+    "reputation": 89,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-408",
+    "company_name": "Victory Wear Threads Lab 6-12",
+    "reputation": 90,
+    "category": "dress",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-409",
+    "company_name": "Flex Forge Tailor Studio 7-1",
+    "reputation": 95,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-410",
+    "company_name": "Arena Fit Apparel Collective 7-2",
+    "reputation": 96,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-411",
+    "company_name": "Iron Stitch Uniform Supply 7-3",
+    "reputation": 97,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-412",
+    "company_name": "Prime Stitch Attire Lab 7-4",
+    "reputation": 98,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-413",
+    "company_name": "Motion Cloth Gear Co 7-5",
+    "reputation": 99,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-414",
+    "company_name": "Elite Gear Wardrobe Works 7-6",
+    "reputation": 100,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-415",
+    "company_name": "Ringline Threads Studio 7-7",
+    "reputation": 95,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-416",
+    "company_name": "Combat Loom Outfit Collective 7-8",
+    "reputation": 96,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-417",
+    "company_name": "Titan Thread Tailor Supply 7-9",
+    "reputation": 97,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-418",
+    "company_name": "Victory Wear Apparel Lab 7-10",
+    "reputation": 98,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-419",
+    "company_name": "Flex Forge Uniform Co 7-11",
+    "reputation": 99,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-420",
+    "company_name": "Arena Fit Attire Works 7-12",
+    "reputation": 100,
+    "category": "dress",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-421",
+    "company_name": "Banner Box Graphics Partners 1-1",
+    "reputation": 36,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-422",
+    "company_name": "Logo Lane Design Works 1-2",
+    "reputation": 37,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-423",
+    "company_name": "Brand Forge Creative Collective 1-3",
+    "reputation": 38,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-424",
+    "company_name": "Promo Stack Toolkit Suite 1-4",
+    "reputation": 39,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-425",
+    "company_name": "Visual Vault Media Lab 1-5",
+    "reputation": 40,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-426",
+    "company_name": "Asset Mill Studio Group 1-6",
+    "reputation": 41,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-427",
+    "company_name": "Stage Pack Forge Partners 1-7",
+    "reputation": 42,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-428",
+    "company_name": "Apex Art Assets Works 1-8",
+    "reputation": 43,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-429",
+    "company_name": "Media Crate Graphics Collective 1-9",
+    "reputation": 44,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-430",
+    "company_name": "Render Hub Design Suite 1-10",
+    "reputation": 45,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-431",
+    "company_name": "Banner Box Creative Lab 1-11",
+    "reputation": 46,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-432",
+    "company_name": "Logo Lane Toolkit Group 1-12",
+    "reputation": 47,
+    "category": "asset",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-433",
+    "company_name": "Brand Forge Studio Collective 2-1",
+    "reputation": 54,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-434",
+    "company_name": "Promo Stack Forge Suite 2-2",
+    "reputation": 55,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-435",
+    "company_name": "Visual Vault Assets Lab 2-3",
+    "reputation": 56,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-436",
+    "company_name": "Asset Mill Graphics Group 2-4",
+    "reputation": 57,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-437",
+    "company_name": "Stage Pack Design Partners 2-5",
+    "reputation": 58,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-438",
+    "company_name": "Apex Art Creative Works 2-6",
+    "reputation": 49,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-439",
+    "company_name": "Media Crate Toolkit Collective 2-7",
+    "reputation": 50,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-440",
+    "company_name": "Render Hub Media Suite 2-8",
+    "reputation": 51,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-441",
+    "company_name": "Banner Box Studio Lab 2-9",
+    "reputation": 52,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-442",
+    "company_name": "Logo Lane Forge Group 2-10",
+    "reputation": 53,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-443",
+    "company_name": "Brand Forge Assets Partners 2-11",
+    "reputation": 54,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-444",
+    "company_name": "Promo Stack Graphics Works 2-12",
+    "reputation": 55,
+    "category": "asset",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-445",
+    "company_name": "Visual Vault Creative Lab 3-1",
+    "reputation": 64,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-446",
+    "company_name": "Asset Mill Toolkit Group 3-2",
+    "reputation": 65,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-447",
+    "company_name": "Stage Pack Media Partners 3-3",
+    "reputation": 66,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-448",
+    "company_name": "Apex Art Studio Works 3-4",
+    "reputation": 67,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-449",
+    "company_name": "Media Crate Forge Collective 3-5",
+    "reputation": 68,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-450",
+    "company_name": "Render Hub Assets Suite 3-6",
+    "reputation": 59,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-451",
+    "company_name": "Banner Box Graphics Lab 3-7",
+    "reputation": 60,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-452",
+    "company_name": "Logo Lane Design Group 3-8",
+    "reputation": 61,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-453",
+    "company_name": "Brand Forge Creative Partners 3-9",
+    "reputation": 62,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-454",
+    "company_name": "Promo Stack Toolkit Works 3-10",
+    "reputation": 63,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-455",
+    "company_name": "Visual Vault Media Collective 3-11",
+    "reputation": 64,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-456",
+    "company_name": "Asset Mill Studio Suite 3-12",
+    "reputation": 65,
+    "category": "asset",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-457",
+    "company_name": "Stage Pack Assets Partners 4-1",
+    "reputation": 74,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-458",
+    "company_name": "Apex Art Graphics Works 4-2",
+    "reputation": 75,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-459",
+    "company_name": "Media Crate Design Collective 4-3",
+    "reputation": 76,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-460",
+    "company_name": "Render Hub Creative Suite 4-4",
+    "reputation": 77,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-461",
+    "company_name": "Banner Box Toolkit Lab 4-5",
+    "reputation": 78,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-462",
+    "company_name": "Logo Lane Media Group 4-6",
+    "reputation": 69,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-463",
+    "company_name": "Brand Forge Studio Partners 4-7",
+    "reputation": 70,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-464",
+    "company_name": "Promo Stack Forge Works 4-8",
+    "reputation": 71,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-465",
+    "company_name": "Visual Vault Assets Collective 4-9",
+    "reputation": 72,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-466",
+    "company_name": "Asset Mill Graphics Suite 4-10",
+    "reputation": 73,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-467",
+    "company_name": "Stage Pack Design Lab 4-11",
+    "reputation": 74,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-468",
+    "company_name": "Apex Art Creative Group 4-12",
+    "reputation": 75,
+    "category": "asset",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-469",
+    "company_name": "Media Crate Media Collective 5-1",
+    "reputation": 85,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-470",
+    "company_name": "Render Hub Studio Suite 5-2",
+    "reputation": 86,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-471",
+    "company_name": "Banner Box Forge Lab 5-3",
+    "reputation": 87,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-472",
+    "company_name": "Logo Lane Assets Group 5-4",
+    "reputation": 79,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-473",
+    "company_name": "Brand Forge Graphics Partners 5-5",
+    "reputation": 80,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-474",
+    "company_name": "Promo Stack Design Works 5-6",
+    "reputation": 81,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-475",
+    "company_name": "Visual Vault Creative Collective 5-7",
+    "reputation": 82,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-476",
+    "company_name": "Asset Mill Toolkit Suite 5-8",
+    "reputation": 83,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-477",
+    "company_name": "Stage Pack Media Lab 5-9",
+    "reputation": 84,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-478",
+    "company_name": "Apex Art Studio Group 5-10",
+    "reputation": 85,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-479",
+    "company_name": "Media Crate Forge Partners 5-11",
+    "reputation": 86,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-480",
+    "company_name": "Render Hub Assets Works 5-12",
+    "reputation": 87,
+    "category": "asset",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-481",
+    "company_name": "Banner Box Design Lab 6-1",
+    "reputation": 89,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-482",
+    "company_name": "Logo Lane Creative Group 6-2",
+    "reputation": 90,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-483",
+    "company_name": "Brand Forge Toolkit Partners 6-3",
+    "reputation": 91,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-484",
+    "company_name": "Promo Stack Media Works 6-4",
+    "reputation": 92,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-485",
+    "company_name": "Visual Vault Studio Collective 6-5",
+    "reputation": 93,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-486",
+    "company_name": "Asset Mill Forge Suite 6-6",
+    "reputation": 94,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-487",
+    "company_name": "Stage Pack Assets Lab 6-7",
+    "reputation": 88,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-488",
+    "company_name": "Apex Art Graphics Group 6-8",
+    "reputation": 89,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-489",
+    "company_name": "Media Crate Design Partners 6-9",
+    "reputation": 90,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-490",
+    "company_name": "Render Hub Creative Works 6-10",
+    "reputation": 91,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-491",
+    "company_name": "Banner Box Toolkit Collective 6-11",
+    "reputation": 92,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-492",
+    "company_name": "Logo Lane Media Suite 6-12",
+    "reputation": 93,
+    "category": "asset",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-493",
+    "company_name": "Brand Forge Forge Partners 7-1",
+    "reputation": 98,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-494",
+    "company_name": "Promo Stack Assets Works 7-2",
+    "reputation": 99,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-495",
+    "company_name": "Visual Vault Graphics Collective 7-3",
+    "reputation": 100,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-496",
+    "company_name": "Asset Mill Design Suite 7-4",
+    "reputation": 95,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-497",
+    "company_name": "Stage Pack Creative Lab 7-5",
+    "reputation": 96,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-498",
+    "company_name": "Apex Art Toolkit Group 7-6",
+    "reputation": 97,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-499",
+    "company_name": "Media Crate Media Partners 7-7",
+    "reputation": 98,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-500",
+    "company_name": "Render Hub Studio Works 7-8",
+    "reputation": 99,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-501",
+    "company_name": "Banner Box Forge Collective 7-9",
+    "reputation": 100,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-502",
+    "company_name": "Logo Lane Assets Suite 7-10",
+    "reputation": 95,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-503",
+    "company_name": "Brand Forge Graphics Lab 7-11",
+    "reputation": 96,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-504",
+    "company_name": "Promo Stack Design Group 7-12",
+    "reputation": 97,
+    "category": "asset",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-505",
+    "company_name": "Streamline Platform Partners 1-1",
+    "reputation": 39,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-506",
+    "company_name": "Pixel Peak Network Works 1-2",
+    "reputation": 40,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-507",
+    "company_name": "Cloud Punch Media Studio 1-3",
+    "reputation": 41,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-508",
+    "company_name": "Data Dome Systems Collective 1-4",
+    "reputation": 42,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-509",
+    "company_name": "Wireframe Cloud Labs 1-5",
+    "reputation": 43,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-510",
+    "company_name": "Fusion Feed Analytics Group 1-6",
+    "reputation": 44,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-511",
+    "company_name": "Signal Grid Engage Partners 1-7",
+    "reputation": 45,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-512",
+    "company_name": "Neon Sync Digital Works 1-8",
+    "reputation": 46,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-513",
+    "company_name": "Code Arc Platform Studio 1-9",
+    "reputation": 47,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-514",
+    "company_name": "Pulse Cast Network Collective 1-10",
+    "reputation": 48,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-515",
+    "company_name": "Streamline Media Labs 1-11",
+    "reputation": 35,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-516",
+    "company_name": "Pixel Peak Systems Group 1-12",
+    "reputation": 36,
+    "category": "digital",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-517",
+    "company_name": "Cloud Punch Analytics Studio 2-1",
+    "reputation": 57,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-518",
+    "company_name": "Data Dome Engage Collective 2-2",
+    "reputation": 58,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-519",
+    "company_name": "Wireframe Digital Labs 2-3",
+    "reputation": 49,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-520",
+    "company_name": "Fusion Feed Platform Group 2-4",
+    "reputation": 50,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-521",
+    "company_name": "Signal Grid Network Partners 2-5",
+    "reputation": 51,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-522",
+    "company_name": "Neon Sync Media Works 2-6",
+    "reputation": 52,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-523",
+    "company_name": "Code Arc Systems Studio 2-7",
+    "reputation": 53,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-524",
+    "company_name": "Pulse Cast Cloud Collective 2-8",
+    "reputation": 54,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-525",
+    "company_name": "Streamline Analytics Labs 2-9",
+    "reputation": 55,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-526",
+    "company_name": "Pixel Peak Engage Group 2-10",
+    "reputation": 56,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-527",
+    "company_name": "Cloud Punch Digital Partners 2-11",
+    "reputation": 57,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-528",
+    "company_name": "Data Dome Platform Works 2-12",
+    "reputation": 58,
+    "category": "digital",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-529",
+    "company_name": "Wireframe Media Labs 3-1",
+    "reputation": 67,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-530",
+    "company_name": "Fusion Feed Systems Group 3-2",
+    "reputation": 68,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-531",
+    "company_name": "Signal Grid Cloud Partners 3-3",
+    "reputation": 59,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-532",
+    "company_name": "Neon Sync Analytics Works 3-4",
+    "reputation": 60,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-533",
+    "company_name": "Code Arc Engage Studio 3-5",
+    "reputation": 61,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-534",
+    "company_name": "Pulse Cast Digital Collective 3-6",
+    "reputation": 62,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-535",
+    "company_name": "Streamline Platform Labs 3-7",
+    "reputation": 63,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-536",
+    "company_name": "Pixel Peak Network Group 3-8",
+    "reputation": 64,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-537",
+    "company_name": "Cloud Punch Media Partners 3-9",
+    "reputation": 65,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-538",
+    "company_name": "Data Dome Systems Works 3-10",
+    "reputation": 66,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-539",
+    "company_name": "Wireframe Cloud Studio 3-11",
+    "reputation": 67,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-540",
+    "company_name": "Fusion Feed Analytics Collective 3-12",
+    "reputation": 68,
+    "category": "digital",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-541",
+    "company_name": "Signal Grid Digital Partners 4-1",
+    "reputation": 77,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-542",
+    "company_name": "Neon Sync Platform Works 4-2",
+    "reputation": 78,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-543",
+    "company_name": "Code Arc Network Studio 4-3",
+    "reputation": 69,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-544",
+    "company_name": "Pulse Cast Media Collective 4-4",
+    "reputation": 70,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-545",
+    "company_name": "Streamline Systems Labs 4-5",
+    "reputation": 71,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-546",
+    "company_name": "Pixel Peak Cloud Group 4-6",
+    "reputation": 72,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-547",
+    "company_name": "Cloud Punch Analytics Partners 4-7",
+    "reputation": 73,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-548",
+    "company_name": "Data Dome Engage Works 4-8",
+    "reputation": 74,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-549",
+    "company_name": "Wireframe Digital Studio 4-9",
+    "reputation": 75,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-550",
+    "company_name": "Fusion Feed Platform Collective 4-10",
+    "reputation": 76,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-551",
+    "company_name": "Signal Grid Network Labs 4-11",
+    "reputation": 77,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-552",
+    "company_name": "Neon Sync Media Group 4-12",
+    "reputation": 78,
+    "category": "digital",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-553",
+    "company_name": "Code Arc Cloud Studio 5-1",
+    "reputation": 79,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-554",
+    "company_name": "Pulse Cast Analytics Collective 5-2",
+    "reputation": 80,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-555",
+    "company_name": "Streamline Engage Labs 5-3",
+    "reputation": 81,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-556",
+    "company_name": "Pixel Peak Digital Group 5-4",
+    "reputation": 82,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-557",
+    "company_name": "Cloud Punch Platform Partners 5-5",
+    "reputation": 83,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-558",
+    "company_name": "Data Dome Network Works 5-6",
+    "reputation": 84,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-559",
+    "company_name": "Wireframe Media Studio 5-7",
+    "reputation": 85,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-560",
+    "company_name": "Fusion Feed Systems Collective 5-8",
+    "reputation": 86,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-561",
+    "company_name": "Signal Grid Cloud Labs 5-9",
+    "reputation": 87,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-562",
+    "company_name": "Neon Sync Analytics Group 5-10",
+    "reputation": 79,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-563",
+    "company_name": "Code Arc Engage Partners 5-11",
+    "reputation": 80,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-564",
+    "company_name": "Pulse Cast Digital Works 5-12",
+    "reputation": 81,
+    "category": "digital",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-565",
+    "company_name": "Streamline Network Labs 6-1",
+    "reputation": 92,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-566",
+    "company_name": "Pixel Peak Media Group 6-2",
+    "reputation": 93,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-567",
+    "company_name": "Cloud Punch Systems Partners 6-3",
+    "reputation": 94,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-568",
+    "company_name": "Data Dome Cloud Works 6-4",
+    "reputation": 88,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-569",
+    "company_name": "Wireframe Analytics Studio 6-5",
+    "reputation": 89,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-570",
+    "company_name": "Fusion Feed Engage Collective 6-6",
+    "reputation": 90,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-571",
+    "company_name": "Signal Grid Digital Labs 6-7",
+    "reputation": 91,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-572",
+    "company_name": "Neon Sync Platform Group 6-8",
+    "reputation": 92,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-573",
+    "company_name": "Code Arc Network Partners 6-9",
+    "reputation": 93,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-574",
+    "company_name": "Pulse Cast Media Works 6-10",
+    "reputation": 94,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-575",
+    "company_name": "Streamline Systems Studio 6-11",
+    "reputation": 88,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-576",
+    "company_name": "Pixel Peak Cloud Collective 6-12",
+    "reputation": 89,
+    "category": "digital",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-577",
+    "company_name": "Cloud Punch Engage Partners 7-1",
+    "reputation": 95,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-578",
+    "company_name": "Data Dome Digital Works 7-2",
+    "reputation": 96,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-579",
+    "company_name": "Wireframe Platform Studio 7-3",
+    "reputation": 97,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-580",
+    "company_name": "Fusion Feed Network Collective 7-4",
+    "reputation": 98,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-581",
+    "company_name": "Signal Grid Media Labs 7-5",
+    "reputation": 99,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-582",
+    "company_name": "Neon Sync Systems Group 7-6",
+    "reputation": 100,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-583",
+    "company_name": "Code Arc Cloud Partners 7-7",
+    "reputation": 95,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-584",
+    "company_name": "Pulse Cast Analytics Works 7-8",
+    "reputation": 96,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-585",
+    "company_name": "Streamline Engage Studio 7-9",
+    "reputation": 97,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-586",
+    "company_name": "Pixel Peak Digital Collective 7-10",
+    "reputation": 98,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-587",
+    "company_name": "Cloud Punch Platform Labs 7-11",
+    "reputation": 99,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-588",
+    "company_name": "Data Dome Network Group 7-12",
+    "reputation": 100,
+    "category": "digital",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-589",
+    "company_name": "Front Row Hospitality Collective 1-1",
+    "reputation": 42,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-590",
+    "company_name": "Pulse Seat Moments Studios 1-2",
+    "reputation": 43,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-591",
+    "company_name": "VIP Lane Club Network 1-3",
+    "reputation": 44,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-592",
+    "company_name": "Signature Night Access Works 1-4",
+    "reputation": 45,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-593",
+    "company_name": "Gold Access Lounge Group 1-5",
+    "reputation": 46,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-594",
+    "company_name": "Backstage Pass Premium Partners 1-6",
+    "reputation": 47,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-595",
+    "company_name": "Prime Lounge Journey Collective 1-7",
+    "reputation": 48,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-596",
+    "company_name": "Fan Forge Experience Studios 1-8",
+    "reputation": 35,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-597",
+    "company_name": "Arena Club Hospitality Network 1-9",
+    "reputation": 36,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-598",
+    "company_name": "Skybox Moments Works 1-10",
+    "reputation": 37,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-599",
+    "company_name": "Front Row Club Group 1-11",
+    "reputation": 38,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-600",
+    "company_name": "Pulse Seat Access Partners 1-12",
+    "reputation": 39,
+    "category": "experience",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-601",
+    "company_name": "VIP Lane Premium Network 2-1",
+    "reputation": 50,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-602",
+    "company_name": "Signature Night Journey Works 2-2",
+    "reputation": 51,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-603",
+    "company_name": "Gold Access Experience Group 2-3",
+    "reputation": 52,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-604",
+    "company_name": "Backstage Pass Hospitality Partners 2-4",
+    "reputation": 53,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-605",
+    "company_name": "Prime Lounge Moments Collective 2-5",
+    "reputation": 54,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-606",
+    "company_name": "Fan Forge Club Studios 2-6",
+    "reputation": 55,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-607",
+    "company_name": "Arena Club Access Network 2-7",
+    "reputation": 56,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-608",
+    "company_name": "Skybox Lounge Works 2-8",
+    "reputation": 57,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-609",
+    "company_name": "Front Row Premium Group 2-9",
+    "reputation": 58,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-610",
+    "company_name": "Pulse Seat Journey Partners 2-10",
+    "reputation": 49,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-611",
+    "company_name": "VIP Lane Experience Collective 2-11",
+    "reputation": 50,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-612",
+    "company_name": "Signature Night Hospitality Studios 2-12",
+    "reputation": 51,
+    "category": "experience",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-613",
+    "company_name": "Gold Access Club Group 3-1",
+    "reputation": 60,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-614",
+    "company_name": "Backstage Pass Access Partners 3-2",
+    "reputation": 61,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-615",
+    "company_name": "Prime Lounge Lounge Collective 3-3",
+    "reputation": 62,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-616",
+    "company_name": "Fan Forge Premium Studios 3-4",
+    "reputation": 63,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-617",
+    "company_name": "Arena Club Journey Network 3-5",
+    "reputation": 64,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-618",
+    "company_name": "Skybox Experience Works 3-6",
+    "reputation": 65,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-619",
+    "company_name": "Front Row Hospitality Group 3-7",
+    "reputation": 66,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-620",
+    "company_name": "Pulse Seat Moments Partners 3-8",
+    "reputation": 67,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-621",
+    "company_name": "VIP Lane Club Collective 3-9",
+    "reputation": 68,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-622",
+    "company_name": "Signature Night Access Studios 3-10",
+    "reputation": 59,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-623",
+    "company_name": "Gold Access Lounge Network 3-11",
+    "reputation": 60,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-624",
+    "company_name": "Backstage Pass Premium Works 3-12",
+    "reputation": 61,
+    "category": "experience",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-625",
+    "company_name": "Prime Lounge Experience Collective 4-1",
+    "reputation": 70,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-626",
+    "company_name": "Fan Forge Hospitality Studios 4-2",
+    "reputation": 71,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-627",
+    "company_name": "Arena Club Moments Network 4-3",
+    "reputation": 72,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-628",
+    "company_name": "Skybox Club Works 4-4",
+    "reputation": 73,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-629",
+    "company_name": "Front Row Access Group 4-5",
+    "reputation": 74,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-630",
+    "company_name": "Pulse Seat Lounge Partners 4-6",
+    "reputation": 75,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-631",
+    "company_name": "VIP Lane Premium Collective 4-7",
+    "reputation": 76,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-632",
+    "company_name": "Signature Night Journey Studios 4-8",
+    "reputation": 77,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-633",
+    "company_name": "Gold Access Experience Network 4-9",
+    "reputation": 78,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-634",
+    "company_name": "Backstage Pass Hospitality Works 4-10",
+    "reputation": 69,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-635",
+    "company_name": "Prime Lounge Moments Group 4-11",
+    "reputation": 70,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-636",
+    "company_name": "Fan Forge Club Partners 4-12",
+    "reputation": 71,
+    "category": "experience",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-637",
+    "company_name": "Arena Club Lounge Network 5-1",
+    "reputation": 82,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-638",
+    "company_name": "Skybox Premium Works 5-2",
+    "reputation": 83,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-639",
+    "company_name": "Front Row Journey Group 5-3",
+    "reputation": 84,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-640",
+    "company_name": "Pulse Seat Experience Partners 5-4",
+    "reputation": 85,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-641",
+    "company_name": "VIP Lane Hospitality Collective 5-5",
+    "reputation": 86,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-642",
+    "company_name": "Signature Night Moments Studios 5-6",
+    "reputation": 87,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-643",
+    "company_name": "Gold Access Club Network 5-7",
+    "reputation": 79,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-644",
+    "company_name": "Backstage Pass Access Works 5-8",
+    "reputation": 80,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-645",
+    "company_name": "Prime Lounge Lounge Group 5-9",
+    "reputation": 81,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-646",
+    "company_name": "Fan Forge Premium Partners 5-10",
+    "reputation": 82,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-647",
+    "company_name": "Arena Club Journey Collective 5-11",
+    "reputation": 83,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-648",
+    "company_name": "Skybox Experience Studios 5-12",
+    "reputation": 84,
+    "category": "experience",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-649",
+    "company_name": "Front Row Moments Group 6-1",
+    "reputation": 88,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-650",
+    "company_name": "Pulse Seat Club Partners 6-2",
+    "reputation": 89,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-651",
+    "company_name": "VIP Lane Access Collective 6-3",
+    "reputation": 90,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-652",
+    "company_name": "Signature Night Lounge Studios 6-4",
+    "reputation": 91,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-653",
+    "company_name": "Gold Access Premium Network 6-5",
+    "reputation": 92,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-654",
+    "company_name": "Backstage Pass Journey Works 6-6",
+    "reputation": 93,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-655",
+    "company_name": "Prime Lounge Experience Group 6-7",
+    "reputation": 94,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-656",
+    "company_name": "Fan Forge Hospitality Partners 6-8",
+    "reputation": 88,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-657",
+    "company_name": "Arena Club Moments Collective 6-9",
+    "reputation": 89,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-658",
+    "company_name": "Skybox Club Studios 6-10",
+    "reputation": 90,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-659",
+    "company_name": "Front Row Access Network 6-11",
+    "reputation": 91,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-660",
+    "company_name": "Pulse Seat Lounge Works 6-12",
+    "reputation": 92,
+    "category": "experience",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-661",
+    "company_name": "VIP Lane Journey Collective 7-1",
+    "reputation": 98,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-662",
+    "company_name": "Signature Night Experience Studios 7-2",
+    "reputation": 99,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-663",
+    "company_name": "Gold Access Hospitality Network 7-3",
+    "reputation": 100,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-664",
+    "company_name": "Backstage Pass Moments Works 7-4",
+    "reputation": 95,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-665",
+    "company_name": "Prime Lounge Club Group 7-5",
+    "reputation": 96,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-666",
+    "company_name": "Fan Forge Access Partners 7-6",
+    "reputation": 97,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-667",
+    "company_name": "Arena Club Lounge Collective 7-7",
+    "reputation": 98,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-668",
+    "company_name": "Skybox Premium Studios 7-8",
+    "reputation": 99,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-669",
+    "company_name": "Front Row Journey Network 7-9",
+    "reputation": 100,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-670",
+    "company_name": "Pulse Seat Experience Works 7-10",
+    "reputation": 95,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-671",
+    "company_name": "VIP Lane Hospitality Group 7-11",
+    "reputation": 96,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-672",
+    "company_name": "Signature Night Moments Partners 7-12",
+    "reputation": 97,
+    "category": "experience",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-673",
+    "company_name": "Headline Broadcast Studios 1-1",
+    "reputation": 45,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-674",
+    "company_name": "Broadcast Bay Press Network 1-2",
+    "reputation": 46,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-675",
+    "company_name": "Pressline Network Collective 1-3",
+    "reputation": 47,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-676",
+    "company_name": "Storyline Coverage Works 1-4",
+    "reputation": 48,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-677",
+    "company_name": "Spotlight Channel Group 1-5",
+    "reputation": 35,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-678",
+    "company_name": "Talkback Studio Partners 1-6",
+    "reputation": 36,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-679",
+    "company_name": "Airwave Report Studios 1-7",
+    "reputation": 37,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-680",
+    "company_name": "Replay Media Network 1-8",
+    "reputation": 38,
+    "category": "media",
+    "tier": 1,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-681",
+    "company_name": "Camera Row Broadcast Collective 1-9",
+    "reputation": 39,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-682",
+    "company_name": "Anchor Desk Press Works 1-10",
+    "reputation": 40,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-683",
+    "company_name": "Headline Network Group 1-11",
+    "reputation": 41,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-684",
+    "company_name": "Broadcast Bay Coverage Partners 1-12",
+    "reputation": 42,
+    "category": "media",
+    "tier": 1,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-685",
+    "company_name": "Pressline Studio Collective 2-1",
+    "reputation": 53,
+    "category": "media",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-686",
+    "company_name": "Storyline Report Works 2-2",
+    "reputation": 54,
+    "category": "media",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-687",
+    "company_name": "Spotlight Media Group 2-3",
+    "reputation": 55,
+    "category": "media",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-688",
+    "company_name": "Talkback Broadcast Partners 2-4",
+    "reputation": 56,
+    "category": "media",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-689",
+    "company_name": "Airwave Press Studios 2-5",
+    "reputation": 57,
+    "category": "media",
+    "tier": 2,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-690",
+    "company_name": "Replay Network Network 2-6",
+    "reputation": 58,
+    "category": "media",
+    "tier": 2,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-691",
+    "company_name": "Camera Row Coverage Collective 2-7",
+    "reputation": 49,
+    "category": "media",
+    "tier": 2,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-692",
+    "company_name": "Anchor Desk Channel Works 2-8",
+    "reputation": 50,
+    "category": "media",
+    "tier": 2,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-693",
+    "company_name": "Headline Studio Group 2-9",
+    "reputation": 51,
+    "category": "media",
+    "tier": 2,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-694",
+    "company_name": "Broadcast Bay Report Partners 2-10",
+    "reputation": 52,
+    "category": "media",
+    "tier": 2,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-695",
+    "company_name": "Pressline Media Studios 2-11",
+    "reputation": 53,
+    "category": "media",
+    "tier": 2,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-696",
+    "company_name": "Storyline Broadcast Network 2-12",
+    "reputation": 54,
+    "category": "media",
+    "tier": 2,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-697",
+    "company_name": "Spotlight Network Group 3-1",
+    "reputation": 63,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-698",
+    "company_name": "Talkback Coverage Partners 3-2",
+    "reputation": 64,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-699",
+    "company_name": "Airwave Channel Studios 3-3",
+    "reputation": 65,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-700",
+    "company_name": "Replay Studio Network 3-4",
+    "reputation": 66,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-701",
+    "company_name": "Camera Row Report Collective 3-5",
+    "reputation": 67,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-702",
+    "company_name": "Anchor Desk Media Works 3-6",
+    "reputation": 68,
+    "category": "media",
+    "tier": 3,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-703",
+    "company_name": "Headline Broadcast Group 3-7",
+    "reputation": 59,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-704",
+    "company_name": "Broadcast Bay Press Partners 3-8",
+    "reputation": 60,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-705",
+    "company_name": "Pressline Network Studios 3-9",
+    "reputation": 61,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-706",
+    "company_name": "Storyline Coverage Network 3-10",
+    "reputation": 62,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-707",
+    "company_name": "Spotlight Channel Collective 3-11",
+    "reputation": 63,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-708",
+    "company_name": "Talkback Studio Works 3-12",
+    "reputation": 64,
+    "category": "media",
+    "tier": 3,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-709",
+    "company_name": "Airwave Media Studios 4-1",
+    "reputation": 73,
+    "category": "media",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-710",
+    "company_name": "Replay Broadcast Network 4-2",
+    "reputation": 74,
+    "category": "media",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-711",
+    "company_name": "Camera Row Press Collective 4-3",
+    "reputation": 75,
+    "category": "media",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-712",
+    "company_name": "Anchor Desk Network Works 4-4",
+    "reputation": 76,
+    "category": "media",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-713",
+    "company_name": "Headline Coverage Group 4-5",
+    "reputation": 77,
+    "category": "media",
+    "tier": 4,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-714",
+    "company_name": "Broadcast Bay Channel Partners 4-6",
+    "reputation": 78,
+    "category": "media",
+    "tier": 4,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-715",
+    "company_name": "Pressline Studio Studios 4-7",
+    "reputation": 69,
+    "category": "media",
+    "tier": 4,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-716",
+    "company_name": "Storyline Report Network 4-8",
+    "reputation": 70,
+    "category": "media",
+    "tier": 4,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-717",
+    "company_name": "Spotlight Media Collective 4-9",
+    "reputation": 71,
+    "category": "media",
+    "tier": 4,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-718",
+    "company_name": "Talkback Broadcast Works 4-10",
+    "reputation": 72,
+    "category": "media",
+    "tier": 4,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-719",
+    "company_name": "Airwave Press Group 4-11",
+    "reputation": 73,
+    "category": "media",
+    "tier": 4,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-720",
+    "company_name": "Replay Network Partners 4-12",
+    "reputation": 74,
+    "category": "media",
+    "tier": 4,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-721",
+    "company_name": "Camera Row Channel Collective 5-1",
+    "reputation": 85,
+    "category": "media",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-722",
+    "company_name": "Anchor Desk Studio Works 5-2",
+    "reputation": 86,
+    "category": "media",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-723",
+    "company_name": "Headline Report Group 5-3",
+    "reputation": 87,
+    "category": "media",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-724",
+    "company_name": "Broadcast Bay Media Partners 5-4",
+    "reputation": 79,
+    "category": "media",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-725",
+    "company_name": "Pressline Broadcast Studios 5-5",
+    "reputation": 80,
+    "category": "media",
+    "tier": 5,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-726",
+    "company_name": "Storyline Press Network 5-6",
+    "reputation": 81,
+    "category": "media",
+    "tier": 5,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-727",
+    "company_name": "Spotlight Network Collective 5-7",
+    "reputation": 82,
+    "category": "media",
+    "tier": 5,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-728",
+    "company_name": "Talkback Coverage Works 5-8",
+    "reputation": 83,
+    "category": "media",
+    "tier": 5,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-729",
+    "company_name": "Airwave Channel Group 5-9",
+    "reputation": 84,
+    "category": "media",
+    "tier": 5,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-730",
+    "company_name": "Replay Studio Partners 5-10",
+    "reputation": 85,
+    "category": "media",
+    "tier": 5,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-731",
+    "company_name": "Camera Row Report Studios 5-11",
+    "reputation": 86,
+    "category": "media",
+    "tier": 5,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-732",
+    "company_name": "Anchor Desk Media Network 5-12",
+    "reputation": 87,
+    "category": "media",
+    "tier": 5,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-733",
+    "company_name": "Headline Press Group 6-1",
+    "reputation": 91,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-734",
+    "company_name": "Broadcast Bay Network Partners 6-2",
+    "reputation": 92,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-735",
+    "company_name": "Pressline Coverage Studios 6-3",
+    "reputation": 93,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-736",
+    "company_name": "Storyline Channel Network 6-4",
+    "reputation": 94,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-737",
+    "company_name": "Spotlight Studio Collective 6-5",
+    "reputation": 88,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-738",
+    "company_name": "Talkback Report Works 6-6",
+    "reputation": 89,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-739",
+    "company_name": "Airwave Media Group 6-7",
+    "reputation": 90,
+    "category": "media",
+    "tier": 6,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-740",
+    "company_name": "Replay Broadcast Partners 6-8",
+    "reputation": 91,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-741",
+    "company_name": "Camera Row Press Studios 6-9",
+    "reputation": 92,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-742",
+    "company_name": "Anchor Desk Network Network 6-10",
+    "reputation": 93,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-743",
+    "company_name": "Headline Coverage Collective 6-11",
+    "reputation": 94,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-744",
+    "company_name": "Broadcast Bay Channel Works 6-12",
+    "reputation": 88,
+    "category": "media",
+    "tier": 6,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-745",
+    "company_name": "Pressline Report Studios 7-1",
+    "reputation": 95,
+    "category": "media",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-746",
+    "company_name": "Storyline Media Network 7-2",
+    "reputation": 96,
+    "category": "media",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-747",
+    "company_name": "Spotlight Broadcast Collective 7-3",
+    "reputation": 97,
+    "category": "media",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-748",
+    "company_name": "Talkback Press Works 7-4",
+    "reputation": 98,
+    "category": "media",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-749",
+    "company_name": "Airwave Network Group 7-5",
+    "reputation": 99,
+    "category": "media",
+    "tier": 7,
+    "market_region": "Latin America",
+    "brand_fit": "Performance",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-750",
+    "company_name": "Replay Coverage Partners 7-6",
+    "reputation": 100,
+    "category": "media",
+    "tier": 7,
+    "market_region": "Global",
+    "brand_fit": "Combat",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-751",
+    "company_name": "Camera Row Channel Studios 7-7",
+    "reputation": 95,
+    "category": "media",
+    "tier": 7,
+    "market_region": "Middle East",
+    "brand_fit": "Entertainment",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-752",
+    "company_name": "Anchor Desk Studio Network 7-8",
+    "reputation": 96,
+    "category": "media",
+    "tier": 7,
+    "market_region": "Oceania",
+    "brand_fit": "Luxury",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-753",
+    "company_name": "Headline Report Collective 7-9",
+    "reputation": 97,
+    "category": "media",
+    "tier": 7,
+    "market_region": "Africa",
+    "brand_fit": "Community",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-754",
+    "company_name": "Broadcast Bay Media Works 7-10",
+    "reputation": 98,
+    "category": "media",
+    "tier": 7,
+    "market_region": "North America",
+    "brand_fit": "Lifestyle",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-755",
+    "company_name": "Pressline Broadcast Group 7-11",
+    "reputation": 99,
+    "category": "media",
+    "tier": 7,
+    "market_region": "Europe",
+    "brand_fit": "Tech",
+    "is_event_only": false
+  },
+  {
+    "id": "SP-756",
+    "company_name": "Storyline Press Partners 7-12",
+    "reputation": 100,
+    "category": "media",
+    "tier": 7,
+    "market_region": "Asia",
+    "brand_fit": "Media",
+    "is_event_only": false
+  }
+]

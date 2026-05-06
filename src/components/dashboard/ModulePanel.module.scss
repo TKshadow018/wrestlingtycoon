@@ -1,0 +1,54 @@
+.modulePanel {
+  background: linear-gradient(160deg, rgba(20, 32, 47, 0.84), rgba(7, 13, 21, 0.92));
+  border: 1px solid var(--line-soft);
+  border-radius: 16px;
+  min-height: 340px;
+  padding: 1rem;
+
+  header {
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h2 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+    }
+
+    p {
+      color: var(--text-faint);
+      font-size: 0.9rem;
+      margin-top: 0.45rem;
+      max-width: 65ch;
+    }
+  }
+}
+
+.focusCard {
+  background: rgba(7, 11, 18, 0.72);
+  border: 1px solid rgba(243, 159, 97, 0.25);
+  border-radius: 14px;
+  margin-top: 1rem;
+  padding: 1rem;
+
+  p,
+  h3 {
+    margin: 0;
+  }
+
+  p {
+    color: var(--text-faint);
+    font-size: 0.76rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    color: var(--accent-copper);
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    margin-top: 0.45rem;
+  }
+}

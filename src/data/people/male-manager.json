@@ -1,0 +1,107 @@
+[
+  {
+    "id": "manager-male-001",
+    "name": "Sawyer Storm",
+    "dob": "1977-02-05",
+    "gender": "male",
+    "role": "manager",
+    "salary_demand": {
+      "monthly_wage": 6738,
+      "per_match_salary": 1213,
+      "additional_bonus": 2156
+    },
+    "popularity": 35,
+    "has_money_amount": 60446,
+    "management_ability": {
+      "charisma": 81,
+      "negotiation": 89,
+      "promo_skill": 95,
+      "strategy": 54
+    },
+    "image_url": "/people/manager/male/1.png"
+  },
+  {
+    "id": "manager-male-002",
+    "name": "Tyler Steele",
+    "dob": "1987-02-22",
+    "gender": "male",
+    "role": "manager",
+    "salary_demand": {
+      "monthly_wage": 7258,
+      "per_match_salary": 1306,
+      "additional_bonus": 2323
+    },
+    "popularity": 60,
+    "has_money_amount": 66305,
+    "management_ability": {
+      "charisma": 92,
+      "negotiation": 52,
+      "promo_skill": 67,
+      "strategy": 55
+    },
+    "image_url": "/people/manager/male/2.png"
+  },
+  {
+    "id": "manager-male-003",
+    "name": "Umar Vale",
+    "dob": "1994-09-17",
+    "gender": "male",
+    "role": "manager",
+    "salary_demand": {
+      "monthly_wage": 3389,
+      "per_match_salary": 610,
+      "additional_bonus": 1084
+    },
+    "popularity": 51,
+    "has_money_amount": 39746,
+    "management_ability": {
+      "charisma": 79,
+      "negotiation": 79,
+      "promo_skill": 48,
+      "strategy": 76
+    },
+    "image_url": "/people/manager/male/3.png"
+  },
+  {
+    "id": "manager-male-004",
+    "name": "Victor Mercer",
+    "dob": "1991-01-21",
+    "gender": "male",
+    "role": "manager",
+    "salary_demand": {
+      "monthly_wage": 7125,
+      "per_match_salary": 1283,
+      "additional_bonus": 2280
+    },
+    "popularity": 36,
+    "has_money_amount": 36107,
+    "management_ability": {
+      "charisma": 57,
+      "negotiation": 68,
+      "promo_skill": 86,
+      "strategy": 50
+    },
+    "image_url": "/people/manager/male/4.png"
+  },
+  {
+    "id": "manager-male-005",
+    "name": "Wyatt Santos",
+    "dob": "1979-11-23",
+    "gender": "male",
+    "role": "manager",
+    "salary_demand": {
+      "monthly_wage": 6460,
+      "per_match_salary": 1163,
+      "additional_bonus": 2067
+    },
+    "popularity": 76,
+    "has_money_amount": 9936,
+    "management_ability": {
+      "charisma": 80,
+      "negotiation": 92,
+      "promo_skill": 52,
+      "strategy": 48
+    },
+    "image_url": "/people/manager/male/5.png"
+  }
+]

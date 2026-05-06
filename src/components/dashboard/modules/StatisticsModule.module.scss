@@ -1,0 +1,76 @@
+.moduleBody {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.kpiGrid {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+
+  article {
+    background: rgba(8, 13, 20, 0.8);
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+    padding: 0.75rem;
+
+    p,
+    h4 {
+      margin: 0;
+    }
+
+    p {
+      color: var(--text-faint);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h4 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      margin-top: 0.35rem;
+    }
+  }
+}
+
+.emptyState {
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.trendGrid {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.timelineList {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.timelineRow {
+  background: rgba(8, 13, 20, 0.8);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0.7rem;
+
+  p,
+  small {
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.85rem;
+  }
+
+  small {
+    color: var(--text-faint);
+    font-size: 0.75rem;
+  }
+}

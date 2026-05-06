@@ -1,0 +1,39 @@
+.controlPanel {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.primaryButton,
+.resetButton {
+  border: 0;
+  border-radius: 12px;
+  color: #f2f8fa;
+  cursor: pointer;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  padding: 0.9rem 1.2rem;
+  text-transform: uppercase;
+  width: 100%;
+
+  &:hover {
+    filter: brightness(1.05);
+  }
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, #0f7b72, #25a19b);
+  box-shadow: 0 12px 24px rgba(37, 161, 155, 0.34);
+}
+
+.resetButton {
+  background: linear-gradient(135deg, #662d2d, #914141);
+  box-shadow: 0 10px 20px rgba(145, 65, 65, 0.3);
+}
+
+.saveHint {
+  color: var(--text-faint);
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  margin: 0.15rem 0 0;
+  text-transform: uppercase;
+}

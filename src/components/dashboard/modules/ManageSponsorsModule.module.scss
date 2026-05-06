@@ -1,0 +1,121 @@
+.moduleBody {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.typeSection {
+  background: rgba(8, 13, 20, 0.45);
+  border: 1px solid rgba(145, 171, 215, 0.2);
+  border-radius: 12px;
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.8rem;
+}
+
+.typeHeader {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+
+  h4,
+  p {
+    margin: 0;
+  }
+
+  h4 {
+    font-size: 0.96rem;
+    letter-spacing: 0.04em;
+  }
+
+  p {
+    color: var(--text-faint);
+    font-size: 0.78rem;
+  }
+}
+
+.headerRow {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+
+  p {
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  button {
+    background: rgba(15, 123, 114, 0.2);
+    border: 1px solid rgba(37, 161, 155, 0.6);
+    border-radius: 10px;
+    color: var(--text-main);
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    padding: 0.55rem 0.8rem;
+    text-transform: uppercase;
+  }
+}
+
+.emptyState {
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.activeList,
+.offerGrid {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+}
+
+.activeCard,
+.offerCard {
+  background: rgba(8, 13, 20, 0.8);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 0.8rem;
+
+  h5,
+  p {
+    margin: 0;
+  }
+
+  h5 {
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+  }
+
+  p {
+    color: var(--text-faint);
+    font-size: 0.82rem;
+    margin-top: 0.2rem;
+  }
+}
+
+.offerCard {
+  button {
+    background: linear-gradient(135deg, #bd5d2b, #f39f61);
+    border: 0;
+    border-radius: 10px;
+    color: #121212;
+    cursor: pointer;
+    font-size: 0.78rem;
+    letter-spacing: 0.07em;
+    margin-top: 0.65rem;
+    padding: 0.55rem 0.7rem;
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    filter: saturate(0.25);
+    opacity: 0.65;
+  }
+}
+
+.hint {
+  color: var(--text-faint);
+  font-size: 0.75rem;
+  margin-top: 0.45rem;
+}

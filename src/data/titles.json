@@ -1,0 +1,72 @@
+[
+  {
+    "titleId": "world-championship",
+    "name": "World Heavyweight Championship Beft",
+    "division": "singles",
+    "image": "/Belt/world.png",
+    "isActive": true,
+    "holderEmployeeId": null,
+    "prestige": 100,
+    "isWomenOnly": false
+  },
+  {
+    "titleId": "national-star-belt",
+    "name": "Superstar of Tomorrow Belt",
+    "division": "singles",
+    "image": "/Belt/sot.png",
+    "isActive": true,
+    "holderEmployeeId": null,
+    "prestige": 70,
+    "isWomenOnly": false
+  },
+  {
+    "titleId": "womens-championship",
+    "name": "Womens Championship",
+    "division": "singles",
+    "image": "/Belt/women.png",
+    "isActive": true,
+    "holderEmployeeId": null,
+    "prestige": 80,
+    "isWomenOnly": true
+  },
+  {
+    "titleId": "sultan-of-bengal",
+    "name": "Sultan of Bengal ",
+    "division": "singles",
+    "image": "/Belt/sultan.png",
+    "isActive": false,
+    "holderEmployeeId": null,
+    "prestige": 80,
+    "isWomenOnly": false
+  },
+  {
+    "titleId": "money-in-the-bank",
+    "name": "Money in the Bank",
+    "division": "singles",
+    "image": "/Belt/mib.png",
+    "isActive": false,
+    "holderEmployeeId": null,
+    "prestige": 30,
+    "isWomenOnly": false
+  },
+  {
+    "titleId": "tag-team-championship",
+    "name": "Tag Team Championship",
+    "division": "doubles",
+    "image": "/Belt/tag.png",
+    "isActive": true,
+    "holderEmployeeId": null,
+    "prestige": 60,
+    "isWomenOnly": false
+  },
+  {
+    "titleId": "womens-tag-team-championship",
+    "name": "Womens Tag Team Championship",
+    "division": "doubles",
+    "image": "/Belt/tag.png",
+    "isActive": true,
+    "holderEmployeeId": null,
+    "prestige": 60,
+    "isWomenOnly": true
+  }
+]
