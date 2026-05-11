@@ -124,19 +124,37 @@
   text-transform: uppercase;
 }
 
-.teamMemberNames {
+.teamMembers {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
+}
+
+.teamMemberChip {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 0.35rem;
+  overflow: hidden;
+  padding: 0.14rem 0.42rem 0.14rem 0.14rem;
 
   span {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 999px;
     color: #dbe7f2;
-    font-size: 0.69rem;
-    padding: 0.16rem 0.42rem;
+    font-size: 2rem;
+    padding: 0px 10px;
+    line-height: 1;
   }
+}
+
+.teamMemberImage {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  display: block;
+  height: 10rem;
+  object-fit: cover;
+  width: 10rem;
 }
 
 .rankIndex {

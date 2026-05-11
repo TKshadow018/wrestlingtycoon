@@ -87,3 +87,320 @@
 .negative {
   color: #ff9b9b;
 }
+
+.subscriptionPanel {
+  align-items: center;
+  background: rgba(8, 13, 20, 0.8);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+
+  p,
+  h4,
+  small {
+    margin: 0;
+  }
+
+  p {
+    color: var(--text-faint);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  h4 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    margin-top: 0.2rem;
+  }
+
+  small {
+    color: var(--text-faint);
+    font-size: 0.75rem;
+  }
+}
+
+.subscriptionEdit {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.feeInput {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  padding: 0.45rem 0.7rem;
+  width: 90px;
+
+  &:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+}
+
+.feeApplyBtn {
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.45rem 0.9rem;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.ticketFeePanel {
+  background: rgba(8, 13, 20, 0.8);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  display: grid;
+  gap: 0.8rem;
+  padding: 0.85rem 1rem;
+}
+
+.ticketFeeList {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.ticketFeeRow {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: space-between;
+
+  p,
+  small {
+    margin: 0;
+  }
+
+  p {
+    color: var(--text-faint);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  small {
+    color: var(--text-main);
+    font-size: 0.82rem;
+  }
+}
+
+// ─── Tab navigation ────────────────────────────────────────────────────────────
+.tabBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tabBtn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  color: var(--text-faint);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.85rem;
+  text-transform: uppercase;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+  }
+}
+
+.tabBtnActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+
+  &:hover {
+    background: var(--accent);
+    color: #000;
+    opacity: 0.9;
+  }
+}
+
+// ─── Period selector ───────────────────────────────────────────────────────────
+.periodBar {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.periodBtn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  color: var(--text-faint);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.7rem;
+  text-transform: uppercase;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+  }
+}
+
+.periodBtnActive {
+  background: rgba(114, 224, 179, 0.15);
+  border-color: #72e0b3;
+  color: #72e0b3;
+}
+
+// ─── Overview breakdown cards ──────────────────────────────────────────────────
+.breakdownGrid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.breakdownCard {
+  background: rgba(8, 13, 20, 0.8);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem 1rem;
+}
+
+.breakdownTitle {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.3rem;
+  text-transform: uppercase;
+}
+
+.breakdownRow {
+  align-items: center;
+  display: grid;
+  font-size: 0.84rem;
+  gap: 0.5rem;
+  grid-template-columns: 10px 1fr auto;
+
+  span {
+    color: var(--text-primary);
+  }
+}
+
+.breakdownAmt {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.breakdownTotal {
+  border-top: 1px solid var(--line-soft);
+  font-weight: 700;
+  margin-top: 0.2rem;
+  padding-top: 0.4rem;
+}
+
+.dot {
+  border-radius: 50%;
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+}
+
+// ─── Breakdown tables ──────────────────────────────────────────────────────────
+.breakdownTableWrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.breakdownTable {
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  min-width: 600px;
+  width: 100%;
+
+  th,
+  td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.5rem 0.75rem;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  th {
+    color: var(--text-faint);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  td:first-child,
+  th:first-child {
+    text-align: left;
+  }
+
+  tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  tfoot td {
+    border-top: 1px solid var(--line-soft);
+    font-weight: 700;
+  }
+}
+
+// ─── Charts grid ───────────────────────────────────────────────────────────────
+.chartsGrid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+
+.chartCard {
+  background: rgba(8, 13, 20, 0.8);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 0.85rem 1rem 0.6rem;
+}
+
+.chartCardTitle {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.6rem;
+  text-transform: uppercase;
+}
+
+.chartTooltip {
+  background: rgba(10, 14, 22, 0.95);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+}
+
+.chartTooltipLabel {
+  color: var(--text-faint);
+  font-size: 0.75rem;
+  margin: 0 0 0.3rem;
+  text-transform: uppercase;
+}

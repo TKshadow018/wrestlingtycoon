@@ -147,8 +147,108 @@ function ManageEventsModule() {
         <article className={styles.outcomeCard}>
           <p>Latest Event Outcome</p>
           <h4>{lastOutcome.type === 'success' ? `${lastOutcome.eventName} delivered a strong show` : 'No event outcome available'}</h4>
-          <small>Income: $ {lastOutcome.income.toLocaleString()} | Expenses: $ {lastOutcome.expenses.toLocaleString()}</small>
-          <small>Fans Delta: {lastOutcome.fanDelta} | Prestige Delta: {lastOutcome.prestigeDelta}</small>
+
+          {lastOutcome.audience != null && (
+            <div className={styles.outcomeRow}>
+              <span>Audience</span>
+              <span>{lastOutcome.audience.toLocaleString()} attendees</span>
+            </div>
+          )}
+
+          {lastOutcome.overallRating != null && (
+            <div className={styles.outcomeRow}>
+              <span>Overall Rating</span>
+              <span>★ {lastOutcome.overallRating} / 10</span>
+            </div>
+          )}
+
+          <div className={styles.outcomeRow}>
+            <span>Fans</span>
+            <span className={lastOutcome.fanDelta >= 0 ? styles.positive : styles.negative}>
+              {lastOutcome.fanDelta >= 0 ? '+' : ''}{lastOutcome.fanDelta}
+            </span>
+          </div>
+
+          <div className={styles.outcomeRow}>
+            <span>Prestige</span>
+            <span className={lastOutcome.prestigeDelta >= 0 ? styles.positive : styles.negative}>
+              {lastOutcome.prestigeDelta >= 0 ? '+' : ''}{lastOutcome.prestigeDelta}
+            </span>
+          </div>
+
+          {lastOutcome.incomeBreakdown && (
+            <div className={styles.breakdownSection}>
+              <p className={styles.breakdownTitle}>Day Earnings Breakdown</p>
+              <div className={styles.outcomeRow}>
+                <span>Event Gate</span>
+                <span className={styles.positive}>+$ {(lastOutcome.incomeBreakdown.eventGate || 0).toLocaleString()}</span>
+              </div>
+              <div className={styles.outcomeRow}>
+                <span>Merchandise</span>
+                <span className={styles.positive}>+$ {(lastOutcome.incomeBreakdown.merchandise || 0).toLocaleString()}</span>
+              </div>
+              <div className={styles.outcomeRow}>
+                <span>Sponsor</span>
+                <span className={styles.positive}>+$ {(lastOutcome.incomeBreakdown.sponsor || 0).toLocaleString()}</span>
+              </div>
+              <div className={styles.outcomeRow}>
+                <span>Web Subscriptions</span>
+                <span className={styles.positive}>+$ {(lastOutcome.incomeBreakdown.webSubscription || 0).toLocaleString()}</span>
+              </div>
+              {(lastOutcome.incomeBreakdown.thirdParty || 0) > 0 && (
+                <div className={styles.outcomeRow}>
+                  <span>3rd Party</span>
+                  <span className={styles.positive}>+$ {lastOutcome.incomeBreakdown.thirdParty.toLocaleString()}</span>
+                </div>
+              )}
+              <div className={`${styles.outcomeRow} ${styles.outcomeTotal}`}>
+                <span>Total Income</span>
+                <span className={styles.positive}>$ {(lastOutcome.totalDayIncome || 0).toLocaleString()}</span>
+              </div>
+            </div>
+          )}
+
+          {lastOutcome.expenseBreakdown && (
+            <div className={styles.breakdownSection}>
+              <p className={styles.breakdownTitle}>Day Cost Breakdown</p>
+              <div className={styles.outcomeRow}>
+                <span>Event Cost</span>
+                <span className={styles.negative}>-$ {(lastOutcome.expenseBreakdown.eventCost || 0).toLocaleString()}</span>
+              </div>
+              <div className={styles.outcomeRow}>
+                <span>Wrestler Payroll</span>
+                <span className={styles.negative}>-$ {(lastOutcome.expenseBreakdown.wrestlerPayroll || 0).toLocaleString()}</span>
+              </div>
+              <div className={styles.outcomeRow}>
+                <span>Staff Cost</span>
+                <span className={styles.negative}>-$ {(lastOutcome.expenseBreakdown.staffCost || 0).toLocaleString()}</span>
+              </div>
+              <div className={styles.outcomeRow}>
+                <span>Operating Cost</span>
+                <span className={styles.negative}>-$ {(lastOutcome.expenseBreakdown.operatingCost || 0).toLocaleString()}</span>
+              </div>
+              <div className={styles.outcomeRow}>
+                <span>Other Cost</span>
+                <span className={styles.negative}>-$ {(lastOutcome.expenseBreakdown.otherCost || 0).toLocaleString()}</span>
+              </div>
+              <div className={`${styles.outcomeRow} ${styles.outcomeTotal}`}>
+                <span>Total Expenses</span>
+                <span className={styles.negative}>$ {(lastOutcome.totalDayExpenses || 0).toLocaleString()}</span>
+              </div>
+            </div>
+          )}
+
+          {lastOutcome.setup && (
+            <div className={styles.breakdownSection}>
+              <p className={styles.breakdownTitle}>Participation ({lastOutcome.setup.uniqueParticipants} unique)</p>
+              {lastOutcome.setup.segments.map((seg, i) => (
+                <div key={i} className={styles.outcomeRow}>
+                  <span className={styles.segType}>{seg.segmentType}</span>
+                  <span>{seg.participants.join(', ') || '—'}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </article>
       ) : null}
 

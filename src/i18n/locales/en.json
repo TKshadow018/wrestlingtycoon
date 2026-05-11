@@ -49,6 +49,7 @@
     "controls": {
       "proceedDay": "Proceed to Next Day",
       "proceedEvent": "Proceed to Event",
+      "eventPreparation": "Event Preparation",
       "resetGame": "Reset Game",
       "resetConfirm": "Reset this save and return to a fresh game state?"
     },
@@ -256,6 +257,8 @@
         "dragHintReferee": "Drag referee here",
         "dragHintAnnouncer": "Drag announcer/interviewer here",
         "dragHintInterviewerOptional": "Drag interviewer here (optional)",
+        "participantFormat": "Participant Format",
+        "matchTypeSelection": "Match Type Selection",
         "cashInOption": "{{name}} cashes in Money in the Bank and joins this title match",
         "poolGenderFilter": "Gender",
         "poolSearch": "Search",
@@ -330,16 +333,74 @@
       "lastExpenses": "Last Expenses",
       "lastDelta": "Last Delta",
       "empty": "No ledger entries yet. Advance time to generate transactions.",
+      "noData": "No financial data yet. Advance time to generate records.",
       "dayLabel": "{{date}}",
       "incomeTag": "Income",
       "expenseTag": "Expense",
+      "total": "Total",
+      "tableColPeriod": "Period",
+      "incomeTitle": "Income Breakdown",
+      "expensesTitle": "Expenses Breakdown",
+      "subscriptionFeeLabel": "Website Subscription Fee",
+      "subscriberEstimate": "Est. Subscribers: {{count}}",
+      "setFee": "Set Fee",
+      "ticketFeeTitle": "Event Ticket Fees",
+      "ticketFeeSubtitle": "Adjust ticket fee by event type.",
+      "tabs": {
+        "overview": "Overview",
+        "income": "Income",
+        "expenses": "Expenses",
+        "charts": "Charts",
+        "settings": "Settings",
+        "ledger": "Ledger"
+      },
+      "period": {
+        "daily": "Daily",
+        "monthly": "Monthly",
+        "yearly": "Yearly"
+      },
+      "income": {
+        "sponsor": "Sponsors",
+        "event": "Event Gate",
+        "merchandise": "Merchandise",
+        "thirdParty": "3rd Party",
+        "webSubscription": "Web Subs"
+      },
+      "expenses": {
+        "wrestlerPayroll": "Wrestler Pay",
+        "staffCost": "Staff Cost",
+        "eventCost": "Event Cost",
+        "operatingCost": "Operating",
+        "otherCost": "Other"
+      },
+      "charts": {
+        "cashTrend": "Cash Balance Trend",
+        "incomeVsExpenses": "Income vs Expenses",
+        "incomeBreakdown": "Income Breakdown (Stacked)",
+        "expenseBreakdown": "Expense Breakdown (Stacked)",
+        "incomePie": "Income Distribution",
+        "expensePie": "Expense Distribution"
+      },
+      "eventTypes": {
+        "regularWeekly": "Regular Weekly",
+        "houseShow": "House Show",
+        "digitalOnly": "Digital Only",
+        "ppv": "PPV",
+        "oneTime": "One Time",
+        "megaLive": "Mega Live"
+      },
       "categories": {
         "dailyClose": "Daily Close",
         "eventBooking": "Event Booking",
         "eventRefund": "Event Refund",
+        "matchPayroll": "Wrestler Payroll",
+        "staffPayroll": "Staff Payroll",
+        "eventCost": "Event Cost",
+        "thirdPartyIncome": "3rd Party Income",
         "hiring": "Hiring",
         "severance": "Severance",
-        "sponsorSigning": "Sponsor Signing"
+        "sponsorSigning": "Sponsor Signing",
+        "employeeBonus": "Employee Bonus"
       }
     },
     "sponsors": {
@@ -487,6 +548,8 @@
     "hiring": {
       "availableCash": "Available cash: ${{amount}}",
       "availablePeople": "Available people: {{amount}} / {{total}}",
+      "rosterQuotaMale": "Male wrestlers: {{count}}/{{max}}",
+      "rosterQuotaFemale": "Female wrestlers: {{count}}/{{max}}",
       "roleSearch": "Filter by role",
       "genderFilter": "Filter by gender",
       "salarySort": "Sort by salary demand",
@@ -556,7 +619,39 @@
       "autoHireInsufficientCash": "Offer accepted, but you do not have enough cash to auto-hire.",
       "submitOffer": "Submit offer",
       "closeModal": "Close",
-      "insufficientCash": "Insufficient cash"
+      "insufficientCash": "Insufficient cash",
+      "rosterFull": "Roster Full",
+      "rosterFullError": "Wrestler roster is full. Fire a wrestler first before hiring a new one."
+    },
+    "eventPreparation": {
+      "title": "Event Preparation",
+      "eventTypes": {
+        "ppv": "Pay-Per-View",
+        "megaLive": "Mega Live Event"
+      },
+      "venueTitle": "1. Select Venue",
+      "venueHint": "Choose the venue for this event. The selected venue will be used as the event location.",
+      "indoor": "Indoor",
+      "outdoor": "Outdoor",
+      "venueCapacity": "Capacity: {{capacity}}",
+      "venueSelected": "Selected: {{name}}, {{location}}",
+      "promoTitle": "2. Promote a Match",
+      "promoHint": "Select exactly 2 wrestlers to advertise as the featured match. If they compete together on the night, the match gets a rating bonus.",
+      "promoNoWrestlers": "No wrestlers on the roster to promote.",
+      "promoSelected": "{{count}} / 2 wrestlers selected",
+      "promoSelectMore": "Select one more wrestler to complete the featured pairing.",
+      "promoBonusHigh": "+0.5 rating bonus if this match happens (top-5 or title holder involved).",
+      "promoBonusLow": "+0.2 rating bonus if this match happens. Tip: include a top-5 wrestler or champion for the full +0.5.",
+      "ticketTitle": "3. Ticket Price",
+      "ticketHint": "Set the ticket price for this event. Changes here are reflected in your Finance settings.",
+      "ticketLabel": "Ticket price",
+      "ticketInvalid": "Enter a valid non-negative ticket price.",
+      "sponsorTitle": "4. Event Sponsors",
+      "sponsorNone": "No active sponsors. Sign a sponsor from the Manage Sponsors module.",
+      "sponsorEventBadge": "Event Sponsor",
+      "sponsorDaysLeft": "{{days}} days left",
+      "cancel": "Skip & Proceed",
+      "save": "Save & Proceed to Next Day"
     }
   }
 }

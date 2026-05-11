@@ -247,6 +247,14 @@
   gap: 0.4rem;
 }
 
+.matchTypeSelect {
+  background: rgba(9, 14, 21, 0.9);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  color: var(--text-main);
+  padding: 0.5rem 0.6rem;
+}
+
 .typeChip {
   background: rgba(9, 14, 21, 0.9);
   border: 1px solid var(--line-soft);

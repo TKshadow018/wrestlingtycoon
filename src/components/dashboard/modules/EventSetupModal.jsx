@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
+import matchTypeCatalog from '../../../data/matchTypes.json'
 import { calculateRanking } from '../../../utils/wrestlerRank'
 import styles from './EventSetupModal.module.scss'
 
@@ -20,6 +21,7 @@ const buildInitialSegment = (index) => ({
   id: `segment-${index + 1}`,
   segmentType: 'match',
   matchType: 'singles',
+  matchStipulation: 'singles',
   wrestlerIds: [],
   team1Ids: [],
   team2Ids: [],
@@ -36,6 +38,7 @@ const getFallbackImage = (gender) =>
   gender === 'female' ? '/people/girl.png' : '/people/boy.png'
 
 const MATCH_SEGMENT_TYPES = new Set(['match', 'mainEvent', 'titleMatch'])
+const DEFAULT_MATCH_STIPULATION = 'singles'
 const MIN_MATCH_STAMINA_LOSS = 20
 const MAX_MATCH_STAMINA_LOSS = 50
 
@@ -112,6 +115,9 @@ const normalizeSegmentsForSubmit = (segments) => {
     segmentType: segment.segmentType,
     matchType: MATCH_SEGMENT_TYPES.has(segment.segmentType)
       ? (segment.matchType === 'tagTeam' ? 'tagTeam' : 'singles')
+      : null,
+    matchStipulation: MATCH_SEGMENT_TYPES.has(segment.segmentType)
+      ? (segment.matchStipulation || DEFAULT_MATCH_STIPULATION)
       : null,
     wrestlerIds: getSegmentWrestlerIds(segment),
     team1Ids: segment.matchType === 'tagTeam' ? segment.team1Ids : [],
@@ -667,6 +673,25 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
   ].filter(Boolean)
 
   // ── Segment mutations ───────────────────────────────────────────────────────
+  const availableMatchStipulations = useMemo(() => {
+    if (!Array.isArray(matchTypeCatalog) || matchTypeCatalog.length === 0) {
+      return [{ id: DEFAULT_MATCH_STIPULATION, name: 'Singles' }]
+    }
+
+    return matchTypeCatalog
+      .map((entry) => ({
+        id: typeof entry?.id === 'string' ? entry.id : '',
+        name: typeof entry?.name === 'string' ? entry.name : '',
+      }))
+      .filter((entry) => entry.id && entry.name)
+  }, [])
+
+  const activeMatchStipulation = useMemo(() => {
+    const requestedId = segment.matchStipulation || DEFAULT_MATCH_STIPULATION
+    const selected = availableMatchStipulations.find((entry) => entry.id === requestedId)
+    return selected || availableMatchStipulations[0] || { id: DEFAULT_MATCH_STIPULATION, name: 'Singles' }
+  }, [availableMatchStipulations, segment.matchStipulation])
+
   const patchSegment = (patch) => {
     setError('')
     setSegments((prev) => prev.map((s) => (s.id === segment.id ? { ...s, ...patch } : s)))
@@ -685,6 +710,9 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
     patchSegment({
       segmentType: value,
       matchType: nextMatchType,
+      matchStipulation: MATCH_SEGMENT_TYPES.has(value)
+        ? (segment.matchStipulation || DEFAULT_MATCH_STIPULATION)
+        : null,
       refereeId:   cfg.hasReferee   ? segment.refereeId   : null,
       announcerId: showsAnnouncerSlot(value) ? segment.announcerId : null,
       titleId: nextTitleId,
@@ -727,6 +755,14 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
       team1Ids: [],
       team2Ids: [],
     })
+  }
+
+  const handleMatchStipulationChange = (value) => {
+    if (!MATCH_SEGMENT_TYPES.has(segment.segmentType)) {
+      return
+    }
+
+    patchSegment({ matchStipulation: value || DEFAULT_MATCH_STIPULATION })
   }
 
   const handleTitleChange = (titleId) => {
@@ -1148,7 +1184,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
 
             {isMatchSegment && (
               <div className={styles.matchTypeRow}>
-                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.matchType', 'Match Type')}</span>
+                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.participantFormat', 'Participant Format')}</span>
                 <div className={styles.matchTypeChips}>
                   <button
                     type="button"
@@ -1165,6 +1201,23 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                     {t('dashboard.events.setup.matchTypes.tagTeam', 'Tag Team')}
                   </button>
                 </div>
+              </div>
+            )}
+
+            {isMatchSegment && (
+              <div className={styles.matchTypeRow}>
+                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.matchTypeSelection', 'Match Type Selection')}</span>
+                <select
+                  className={styles.matchTypeSelect}
+                  value={activeMatchStipulation.id}
+                  onChange={(event) => handleMatchStipulationChange(event.target.value)}
+                >
+                  {availableMatchStipulations.map((entry) => (
+                    <option key={entry.id} value={entry.id}>
+                      {entry.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
 

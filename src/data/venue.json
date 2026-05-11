@@ -1,0 +1,452 @@
+[
+  {
+    "id": "venue-001",
+    "name": "Bangabandhu Grand Dome",
+    "capacity": 48000,
+    "location": "Dhaka",
+    "isIndoor": true,
+    "rentFee": 6026000,
+    "facilities": 5
+  },
+  {
+    "id": "venue-002",
+    "name": "Sakib Al Hasan Indoor Stadium",
+    "capacity": 42000,
+    "location": "Chattogram",
+    "isIndoor": true,
+    "rentFee": 5314000,
+    "facilities": 5
+  },
+  {
+    "id": "venue-003",
+    "name": "Jalal Arena",
+    "capacity": 36000,
+    "location": "Khulna",
+    "isIndoor": false,
+    "rentFee": 4260000,
+    "facilities": 5
+  },
+  {
+    "id": "venue-004",
+    "name": "Padma River Super Bowl",
+    "capacity": 30000,
+    "location": "Rajshahi",
+    "isIndoor": false,
+    "rentFee": 3600000,
+    "facilities": 5
+  },
+  {
+    "id": "venue-005",
+    "name": "Khan Shaheb Titans Arena",
+    "capacity": 24000,
+    "location": "Sylhet",
+    "isIndoor": false,
+    "rentFee": 2940000,
+    "facilities": 5
+  },
+  {
+    "id": "venue-006",
+    "name": "Surma Elite Stadium",
+    "capacity": 19500,
+    "location": "Mymensingh",
+    "isIndoor": true,
+    "rentFee": 2236000,
+    "facilities": 4
+  },
+  {
+    "id": "venue-007",
+    "name": "Chattogram Champions Arena",
+    "capacity": 18200,
+    "location": "Chattogram",
+    "isIndoor": false,
+    "rentFee": 1940000,
+    "facilities": 4
+  },
+  {
+    "id": "venue-008",
+    "name": "Nazrul Combat Coliseum",
+    "capacity": 16900,
+    "location": "Cumilla",
+    "isIndoor": true,
+    "rentFee": 1955000,
+    "facilities": 4
+  },
+  {
+    "id": "venue-009",
+    "name": "Rupsha Legacy Park",
+    "capacity": 15600,
+    "location": "Jashore",
+    "isIndoor": false,
+    "rentFee": 1680000,
+    "facilities": 4
+  },
+  {
+    "id": "venue-010",
+    "name": "Begum Rokeya Hall of Fight",
+    "capacity": 14300,
+    "location": "Rangpur",
+    "isIndoor": true,
+    "rentFee": 1674000,
+    "facilities": 4
+  },
+  {
+    "id": "venue-011",
+    "name": "Bogra Iron Ring Complex",
+    "capacity": 13000,
+    "location": "Bogura",
+    "isIndoor": true,
+    "rentFee": 1534000,
+    "facilities": 4
+  },
+  {
+    "id": "venue-012",
+    "name": "Sher-E-Bangla Action Park",
+    "capacity": 11700,
+    "location": "Barishal",
+    "isIndoor": false,
+    "rentFee": 1290000,
+    "facilities": 4
+  },
+  {
+    "id": "venue-013",
+    "name": "Jamuna Prime Arena",
+    "capacity": 10400,
+    "location": "Sirajganj",
+    "isIndoor": true,
+    "rentFee": 1253000,
+    "facilities": 4
+  },
+  {
+    "id": "venue-014",
+    "name": "Noakhali Storm Dome",
+    "capacity": 9100,
+    "location": "Noakhali",
+    "isIndoor": true,
+    "rentFee": 1112000,
+    "facilities": 4
+  },
+  {
+    "id": "venue-015",
+    "name": "Patuakhali Seaside Arena",
+    "capacity": 7800,
+    "location": "Patuakhali",
+    "isIndoor": false,
+    "rentFee": 900000,
+    "facilities": 4
+  },
+  {
+    "id": "venue-016",
+    "name": "Mujib City Ring Center",
+    "capacity": 4900,
+    "location": "Gazipur",
+    "isIndoor": true,
+    "rentFee": 530000,
+    "facilities": 3
+  },
+  {
+    "id": "venue-017",
+    "name": "Mirpur Night Slam Hall",
+    "capacity": 4500,
+    "location": "Dhaka",
+    "isIndoor": true,
+    "rentFee": 491000,
+    "facilities": 3
+  },
+  {
+    "id": "venue-018",
+    "name": "Faridpur Fighters Arena",
+    "capacity": 4100,
+    "location": "Faridpur",
+    "isIndoor": false,
+    "rentFee": 419000,
+    "facilities": 3
+  },
+  {
+    "id": "venue-019",
+    "name": "Cox Ring Theatre",
+    "capacity": 3700,
+    "location": "Cox's Bazar",
+    "isIndoor": true,
+    "rentFee": 414000,
+    "facilities": 3
+  },
+  {
+    "id": "venue-020",
+    "name": "Brahmanbaria Battle Ground",
+    "capacity": 3300,
+    "location": "Brahmanbaria",
+    "isIndoor": false,
+    "rentFee": 347000,
+    "facilities": 3
+  },
+  {
+    "id": "venue-021",
+    "name": "Maulana Bhashani Sports Hall",
+    "capacity": 2900,
+    "location": "Tangail",
+    "isIndoor": true,
+    "rentFee": 336000,
+    "facilities": 3
+  },
+  {
+    "id": "venue-022",
+    "name": "Netrokona Ring Arena",
+    "capacity": 2500,
+    "location": "Netrokona",
+    "isIndoor": false,
+    "rentFee": 275000,
+    "facilities": 3
+  },
+  {
+    "id": "venue-023",
+    "name": "Rajbari Champions Hall",
+    "capacity": 2100,
+    "location": "Rajbari",
+    "isIndoor": true,
+    "rentFee": 258000,
+    "facilities": 3
+  },
+  {
+    "id": "venue-024",
+    "name": "Dinajpur Thunder Pavilion",
+    "capacity": 1700,
+    "location": "Dinajpur",
+    "isIndoor": true,
+    "rentFee": 219000,
+    "facilities": 3
+  },
+  {
+    "id": "venue-025",
+    "name": "Bagerhat Heritage Dome",
+    "capacity": 1300,
+    "location": "Bagerhat",
+    "isIndoor": true,
+    "rentFee": 180000,
+    "facilities": 3
+  },
+  {
+    "id": "venue-026",
+    "name": "Kushtia Ring House",
+    "capacity": 980,
+    "location": "Kushtia",
+    "isIndoor": true,
+    "rentFee": 106000,
+    "facilities": 2
+  },
+  {
+    "id": "venue-027",
+    "name": "Lakshmipur Showdown Hall",
+    "capacity": 920,
+    "location": "Lakshmipur",
+    "isIndoor": true,
+    "rentFee": 101000,
+    "facilities": 2
+  },
+  {
+    "id": "venue-028",
+    "name": "Bhola Island Fight Plaza",
+    "capacity": 860,
+    "location": "Bhola",
+    "isIndoor": false,
+    "rentFee": 89000,
+    "facilities": 2
+  },
+  {
+    "id": "venue-029",
+    "name": "Habiganj Knockout Court",
+    "capacity": 800,
+    "location": "Habiganj",
+    "isIndoor": true,
+    "rentFee": 91000,
+    "facilities": 2
+  },
+  {
+    "id": "venue-030",
+    "name": "Madaripur Wrestling Hall",
+    "capacity": 740,
+    "location": "Madaripur",
+    "isIndoor": true,
+    "rentFee": 86000,
+    "facilities": 2
+  },
+  {
+    "id": "venue-031",
+    "name": "Shariatpur Action Dome",
+    "capacity": 680,
+    "location": "Shariatpur",
+    "isIndoor": true,
+    "rentFee": 80000,
+    "facilities": 2
+  },
+  {
+    "id": "venue-032",
+    "name": "Narail Riverfront Arena",
+    "capacity": 620,
+    "location": "Narail",
+    "isIndoor": false,
+    "rentFee": 70000,
+    "facilities": 2
+  },
+  {
+    "id": "venue-033",
+    "name": "Jhenaidah Pro Ring Center",
+    "capacity": 560,
+    "location": "Jhenaidah",
+    "isIndoor": true,
+    "rentFee": 70000,
+    "facilities": 2
+  },
+  {
+    "id": "venue-034",
+    "name": "Satkhira Frontier Fight Hub",
+    "capacity": 480,
+    "location": "Satkhira",
+    "isIndoor": false,
+    "rentFee": 58000,
+    "facilities": 2
+  },
+  {
+    "id": "venue-035",
+    "name": "Magura Storm Hall",
+    "capacity": 340,
+    "location": "Magura",
+    "isIndoor": true,
+    "rentFee": 51000,
+    "facilities": 2
+  },
+  {
+    "id": "venue-036",
+    "name": "Chuadanga Steel Ring Hall",
+    "capacity": 300,
+    "location": "Chuadanga",
+    "isIndoor": true,
+    "rentFee": 31000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-037",
+    "name": "Meherpur Freedom Arena",
+    "capacity": 285,
+    "location": "Meherpur",
+    "isIndoor": false,
+    "rentFee": 28000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-038",
+    "name": "Gopalganj Legacy Hall",
+    "capacity": 270,
+    "location": "Gopalganj",
+    "isIndoor": true,
+    "rentFee": 29000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-039",
+    "name": "Kurigram North Ring",
+    "capacity": 255,
+    "location": "Kurigram",
+    "isIndoor": true,
+    "rentFee": 28000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-040",
+    "name": "Gaibandha Grapple Hall",
+    "capacity": 240,
+    "location": "Gaibandha",
+    "isIndoor": true,
+    "rentFee": 27000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-041",
+    "name": "Thakurgaon Avalanche Dome",
+    "capacity": 225,
+    "location": "Thakurgaon",
+    "isIndoor": false,
+    "rentFee": 24000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-042",
+    "name": "Panchagarh Peak Arena",
+    "capacity": 210,
+    "location": "Panchagarh",
+    "isIndoor": false,
+    "rentFee": 23000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-043",
+    "name": "Natore Royal Fight Hall",
+    "capacity": 195,
+    "location": "Natore",
+    "isIndoor": true,
+    "rentFee": 23000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-044",
+    "name": "Naogaon Arena One",
+    "capacity": 180,
+    "location": "Naogaon",
+    "isIndoor": true,
+    "rentFee": 22000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-045",
+    "name": "Joypurhat Ringhouse",
+    "capacity": 165,
+    "location": "Joypurhat",
+    "isIndoor": true,
+    "rentFee": 21000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-046",
+    "name": "Feni Dragon Hall",
+    "capacity": 150,
+    "location": "Feni",
+    "isIndoor": true,
+    "rentFee": 20000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-047",
+    "name": "Chandpur River Ring",
+    "capacity": 135,
+    "location": "Chandpur",
+    "isIndoor": false,
+    "rentFee": 17000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-048",
+    "name": "Sunamganj Pro Dome",
+    "capacity": 120,
+    "location": "Sunamganj",
+    "isIndoor": true,
+    "rentFee": 18000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-049",
+    "name": "Moulvibazar Tea City Arena",
+    "capacity": 90,
+    "location": "Moulvibazar",
+    "isIndoor": true,
+    "rentFee": 15000,
+    "facilities": 1
+  },
+  {
+    "id": "venue-050",
+    "name": "Bandarban Hill Clash Hall",
+    "capacity": 60,
+    "location": "Bandarban",
+    "isIndoor": false,
+    "rentFee": 12000,
+    "facilities": 1
+  }
+]

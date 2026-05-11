@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import styles from './ControlPanel.module.scss'
 
-function ControlPanel({ isEventDay, onProceed, onReset }) {
+function ControlPanel({ isEventDay, isPreparationDay, onProceed, onReset }) {
   const { t } = useTranslation()
 
   const handleReset = () => {
@@ -13,10 +13,16 @@ function ControlPanel({ isEventDay, onProceed, onReset }) {
     onReset()
   }
 
+  const proceedLabel = isPreparationDay
+    ? t('dashboard.controls.eventPreparation')
+    : isEventDay
+    ? t('dashboard.controls.proceedEvent')
+    : t('dashboard.controls.proceedDay')
+
   return (
     <section className={styles.controlPanel}>
       <button type="button" className={styles.primaryButton} onClick={onProceed}>
-        {isEventDay ? t('dashboard.controls.proceedEvent') : t('dashboard.controls.proceedDay')}
+        {proceedLabel}
       </button>
       <button type="button" className={styles.resetButton} onClick={handleReset}>
         {t('dashboard.controls.resetGame')}

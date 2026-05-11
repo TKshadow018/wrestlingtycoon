@@ -300,6 +300,73 @@
   width: 100%;
 }
 
+.segmentsSectionHeader {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.bestMatchBadge {
+  align-items: center;
+  background: rgba(9, 14, 21, 0.88);
+  border: 2px solid;
+  border-radius: 12px;
+  display: flex;
+  gap: 0.7rem;
+  max-width: 320px;
+  padding: 0.75rem 1rem;
+}
+
+.bestMatchCrown {
+  color: #f3c96a;
+  flex-shrink: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(243, 201, 106, 0.7);
+}
+
+.bestMatchInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.bestMatchLabel {
+  color: var(--text-faint);
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.bestMatchRating {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bestMatchDesc {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.bestMatchName {
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .segmentsList {
   display: flex;
   flex-direction: column;
@@ -500,6 +567,24 @@
   font-family: var(--font-body);
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+.promoAdjustment {
+  display: inline-flex;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-top: 0.35rem;
+  text-transform: uppercase;
+}
+
+.promoAdjustmentBonus {
+  color: #6fe7a7;
+}
+
+.promoAdjustmentPenalty {
+  color: #f58f8f;
 }
 
 // ─── CTA ──────────────────────────────────────────────────────────────────────

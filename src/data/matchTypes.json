@@ -1,0 +1,164 @@
+[
+  {
+    "id": "singles",
+    "name": "Singles Match",
+    "participants": "2",
+    "description": "One-on-one contest with standard rules."
+  },
+  {
+    "id": "tripleThreat",
+    "name": "Triple Threat",
+    "participants": "3",
+    "description": "Three wrestlers compete at the same time; first fall wins."
+  },
+  {
+    "id": "fatalFourWay",
+    "name": "Fatal 4-Way",
+    "participants": "4",
+    "description": "Four-way match where the first wrestler to score a fall wins."
+  },
+  {
+    "id": "hardcore",
+    "name": "Hardcore Match",
+    "participants": "2",
+    "description": "No disqualifications; weapons and extreme spots are legal."
+  },
+  {
+    "id": "steelCage",
+    "name": "Steel Cage",
+    "participants": "2",
+    "description": "Match takes place inside a steel cage with escape or pinfall win conditions."
+  },
+  {
+    "id": "eliminationChamber",
+    "name": "Elimination Chamber",
+    "participants": "6",
+    "description": "Six competitors enter pods and are eliminated one by one until one remains."
+  },
+  {
+    "id": "royalRumble",
+    "name": "Royal Rumble",
+    "participants": "30",
+    "description": "Entrants arrive at intervals; elimination happens by throwing opponents over the top rope."
+  },
+  {
+    "id": "ladder",
+    "name": "Ladder Match",
+    "participants": "2-6",
+    "description": "Victory is earned by climbing a ladder and retrieving the prize above the ring."
+  },
+  {
+    "id": "lastManStanding",
+    "name": "Last Man Standing",
+    "participants": "2",
+    "description": "A wrestler wins when the opponent cannot answer the referee's ten count."
+  },
+  {
+    "id": "submission",
+    "name": "Submission Match",
+    "participants": "2",
+    "description": "Pinfalls are not counted; the only way to win is by submission."
+  },
+  {
+    "id": "ironMan",
+    "name": "Iron Man Match",
+    "participants": "2",
+    "description": "Timed match where the wrestler with the most falls at the end wins."
+  },
+  {
+    "id": "hellInACell",
+    "name": "Hell in a Cell",
+    "participants": "2",
+    "description": "Brutal cage match enclosed by a roofed cell structure."
+  },
+  {
+    "id": "noDisqualification",
+    "name": "No Disqualification",
+    "participants": "2",
+    "description": "There are no disqualifications, allowing use of weapons and outside interference."
+  },
+  {
+    "id": "tlc",
+    "name": "TLC Match",
+    "participants": "2-6",
+    "description": "Tables, ladders, and chairs are legal and commonly used."
+  },
+  {
+    "id": "gauntlet",
+    "name": "Gauntlet Match",
+    "participants": "4-10",
+    "description": "Wrestlers enter sequentially; each winner stays in until all challengers are faced."
+  },
+  {
+    "id": "firstBlood",
+    "name": "First Blood Match",
+    "participants": "2",
+    "description": "The winner is the first wrestler to make the opponent bleed."
+  },
+  {
+    "id": "fallsCountAnywhere",
+    "name": "Falls Count Anywhere",
+    "participants": "2",
+    "description": "Pinfalls and submissions count anywhere in the arena."
+  },
+  {
+    "id": "extremeRules",
+    "name": "Extreme Rules",
+    "participants": "2",
+    "description": "No disqualification match with high emphasis on weapons and stipulations."
+  },
+  {
+    "id": "tables",
+    "name": "Tables Match",
+    "participants": "2",
+    "description": "A wrestler wins by putting the opponent through a table."
+  },
+  {
+    "id": "handicap",
+    "name": "Handicap Match",
+    "participants": "3-4",
+    "description": "Uneven sides battle, such as one wrestler against a team."
+  },
+  {
+    "id": "tornadoTag",
+    "name": "Tornado Tag Team",
+    "participants": "4",
+    "description": "Both members of each team are legal in the ring at the same time."
+  },
+  {
+    "id": "battleRoyal",
+    "name": "Battle Royal",
+    "participants": "10-30",
+    "description": "Multiple entrants fight simultaneously with elimination over the top rope."
+  },
+  {
+    "id": "casket",
+    "name": "Casket Match",
+    "participants": "2",
+    "description": "Win by placing the opponent inside a casket and closing the lid."
+  },
+  {
+    "id": "inferno",
+    "name": "Inferno Match",
+    "participants": "2",
+    "description": "Ring is surrounded by fire; objective is to set the opponent on fire in classic rulesets."
+  },
+  {
+    "id": "noHoldsBarred",
+    "name": "No Holds Barred",
+    "participants": "2",
+    "description": "Very few restrictions with brutal offense and minimal referee intervention."
+  },
+  {
+    "id": "ambulance",
+    "name": "Ambulance Match",
+    "participants": "2",
+    "description": "Victory condition is forcing the opponent into an ambulance and shutting the doors."
+  },
+  {
+    "id": "strap",
+    "name": "Strap Match",
+    "participants": "2",
+    "description": "Opponents are tied together with a strap; often requires touching all four corners to win."
+  }
+]

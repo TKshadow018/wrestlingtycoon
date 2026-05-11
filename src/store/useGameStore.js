@@ -369,6 +369,15 @@ const buildInitialState = () => {
       lastIncome: 0,
       lastExpenses: 0,
       lastDelta: 0,
+      subscriptionFee: GAME_CONFIG.economy.webSubscription.defaultFee,
+      ticketFees: {
+        regularWeekly: GAME_CONFIG.economy.audience.byEventType.regularWeekly.ticketPrice,
+        houseShow: GAME_CONFIG.economy.audience.byEventType.houseShow.ticketPrice,
+        digitalOnly: GAME_CONFIG.economy.audience.byEventType.digitalOnly.ticketPrice,
+        ppv: GAME_CONFIG.economy.audience.byEventType.ppv.ticketPrice,
+        oneTime: GAME_CONFIG.economy.audience.byEventType.oneTime.ticketPrice,
+        megaLive: GAME_CONFIG.economy.audience.byEventType.megaLive.ticketPrice,
+      },
       ledger: [],
     },
     roster: initialRoster,
@@ -397,6 +406,7 @@ const buildInitialState = () => {
       bookedEvent: buildBookedEventProjection(1, seededCustomEvents, startDateIso),
       lastOutcome: null,
       eventLog: [],
+      eventPreparation: null,
     },
     history: {
       timeline: [],
@@ -621,6 +631,7 @@ const EVENT_TYPE_CONFIG = {
     productionScale: 2,
     risk: 16,
     hype: 62,
+    setupCost: 0,
   },
   houseShow: {
     label: 'House Show',
@@ -630,6 +641,7 @@ const EVENT_TYPE_CONFIG = {
     productionScale: 1,
     risk: 12,
     hype: 50,
+    setupCost: 9000,
   },
   ppv: {
     label: 'PPV',
@@ -639,6 +651,7 @@ const EVENT_TYPE_CONFIG = {
     productionScale: 4,
     risk: 28,
     hype: 88,
+    setupCost: 24000,
   },
   megaLive: {
     label: 'Mega Live Event',
@@ -648,6 +661,7 @@ const EVENT_TYPE_CONFIG = {
     productionScale: 5,
     risk: 34,
     hype: 98,
+    setupCost: 32000,
   },
   oneTime: {
     label: 'One Time Event',
@@ -657,6 +671,7 @@ const EVENT_TYPE_CONFIG = {
     productionScale: 4,
     risk: 24,
     hype: 84,
+    setupCost: 20000,
   },
   digitalOnly: {
     label: 'Digital Only Show',
@@ -666,8 +681,11 @@ const EVENT_TYPE_CONFIG = {
     productionScale: 1,
     risk: 10,
     hype: 52,
+    setupCost: 7000,
   },
 }
+
+const EVENT_BOOKING_REFUND_RATE = 0.6
 
 const MATCH_SEGMENT_TYPES = new Set(['match', 'mainEvent', 'titleMatch'])
 const HELPER_ROLES = new Set(['announcer', 'referee'])
@@ -689,6 +707,13 @@ const HAPPINESS_BONUS_MAX_BOOST = 20
 const DAILY_STAMINA_REGEN = 10
 const MIN_MATCH_STAMINA_LOSS = 20
 const MAX_MATCH_STAMINA_LOSS = 50
+const MAX_MALE_WRESTLERS = 20
+const MAX_FEMALE_WRESTLERS = 15
+
+const getEventSetupCost = (eventType) => {
+  const typeConfig = EVENT_TYPE_CONFIG[eventType]
+  return Math.max(0, Math.round(Number(typeConfig?.setupCost || 0)))
+}
 
 const clampStamina = (value) => {
   const numeric = Number(value)
@@ -1325,6 +1350,9 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments) => 
     .map((segment, index) => {
       const segmentType = normalizeSegmentType(segment?.segmentType)
       const rawMatchType = segment?.matchType === 'tagTeam' ? 'tagTeam' : 'singles'
+      const rawMatchStipulation = typeof segment?.matchStipulation === 'string' && segment.matchStipulation.trim()
+        ? segment.matchStipulation.trim()
+        : 'singles'
       const team1Ids = rawMatchType === 'tagTeam'
         ? filterIds(segment?.team1Ids)
         : []
@@ -1388,6 +1416,7 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments) => 
         id: `segment-${index + 1}`,
         segmentType,
         matchType: MATCH_SEGMENT_TYPES.has(segmentType) ? rawMatchType : null,
+        matchStipulation: MATCH_SEGMENT_TYPES.has(segmentType) ? rawMatchStipulation : null,
         titleId: segmentType === 'titleMatch' && typeof segment?.titleId === 'string' ? segment.titleId : null,
         wrestlerIds,
         team1Ids: MATCH_SEGMENT_TYPES.has(segmentType) && rawMatchType === 'tagTeam' ? team1Ids : [],
@@ -1912,6 +1941,12 @@ export const useGameStore = create(
             createdAt: Date.now(),
           }
 
+          const bookingCost = getEventSetupCost(createdEvent.type)
+          if (state.finances.cash < bookingCost) {
+            result = { ok: false, error: 'Insufficient cash for event setup cost.' }
+            return state
+          }
+
           const nextCustomEvents = [...state.events.customEvents, createdEvent]
 
           result = { ok: true }
@@ -1921,6 +1956,20 @@ export const useGameStore = create(
               ...state.events,
               customEvents: nextCustomEvents,
               bookedEvent: buildBookedEventProjection(state.calendar.day, nextCustomEvents, state.calendar.startDateIso),
+            },
+            finances: {
+              ...state.finances,
+              cash: state.finances.cash - bookingCost,
+              lastExpenses: state.finances.lastExpenses + bookingCost,
+              lastDelta: state.finances.lastDelta - bookingCost,
+              ledger: appendLedger(state.finances.ledger, {
+                id: `tx-${Date.now()}-event-booking`,
+                day: state.calendar.day,
+                type: 'expense',
+                category: 'eventBooking',
+                amount: bookingCost,
+                note: `Booked custom event ${createdEvent.name}`,
+              }),
             },
           }
         })
@@ -1996,13 +2045,49 @@ export const useGameStore = create(
             }
           })
 
+          const oldSetupCost = getEventSetupCost(currentEvent.type)
+          const nextSetupCost = getEventSetupCost(draftEvent.type)
+          const setupCostDelta = nextSetupCost - oldSetupCost
+
+          if (setupCostDelta > 0 && state.finances.cash < setupCostDelta) {
+            result = { ok: false, error: 'Insufficient cash for updated event setup cost.' }
+            return state
+          }
+
           result = { ok: true }
+
+          const nextLedger = (() => {
+            if (setupCostDelta === 0) {
+              return state.finances.ledger
+            }
+
+            return appendLedger(state.finances.ledger, {
+              id: `tx-${Date.now()}-event-update-${eventId}`,
+              day: state.calendar.day,
+              type: setupCostDelta > 0 ? 'expense' : 'income',
+              category: setupCostDelta > 0 ? 'eventBooking' : 'eventRefund',
+              amount: Math.abs(setupCostDelta),
+              note: `Updated setup cost for ${draftEvent.name}`,
+            })
+          })()
 
           return {
             events: {
               ...state.events,
               customEvents: updatedEvents,
               bookedEvent: buildBookedEventProjection(state.calendar.day, updatedEvents, state.calendar.startDateIso),
+            },
+            finances: {
+              ...state.finances,
+              cash: state.finances.cash - setupCostDelta,
+              lastIncome: setupCostDelta < 0
+                ? state.finances.lastIncome + Math.abs(setupCostDelta)
+                : state.finances.lastIncome,
+              lastExpenses: setupCostDelta > 0
+                ? state.finances.lastExpenses + setupCostDelta
+                : state.finances.lastExpenses,
+              lastDelta: state.finances.lastDelta - setupCostDelta,
+              ledger: nextLedger,
             },
           }
         })
@@ -2012,13 +2097,35 @@ export const useGameStore = create(
 
       deleteCustomEvent: (eventId) => {
         set((state) => {
+          const eventToDelete = state.events.customEvents.find((event) => event.eventId === eventId)
           const nextCustomEvents = state.events.customEvents.filter((event) => event.eventId !== eventId)
+          const isFutureOrCurrent = Boolean(eventToDelete && Number(eventToDelete.scheduledDay) >= Number(state.calendar.day))
+          const refundAmount = isFutureOrCurrent
+            ? Math.round(getEventSetupCost(eventToDelete.type) * EVENT_BOOKING_REFUND_RATE)
+            : 0
+          const nextLedger = refundAmount > 0
+            ? appendLedger(state.finances.ledger, {
+                id: `tx-${Date.now()}-event-refund-${eventId}`,
+                day: state.calendar.day,
+                type: 'income',
+                category: 'eventRefund',
+                amount: refundAmount,
+                note: `Refund for deleted event ${eventToDelete.name}`,
+              })
+            : state.finances.ledger
 
           return {
             events: {
               ...state.events,
               customEvents: nextCustomEvents,
               bookedEvent: buildBookedEventProjection(state.calendar.day, nextCustomEvents, state.calendar.startDateIso),
+            },
+            finances: {
+              ...state.finances,
+              cash: state.finances.cash + refundAmount,
+              lastIncome: state.finances.lastIncome + refundAmount,
+              lastDelta: state.finances.lastDelta + refundAmount,
+              ledger: nextLedger,
             },
           }
         })
@@ -2069,6 +2176,17 @@ export const useGameStore = create(
           if (state.finances.cash < upfrontMonthlySalary) {
             hireResult = { ok: false, reason: 'insufficientCash' }
             return state
+          }
+
+          if (candidate.role === 'wrestler') {
+            const maxRosterSize = candidate.gender === 'female' ? MAX_FEMALE_WRESTLERS : MAX_MALE_WRESTLERS
+            const currentCount = state.roster.employees.filter(
+              (emp) => emp.role === 'wrestler' && emp.gender === candidate.gender,
+            ).length
+            if (currentCount >= maxRosterSize) {
+              hireResult = { ok: false, reason: 'rosterFull' }
+              return state
+            }
           }
 
           const candidateForHire = skipNegotiation
@@ -2218,7 +2336,9 @@ export const useGameStore = create(
             return state
           }
 
-          const severanceCost = Math.round(employee.salary * 0.5)
+          const perMatchSalary = Number(employee.contract?.perMatchSalary) || 0
+          const signingBonus = Number(employee.contract?.signingBonus) || 0
+          const severanceCost = 20 * perMatchSalary + 3 * signingBonus
           const firePrestigeDelta = (employee.role === 'wrestler' && (employee.skill || 0) >= 82)
             ? -Math.round(((employee.skill || 0) - 80) / 3)
             : 0
@@ -2360,6 +2480,57 @@ export const useGameStore = create(
         })
 
         return result
+      },
+
+      setSubscriptionFee: (fee) => {
+        set((state) => {
+          const parsed = Number(fee)
+          if (!Number.isFinite(parsed)) return state
+          const minFee = GAME_CONFIG.economy.webSubscription.minFee
+          const maxFee = GAME_CONFIG.economy.webSubscription.maxFee
+          const normalizedFee = Math.max(minFee, Math.min(maxFee, parsed))
+          return {
+            finances: {
+              ...state.finances,
+              subscriptionFee: normalizedFee,
+            },
+          }
+        })
+      },
+
+      setEventTicketFee: (eventType, fee) => {
+        set((state) => {
+          const parsed = Number(fee)
+          if (!Number.isFinite(parsed) || parsed < 0) return state
+          if (!GAME_CONFIG.economy.audience.byEventType[eventType]) return state
+
+          return {
+            finances: {
+              ...state.finances,
+              ticketFees: {
+                ...(state.finances.ticketFees || {}),
+                [eventType]: Math.round(parsed),
+              },
+            },
+          }
+        })
+      },
+
+      setEventPreparation: (data) => {
+        set((state) => ({
+          events: {
+            ...state.events,
+            eventPreparation: data
+              ? {
+                  eventId: typeof data.eventId === 'string' ? data.eventId : null,
+                  venueId: typeof data.venueId === 'string' ? data.venueId : null,
+                  promotedWrestlerIds: Array.isArray(data.promotedWrestlerIds)
+                    ? data.promotedWrestlerIds.filter((id) => typeof id === 'string')
+                    : [],
+                }
+              : null,
+          },
+        }))
       },
 
       setTitleActive: (titleId, isActive) => {
@@ -2507,13 +2678,7 @@ export const useGameStore = create(
         set((state) => {
           const nextCalendar = calculateNextCalendar(state.calendar.day, state.calendar.startDateIso)
           const nextActiveEmployees = filterActiveEmployees(state.roster.employees, nextCalendar.day)
-          const baseIncome = 18000 + Math.round(state.stats.fans * 0.08)
-          const payrollCost = 0
-          const staffingCost = 5500 + payrollCost
           const normalizedSponsors = normalizeSponsors(state.roster.sponsors)
-          const sponsorIncome = normalizedSponsors
-            .filter((sponsor) => !sponsor.eventScoped)
-            .reduce((sum, sponsor) => sum + sponsor.dailyPayout, 0)
           const dueCustomEvent = getDueCustomEventForDay(state.calendar.day, state.events.customEvents)
           const regularEventToday = isRegularWeeklyEventDay(state.calendar.startDateIso, state.calendar.day)
           const production = dueCustomEvent
@@ -2529,13 +2694,12 @@ export const useGameStore = create(
           const sponsorFanBoost = isSponsorableEventType
             ? normalizedSponsors.reduce((sum, sponsor) => sum + sponsor.fanBoost, 0)
             : 0
-          const employeeSkillAverage =
-            nextActiveEmployees.length > 0
-              ? nextActiveEmployees.reduce((sum, employee) => sum + employee.skill, 0) / nextActiveEmployees.length
-              : 0
-
           let eventIncome = 0
-          let eventExpenses = 0
+          let perMatchSalaryExpenses = 0
+          let perMatchPayoutCount = 0
+          let titleHolderMatchBonus = 0
+          let staffMatchExpenses = 0
+          let staffMatchPayoutCount = 0
           let fanDelta = 60
           let prestigeDelta = 0
           let moraleDelta = 0
@@ -2548,6 +2712,143 @@ export const useGameStore = create(
           const performanceApplied = applyDailyPerformanceChanges(nextActiveEmployees, eventSetupSegments)
           const nextActiveEmployeesWithPerformance = performanceApplied.employees
           configuredSegments = performanceApplied.configuredSegments || []
+
+          // Apply event preparation promotion bonus/penalty
+          const prepEventId = dueCustomEvent?.eventId || 'regular-weekly-event'
+          const prep = state.events.eventPreparation
+          if (shouldRunEvent && prep && prep.eventId === prepEventId) {
+            const promotedIds = Array.isArray(prep.promotedWrestlerIds) ? prep.promotedWrestlerIds : []
+            if (promotedIds.length >= 2) {
+              const promotedMatchSeg = configuredSegments.find(
+                (seg) =>
+                  MATCH_SEGMENT_TYPES.has(seg.segmentType) &&
+                  promotedIds.every((id) => (seg.wrestlerIds || []).includes(id)),
+              )
+              if (promotedMatchSeg) {
+                const prepTitleHolderIds = new Set(
+                  (state.roster.titles || [])
+                    .filter((t) => t.isActive !== false)
+                    .flatMap((t) =>
+                      t.division === 'doubles'
+                        ? (Array.isArray(t.holderEmployeeIds) ? t.holderEmployeeIds : [])
+                        : (t.holderEmployeeId ? [t.holderEmployeeId] : []),
+                    ),
+                )
+                const sortedByPop = [...nextActiveEmployees]
+                  .filter((e) => e.role === 'wrestler')
+                  .sort((a, b) => (Number(b.popularity) || 0) - (Number(a.popularity) || 0))
+                const top5Ids = new Set(sortedByPop.slice(0, 5).map((e) => e.employeeId))
+                const hasQualifier = promotedIds.some((id) => top5Ids.has(id) || prepTitleHolderIds.has(id))
+                const promoBonus = hasQualifier ? 0.5 : 0.2
+                configuredSegments = configuredSegments.map((seg) => {
+                  if (seg !== promotedMatchSeg) return seg
+
+                  const baseRating = Number.isFinite(Number(seg.matchRating))
+                    ? Number(seg.matchRating)
+                    : calculateMatchRating(
+                        (seg.wrestlerIds || [])
+                          .map((id) => nextActiveEmployeesWithPerformance.find((employee) => employee.employeeId === id))
+                          .filter((employee) => employee?.role === 'wrestler'),
+                      )
+                  const nextRating = Math.max(1, Math.min(10, Number((baseRating + promoBonus).toFixed(1))))
+                  const appliedDelta = Number((nextRating - baseRating).toFixed(1))
+                  return {
+                    ...seg,
+                    matchRating: nextRating,
+                    promoRatingAdjustment: appliedDelta,
+                    promoRatingAdjustmentType: 'bonus',
+                    promoRatingAdjustmentRule: hasQualifier ? 'qualified' : 'base',
+                    promoRatingAdjustmentSource: 'eventPreparation',
+                    promoRatingCapHit: nextRating >= 10,
+                  }
+                })
+              } else {
+                // Promoted match didn't happen: penalise all match ratings
+                configuredSegments = configuredSegments.map((seg) => {
+                  if (!MATCH_SEGMENT_TYPES.has(seg.segmentType) || seg.matchRating == null) return seg
+                  const baseRating = Number(seg.matchRating)
+                  const nextRating = Math.max(1, Math.min(10, Number((baseRating - 0.2).toFixed(1))))
+                  const appliedDelta = Number((nextRating - baseRating).toFixed(1))
+                  return {
+                    ...seg,
+                    matchRating: nextRating,
+                    promoRatingAdjustment: appliedDelta,
+                    promoRatingAdjustmentType: 'penalty',
+                    promoRatingAdjustmentRule: 'missedPromotedMatch',
+                    promoRatingAdjustmentSource: 'eventPreparation',
+                    promoRatingCapHit: nextRating <= 1,
+                  }
+                })
+              }
+            }
+          }
+
+          if (shouldRunEvent) {
+            // Collect title holder IDs for bonus calculation
+            const titleHolderIds = new Set(
+              (state.roster.titles || [])
+                .filter((t) => t.isActive !== false)
+                .flatMap((t) =>
+                  t.division === 'doubles'
+                    ? (Array.isArray(t.holderEmployeeIds) ? t.holderEmployeeIds : [])
+                    : (t.holderEmployeeId ? [t.holderEmployeeId] : []),
+                ),
+            )
+
+            // Track segment count per staff member
+            const staffSegmentCounts = {}
+
+            configuredSegments.forEach((segment) => {
+              if (!MATCH_SEGMENT_TYPES.has(segment.segmentType)) {
+                return
+              }
+
+              const wrestlerIds = Array.from(
+                new Set(
+                  (segment.participantIds || [])
+                    .map((id) => nextActiveEmployeesWithPerformance.find((employee) => employee.employeeId === id))
+                    .filter((employee) => employee?.role === 'wrestler')
+                    .map((employee) => employee.employeeId),
+                ),
+              )
+
+              wrestlerIds.forEach((wrestlerId) => {
+                const wrestler = nextActiveEmployeesWithPerformance.find((employee) => employee.employeeId === wrestlerId)
+                if (!wrestler) {
+                  return
+                }
+
+                const fee = Math.max(0, Number(wrestler.contract?.perMatchSalary || 0))
+                perMatchSalaryExpenses += fee
+                perMatchPayoutCount += 1
+
+                // Title holders get an additional per-match bonus multiplier
+                if (titleHolderIds.has(wrestlerId)) {
+                  titleHolderMatchBonus += Math.round(fee * GAME_CONFIG.economy.expense.titleHolderMatchBonusMultiplier)
+                }
+              })
+
+              // Track staff participation per segment
+              ;(segment.participantIds || []).forEach((id) => {
+                const emp = nextActiveEmployeesWithPerformance.find((e) => e.employeeId === id)
+                if (emp && (emp.role === 'staff' || emp.role === 'referee' || emp.role === 'announcer')) {
+                  staffSegmentCounts[id] = (staffSegmentCounts[id] || 0) + 1
+                }
+              })
+            })
+
+            // Staff cost: per-match fee + bonus if appeared above threshold segments
+            Object.entries(staffSegmentCounts).forEach(([id, count]) => {
+              const emp = nextActiveEmployeesWithPerformance.find((e) => e.employeeId === id)
+              if (!emp) return
+              const fee = Math.max(0, Number(emp.contract?.perMatchSalary || 0))
+              staffMatchExpenses += fee
+              if (count > GAME_CONFIG.economy.expense.staffHeavyUsageThreshold) {
+                staffMatchExpenses += Math.round(fee * GAME_CONFIG.economy.expense.staffHeavyUsageBonusMultiplier)
+              }
+              staffMatchPayoutCount += 1
+            })
+          }
 
           if (shouldRunEvent) {
             const setupParticipantCount = new Set(
@@ -2564,16 +2865,28 @@ export const useGameStore = create(
               },
               { income: 0, fans: 0, prestige: 0 },
             )
-            const crowdMultiplier = 0.85 + Math.random() * 0.3
-            const baseGate = state.stats.fans * 4 * productionWithSponsor.popularityWeight
-            const crewBonus = employeeSkillAverage * 140
-            eventIncome = Math.round(
-              (baseGate + productionWithSponsor.hype * 180 + crewBonus + setupBonus.income) *
-                (1 + sponsorEventBoost) *
-                crowdMultiplier,
+
+            // Audience-based event income
+            const eventType = productionWithSponsor.type
+            const audienceConfig = GAME_CONFIG.economy.audience.byEventType[eventType]
+              || GAME_CONFIG.economy.audience.byEventType.regularWeekly
+            const audienceMin = audienceConfig.min
+            const audienceMax = audienceConfig.max
+            const ticketPrice = Number(state.finances.ticketFees?.[eventType]) || audienceConfig.ticketPrice
+            const fanFactor = Math.min(state.stats.fans / GAME_CONFIG.economy.audience.fanScaleMax, 1)
+            const prestigeFactor = Math.min(state.stats.prestige / GAME_CONFIG.economy.audience.prestigeScaleMax, 1)
+            const audienceNorm =
+              fanFactor * GAME_CONFIG.economy.audience.fansWeight
+              + prestigeFactor * GAME_CONFIG.economy.audience.prestigeWeight
+            const crowdRand =
+              GAME_CONFIG.economy.audience.randomMin
+              + Math.random() * (GAME_CONFIG.economy.audience.randomMax - GAME_CONFIG.economy.audience.randomMin)
+            const audienceCount = Math.round(
+              Math.max(audienceMin, Math.min(audienceMax, audienceMin + (audienceMax - audienceMin) * audienceNorm * crowdRand)),
             )
-            eventExpenses = Math.round(2200 + productionWithSponsor.productionScale * 1700 + productionWithSponsor.risk * 60)
-            fanDelta = Math.round(
+            eventIncome = Math.round(audienceCount * ticketPrice * (1 + sponsorEventBoost) + setupBonus.income)
+
+            const baseFanDelta = Math.round(
               130 + productionWithSponsor.hype * 0.9 - productionWithSponsor.risk * 0.45 + sponsorFanBoost + setupBonus.fans + setupParticipantCount,
             )
             // Prestige: driven by match quality (ratings), wrestler popularity, event type bonuses, and hype/risk
@@ -2604,14 +2917,24 @@ export const useGameStore = create(
             const overallRating = ratedMatchSegs.length > 0
               ? Number((ratedMatchSegs.reduce((sum, seg) => sum + Number(seg.matchRating), 0) / ratedMatchSegs.length).toFixed(1))
               : null
+            const fanGrowthThreshold = {
+              regularWeekly: 7.5,
+              houseShow: 7.5,
+              digitalOnly: 7.5,
+              ppv: 8,
+              oneTime: 8,
+              megaLive: 8.5,
+            }[eventType] ?? 7.5
+            const fansShouldGrow = overallRating !== null && overallRating > fanGrowthThreshold
+            fanDelta = fansShouldGrow ? Math.max(baseFanDelta, 0) : -Math.max(baseFanDelta, 0)
             lastOutcome = {
               type: 'success',
               eventName: productionWithSponsor.name,
               eventType: productionWithSponsor.type,
               hype: productionWithSponsor.hype,
               overallRating,
+              audience: audienceCount,
               income: eventIncome,
-              expenses: eventExpenses,
               fanDelta,
               prestigeDelta,
               segments: configuredSegments.map((seg) => {
@@ -2627,6 +2950,12 @@ export const useGameStore = create(
                   winnerTeamIds: isTagTeamSeg ? segWinnerTeamIds : [],
                   winnerName,
                   matchRating: seg.matchRating,
+                  promoRatingAdjustment: Number.isFinite(Number(seg.promoRatingAdjustment))
+                    ? Number(seg.promoRatingAdjustment)
+                    : null,
+                  promoRatingAdjustmentType: seg.promoRatingAdjustmentType || null,
+                  promoRatingAdjustmentRule: seg.promoRatingAdjustmentRule || null,
+                  promoRatingCapHit: Boolean(seg.promoRatingCapHit),
                   interviewPopularityChanges: seg.interviewPopularityChanges || [],
                   participantDetails: seg.participantIds
                     .map((id) => nextActiveEmployeesWithPerformance.find((e) => e.employeeId === id))
@@ -2692,8 +3021,73 @@ export const useGameStore = create(
               })
             : prunedTeams
 
-          const income = baseIncome + sponsorIncome + eventIncome
-          const expenses = staffingCost + 3000 + eventExpenses
+          // --- Income breakdown ---
+          const subscriptionFee = Number(state.finances.subscriptionFee) || GAME_CONFIG.economy.webSubscription.defaultFee
+          const minSubFee = GAME_CONFIG.economy.webSubscription.minFee
+          const maxSubFee = GAME_CONFIG.economy.webSubscription.maxFee
+          const normalizedSubFee = Math.max(0, Math.min(1, (subscriptionFee - minSubFee) / (maxSubFee - minSubFee)))
+          const subscriberRate =
+            GAME_CONFIG.economy.webSubscription.maxRate
+            - normalizedSubFee * (GAME_CONFIG.economy.webSubscription.maxRate - GAME_CONFIG.economy.webSubscription.minRate)
+          const websiteSubscriptionIncome = Math.round(
+            state.stats.fans * subscriberRate * subscriptionFee / GAME_CONFIG.economy.webSubscription.billingDays,
+          )
+
+          // Merchandise: title holders always + popular event participants
+          const titleHolderIdSet = new Set(
+            (state.roster.titles || [])
+              .filter((t) => t.isActive !== false)
+              .flatMap((t) =>
+                t.division === 'doubles'
+                  ? (Array.isArray(t.holderEmployeeIds) ? t.holderEmployeeIds : [])
+                  : (t.holderEmployeeId ? [t.holderEmployeeId] : []),
+              ),
+          )
+          const titleHolderMerch = nextActiveEmployees.reduce((sum, emp) => {
+            if (!titleHolderIdSet.has(emp.employeeId)) return sum
+            return sum + Math.round((Number(emp.popularity) || 0) * GAME_CONFIG.economy.income.titleHolderMerchMultiplier)
+          }, 0)
+          let eventParticipantMerch = 0
+          if (shouldRunEvent) {
+            const participantIdSet = new Set(configuredSegments.flatMap((seg) => seg.participantIds))
+            nextActiveEmployeesWithPerformance.forEach((emp) => {
+              if (emp.role !== 'wrestler') return
+              if (!participantIdSet.has(emp.employeeId)) return
+              const pop = Number(emp.popularity) || 0
+              if (pop >= GAME_CONFIG.economy.income.eventPopularMerchMinPopularity) {
+                eventParticipantMerch += Math.round(pop * GAME_CONFIG.economy.income.eventPopularMerchMultiplier)
+              }
+            })
+          }
+          const merchandiseIncome = titleHolderMerch + eventParticipantMerch
+
+          // 3rd party income: 3% daily chance
+          const thirdPartyIncome = Math.random() < GAME_CONFIG.economy.income.thirdPartyChance
+            ? Math.round(
+                GAME_CONFIG.economy.income.thirdPartyMin
+                + Math.random() * (GAME_CONFIG.economy.income.thirdPartyMax - GAME_CONFIG.economy.income.thirdPartyMin),
+            )
+            : 0
+
+          // --- Expense breakdown ---
+          const eventCostExpense = shouldRunEvent
+            ? (GAME_CONFIG.eventCost[productionWithSponsor.type] || 0)
+            : 0
+          const operatingCost = Math.round(
+            GAME_CONFIG.economy.expense.operatingBase
+            + state.stats.prestige * GAME_CONFIG.economy.expense.operatingPrestigeMultiplier,
+          )
+          const otherCost = Math.round(
+            GAME_CONFIG.economy.expense.otherMin
+            + Math.random() * (GAME_CONFIG.economy.expense.otherMax - GAME_CONFIG.economy.expense.otherMin),
+          )
+
+          const sponsorIncomeDailyValue = normalizedSponsors
+            .filter((sponsor) => !sponsor.eventScoped)
+            .reduce((sum, sponsor) => sum + sponsor.dailyPayout, 0)
+
+          const income = sponsorIncomeDailyValue + eventIncome + merchandiseIncome + websiteSubscriptionIncome + thirdPartyIncome
+          const expenses = perMatchSalaryExpenses + titleHolderMatchBonus + staffMatchExpenses + eventCostExpense + operatingCost + otherCost
           const delta = income - expenses
           const nextCash = state.finances.cash + delta
           const nextFans = Math.max(0, state.stats.fans + fanDelta)
@@ -2725,8 +3119,104 @@ export const useGameStore = create(
             prestige: nextPrestige,
             employees: nextActiveEmployees.length,
             eventOutcomeType: lastOutcome?.type || null,
+            totalIncome: income,
+            totalExpenses: expenses,
+            incomeBreakdown: {
+              sponsor: sponsorIncomeDailyValue,
+              event: eventIncome,
+              merchandise: merchandiseIncome,
+              thirdParty: thirdPartyIncome,
+              webSubscription: websiteSubscriptionIncome,
+            },
+            expenseBreakdown: {
+              wrestlerPayroll: perMatchSalaryExpenses + titleHolderMatchBonus,
+              staffCost: staffMatchExpenses,
+              eventCost: eventCostExpense,
+              operatingCost,
+              otherCost,
+            },
           }
           const timeline = [...state.history.timeline, nextHistoryEntry].slice(-45)
+
+          // Patch lastOutcome with full day breakdown for event result summary
+          if (lastOutcome) {
+            lastOutcome = {
+              ...lastOutcome,
+              incomeBreakdown: {
+                eventGate: eventIncome,
+                merchandise: merchandiseIncome,
+                sponsor: sponsorIncomeDailyValue,
+                thirdParty: thirdPartyIncome,
+                webSubscription: websiteSubscriptionIncome,
+              },
+              expenseBreakdown: {
+                eventCost: eventCostExpense,
+                wrestlerPayroll: perMatchSalaryExpenses + titleHolderMatchBonus,
+                staffCost: staffMatchExpenses,
+                operatingCost,
+                otherCost,
+              },
+              totalDayIncome: income,
+              totalDayExpenses: expenses,
+            }
+          }
+
+          // Build ledger: separate entries for notable transactions + daily close
+          let nextLedger = state.finances.ledger
+
+          if (perMatchSalaryExpenses > 0 || titleHolderMatchBonus > 0) {
+            const total = perMatchSalaryExpenses + titleHolderMatchBonus
+            nextLedger = appendLedger(nextLedger, {
+              id: `tx-${Date.now()}-match-payroll`,
+              day: nextCalendar.day,
+              type: 'expense',
+              category: 'matchPayroll',
+              amount: total,
+              note: `Wrestler match fees (${perMatchPayoutCount} appearances)${titleHolderMatchBonus > 0 ? ` + title holder bonuses ($${titleHolderMatchBonus.toLocaleString()})` : ''}`,
+            })
+          }
+
+          if (staffMatchExpenses > 0) {
+            nextLedger = appendLedger(nextLedger, {
+              id: `tx-${Date.now()}-staff-payroll`,
+              day: nextCalendar.day,
+              type: 'expense',
+              category: 'staffPayroll',
+              amount: staffMatchExpenses,
+              note: `Staff match fees (${staffMatchPayoutCount} staff)`,
+            })
+          }
+
+          if (eventCostExpense > 0) {
+            nextLedger = appendLedger(nextLedger, {
+              id: `tx-${Date.now()}-event-cost`,
+              day: nextCalendar.day,
+              type: 'expense',
+              category: 'eventCost',
+              amount: eventCostExpense,
+              note: `Event production cost (${productionWithSponsor?.type || 'event'})`,
+            })
+          }
+
+          if (thirdPartyIncome > 0) {
+            nextLedger = appendLedger(nextLedger, {
+              id: `tx-${Date.now()}-third-party`,
+              day: nextCalendar.day,
+              type: 'income',
+              category: 'thirdPartyIncome',
+              amount: thirdPartyIncome,
+              note: 'Third-party rights & participation fee',
+            })
+          }
+
+          nextLedger = appendLedger(nextLedger, {
+            id: `tx-${Date.now()}-daily-close`,
+            day: nextCalendar.day,
+            type: delta >= 0 ? 'income' : 'expense',
+            category: 'dailyClose',
+            amount: Math.abs(delta),
+            note: `Daily close | Income $${income.toLocaleString()} (event $${eventIncome.toLocaleString()}, merch $${merchandiseIncome.toLocaleString()}, web $${websiteSubscriptionIncome.toLocaleString()}) | Expenses $${expenses.toLocaleString()} (ops $${operatingCost.toLocaleString()}, other $${otherCost.toLocaleString()})`,
+          })
 
           return {
             calendar: nextCalendar,
@@ -2746,6 +3236,7 @@ export const useGameStore = create(
                     },
                   ].slice(-100)
                 : state.events.eventLog,
+              eventPreparation: (shouldRunEvent && prep?.eventId === prepEventId) ? null : state.events.eventPreparation,
             },
             history: {
               timeline,
@@ -2756,14 +3247,7 @@ export const useGameStore = create(
               lastIncome: income,
               lastExpenses: expenses,
               lastDelta: delta,
-              ledger: appendLedger(state.finances.ledger, {
-                id: `tx-${Date.now()}-daily-close`,
-                day: nextCalendar.day,
-                type: delta >= 0 ? 'income' : 'expense',
-                category: 'dailyClose',
-                amount: Math.abs(delta),
-                note: `Daily close (income ${income.toLocaleString()} / expenses ${expenses.toLocaleString()})`,
-              }),
+              ledger: nextLedger,
             },
             stats: {
               ...state.stats,
@@ -2889,6 +3373,14 @@ export const useGameStore = create(
           normalizePersistedEmployees(typedPersistedState?.roster?.employees || [], restoredDay),
           restoredDay,
         )
+        const mergedFinances = {
+          ...currentState.finances,
+          ...typedPersistedState?.finances,
+          ticketFees: {
+            ...currentState.finances.ticketFees,
+            ...(typedPersistedState?.finances?.ticketFees || {}),
+          },
+        }
         const normalizedHiringLocks = pruneExpiredHiringLocks(
           typedPersistedState?.market?.hiringLocks || {},
           restoredDay,
@@ -2915,6 +3407,7 @@ export const useGameStore = create(
             customEvents: mergedCustomEvents,
             bookedEvent: buildBookedEventProjection(restoredDay, mergedCustomEvents, restoredStartDateIso),
           },
+          finances: mergedFinances,
           market: {
             ...currentState.market,
             ...typedPersistedState?.market,

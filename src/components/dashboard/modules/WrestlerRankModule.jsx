@@ -121,9 +121,23 @@ function WrestlerRankModule() {
               {team.isMixed ? <span className={styles.teamMixedBadge}>{t('dashboard.wrestlerRank.mixedTeam', 'Mixed')}</span> : null}
             </div>
             <p className={styles.rankMeta}>{t('dashboard.wrestlerRank.teamPoints', 'Points: {{points}}', { points: team.teamRankPoints })}</p>
-            <div className={styles.teamMemberNames}>
+            <div className={styles.teamMembers}>
               {(team.memberEmployees || []).map((member) => (
-                <span key={member.employeeId}>{member.name}</span>
+                <div key={member.employeeId} className={styles.teamMemberChip}>
+                  <img
+                    className={styles.teamMemberImage}
+                    src={member.imageUrl || getFallbackImage(member.gender)}
+                    alt={member.name}
+                    loading="lazy"
+                    onError={(event) => {
+                      if (!event.currentTarget.dataset.fb) {
+                        event.currentTarget.dataset.fb = '1'
+                        event.currentTarget.src = getFallbackImage(member.gender)
+                      }
+                    }}
+                  />
+                  <span>{member.name}</span>
+                </div>
               ))}
             </div>
           </article>

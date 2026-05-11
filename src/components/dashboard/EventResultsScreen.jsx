@@ -57,6 +57,44 @@ function RatingStars({ rating }) {
   )
 }
 
+function formatPromoAdjustment({ segment, t }) {
+  if (segment?.promoRatingAdjustmentType !== 'bonus' && segment?.promoRatingAdjustmentType !== 'penalty') {
+    return null
+  }
+
+  const delta = Number(segment?.promoRatingAdjustment)
+  const hasDelta = Number.isFinite(delta)
+  const absDelta = hasDelta ? Math.abs(delta).toFixed(1) : '0.0'
+
+  if (segment.promoRatingAdjustmentType === 'bonus') {
+    if (segment?.promoRatingCapHit && (!hasDelta || delta <= 0)) {
+      return t(
+        'dashboard.eventResults.promoBonusCapped',
+        'Promoted match bonus applied (rating cap reached).',
+      )
+    }
+
+    return t(
+      'dashboard.eventResults.promoBonusApplied',
+      '+{{delta}} promoted match bonus',
+      { delta: absDelta },
+    )
+  }
+
+  if (segment?.promoRatingCapHit && (!hasDelta || delta >= 0)) {
+    return t(
+      'dashboard.eventResults.promoPenaltyCapped',
+      'Promoted-match penalty applied (rating floor reached).',
+    )
+  }
+
+  return t(
+    'dashboard.eventResults.promoPenaltyApplied',
+    '-{{delta}} promoted-match penalty',
+    { delta: absDelta },
+  )
+}
+
 function WrestlerChip({ person, isWinner }) {
   const [imgSrc, setImgSrc] = useState(person.imageUrl || getFallbackImage(person.gender))
   return (
@@ -73,7 +111,7 @@ function WrestlerChip({ person, isWinner }) {
   )
 }
 
-function SegmentCard({ segment, index, visible }) {
+function SegmentCard({ segment, index, visible, t }) {
   const isMatch = MATCH_SEGMENT_TYPES.has(segment.segmentType)
   const isTagTeam = segment.matchType === 'tagTeam'
 
@@ -89,6 +127,8 @@ function SegmentCard({ segment, index, visible }) {
   const avgPop = wrestlers.length > 0
     ? Math.round(wrestlers.reduce((s, w) => s + (Number(w.popularity) || 0), 0) / wrestlers.length)
     : null
+  const promoAdjustmentText = isMatch ? formatPromoAdjustment({ segment, t }) : null
+  const promoAdjustmentType = segment?.promoRatingAdjustmentType
 
   return (
     <div
@@ -131,6 +171,17 @@ function SegmentCard({ segment, index, visible }) {
                   <span className={styles.ratingDesc}> — {getRatingLabel(segment.matchRating)}</span>
                 </span>
                 <RatingStars rating={segment.matchRating} />
+                {promoAdjustmentText && (
+                  <span
+                    className={[
+                      styles.promoAdjustment,
+                      promoAdjustmentType === 'bonus' ? styles.promoAdjustmentBonus : '',
+                      promoAdjustmentType === 'penalty' ? styles.promoAdjustmentPenalty : '',
+                    ].filter(Boolean).join(' ')}
+                  >
+                    {promoAdjustmentText}
+                  </span>
+                )}
               </div>
             )}
             {avgPop !== null && (
@@ -178,6 +229,15 @@ function EventResultsScreen({ outcome, onContinue }) {
   const eventTypeLabel = EVENT_TYPE_LABELS[eventType] || 'Event'
   const net = (income || 0) - (expenses || 0)
   const matchSegs = segments.filter((s) => MATCH_SEGMENT_TYPES.has(s.segmentType))
+
+  const bestMatch = matchSegs.reduce((best, seg, idx) => {
+    if (!Number.isFinite(Number(seg.matchRating))) return best
+    if (!best) return { seg, idx }
+    const bRating = Number(best.seg.matchRating)
+    const sRating = Number(seg.matchRating)
+    if (sRating > bRating || (sRating === bRating && idx > best.idx)) return { seg, idx }
+    return best
+  }, null)
 
   return (
     <div className={`${styles.overlay} ${visible ? styles.overlayVisible : ''}`}>
@@ -241,12 +301,32 @@ function EventResultsScreen({ outcome, onContinue }) {
 
         {/* Segments */}
         <div className={`${styles.segmentsSection} ${visible ? styles.animate4 : ''}`}>
-          <p className={styles.sectionLabel}>
-            {t('dashboard.eventResults.segmentsLabel', 'Segments')} ({segments.length})
-          </p>
+          <div className={styles.segmentsSectionHeader}>
+            <p className={styles.sectionLabel}>
+              {t('dashboard.eventResults.segmentsLabel', 'Segments')} ({segments.length})
+            </p>
+            {bestMatch && (
+              <div className={styles.bestMatchBadge} style={{ borderColor: getRatingColor(bestMatch.seg.matchRating) }}>
+                <span className={styles.bestMatchCrown}>★</span>
+                <div className={styles.bestMatchInfo}>
+                  <span className={styles.bestMatchLabel}>Match of the Night</span>
+                  <span className={styles.bestMatchRating} style={{ color: getRatingColor(bestMatch.seg.matchRating) }}>
+                    {Number(bestMatch.seg.matchRating).toFixed(1)}
+                    <em className={styles.bestMatchDesc}> — {getRatingLabel(bestMatch.seg.matchRating)}</em>
+                  </span>
+                  <span className={styles.bestMatchName}>
+                    {(bestMatch.seg.participantDetails || [])
+                      .filter((p) => p.role === 'wrestler')
+                      .map((p) => p.name)
+                      .join(' vs ')}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
           <div className={styles.segmentsList}>
             {segments.map((seg, i) => (
-              <SegmentCard key={seg.id || i} segment={seg} index={i} visible={segsVisible} />
+              <SegmentCard key={seg.id || i} segment={seg} index={i} visible={segsVisible} t={t} />
             ))}
           </div>
         </div>

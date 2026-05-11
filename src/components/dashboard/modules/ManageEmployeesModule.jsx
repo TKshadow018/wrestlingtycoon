@@ -8,6 +8,40 @@ const formatMoney = (value) => value.toLocaleString()
 const getBackupImageByGender = (gender) => (gender === 'female' ? '/people/girl.png' : '/people/boy.png')
 const getStamina = (employee) => Number(employee?.stamina ?? 100)
 const getHappiness = (employee) => Number(employee?.happiness ?? 50)
+
+const MATCH_SEGMENT_TYPES = new Set(['match', 'mainEvent', 'titleMatch'])
+
+const getWrestlerRecentStats = (employee) => {
+  const history = Array.isArray(employee?.matchStats?.matchHistory) ? employee.matchStats.matchHistory : []
+  const matchHistory = history
+    .filter((entry) => MATCH_SEGMENT_TYPES.has(entry?.segmentType))
+    .sort((a, b) => (b.day || 0) - (a.day || 0))
+    .slice(0, 20)
+
+  if (matchHistory.length === 0) return null
+
+  let wins = 0
+  let losses = 0
+  const ratings = []
+
+  matchHistory.forEach((entry) => {
+    const isWinner = entry.winnerEmployeeId === employee.employeeId
+      || (Array.isArray(entry.winnerTeamIds) && entry.winnerTeamIds.includes(employee.employeeId))
+    if (isWinner) {
+      wins += 1
+    } else {
+      losses += 1
+    }
+    const r = Number(entry.matchRating)
+    if (Number.isFinite(r)) ratings.push(r)
+  })
+
+  const avgRating = ratings.length > 0
+    ? (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1)
+    : null
+
+  return { wins, losses, avgRating, count: matchHistory.length }
+}
 const ROLE_FILTERS = ['all', 'wrestler', 'referee', 'manager', 'announcer', 'staff']
 const GENDER_FILTERS = ['all', 'male', 'female']
 
@@ -897,6 +931,30 @@ function ManageEmployeesModule() {
               {t('dashboard.employees.stamina', { amount: getStamina(employee) })}
             </p>
           )}
+          {employee.role === 'wrestler' && (() => {
+            const stats = getWrestlerRecentStats(employee)
+            if (!stats) return null
+            return (
+              <div className={styles.recentMatchStats}>
+                <span className={styles.recentMatchStatsLabel}>
+                  {t('dashboard.employees.last20Label', 'Last {{count}} matches', { count: stats.count })}
+                </span>
+                <div className={styles.recentMatchStatsPills}>
+                  {stats.avgRating !== null && (
+                    <span className={styles.recentStatPill}>
+                      ★ {stats.avgRating}
+                    </span>
+                  )}
+                  <span className={`${styles.recentStatPill} ${styles.recentStatWin}`}>
+                    {stats.wins}W
+                  </span>
+                  <span className={`${styles.recentStatPill} ${styles.recentStatLoss}`}>
+                    {stats.losses}L
+                  </span>
+                </div>
+              </div>
+            )
+          })()}
           <p>{t('dashboard.employees.monthlyWage', { amount: formatMoney(employee.contract?.monthlySalary || employee.salary) })}</p>
           <p>{t('dashboard.employees.perMatchSalary', { amount: formatMoney(employee.contract?.perMatchSalary || 0) })}</p>
           <p>{t('dashboard.employees.signingBonus', { amount: formatMoney(employee.contract?.signingBonus || 0) })}</p>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FirebaseError } from 'firebase/app'
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
@@ -10,6 +10,7 @@ import ModuleNav from '../components/dashboard/ModuleNav'
 import ModulePanel from '../components/dashboard/ModulePanel'
 import EventBannerScreen from '../components/dashboard/EventBannerScreen'
 import EventCustomIntroScreen from '../components/dashboard/EventCustomIntroScreen'
+import EventPreparationScreen from '../components/dashboard/EventPreparationScreen'
 import EventRequirementsOverlay, { checkEventRequirements } from '../components/dashboard/EventRequirementsOverlay'
 import EventResultsScreen from '../components/dashboard/EventResultsScreen'
 import EventSetupModal from '../components/dashboard/modules/EventSetupModal'
@@ -108,6 +109,18 @@ const getGameDateFromDay = (startDateIso, day) => {
   return gameDate
 }
 
+// Returns the upcoming PPV/megaLive event if today is a preparation trigger day
+// PPV: 7 days before; megaLive: 14 days before
+const getPreparationEvent = ({ day, customEvents = [] }) => {
+  const sorted = [...customEvents].sort((a, b) => a.scheduledDay - b.scheduledDay)
+  for (const event of sorted) {
+    const daysUntil = event.scheduledDay - day
+    if (event.type === 'ppv' && daysUntil === 7) return event
+    if (event.type === 'megaLive' && daysUntil === 14) return event
+  }
+  return null
+}
+
 const getTodayEventProjection = ({ day, startDateIso, customEvents = [], sponsors = [] }) => {
   const sortedCustomEvents = [...customEvents].sort((a, b) => {
     if (a.scheduledDay !== b.scheduledDay) {
@@ -174,15 +187,23 @@ function DashboardPage() {
   const skipEvent = useGameStore((state) => state.skipEvent)
   const resetGame = useGameStore((state) => state.resetGame)
   const titles = useGameStore((state) => state.roster.titles)
+  const ticketFees = useGameStore((state) => state.finances.ticketFees)
+  const eventPreparation = useGameStore((state) => state.events.eventPreparation)
+  const setEventPreparation = useGameStore((state) => state.setEventPreparation)
+  const setEventTicketFee = useGameStore((state) => state.setEventTicketFee)
   const [showEventBanner, setShowEventBanner] = useState(false)
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false)
   const [showRequirementsOverlay, setShowRequirementsOverlay] = useState(false)
   const [pendingEventResult, setPendingEventResult] = useState(null)
   const [showCustomEventIntro, setShowCustomEventIntro] = useState(false)
+  const [showEventPrep, setShowEventPrep] = useState(false)
   const [saveLoadStatus, setSaveLoadStatus] = useState('')
+  const fileInputRef = useRef(null)
 
   const todayEvent = getTodayEventProjection({ day, startDateIso, customEvents, sponsors })
   const isEventStep = Boolean(todayEvent)
+  const preparationEvent = !isEventStep ? getPreparationEvent({ day, customEvents }) : null
+  const isPreparationDay = Boolean(preparationEvent)
 
   const continueEventFlow = () => {
     const { allMet } = checkEventRequirements(employees)
@@ -195,6 +216,11 @@ function DashboardPage() {
   }
 
   const handleProceed = () => {
+    if (isPreparationDay) {
+      setShowEventPrep(true)
+      return
+    }
+
     if (isEventStep) {
       if (todayEvent?.isCustomEvent && todayEvent?.imageUrl) {
         setShowCustomEventIntro(true)
@@ -215,6 +241,25 @@ function DashboardPage() {
   const handleCustomEventIntroComplete = () => {
     setShowCustomEventIntro(false)
     continueEventFlow()
+  }
+
+  const handleEventPrepSave = ({ venueId, promotedWrestlerIds, ticketPrice }) => {
+    if (preparationEvent) {
+      setEventPreparation({
+        eventId: preparationEvent.eventId,
+        venueId: venueId || null,
+        promotedWrestlerIds,
+      })
+    }
+    if (preparationEvent && ticketPrice >= 0) {
+      setEventTicketFee(preparationEvent.type, ticketPrice)
+    }
+    setShowEventPrep(false)
+    proceedTimeline()
+  }
+
+  const handleEventPrepCancel = () => {
+    setShowEventPrep(false)
   }
 
   const handleRequirementsSkip = () => {
@@ -255,6 +300,17 @@ function DashboardPage() {
     try {
       const snapshot = createSaveSnapshot(useGameStore.getState())
       writeLocalBackup(snapshot)
+
+      const payload = JSON.stringify({ state: snapshot, savedAt: Date.now() }, null, 2)
+      const blob = new Blob([payload], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      const companyName = (useGameStore.getState().profile?.companyName || 'save').replace(/[^a-z0-9]/gi, '_').toLowerCase()
+      anchor.href = url
+      anchor.download = `wrestling-tycoon-${companyName}.json`
+      anchor.click()
+      URL.revokeObjectURL(url)
+
       setSaveLoadStatus(t('dashboard.saveLoad.savedLocal'))
     } catch (error) {
       setSaveLoadStatus(t('dashboard.saveLoad.errorSaveLocal'))
@@ -262,23 +318,28 @@ function DashboardPage() {
   }
 
   const handleLoadLocal = () => {
-    try {
-      const raw = localStorage.getItem(LOCAL_BACKUP_KEY)
-      if (!raw) {
-        setSaveLoadStatus(t('dashboard.saveLoad.noLocalSave'))
-        return
-      }
+    fileInputRef.current?.click()
+  }
 
-      const parsed = JSON.parse(raw)
-      if (!parsed?.state) {
-        setSaveLoadStatus(t('dashboard.saveLoad.noLocalSave'))
-        return
-      }
+  const handleFileLoad = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    event.target.value = ''
 
-      writeSnapshotAndReload(parsed.state)
-    } catch (error) {
-      setSaveLoadStatus(t('dashboard.saveLoad.errorLoadLocal'))
+    const reader = new FileReader()
+    reader.onload = (readerEvent) => {
+      try {
+        const parsed = JSON.parse(readerEvent.target.result)
+        if (!parsed?.state) {
+          setSaveLoadStatus(t('dashboard.saveLoad.noLocalSave'))
+          return
+        }
+        writeSnapshotAndReload(parsed.state)
+      } catch {
+        setSaveLoadStatus(t('dashboard.saveLoad.errorLoadLocal'))
+      }
     }
+    reader.readAsText(file)
   }
 
   const handleSaveFirebase = async (slot) => {
@@ -331,6 +392,13 @@ function DashboardPage() {
 
   return (
     <main className={styles.dashboard}>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json,application/json"
+        style={{ display: 'none' }}
+        onChange={handleFileLoad}
+      />
       {showRequirementsOverlay && (
         <EventRequirementsOverlay
           employees={employees}
@@ -354,6 +422,18 @@ function DashboardPage() {
           event={todayEvent}
           durationMs={2600}
           onComplete={handleCustomEventIntroComplete}
+        />
+      )}
+      {showEventPrep && preparationEvent && (
+        <EventPreparationScreen
+          event={preparationEvent}
+          employees={employees}
+          titles={titles}
+          sponsors={sponsors}
+          ticketFees={ticketFees}
+          eventPreparation={eventPreparation}
+          onSave={handleEventPrepSave}
+          onCancel={handleEventPrepCancel}
         />
       )}
       {pendingEventResult && (
@@ -401,7 +481,7 @@ function DashboardPage() {
         ) : (
           <section className={styles.workspace}>
             <aside className={styles.sidebar}>
-              <ControlPanel isEventDay={isEventStep} onProceed={handleProceed} onReset={resetGame} />
+              <ControlPanel isEventDay={isEventStep} isPreparationDay={isPreparationDay} onProceed={handleProceed} onReset={resetGame} />
               <ModuleNav activeModule={activeModule} onSelect={setActiveModule} />
             </aside>
             <ModulePanel moduleId={activeModule} />

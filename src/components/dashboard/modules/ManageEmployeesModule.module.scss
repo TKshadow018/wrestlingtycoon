@@ -167,6 +167,49 @@
   margin-top: 0.55rem;
 }
 
+.recentMatchStats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.15rem;
+}
+
+.recentMatchStatsLabel {
+  color: var(--text-faint);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.recentMatchStatsPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.recentStatPill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: var(--text-main);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+}
+
+.recentStatWin {
+  background: rgba(102, 217, 145, 0.1);
+  border-color: rgba(102, 217, 145, 0.35);
+  color: #66d991;
+}
+
+.recentStatLoss {
+  background: rgba(228, 138, 138, 0.1);
+  border-color: rgba(228, 138, 138, 0.35);
+  color: #e48a8a;
+}
+
 .detailsOverlay {
   position: fixed;
   inset: 0;

@@ -154,6 +154,16 @@ function HireEmployeesModule() {
   const startDateIso = useGameStore((state) => state.calendar.startDateIso)
   const hireEmployee = useGameStore((state) => state.hireEmployee)
   const negotiateEmployeeContract = useGameStore((state) => state.negotiateEmployeeContract)
+  const maleWrestlerCount = useGameStore((state) => state.roster.employees.filter((emp) => emp.role === 'wrestler' && emp.gender === 'male').length)
+  const femaleWrestlerCount = useGameStore((state) => state.roster.employees.filter((emp) => emp.role === 'wrestler' && emp.gender === 'female').length)
+  const MAX_MALE = 20
+  const MAX_FEMALE = 15
+
+  const isWrestlerRosterFull = (gender) => {
+    if (gender === 'male') return maleWrestlerCount >= MAX_MALE
+    if (gender === 'female') return femaleWrestlerCount >= MAX_FEMALE
+    return false
+  }
   const selectedCandidate = candidates.find((candidate) => candidate.candidateId === selectedCandidateId) || null
   const selectedContract = selectedCandidate?.contract || null
   const gameDate = getGameDate(startDateIso, gameDay)
@@ -275,6 +285,8 @@ function HireEmployeesModule() {
       <header className={styles.headerRow}>
         <p>{t('dashboard.hiring.availableCash', { amount: cash.toLocaleString() })}</p>
         <p>{t('dashboard.hiring.availablePeople', { amount: visibleCandidates.length, total: candidates.length })}</p>
+        <p>{t('dashboard.hiring.rosterQuotaMale', { count: maleWrestlerCount, max: MAX_MALE })}</p>
+        <p>{t('dashboard.hiring.rosterQuotaFemale', { count: femaleWrestlerCount, max: MAX_FEMALE })}</p>
       </header>
 
       <div className={styles.filterRow}>
@@ -356,12 +368,14 @@ function HireEmployeesModule() {
                 <button
                   type="button"
                   className={styles.quickHireAction}
-                  disabled={cash < monthlySalary}
+                  disabled={cash < monthlySalary || (candidate.role === 'wrestler' && isWrestlerRosterFull(candidate.gender))}
                   onClick={() => handleQuickHire(candidate.candidateId)}
                 >
-                  {cash >= monthlySalary
-                    ? t('dashboard.hiring.quickHire')
-                    : t('dashboard.hiring.insufficientCash')}
+                  {candidate.role === 'wrestler' && isWrestlerRosterFull(candidate.gender)
+                    ? t('dashboard.hiring.rosterFull')
+                    : cash >= monthlySalary
+                      ? t('dashboard.hiring.quickHire')
+                      : t('dashboard.hiring.insufficientCash')}
                 </button>
                 <button
                   type="button"
@@ -493,8 +507,13 @@ function HireEmployeesModule() {
                   <p className={styles.errorMessage}>
                     {offerFeedback.quickHireFailureReason === 'insufficientCash'
                       ? t('dashboard.hiring.insufficientCash')
-                      : t('dashboard.hiring.quickHireFailed')}
+                      : offerFeedback.quickHireFailureReason === 'rosterFull'
+                        ? t('dashboard.hiring.rosterFullError')
+                        : t('dashboard.hiring.quickHireFailed')}
                   </p>
+                ) : null}
+                {offerFeedback?.autoHireFailed && offerFeedback.autoHireFailureReason === 'rosterFull' ? (
+                  <p className={styles.errorMessage}>{t('dashboard.hiring.rosterFullError')}</p>
                 ) : null}
 
                 <div className={styles.modalActions}>
