@@ -17,7 +17,14 @@
     "companyNamePlaceholder": "Promotion brand name",
     "startingCashLabel": "Starting Cash",
     "startingCashValue": "$ {{amount}}",
-    "validation": "Please complete both fields before starting."
+    "validation": "Please complete both fields before starting.",
+    "aiLegend": "AI Assistant",
+    "aiStartYes": "Start with AI enabled setup",
+    "aiStartNo": "Start without AI",
+    "aiLoadingTitle": "Preparing AI Assistant",
+    "aiLoadingSubtitle": "Downloading Qwen2.5 3B model for local gameplay assistance.",
+    "aiLoadingPercent": "Download Progress: {{progress}}%",
+    "aiBackgroundButton": "Stop Waiting, Download In Background"
   },
   "dashboard": {
     "welcome": "Welcome back, {{playerName}}",
@@ -46,9 +53,31 @@
       "errorSaveFirebase": "Failed to save game to Firebase.",
       "errorLoadFirebase": "Failed to load game from Firebase."
     },
+    "ai": {
+      "defaultDownloadText": "Downloading Qwen2.5 3B model files...",
+      "downloading": "AI Model Download: {{progress}}% ({{detail}})",
+      "enabledInline": "AI Enabled",
+      "readyTitle": "AI Model Is Ready",
+      "readyBody": "The model finished downloading. Enable AI assistant now?",
+      "enableButton": "Enable AI",
+      "laterButton": "Later",
+      "interviewTitle": "Media Interview",
+      "interviewHeadline": "{{journalist}} from {{newspaper}} is live with your promotion.",
+      "you": "You",
+      "answerPlaceholder": "Give your answer...",
+      "submitAnswer": "Send Answer",
+      "skipInterview": "Skip Interview and Continue Day",
+      "thinking": "Interviewer is thinking...",
+      "finishInterview": "Finish Interview and Continue Day",
+      "interviewClosing": "That wraps up our interview. Thanks for your time.",
+      "interviewInitializing": "Connecting to journalist...",
+      "interviewInitError": "Could not start interview right now. Try proceeding again.",
+      "interviewTurnError": "Interview response failed. Try again."
+    },
     "controls": {
       "proceedDay": "Proceed to Next Day",
       "proceedEvent": "Proceed to Event",
+      "attendInterview": "Attend Interview",
       "eventPreparation": "Event Preparation",
       "resetGame": "Reset Game",
       "resetConfirm": "Reset this save and return to a fresh game state?"

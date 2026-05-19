@@ -1,8 +1,10 @@
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FirebaseError } from 'firebase/app'
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
+import { createInterviewScenario, evaluateInterviewAnswer } from '../ai/interviewService'
 import LanguageSwitcher from '../components/common/LanguageSwitcher'
+import AiInterviewModal from '../components/dashboard/AiInterviewModal'
 import SaveLoadControls from '../components/common/SaveLoadControls'
 import ControlPanel from '../components/dashboard/ControlPanel'
 import HudBar from '../components/dashboard/HudBar'
@@ -21,6 +23,7 @@ import styles from './DashboardPage.module.scss'
 
 const MAIN_SAVE_KEY = 'wrestling-tycoon-save-v1'
 const LOCAL_BACKUP_KEY = 'wrestling-tycoon-manual-save-v1'
+const AI_INTERVIEW_CHANCE = 0.05
 const db = getFirestore(app)
 
 const getFirebaseSaveLoadErrorKey = (error, operation) => {
@@ -121,6 +124,18 @@ const getPreparationEvent = ({ day, customEvents = [] }) => {
   return null
 }
 
+const getPreShowInterviewEvent = ({ day, customEvents = [] }) => {
+  const sorted = [...customEvents].sort((a, b) => a.scheduledDay - b.scheduledDay)
+  for (const event of sorted) {
+    const daysUntil = event.scheduledDay - day
+    if ((event.type === 'ppv' || event.type === 'megaLive') && daysUntil === 1) {
+      return event
+    }
+  }
+
+  return null
+}
+
 const getTodayEventProjection = ({ day, startDateIso, customEvents = [], sponsors = [] }) => {
   const sortedCustomEvents = [...customEvents].sort((a, b) => {
     if (a.scheduledDay !== b.scheduledDay) {
@@ -177,6 +192,7 @@ function DashboardPage() {
   const prestige = useGameStore((state) => state.stats.prestige)
   const profile = useGameStore((state) => state.profile)
   const bookedEvent = useGameStore((state) => state.events.bookedEvent)
+  const lastOutcome = useGameStore((state) => state.events.lastOutcome)
   const customEvents = useGameStore((state) => state.events.customEvents)
   const employees = useGameStore((state) => state.roster.employees)
   const sponsors = useGameStore((state) => state.roster.sponsors)
@@ -191,6 +207,14 @@ function DashboardPage() {
   const eventPreparation = useGameStore((state) => state.events.eventPreparation)
   const setEventPreparation = useGameStore((state) => state.setEventPreparation)
   const setEventTicketFee = useGameStore((state) => state.setEventTicketFee)
+  const aiStatus = useGameStore((state) => state.ai.status)
+  const aiProgress = useGameStore((state) => state.ai.progress)
+  const aiProgressText = useGameStore((state) => state.ai.progressText)
+  const aiEnabled = useGameStore((state) => state.ai.enabled)
+  const aiShowEnableModal = useGameStore((state) => state.ai.showEnableModal)
+  const aiOptedInAtStart = useGameStore((state) => state.ai.optedInAtStart)
+  const enableAi = useGameStore((state) => state.enableAi)
+  const closeAiEnableModal = useGameStore((state) => state.closeAiEnableModal)
   const [showEventBanner, setShowEventBanner] = useState(false)
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false)
   const [showRequirementsOverlay, setShowRequirementsOverlay] = useState(false)
@@ -198,12 +222,248 @@ function DashboardPage() {
   const [showCustomEventIntro, setShowCustomEventIntro] = useState(false)
   const [showEventPrep, setShowEventPrep] = useState(false)
   const [saveLoadStatus, setSaveLoadStatus] = useState('')
+  const [interviewRollByDay, setInterviewRollByDay] = useState({})
+  const [interviewConsumedByDay, setInterviewConsumedByDay] = useState({})
+  const [interviewSession, setInterviewSession] = useState(null)
+  const [interviewMessages, setInterviewMessages] = useState([])
+  const [isInterviewSubmitting, setIsInterviewSubmitting] = useState(false)
+  const [isInterviewFinished, setIsInterviewFinished] = useState(false)
+  const [interviewError, setInterviewError] = useState('')
   const fileInputRef = useRef(null)
 
   const todayEvent = getTodayEventProjection({ day, startDateIso, customEvents, sponsors })
   const isEventStep = Boolean(todayEvent)
   const preparationEvent = !isEventStep ? getPreparationEvent({ day, customEvents }) : null
   const isPreparationDay = Boolean(preparationEvent)
+  const preShowInterviewEvent = !isEventStep ? getPreShowInterviewEvent({ day, customEvents }) : null
+  const isForcedPreShowInterviewDay = Boolean(preShowInterviewEvent)
+  const shouldShowAiProgress = aiOptedInAtStart && aiStatus === 'downloading'
+  const aiStatusMessage = shouldShowAiProgress
+    ? t('dashboard.ai.downloading', {
+        progress: Math.max(0, Math.min(100, Number(aiProgress) || 0)),
+        detail: aiProgressText || t('dashboard.ai.defaultDownloadText'),
+      })
+    : ''
+
+  const isInterviewEligible = aiEnabled
+    && aiStatus === 'ready'
+    && !isEventStep
+    && !isPreparationDay
+    && !isSetupModalOpen
+    && !showEventBanner
+    && !showCustomEventIntro
+    && !showEventPrep
+
+  useEffect(() => {
+    if (!isInterviewEligible) {
+      return
+    }
+
+    if (isForcedPreShowInterviewDay) {
+      setInterviewRollByDay((prev) => ({
+        ...prev,
+        [day]: true,
+      }))
+      return
+    }
+
+    setInterviewRollByDay((prev) => {
+      if (typeof prev?.[day] === 'boolean') {
+        return prev
+      }
+
+      return {
+        ...prev,
+        [day]: Math.random() < AI_INTERVIEW_CHANCE,
+      }
+    })
+  }, [day, isForcedPreShowInterviewDay, isInterviewEligible])
+
+  const shouldOfferInterview = isInterviewEligible
+    && interviewRollByDay?.[day] === true
+    && interviewConsumedByDay?.[day] !== true
+    && !interviewSession
+
+  const interviewButtonLabel = shouldOfferInterview
+    ? t('dashboard.controls.attendInterview')
+    : null
+
+  const interviewContext = useMemo(() => {
+    const newestEmployees = [...employees]
+      .sort((a, b) => (Number(b.contractStartDay) || 0) - (Number(a.contractStartDay) || 0))
+      .slice(0, 3)
+      .map((employee) => employee.name)
+
+    const activeTitles = (titles || [])
+      .filter((title) => title?.isActive !== false)
+      .slice(0, 4)
+      .map((title) => {
+        const holderIds = title.division === 'doubles'
+          ? (Array.isArray(title.holderEmployeeIds) ? title.holderEmployeeIds : [])
+          : (title.holderEmployeeId ? [title.holderEmployeeId] : [])
+        const holders = holderIds
+          .map((id) => employees.find((employee) => employee.employeeId === id)?.name)
+          .filter(Boolean)
+
+        return {
+          title: title.name,
+          holders,
+        }
+      })
+
+    const recentMatches = Array.isArray(lastOutcome?.segments)
+      ? lastOutcome.segments
+          .filter((segment) => segment?.segmentType === 'match')
+          .slice(0, 3)
+          .map((segment) => ({
+            participants: segment.participants || [],
+            winner: segment.winnerName || 'No decision',
+            rating: segment.matchRating,
+          }))
+      : []
+
+    return {
+      day,
+      week,
+      companyName: profile.companyName,
+      cash,
+      fans,
+      prestige,
+      upcomingEvent: bookedEvent?.name || 'No announced event',
+      newestEmployees,
+      recentMatches,
+      champions: activeTitles,
+    }
+  }, [bookedEvent?.name, cash, day, employees, fans, lastOutcome?.segments, prestige, profile.companyName, titles, week])
+
+  const openInterview = async () => {
+    setInterviewConsumedByDay((prev) => ({
+      ...prev,
+      [day]: true,
+    }))
+
+    setInterviewError('')
+    setIsInterviewFinished(false)
+
+    const placeholderSession = {
+      journalistName: 'Journalist',
+      newspaperName: 'Loading...',
+      situation: t('dashboard.ai.interviewInitializing'),
+      questions: [],
+      questionIndex: 0,
+      followUpCount: 0,
+      targetFollowUps: 3,
+    }
+
+    setInterviewSession(placeholderSession)
+    setInterviewMessages([
+      { speaker: 'ai', text: t('dashboard.ai.interviewInitializing') },
+    ])
+    setIsInterviewSubmitting(true)
+
+    try {
+      const scenario = await createInterviewScenario(interviewContext)
+      const firstQuestion = scenario.questions?.[0]
+
+      if (!firstQuestion) {
+        throw new Error('Interview questions unavailable')
+      }
+
+      setInterviewSession({
+        ...scenario,
+        questionIndex: 0,
+        followUpCount: 0,
+        targetFollowUps: 3 + Math.floor(Math.random() * 3),
+      })
+
+      setInterviewMessages([
+        { speaker: 'ai', text: firstQuestion },
+      ])
+    } catch {
+      setInterviewError(t('dashboard.ai.interviewInitError'))
+      setInterviewSession(null)
+      setInterviewMessages([])
+    } finally {
+      setIsInterviewSubmitting(false)
+    }
+  }
+
+  const closeInterviewWithoutProceed = () => {
+    setInterviewSession(null)
+    setInterviewMessages([])
+    setInterviewError('')
+    setIsInterviewFinished(false)
+    setIsInterviewSubmitting(false)
+  }
+
+  const finishInterviewAndContinueDay = () => {
+    closeInterviewWithoutProceed()
+    proceedTimeline()
+  }
+
+  const handleInterviewAnswer = async (userAnswer) => {
+    if (!interviewSession || isInterviewFinished) {
+      return
+    }
+
+    setInterviewError('')
+    setIsInterviewSubmitting(true)
+
+    const nextMessagesAfterUser = [...interviewMessages, { speaker: 'user', text: userAnswer }]
+    setInterviewMessages(nextMessagesAfterUser)
+
+    const baseQuestion = interviewSession.questions?.[interviewSession.questionIndex] || ''
+    const currentQuestion = [...interviewMessages]
+      .reverse()
+      .find((entry) => entry.speaker === 'ai')?.text || baseQuestion
+
+    try {
+      const followUpCount = interviewSession.followUpCount || 0
+      const targetFollowUps = interviewSession.targetFollowUps || 3
+      const mustAskFollowUp = followUpCount < targetFollowUps
+
+      const turn = await evaluateInterviewAnswer({
+        journalistName: interviewSession.journalistName,
+        newspaperName: interviewSession.newspaperName,
+        currentQuestion,
+        userAnswer,
+        transcript: nextMessagesAfterUser,
+        allowCounter: mustAskFollowUp,
+        forceCounter: mustAskFollowUp,
+      })
+
+      if (mustAskFollowUp && turn.counterQuestion) {
+        setInterviewMessages((prev) => [
+          ...prev,
+          { speaker: 'ai', text: turn.reply },
+          { speaker: 'ai', text: turn.counterQuestion },
+        ])
+
+        setInterviewSession((prev) => ({
+          ...prev,
+          followUpCount: (prev.followUpCount || 0) + 1,
+        }))
+
+        return
+      }
+
+      if (mustAskFollowUp && !turn.counterQuestion) {
+        setInterviewError(t('dashboard.ai.interviewTurnError'))
+        return
+      }
+
+      setInterviewMessages((prev) => [
+        ...prev,
+        { speaker: 'ai', text: turn.reply },
+        { speaker: 'ai', text: t('dashboard.ai.interviewClosing') },
+      ])
+      setIsInterviewFinished(true)
+    } catch {
+      setInterviewError(t('dashboard.ai.interviewTurnError'))
+    } finally {
+      setIsInterviewSubmitting(false)
+    }
+  }
 
   const continueEventFlow = () => {
     const { allMet } = checkEventRequirements(employees)
@@ -216,6 +476,11 @@ function DashboardPage() {
   }
 
   const handleProceed = () => {
+    if (shouldOfferInterview) {
+      openInterview()
+      return
+    }
+
     if (isPreparationDay) {
       setShowEventPrep(true)
       return
@@ -442,6 +707,33 @@ function DashboardPage() {
           onContinue={handleDismissEventResult}
         />
       )}
+      <AiInterviewModal
+        isOpen={Boolean(interviewSession)}
+        interview={interviewSession}
+        messages={interviewMessages}
+        onSubmitAnswer={handleInterviewAnswer}
+        onSkip={finishInterviewAndContinueDay}
+        onFinishAndContinue={finishInterviewAndContinueDay}
+        isSubmitting={isInterviewSubmitting}
+        isFinished={isInterviewFinished}
+        error={interviewError}
+      />
+      {aiShowEnableModal && aiStatus === 'ready' && !aiEnabled && (
+        <section className={styles.aiModalBackdrop}>
+          <article className={styles.aiModal}>
+            <h3>{t('dashboard.ai.readyTitle')}</h3>
+            <p>{t('dashboard.ai.readyBody')}</p>
+            <div className={styles.aiModalActions}>
+              <button type="button" className={styles.aiEnableButton} onClick={enableAi}>
+                {t('dashboard.ai.enableButton')}
+              </button>
+              <button type="button" className={styles.aiLaterButton} onClick={closeAiEnableModal}>
+                {t('dashboard.ai.laterButton')}
+              </button>
+            </div>
+          </article>
+        </section>
+      )}
       <section className={styles.shell}>
         <header className={styles.topBar}>
           <div>
@@ -457,6 +749,8 @@ function DashboardPage() {
               onLoadFirebase={handleLoadFirebase}
               firebaseEnabled={isFirebaseConfigured}
               statusMessage={saveLoadStatus}
+              aiStatusMessage={aiStatusMessage}
+              aiEnabled={aiEnabled}
             />
             <LanguageSwitcher />
           </div>
@@ -481,7 +775,13 @@ function DashboardPage() {
         ) : (
           <section className={styles.workspace}>
             <aside className={styles.sidebar}>
-              <ControlPanel isEventDay={isEventStep} isPreparationDay={isPreparationDay} onProceed={handleProceed} onReset={resetGame} />
+              <ControlPanel
+                isEventDay={isEventStep}
+                isPreparationDay={isPreparationDay}
+                onProceed={handleProceed}
+                onReset={resetGame}
+                proceedLabelOverride={interviewButtonLabel}
+              />
               <ModuleNav activeModule={activeModule} onSelect={setActiveModule} />
             </aside>
             <ModulePanel moduleId={activeModule} />

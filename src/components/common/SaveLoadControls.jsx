@@ -8,6 +8,8 @@ function SaveLoadControls({
   onSaveFirebase,
   onLoadFirebase,
   statusMessage = '',
+  aiStatusMessage = '',
+  aiEnabled = false,
   firebaseEnabled = true,
 }) {
   const { t } = useTranslation()
@@ -74,6 +76,8 @@ function SaveLoadControls({
       </div>
 
       {statusMessage ? <p className={styles.status}>{statusMessage}</p> : null}
+      {aiStatusMessage ? <p className={styles.aiStatus}>{aiStatusMessage}</p> : null}
+      {aiEnabled ? <p className={styles.aiEnabled}>{t('dashboard.ai.enabledInline')}</p> : null}
     </div>
   )
 }

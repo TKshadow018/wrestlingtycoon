@@ -167,6 +167,17 @@
   margin-top: 0.55rem;
 }
 
+.heelFaceMeter {
+  margin-top: 0.2rem;
+}
+
+.heelFaceMeterStage {
+  color: var(--text-main);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
 .recentMatchStats {
   display: flex;
   flex-direction: column;

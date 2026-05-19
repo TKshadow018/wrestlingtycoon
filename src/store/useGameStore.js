@@ -4,6 +4,7 @@ import { GAME_CONFIG, MANAGEMENT_MODULES } from '../config/gameConfig'
 import { createEmployeeCandidates } from '../data/employeeMarket'
 import { createEventTemplates } from '../data/eventTemplates'
 import { createSponsorOffers, SPONSOR_TYPE_CONFIG } from '../data/sponsorOffers'
+import { clampHeelFaceMeter, DEFAULT_HEEL_FACE_METER_VALUE } from '../utils/heelFaceMeter'
 import preloadedEvents from '../data/preloadedEvents.json'
 import titleCatalog from '../data/titles.json'
 
@@ -154,6 +155,7 @@ const normalizePersistedEmployees = (employees = [], day = 1) => {
         ? clampStamina(employee?.stamina ?? MAX_STAMINA)
         : employee?.stamina,
       managerId: employee?.managerId || null,
+      heelFaceMeter: clampHeelFaceMeter(employee?.heelFaceMeter ?? DEFAULT_HEEL_FACE_METER_VALUE),
       contract: {
         monthlySalary: employee?.contract?.monthlySalary || employee.salary || 0,
         perMatchSalary: employee?.contract?.perMatchSalary || 0,
@@ -248,6 +250,7 @@ const toEmployeeRecord = (candidate, currentDay) => {
   staffAbility: candidate.staff_ability || null,
   staffDepartment: candidate.staff_department || null,
   managerId: null,
+  heelFaceMeter: DEFAULT_HEEL_FACE_METER_VALUE,
   matchStats: {
     totalMatches: 0,
     totalWins: 0,
@@ -340,7 +343,7 @@ const evaluateCandidateOffer = (candidate, offer = {}) => {
 }
 
 const buildInitialState = () => {
-  const startDateIso = toIsoDateLocal(new Date())
+  const startDateIso = GAME_CONFIG.startDateIso || toIsoDateLocal(new Date())
   const seededCustomEvents = createPreloadedCustomEvents(startDateIso)
   const initialRoster = {
     employees: [],
@@ -418,6 +421,16 @@ const buildInitialState = () => {
     },
     ui: {
       activeModule: MANAGEMENT_MODULES[0].id,
+    },
+    ai: {
+      optedInAtStart: false,
+      enabled: false,
+      modelId: 'Qwen2.5-3B-Instruct-q4f16_1-MLC',
+      status: 'idle',
+      progress: 0,
+      progressText: '',
+      error: '',
+      showEnableModal: false,
     },
   }
 }
@@ -914,6 +927,7 @@ const applyMatchStats = (employees, configuredSegments, eventDay, eventName) => 
     const currentStats = employee.matchStats ?? { totalMatches: 0, totalWins: 0, totalLosses: 0, matchHistory: [] }
     let wins = 0
     let losses = 0
+    let nextHeelFaceMeter = clampHeelFaceMeter(employee?.heelFaceMeter ?? DEFAULT_HEEL_FACE_METER_VALUE)
 
     const newHistory = involvedSegments.map((seg) => {
       const isMatchType = MATCH_SEGMENT_TYPES.has(seg.segmentType)
@@ -932,6 +946,8 @@ const applyMatchStats = (employees, configuredSegments, eventDay, eventName) => 
 
       if (isMatchType && isWinner) wins += 1
       if (isLoser) losses += 1
+  if (isMatchType && isWinner) nextHeelFaceMeter -= 4
+  if (isMatchType && isLoser) nextHeelFaceMeter += 4
 
       const participantDetails = seg.participantIds
         .map((id) => employeesById.get(id))
@@ -987,6 +1003,7 @@ const applyMatchStats = (employees, configuredSegments, eventDay, eventName) => 
 
     return {
       ...employee,
+      heelFaceMeter: clampHeelFaceMeter(nextHeelFaceMeter),
       matchStats: {
         totalMatches: currentStats.totalMatches + involvedSegments.length,
         totalWins: currentStats.totalWins + wins,
@@ -1775,6 +1792,93 @@ export const useGameStore = create(
           ui: {
             ...state.ui,
             activeModule: moduleId,
+          },
+        }))
+      },
+
+      setAiOptedInAtStart: (optedInAtStart) => {
+        set((state) => ({
+          ai: {
+            ...state.ai,
+            optedInAtStart: Boolean(optedInAtStart),
+          },
+        }))
+      },
+
+      setAiDownloadStarted: ({ modelId } = {}) => {
+        set((state) => ({
+          ai: {
+            ...state.ai,
+            modelId: modelId || state.ai.modelId || 'Qwen2.5-3B-Instruct-q4f16_1-MLC',
+            status: 'downloading',
+            progress: state.ai.status === 'ready' ? 100 : Math.max(0, Number(state.ai.progress) || 0),
+            progressText: '',
+            error: '',
+          },
+        }))
+      },
+
+      setAiDownloadProgress: ({ progress, text } = {}) => {
+        set((state) => {
+          if (state.ai.status === 'ready') {
+            return state
+          }
+
+          const numericProgress = Number(progress)
+          const normalizedProgress = Number.isFinite(numericProgress)
+            ? Math.max(0, Math.min(100, Math.round(numericProgress)))
+            : state.ai.progress
+
+          return {
+            ai: {
+              ...state.ai,
+              status: 'downloading',
+              progress: normalizedProgress,
+              progressText: typeof text === 'string' ? text : state.ai.progressText,
+              error: '',
+            },
+          }
+        })
+      },
+
+      setAiDownloadReady: () => {
+        set((state) => ({
+          ai: {
+            ...state.ai,
+            status: 'ready',
+            progress: 100,
+            progressText: 'Model ready',
+            error: '',
+            showEnableModal: !state.ai.enabled,
+          },
+        }))
+      },
+
+      setAiDownloadError: (errorMessage) => {
+        set((state) => ({
+          ai: {
+            ...state.ai,
+            status: 'error',
+            error: String(errorMessage || 'Model download failed'),
+          },
+        }))
+      },
+
+      enableAi: () => {
+        set((state) => ({
+          ai: {
+            ...state.ai,
+            enabled: true,
+            showEnableModal: false,
+          },
+        }))
+      },
+
+      closeAiEnableModal: () => {
+        set((state) => ({
+          ai: {
+            ...state.ai,
+            showEnableModal: false,
           },
         }))
       },
@@ -3407,6 +3511,12 @@ export const useGameStore = create(
             customEvents: mergedCustomEvents,
             bookedEvent: buildBookedEventProjection(restoredDay, mergedCustomEvents, restoredStartDateIso),
           },
+          ai: {
+            ...currentState.ai,
+            ...(typedPersistedState?.ai || {}),
+            showEnableModal: Boolean(typedPersistedState?.ai?.showEnableModal),
+            error: typedPersistedState?.ai?.status === 'error' ? String(typedPersistedState?.ai?.error || '') : '',
+          },
           finances: mergedFinances,
           market: {
             ...currentState.market,
@@ -3432,6 +3542,7 @@ export const useGameStore = create(
         history: state.history,
         stats: state.stats,
         ui: state.ui,
+        ai: state.ai,
       }),
     },
   ),

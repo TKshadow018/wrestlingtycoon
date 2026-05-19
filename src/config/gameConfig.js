@@ -5,6 +5,7 @@ const asNumber = (value, fallback) => {
 
 export const GAME_CONFIG = {
   version: import.meta.env.VITE_GAME_VERSION || '0.1.0',
+  startDateIso: import.meta.env.VITE_GAME_START_DATE || '',
   startingCash: asNumber(import.meta.env.VITE_GAME_STARTING_CASH, 500000),
   eventCycleDays: asNumber(import.meta.env.VITE_EVENT_CYCLE_DAYS, 7),
   startingFans: asNumber(import.meta.env.VITE_GAME_STARTING_FANS, 1000),

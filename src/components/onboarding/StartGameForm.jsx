@@ -4,8 +4,10 @@ import styles from './StartGameForm.module.scss'
 function StartGameForm({
   playerName,
   companyName,
+  startWithAi,
   validation,
   startingCash,
+  onStartWithAiChange,
   onPlayerNameChange,
   onCompanyNameChange,
   onSubmit,
@@ -38,6 +40,28 @@ function StartGameForm({
 
       <p className={styles.cashLabel}>{t('onboarding.startingCashLabel')}</p>
       <p className={styles.cashValue}>{t('onboarding.startingCashValue', { amount: startingCash.toLocaleString() })}</p>
+
+      <fieldset className={styles.aiChoice}>
+        <legend>{t('onboarding.aiLegend')}</legend>
+        <label>
+          <input
+            type="radio"
+            name="startWithAi"
+            checked={startWithAi === true}
+            onChange={() => onStartWithAiChange(true)}
+          />
+          <span>{t('onboarding.aiStartYes')}</span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="startWithAi"
+            checked={startWithAi === false}
+            onChange={() => onStartWithAiChange(false)}
+          />
+          <span>{t('onboarding.aiStartNo')}</span>
+        </label>
+      </fieldset>
 
       {validation ? <p className={styles.validation}>{t('onboarding.validation')}</p> : null}
 

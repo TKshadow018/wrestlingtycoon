@@ -1,0 +1,153 @@
+.backdrop {
+  align-items: center;
+  background: rgba(3, 8, 16, 0.78);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1rem;
+  position: fixed;
+  z-index: 95;
+}
+
+.modal {
+  background: linear-gradient(150deg, rgba(11, 17, 27, 0.98), rgba(6, 12, 20, 0.98));
+  border: 1px solid rgba(110, 146, 168, 0.34);
+  border-radius: 16px;
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.52);
+  display: grid;
+  gap: 0.85rem;
+  max-height: min(86vh, 780px);
+  max-width: 760px;
+  padding: 1rem;
+  width: min(100%, 760px);
+}
+
+.header {
+  display: grid;
+  gap: 0.2rem;
+
+  h3,
+  p {
+    margin: 0;
+  }
+
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+}
+
+.situation {
+  color: var(--text-main) !important;
+}
+
+.chatLog {
+  background: rgba(7, 13, 20, 0.72);
+  border: 1px solid rgba(105, 125, 146, 0.2);
+  border-radius: 12px;
+  display: grid;
+  gap: 0.55rem;
+  overflow: auto;
+  padding: 0.8rem;
+}
+
+.message {
+  border-radius: 10px;
+  display: grid;
+  gap: 0.2rem;
+  max-width: 88%;
+  padding: 0.58rem 0.68rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.aiMessage {
+  background: rgba(12, 22, 34, 0.9);
+  border: 1px solid rgba(96, 121, 143, 0.22);
+  justify-self: start;
+}
+
+.userMessage {
+  background: rgba(16, 64, 60, 0.74);
+  border: 1px solid rgba(58, 175, 165, 0.26);
+  justify-self: end;
+}
+
+.speaker {
+  color: var(--text-faint);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.answerForm {
+  display: grid;
+  gap: 0.6rem;
+
+  textarea {
+    background: rgba(7, 12, 19, 0.94);
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    min-height: 94px;
+    padding: 0.7rem 0.75rem;
+    resize: vertical;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.primary,
+.secondary {
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  min-height: 34px;
+  padding: 0.45rem 0.88rem;
+  text-transform: uppercase;
+}
+
+.primary {
+  background: linear-gradient(135deg, #bd5d2b, #f39f61, #c46f3f);
+  border: 1px solid rgba(243, 159, 97, 0.45);
+  color: #111;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+
+.secondary {
+  background: rgba(12, 21, 31, 0.85);
+  border: 1px solid var(--line-soft);
+  color: var(--text-main);
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+
+.error {
+  color: #ffb2b2;
+  font-size: 0.8rem;
+  margin: 0;
+}

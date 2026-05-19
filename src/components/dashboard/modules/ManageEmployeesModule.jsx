@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
 import { calculateRanking, calculateTeamRanking } from '../../../utils/wrestlerRank'
+import { clampHeelFaceMeter, getHeelFaceStageLabel } from '../../../utils/heelFaceMeter'
 import styles from './ManageEmployeesModule.module.scss'
 
 const formatMoney = (value) => value.toLocaleString()
@@ -41,6 +42,17 @@ const getWrestlerRecentStats = (employee) => {
     : null
 
   return { wins, losses, avgRating, count: matchHistory.length }
+}
+
+function HeelFaceMeter({ employee }) {
+  const meter = clampHeelFaceMeter(employee?.heelFaceMeter)
+  const stageLabel = getHeelFaceStageLabel(meter)
+
+  return (
+    <div className={styles.heelFaceMeter}>
+      <span className={styles.heelFaceMeterStage}>{`Ring Personality: ${stageLabel}(${meter})`}</span>
+    </div>
+  )
 }
 const ROLE_FILTERS = ['all', 'wrestler', 'referee', 'manager', 'announcer', 'staff']
 const GENDER_FILTERS = ['all', 'male', 'female']
@@ -931,6 +943,7 @@ function ManageEmployeesModule() {
               {t('dashboard.employees.stamina', { amount: getStamina(employee) })}
             </p>
           )}
+          {employee.role === 'wrestler' && <HeelFaceMeter employee={employee} />}
           {employee.role === 'wrestler' && (() => {
             const stats = getWrestlerRecentStats(employee)
             if (!stats) return null
@@ -1080,6 +1093,7 @@ function ManageEmployeesModule() {
                     {t('dashboard.employees.stamina', { amount: getStamina(selectedEmployee) })}
                   </p>
                 )}
+                {selectedEmployee.role === 'wrestler' && <HeelFaceMeter employee={selectedEmployee} />}
               </div>
             </div>
 

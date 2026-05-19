@@ -87,3 +87,74 @@
     letter-spacing: 0.06em;
   }
 }
+
+.aiLoadingScreen {
+  align-content: start;
+  display: grid;
+  gap: 1rem;
+  min-height: 260px;
+  padding: 1.2rem;
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  p {
+    color: var(--text-muted);
+    max-width: 52ch;
+  }
+
+  @media (min-width: 960px) {
+    padding: 1.6rem;
+  }
+}
+
+.aiProgressPanel {
+  background: rgba(9, 16, 25, 0.9);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  display: grid;
+  gap: 0.45rem;
+  max-width: 520px;
+  padding: 0.9rem 1rem;
+
+  p {
+    color: var(--text-main);
+    font-weight: 700;
+  }
+
+  small {
+    color: var(--text-faint);
+    font-size: 0.82rem;
+  }
+}
+
+.aiError {
+  color: #ffb0b0 !important;
+}
+
+.backgroundButton {
+  background: linear-gradient(135deg, #0f7b72, #25a19b);
+  border: 1px solid rgba(39, 161, 155, 0.45);
+  border-radius: 999px;
+  color: #f3fbfa;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  justify-self: start;
+  letter-spacing: 0.08em;
+  padding: 0.72rem 1rem;
+  text-transform: uppercase;
+
+  &:hover {
+    background: linear-gradient(135deg, #0d9986, #2db3a3);
+  }
+}

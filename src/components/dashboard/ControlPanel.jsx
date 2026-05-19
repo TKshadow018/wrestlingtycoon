@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import styles from './ControlPanel.module.scss'
 
-function ControlPanel({ isEventDay, isPreparationDay, onProceed, onReset }) {
+function ControlPanel({ isEventDay, isPreparationDay, onProceed, onReset, proceedLabelOverride = '' }) {
   const { t } = useTranslation()
 
   const handleReset = () => {
@@ -13,11 +13,11 @@ function ControlPanel({ isEventDay, isPreparationDay, onProceed, onReset }) {
     onReset()
   }
 
-  const proceedLabel = isPreparationDay
+  const proceedLabel = proceedLabelOverride || (isPreparationDay
     ? t('dashboard.controls.eventPreparation')
     : isEventDay
     ? t('dashboard.controls.proceedEvent')
-    : t('dashboard.controls.proceedDay')
+    : t('dashboard.controls.proceedDay'))
 
   return (
     <section className={styles.controlPanel}>
