@@ -12,6 +12,7 @@ import ModuleNav from '../components/dashboard/ModuleNav'
 import ModulePanel from '../components/dashboard/ModulePanel'
 import EventBannerScreen from '../components/dashboard/EventBannerScreen'
 import EventCustomIntroScreen from '../components/dashboard/EventCustomIntroScreen'
+import MegaEventVideoScreen from '../components/dashboard/MegaEventVideoScreen'
 import EventPreparationScreen from '../components/dashboard/EventPreparationScreen'
 import EventRequirementsOverlay, { checkEventRequirements } from '../components/dashboard/EventRequirementsOverlay'
 import EventResultsScreen from '../components/dashboard/EventResultsScreen'
@@ -220,6 +221,7 @@ function DashboardPage() {
   const [showRequirementsOverlay, setShowRequirementsOverlay] = useState(false)
   const [pendingEventResult, setPendingEventResult] = useState(null)
   const [showCustomEventIntro, setShowCustomEventIntro] = useState(false)
+  const [showMegaVideo, setShowMegaVideo] = useState(false)
   const [showEventPrep, setShowEventPrep] = useState(false)
   const [saveLoadStatus, setSaveLoadStatus] = useState('')
   const [interviewRollByDay, setInterviewRollByDay] = useState({})
@@ -252,6 +254,7 @@ function DashboardPage() {
     && !isSetupModalOpen
     && !showEventBanner
     && !showCustomEventIntro
+    && !showMegaVideo
     && !showEventPrep
 
   useEffect(() => {
@@ -505,6 +508,15 @@ function DashboardPage() {
 
   const handleCustomEventIntroComplete = () => {
     setShowCustomEventIntro(false)
+    if (todayEvent?.type === 'megaLive') {
+      setShowMegaVideo(true)
+      return
+    }
+    continueEventFlow()
+  }
+
+  const handleMegaVideoComplete = () => {
+    setShowMegaVideo(false)
     continueEventFlow()
   }
 
@@ -687,6 +699,12 @@ function DashboardPage() {
           event={todayEvent}
           durationMs={2600}
           onComplete={handleCustomEventIntroComplete}
+        />
+      )}
+      {showMegaVideo && todayEvent?.type === 'megaLive' && (
+        <MegaEventVideoScreen
+          event={todayEvent}
+          onComplete={handleMegaVideoComplete}
         />
       )}
       {showEventPrep && preparationEvent && (
