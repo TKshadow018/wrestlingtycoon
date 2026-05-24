@@ -10,9 +10,17 @@ import maleAnnouncers from './people/male-announcer.json';
 import femaleAnnouncers from './people/female-announcer.json';
 import maleStaff from './people/male-staff.json';
 import femaleStaff from './people/female-staff.json';
+import { GAME_CONFIG } from '../config/gameConfig';
+
+const areLegendsAllowed = GAME_CONFIG.allowLegends;
 
 const peopleData = {
-  wrestlers: [...maleWrestlers, ...femaleWrestlers, ...maleLegendWrestlers, ...femaleLegendWrestlers],
+  wrestlers: [
+    ...maleWrestlers,
+    ...femaleWrestlers,
+    ...(areLegendsAllowed ? maleLegendWrestlers : []),
+    ...(areLegendsAllowed ? femaleLegendWrestlers : []),
+  ],
   referees: [...maleReferees, ...femaleReferees],
   managers: [...maleManagers, ...femaleManagers],
   announcers: [...maleAnnouncers, ...femaleAnnouncers],

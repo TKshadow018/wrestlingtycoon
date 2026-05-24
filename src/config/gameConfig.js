@@ -3,6 +3,21 @@ const asNumber = (value, fallback) => {
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
+const asBoolean = (value, fallback = false) => {
+  if (value === undefined || value === null || value === '') {
+    return fallback
+  }
+
+  if (typeof value === 'boolean') {
+    return value
+  }
+
+  const normalized = String(value).trim().toLowerCase()
+  if (['true', '1', 'yes', 'on'].includes(normalized)) return true
+  if (['false', '0', 'no', 'off'].includes(normalized)) return false
+  return fallback
+}
+
 export const GAME_CONFIG = {
   version: import.meta.env.VITE_GAME_VERSION || '0.1.0',
   startDateIso: import.meta.env.VITE_GAME_START_DATE || '',
@@ -10,6 +25,7 @@ export const GAME_CONFIG = {
   eventCycleDays: asNumber(import.meta.env.VITE_EVENT_CYCLE_DAYS, 7),
   startingFans: asNumber(import.meta.env.VITE_GAME_STARTING_FANS, 1000),
   startingMorale: asNumber(import.meta.env.VITE_GAME_STARTING_MORALE, 60),
+  allowLegends: asBoolean(import.meta.env.VITE_ALLOW_LEGENDS, false),
   economy: {
     webSubscription: {
       defaultFee: asNumber(import.meta.env.VITE_WEB_SUBSCRIPTION_DEFAULT_FEE, 9.99),
