@@ -1,5 +1,10 @@
 # 🎭 Wrestling Tycoon
-https://youtu.be/O9Vce6h7eBY
+<a href="https://youtu.be/O9Vce6h7eBY">
+  <img src="https://github.com/user-attachments/assets/a2ee712d-efa6-48ed-9808-f3fed4caf22e" alt="Watch Video Guide" width="400">
+  <div>Watch Video Guide By Clicking on Image Above</div>
+</a>
+
+
 **Build your wrestling empire from the ground up!**
 
 Wrestling Tycoon is a comprehensive sports management simulation game where you become the owner and operator of a wrestling company. Start with limited resources and grow your organization into a powerhouse by hiring talented wrestlers, booking matches, managing finances, and building your company's prestige and reputation.
