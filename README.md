@@ -1,4 +1,9 @@
 # 🎭 Wrestling Tycoon
+<a href="https://youtu.be/O9Vce6h7eBY">
+  <img src="https://github.com/user-attachments/assets/a2ee712d-efa6-48ed-9808-f3fed4caf22e" alt="Watch Video Guide" width="400">
+  <div>Watch Video Guide By Clicking on Image Above</div>
+</a>
+
 
 **Build your wrestling empire from the ground up!**
 
