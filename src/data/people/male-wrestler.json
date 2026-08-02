@@ -4,6 +4,8 @@
     "name": "Arun Rajput",
     "dob": "1991-04-18",
     "gender": "male",
+    "country": "indian",
+    "ring_name": "King of Akhara",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 4138,
@@ -20,13 +22,8 @@
       "body_stamina": 68,
       "head_stamina": 70
     },
-    "signature_moves": [
-      "Running Bulldog",
-      "Flying Lariat"
-    ],
-    "finisher_moves": [
-      "Skyfall Cutter"
-    ],
+    "signature_moves": ["Running Bulldog", "Flying Lariat"],
+    "finisher_moves": ["Skyfall Cutter"],
     "image_url": "/people/wrestler/male/1.png"
   },
   {
@@ -34,6 +31,8 @@
     "name": "Bharat Pandey",
     "dob": "1996-03-17",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 17172,
@@ -50,20 +49,17 @@
       "body_stamina": 91,
       "head_stamina": 52
     },
-    "signature_moves": [
-      "Dragon Screw",
-      "Spinebuster"
-    ],
-    "finisher_moves": [
-      "Iron Lock Driver"
-    ],
+    "signature_moves": ["Dragon Screw", "Spinebuster"],
+    "finisher_moves": ["Iron Lock Driver"],
     "image_url": "/people/wrestler/male/2.png"
   },
   {
     "id": "wrestler-male-003",
-    "name": "Suvendu The Thunder Dada",
+    "name": "Suvendu",
     "dob": "1993-02-17",
     "gender": "male",
+    "country": "indian",
+    "ring_name": "The Thunder Dada",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 19534,
@@ -80,13 +76,8 @@
       "body_stamina": 74,
       "head_stamina": 65
     },
-    "signature_moves": [
-      "Suplex Driver",
-      "Snap DDT"
-    ],
-    "finisher_moves": [
-      "Crimson Spear"
-    ],
+    "signature_moves": ["Suplex Driver", "Snap DDT"],
+    "finisher_moves": ["Crimson Spear"],
     "image_url": "/people/wrestler/male/3.png"
   },
   {
@@ -94,6 +85,8 @@
     "name": "Roisul Islam Rajon",
     "dob": "1991-08-06",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 14488,
@@ -110,13 +103,8 @@
       "body_stamina": 76,
       "head_stamina": 81
     },
-    "signature_moves": [
-      "Flying Lariat",
-      "Backbreaker Combo"
-    ],
-    "finisher_moves": [
-      "Thunder Bomb"
-    ],
+    "signature_moves": ["Flying Lariat", "Backbreaker Combo"],
+    "finisher_moves": ["Thunder Bomb"],
     "image_url": "/people/wrestler/male/4.png"
   },
   {
@@ -124,6 +112,8 @@
     "name": "Imran Kabir",
     "dob": "2001-02-26",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 10702,
@@ -140,13 +130,8 @@
       "body_stamina": 53,
       "head_stamina": 65
     },
-    "signature_moves": [
-      "Spinebuster",
-      "Step-Up Enzuigiri"
-    ],
-    "finisher_moves": [
-      "Phoenix Clash"
-    ],
+    "signature_moves": ["Spinebuster", "Step-Up Enzuigiri"],
+    "finisher_moves": ["Phoenix Clash"],
     "image_url": "/people/wrestler/male/5.png"
   },
   {
@@ -154,6 +139,8 @@
     "name": "Tailla Chila Baten",
     "dob": "1996-07-05",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 18284,
@@ -170,13 +157,8 @@
       "body_stamina": 88,
       "head_stamina": 90
     },
-    "signature_moves": [
-      "Snap DDT",
-      "Tilt-a-Whirl Slam"
-    ],
-    "finisher_moves": [
-      "Midnight Submission"
-    ],
+    "signature_moves": ["Snap DDT", "Tilt-a-Whirl Slam"],
+    "finisher_moves": ["Midnight Submission"],
     "image_url": "/people/wrestler/male/6.png"
   },
   {
@@ -184,6 +166,8 @@
     "name": "Lokman Bari",
     "dob": "1958-03-13",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 17997,
@@ -200,13 +184,8 @@
       "body_stamina": 94,
       "head_stamina": 71
     },
-    "signature_moves": [
-      "Backbreaker Combo",
-      "German Suplex"
-    ],
-    "finisher_moves": [
-      "Titan Drop"
-    ],
+    "signature_moves": ["Backbreaker Combo", "German Suplex"],
+    "finisher_moves": ["Titan Drop"],
     "image_url": "/people/wrestler/male/7.png"
   },
   {
@@ -214,6 +193,8 @@
     "name": "Osman Ali",
     "dob": "2004-09-16",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 11798,
@@ -230,13 +211,8 @@
       "body_stamina": 93,
       "head_stamina": 76
     },
-    "signature_moves": [
-      "Step-Up Enzuigiri",
-      "Running Bulldog"
-    ],
-    "finisher_moves": [
-      "Royal Knee"
-    ],
+    "signature_moves": ["Step-Up Enzuigiri", "Running Bulldog"],
+    "finisher_moves": ["Royal Knee"],
     "image_url": "/people/wrestler/male/8.png"
   },
   {
@@ -244,6 +220,8 @@
     "name": "Avik Rahman Sopno",
     "dob": "2002-11-20",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 7495,
@@ -260,13 +238,8 @@
       "body_stamina": 52,
       "head_stamina": 51
     },
-    "signature_moves": [
-      "Tilt-a-Whirl Slam",
-      "Dragon Screw"
-    ],
-    "finisher_moves": [
-      "Cyclone Kick"
-    ],
+    "signature_moves": ["Tilt-a-Whirl Slam", "Dragon Screw"],
+    "finisher_moves": ["Cyclone Kick"],
     "image_url": "/people/wrestler/male/9.png"
   },
   {
@@ -274,6 +247,8 @@
     "name": "Borhanuddin Molla",
     "dob": "1991-09-27",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 12301,
@@ -290,13 +265,8 @@
       "body_stamina": 75,
       "head_stamina": 91
     },
-    "signature_moves": [
-      "German Suplex",
-      "Suplex Driver"
-    ],
-    "finisher_moves": [
-      "Final Verdict"
-    ],
+    "signature_moves": ["German Suplex", "Suplex Driver"],
+    "finisher_moves": ["Final Verdict"],
     "image_url": "/people/wrestler/male/10.png"
   },
   {
@@ -304,6 +274,8 @@
     "name": "Asgerd Leon",
     "dob": "2004-03-28",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 8863,
@@ -320,13 +292,8 @@
       "body_stamina": 55,
       "head_stamina": 61
     },
-    "signature_moves": [
-      "Running Bulldog",
-      "Flying Lariat"
-    ],
-    "finisher_moves": [
-      "Skyfall Cutter"
-    ],
+    "signature_moves": ["Running Bulldog", "Flying Lariat"],
+    "finisher_moves": ["Skyfall Cutter"],
     "image_url": "/people/wrestler/male/11.png"
   },
   {
@@ -334,6 +301,8 @@
     "name": "Korol Petersen",
     "dob": "2002-01-16",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 15614,
@@ -350,13 +319,8 @@
       "body_stamina": 96,
       "head_stamina": 90
     },
-    "signature_moves": [
-      "Dragon Screw",
-      "Spinebuster"
-    ],
-    "finisher_moves": [
-      "Iron Lock Driver"
-    ],
+    "signature_moves": ["Dragon Screw", "Spinebuster"],
+    "finisher_moves": ["Iron Lock Driver"],
     "image_url": "/people/wrestler/male/12.png"
   },
   {
@@ -364,6 +328,8 @@
     "name": "Kim Nam Jiho",
     "dob": "2004-12-28",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 17923,
@@ -380,13 +346,8 @@
       "body_stamina": 53,
       "head_stamina": 85
     },
-    "signature_moves": [
-      "Suplex Driver",
-      "Snap DDT"
-    ],
-    "finisher_moves": [
-      "Crimson Spear"
-    ],
+    "signature_moves": ["Suplex Driver", "Snap DDT"],
+    "finisher_moves": ["Crimson Spear"],
     "image_url": "/people/wrestler/male/13.png"
   },
   {
@@ -394,6 +355,8 @@
     "name": "Ehmad Sulemani",
     "dob": "1992-09-17",
     "gender": "male",
+    "country": "irani",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 10737,
@@ -410,13 +373,8 @@
       "body_stamina": 80,
       "head_stamina": 50
     },
-    "signature_moves": [
-      "Flying Lariat",
-      "Backbreaker Combo"
-    ],
-    "finisher_moves": [
-      "Thunder Bomb"
-    ],
+    "signature_moves": ["Flying Lariat", "Backbreaker Combo"],
+    "finisher_moves": ["Thunder Bomb"],
     "image_url": "/people/wrestler/male/14.png"
   },
   {
@@ -424,6 +382,8 @@
     "name": "Balbindar Singh",
     "dob": "1985-06-27",
     "gender": "male",
+    "country": "indian",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 11853,
@@ -440,13 +400,8 @@
       "body_stamina": 93,
       "head_stamina": 65
     },
-    "signature_moves": [
-      "Spinebuster",
-      "Step-Up Enzuigiri"
-    ],
-    "finisher_moves": [
-      "Phoenix Clash"
-    ],
+    "signature_moves": ["Spinebuster", "Step-Up Enzuigiri"],
+    "finisher_moves": ["Phoenix Clash"],
     "image_url": "/people/wrestler/male/15.png"
   },
   {
@@ -454,6 +409,8 @@
     "name": "Rivaldo Rodrigues",
     "dob": "2000-11-09",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 18392,
@@ -470,13 +427,8 @@
       "body_stamina": 74,
       "head_stamina": 88
     },
-    "signature_moves": [
-      "Snap DDT",
-      "Tilt-a-Whirl Slam"
-    ],
-    "finisher_moves": [
-      "Midnight Submission"
-    ],
+    "signature_moves": ["Snap DDT", "Tilt-a-Whirl Slam"],
+    "finisher_moves": ["Midnight Submission"],
     "image_url": "/people/wrestler/male/16.png"
   },
   {
@@ -484,6 +436,8 @@
     "name": "Flavien Tezzlaff",
     "dob": "2000-12-24",
     "gender": "male",
+    "country": "Swedish",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 6595,
@@ -500,13 +454,8 @@
       "body_stamina": 80,
       "head_stamina": 72
     },
-    "signature_moves": [
-      "Backbreaker Combo",
-      "German Suplex"
-    ],
-    "finisher_moves": [
-      "Titan Drop"
-    ],
+    "signature_moves": ["Backbreaker Combo", "German Suplex"],
+    "finisher_moves": ["Titan Drop"],
     "image_url": "/people/wrestler/male/17.png"
   },
   {
@@ -514,6 +463,8 @@
     "name": "Bjorn Hegge",
     "dob": "2001-12-28",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 15274,
@@ -530,13 +481,8 @@
       "body_stamina": 76,
       "head_stamina": 54
     },
-    "signature_moves": [
-      "Step-Up Enzuigiri",
-      "Running Bulldog"
-    ],
-    "finisher_moves": [
-      "Royal Knee"
-    ],
+    "signature_moves": ["Step-Up Enzuigiri", "Running Bulldog"],
+    "finisher_moves": ["Royal Knee"],
     "image_url": "/people/wrestler/male/18.png"
   },
   {
@@ -544,6 +490,8 @@
     "name": "Kamrul Patwari",
     "dob": "2000-09-28",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 11779,
@@ -560,13 +508,8 @@
       "body_stamina": 75,
       "head_stamina": 78
     },
-    "signature_moves": [
-      "Tilt-a-Whirl Slam",
-      "Dragon Screw"
-    ],
-    "finisher_moves": [
-      "Cyclone Kick"
-    ],
+    "signature_moves": ["Tilt-a-Whirl Slam", "Dragon Screw"],
+    "finisher_moves": ["Cyclone Kick"],
     "image_url": "/people/wrestler/male/19.png"
   },
   {
@@ -574,6 +517,8 @@
     "name": "Mrimman Chidambaram",
     "dob": "1986-02-22",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 15120,
@@ -590,13 +535,8 @@
       "body_stamina": 58,
       "head_stamina": 74
     },
-    "signature_moves": [
-      "German Suplex",
-      "Suplex Driver"
-    ],
-    "finisher_moves": [
-      "Final Verdict"
-    ],
+    "signature_moves": ["German Suplex", "Suplex Driver"],
+    "finisher_moves": ["Final Verdict"],
     "image_url": "/people/wrestler/male/20.png"
   },
   {
@@ -604,6 +544,8 @@
     "name": "Mahmud Ali Khan",
     "dob": "1993-01-06",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 4978,
@@ -620,43 +562,35 @@
       "body_stamina": 51,
       "head_stamina": 79
     },
-    "signature_moves": [
-      "Running Bulldog",
-      "Flying Lariat"
-    ],
-    "finisher_moves": [
-      "Skyfall Cutter"
-    ],
+    "signature_moves": ["Running Bulldog", "Flying Lariat"],
+    "finisher_moves": ["Skyfall Cutter"],
     "image_url": "/people/wrestler/male/21.png"
   },
   {
     "id": "wrestler-male-022",
     "name": "Fokir Shah",
-    "dob": "1989-01-27",
+    "dob": "1983-01-27",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 7486,
-      "per_match_salary": 1147,
-      "additional_bonus": 5596
+      "monthly_wage": 1486,
+      "per_match_salary": 347,
+      "additional_bonus": 596
     },
     "popularity": 15,
-    "has_money_amount": 13586,
+    "has_money_amount": 3586,
     "wrestling_ability": {
-      "strength": 52,
-      "technics": 44,
-      "high_fly_ability": 81,
-      "leg_stamina": 48,
-      "body_stamina": 82,
-      "head_stamina": 89
+      "strength": 32,
+      "technics": 34,
+      "high_fly_ability": 71,
+      "leg_stamina": 38,
+      "body_stamina": 62,
+      "head_stamina": 69
     },
-    "signature_moves": [
-      "Dragon Screw",
-      "Spinebuster"
-    ],
-    "finisher_moves": [
-      "Iron Lock Driver"
-    ],
+    "signature_moves": ["Dragon Screw", "Spinebuster"],
+    "finisher_moves": ["Iron Lock Driver"],
     "image_url": "/people/wrestler/male/22.png"
   },
   {
@@ -664,6 +598,8 @@
     "name": "Akkas Ali Bahar",
     "dob": "1957-07-18",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 4031,
@@ -680,13 +616,8 @@
       "body_stamina": 83,
       "head_stamina": 87
     },
-    "signature_moves": [
-      "Suplex Driver",
-      "Snap DDT"
-    ],
-    "finisher_moves": [
-      "Crimson Spear"
-    ],
+    "signature_moves": ["Suplex Driver", "Snap DDT"],
+    "finisher_moves": ["Crimson Spear"],
     "image_url": "/people/wrestler/male/23.png"
   },
   {
@@ -694,6 +625,8 @@
     "name": "Motaher Hossain Tiger",
     "dob": "2000-08-10",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 6850,
@@ -710,13 +643,8 @@
       "body_stamina": 90,
       "head_stamina": 45
     },
-    "signature_moves": [
-      "Flying Lariat",
-      "Backbreaker Combo"
-    ],
-    "finisher_moves": [
-      "Thunder Bomb"
-    ],
+    "signature_moves": ["Flying Lariat", "Backbreaker Combo"],
+    "finisher_moves": ["Thunder Bomb"],
     "image_url": "/people/wrestler/male/24.png"
   },
   {
@@ -724,6 +652,8 @@
     "name": "Hasan Alvi",
     "dob": "1989-06-25",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 11975,
@@ -740,13 +670,8 @@
       "body_stamina": 59,
       "head_stamina": 54
     },
-    "signature_moves": [
-      "Spinebuster",
-      "Step-Up Enzuigiri"
-    ],
-    "finisher_moves": [
-      "Phoenix Clash"
-    ],
+    "signature_moves": ["Spinebuster", "Step-Up Enzuigiri"],
+    "finisher_moves": ["Phoenix Clash"],
     "image_url": "/people/wrestler/male/25.png"
   },
   {
@@ -754,6 +679,8 @@
     "name": "Ridwan Ahmed",
     "dob": "1990-08-11",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 17600,
@@ -770,13 +697,8 @@
       "body_stamina": 86,
       "head_stamina": 51
     },
-    "signature_moves": [
-      "Snap DDT",
-      "Tilt-a-Whirl Slam"
-    ],
-    "finisher_moves": [
-      "Midnight Submission"
-    ],
+    "signature_moves": ["Snap DDT", "Tilt-a-Whirl Slam"],
+    "finisher_moves": ["Midnight Submission"],
     "image_url": "/people/wrestler/male/26.png"
   },
   {
@@ -784,6 +706,8 @@
     "name": "Jobbar Khan",
     "dob": "1993-08-12",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 16072,
@@ -800,13 +724,8 @@
       "body_stamina": 94,
       "head_stamina": 79
     },
-    "signature_moves": [
-      "Backbreaker Combo",
-      "German Suplex"
-    ],
-    "finisher_moves": [
-      "Titan Drop"
-    ],
+    "signature_moves": ["Backbreaker Combo", "German Suplex"],
+    "finisher_moves": ["Titan Drop"],
     "image_url": "/people/wrestler/male/27.png"
   },
   {
@@ -814,6 +733,8 @@
     "name": "Tawhid Islam",
     "dob": "2004-06-01",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 6220,
@@ -830,13 +751,8 @@
       "body_stamina": 87,
       "head_stamina": 53
     },
-    "signature_moves": [
-      "Step-Up Enzuigiri",
-      "Running Bulldog"
-    ],
-    "finisher_moves": [
-      "Royal Knee"
-    ],
+    "signature_moves": ["Step-Up Enzuigiri", "Running Bulldog"],
+    "finisher_moves": ["Royal Knee"],
     "image_url": "/people/wrestler/male/28.png"
   },
   {
@@ -844,6 +760,8 @@
     "name": "Farhan Rahat",
     "dob": "2000-06-21",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 10176,
@@ -860,13 +778,8 @@
       "body_stamina": 53,
       "head_stamina": 67
     },
-    "signature_moves": [
-      "Tilt-a-Whirl Slam",
-      "Dragon Screw"
-    ],
-    "finisher_moves": [
-      "Cyclone Kick"
-    ],
+    "signature_moves": ["Tilt-a-Whirl Slam", "Dragon Screw"],
+    "finisher_moves": ["Cyclone Kick"],
     "image_url": "/people/wrestler/male/29.png"
   },
   {
@@ -874,6 +787,8 @@
     "name": "Munim Hasan",
     "dob": "1998-12-23",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 15917,
@@ -890,27 +805,24 @@
       "body_stamina": 92,
       "head_stamina": 73
     },
-    "signature_moves": [
-      "German Suplex",
-      "Suplex Driver"
-    ],
-    "finisher_moves": [
-      "Final Verdict"
-    ],
+    "signature_moves": ["German Suplex", "Suplex Driver"],
+    "finisher_moves": ["Final Verdict"],
     "image_url": "/people/wrestler/male/30.png"
   },
   {
     "id": "wrestler-male-031",
-    "name": "Yasin Araf",
-    "dob": "2002-06-02",
+    "name": "Noah Smith",
+    "dob": "1978-06-02",
     "gender": "male",
+    "country": "Canada",
+    "ring_name": "Crazy Noah",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 3039,
-      "per_match_salary": 547,
-      "additional_bonus": 972
+      "monthly_wage": 8039,
+      "per_match_salary": 1547,
+      "additional_bonus": 2972
     },
-    "popularity": 49,
+    "popularity": 69,
     "has_money_amount": 174925,
     "wrestling_ability": {
       "strength": 62,
@@ -920,13 +832,8 @@
       "body_stamina": 63,
       "head_stamina": 61
     },
-    "signature_moves": [
-      "Running Bulldog",
-      "Flying Lariat"
-    ],
-    "finisher_moves": [
-      "Skyfall Cutter"
-    ],
+    "signature_moves": ["Running Bulldog", "Flying Lariat"],
+    "finisher_moves": ["Skyfall Cutter"],
     "image_url": "/people/wrestler/male/31.png"
   },
   {
@@ -934,6 +841,8 @@
     "name": "Mahin Shafiq",
     "dob": "1984-02-20",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 8758,
@@ -950,13 +859,8 @@
       "body_stamina": 56,
       "head_stamina": 55
     },
-    "signature_moves": [
-      "Dragon Screw",
-      "Spinebuster"
-    ],
-    "finisher_moves": [
-      "Iron Lock Driver"
-    ],
+    "signature_moves": ["Dragon Screw", "Spinebuster"],
+    "finisher_moves": ["Iron Lock Driver"],
     "image_url": "/people/wrestler/male/32.png"
   },
   {
@@ -964,6 +868,8 @@
     "name": "Rakibul Haque",
     "dob": "2001-11-06",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 19139,
@@ -980,13 +886,8 @@
       "body_stamina": 67,
       "head_stamina": 64
     },
-    "signature_moves": [
-      "Suplex Driver",
-      "Snap DDT"
-    ],
-    "finisher_moves": [
-      "Crimson Spear"
-    ],
+    "signature_moves": ["Suplex Driver", "Snap DDT"],
+    "finisher_moves": ["Crimson Spear"],
     "image_url": "/people/wrestler/male/33.png"
   },
   {
@@ -994,6 +895,8 @@
     "name": "Badrul Arefin",
     "dob": "1989-10-05",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 7284,
@@ -1010,13 +913,8 @@
       "body_stamina": 52,
       "head_stamina": 76
     },
-    "signature_moves": [
-      "Flying Lariat",
-      "Backbreaker Combo"
-    ],
-    "finisher_moves": [
-      "Thunder Bomb"
-    ],
+    "signature_moves": ["Flying Lariat", "Backbreaker Combo"],
+    "finisher_moves": ["Thunder Bomb"],
     "image_url": "/people/wrestler/male/34.png"
   },
   {
@@ -1024,6 +922,8 @@
     "name": "Jamil Uddin",
     "dob": "1985-07-15",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 4507,
@@ -1040,13 +940,8 @@
       "body_stamina": 78,
       "head_stamina": 49
     },
-    "signature_moves": [
-      "Spinebuster",
-      "Step-Up Enzuigiri"
-    ],
-    "finisher_moves": [
-      "Phoenix Clash"
-    ],
+    "signature_moves": ["Spinebuster", "Step-Up Enzuigiri"],
+    "finisher_moves": ["Phoenix Clash"],
     "image_url": "/people/wrestler/male/35.png"
   },
   {
@@ -1054,6 +949,8 @@
     "name": "Waliur Rahman",
     "dob": "1989-02-17",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 18036,
@@ -1070,13 +967,8 @@
       "body_stamina": 73,
       "head_stamina": 60
     },
-    "signature_moves": [
-      "Snap DDT",
-      "Tilt-a-Whirl Slam"
-    ],
-    "finisher_moves": [
-      "Midnight Submission"
-    ],
+    "signature_moves": ["Snap DDT", "Tilt-a-Whirl Slam"],
+    "finisher_moves": ["Midnight Submission"],
     "image_url": "/people/wrestler/male/36.png"
   },
   {
@@ -1084,6 +976,8 @@
     "name": "Saif Mahbub",
     "dob": "2004-04-09",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 19204,
@@ -1100,13 +994,8 @@
       "body_stamina": 79,
       "head_stamina": 46
     },
-    "signature_moves": [
-      "Backbreaker Combo",
-      "German Suplex"
-    ],
-    "finisher_moves": [
-      "Titan Drop"
-    ],
+    "signature_moves": ["Backbreaker Combo", "German Suplex"],
+    "finisher_moves": ["Titan Drop"],
     "image_url": "/people/wrestler/male/37.png"
   },
   {
@@ -1114,6 +1003,8 @@
     "name": "Emon Sadiq",
     "dob": "1984-09-24",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 18762,
@@ -1130,13 +1021,8 @@
       "body_stamina": 68,
       "head_stamina": 56
     },
-    "signature_moves": [
-      "Step-Up Enzuigiri",
-      "Running Bulldog"
-    ],
-    "finisher_moves": [
-      "Royal Knee"
-    ],
+    "signature_moves": ["Step-Up Enzuigiri", "Running Bulldog"],
+    "finisher_moves": ["Royal Knee"],
     "image_url": "/people/wrestler/male/38.png"
   },
   {
@@ -1144,6 +1030,8 @@
     "name": "Fardin Noor",
     "dob": "1990-06-24",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 3782,
@@ -1160,13 +1048,8 @@
       "body_stamina": 64,
       "head_stamina": 77
     },
-    "signature_moves": [
-      "Tilt-a-Whirl Slam",
-      "Dragon Screw"
-    ],
-    "finisher_moves": [
-      "Cyclone Kick"
-    ],
+    "signature_moves": ["Tilt-a-Whirl Slam", "Dragon Screw"],
+    "finisher_moves": ["Cyclone Kick"],
     "image_url": "/people/wrestler/male/39.png"
   },
   {
@@ -1174,6 +1057,8 @@
     "name": "Parvez Hasan",
     "dob": "1991-09-12",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 18002,
@@ -1190,13 +1075,8 @@
       "body_stamina": 69,
       "head_stamina": 56
     },
-    "signature_moves": [
-      "German Suplex",
-      "Suplex Driver"
-    ],
-    "finisher_moves": [
-      "Final Verdict"
-    ],
+    "signature_moves": ["German Suplex", "Suplex Driver"],
+    "finisher_moves": ["Final Verdict"],
     "image_url": "/people/wrestler/male/40.png"
   },
   {
@@ -1204,6 +1084,8 @@
     "name": "Nabil Ahmed",
     "dob": "1997-07-23",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 17217,
@@ -1220,20 +1102,17 @@
       "body_stamina": 60,
       "head_stamina": 61
     },
-    "signature_moves": [
-      "Running Bulldog",
-      "Flying Lariat"
-    ],
-    "finisher_moves": [
-      "Skyfall Cutter"
-    ],
+    "signature_moves": ["Running Bulldog", "Flying Lariat"],
+    "finisher_moves": ["Skyfall Cutter"],
     "image_url": "/people/wrestler/male/41.png"
   },
   {
     "id": "wrestler-male-042",
-    "name": "Shadman Islam",
-    "dob": "2001-03-28",
+    "name": "Waliullah The Murgiman",
+    "dob": "1981-12-28",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 16223,
@@ -1250,13 +1129,8 @@
       "body_stamina": 76,
       "head_stamina": 49
     },
-    "signature_moves": [
-      "Dragon Screw",
-      "Spinebuster"
-    ],
-    "finisher_moves": [
-      "Iron Lock Driver"
-    ],
+    "signature_moves": ["Dragon Screw", "Spinebuster"],
+    "finisher_moves": ["Iron Lock Driver"],
     "image_url": "/people/wrestler/male/42.png"
   },
   {
@@ -1264,6 +1138,8 @@
     "name": "Alvi Chowdhury",
     "dob": "1994-01-25",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 10884,
@@ -1280,13 +1156,8 @@
       "body_stamina": 95,
       "head_stamina": 53
     },
-    "signature_moves": [
-      "Suplex Driver",
-      "Snap DDT"
-    ],
-    "finisher_moves": [
-      "Crimson Spear"
-    ],
+    "signature_moves": ["Suplex Driver", "Snap DDT"],
+    "finisher_moves": ["Crimson Spear"],
     "image_url": "/people/wrestler/male/43.png"
   },
   {
@@ -1294,6 +1165,8 @@
     "name": "Rayhan Bin Karim",
     "dob": "1990-02-14",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 15954,
@@ -1310,13 +1183,8 @@
       "body_stamina": 78,
       "head_stamina": 83
     },
-    "signature_moves": [
-      "Flying Lariat",
-      "Backbreaker Combo"
-    ],
-    "finisher_moves": [
-      "Thunder Bomb"
-    ],
+    "signature_moves": ["Flying Lariat", "Backbreaker Combo"],
+    "finisher_moves": ["Thunder Bomb"],
     "image_url": "/people/wrestler/male/44.png"
   },
   {
@@ -1324,6 +1192,8 @@
     "name": "Shoaib Hossain",
     "dob": "1999-05-07",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 9954,
@@ -1340,13 +1210,8 @@
       "body_stamina": 84,
       "head_stamina": 76
     },
-    "signature_moves": [
-      "Spinebuster",
-      "Step-Up Enzuigiri"
-    ],
-    "finisher_moves": [
-      "Phoenix Clash"
-    ],
+    "signature_moves": ["Spinebuster", "Step-Up Enzuigiri"],
+    "finisher_moves": ["Phoenix Clash"],
     "image_url": "/people/wrestler/male/45.png"
   },
   {
@@ -1354,6 +1219,8 @@
     "name": "Rifat Rahman",
     "dob": "1986-02-07",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 20074,
@@ -1370,20 +1237,17 @@
       "body_stamina": 55,
       "head_stamina": 84
     },
-    "signature_moves": [
-      "Snap DDT",
-      "Tilt-a-Whirl Slam"
-    ],
-    "finisher_moves": [
-      "Midnight Submission"
-    ],
+    "signature_moves": ["Snap DDT", "Tilt-a-Whirl Slam"],
+    "finisher_moves": ["Midnight Submission"],
     "image_url": "/people/wrestler/male/46.png"
   },
   {
     "id": "wrestler-male-047",
-    "name": "Tahmid Anan",
-    "dob": "1985-06-13",
+    "name": "Tahmid Anan Neon",
+    "dob": "1988-06-13",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 15321,
@@ -1400,13 +1264,8 @@
       "body_stamina": 84,
       "head_stamina": 58
     },
-    "signature_moves": [
-      "Backbreaker Combo",
-      "German Suplex"
-    ],
-    "finisher_moves": [
-      "Titan Drop"
-    ],
+    "signature_moves": ["Backbreaker Combo", "German Suplex"],
+    "finisher_moves": ["Titan Drop"],
     "image_url": "/people/wrestler/male/47.png"
   },
   {
@@ -1414,6 +1273,8 @@
     "name": "Zayan Mahmud",
     "dob": "2005-09-11",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 20323,
@@ -1430,13 +1291,8 @@
       "body_stamina": 62,
       "head_stamina": 88
     },
-    "signature_moves": [
-      "Step-Up Enzuigiri",
-      "Running Bulldog"
-    ],
-    "finisher_moves": [
-      "Royal Knee"
-    ],
+    "signature_moves": ["Step-Up Enzuigiri", "Running Bulldog"],
+    "finisher_moves": ["Royal Knee"],
     "image_url": "/people/wrestler/male/48.png"
   },
   {
@@ -1444,6 +1300,8 @@
     "name": "Naveed Ahsan",
     "dob": "1985-09-19",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 6620,
@@ -1460,13 +1318,8 @@
       "body_stamina": 57,
       "head_stamina": 79
     },
-    "signature_moves": [
-      "Tilt-a-Whirl Slam",
-      "Dragon Screw"
-    ],
-    "finisher_moves": [
-      "Cyclone Kick"
-    ],
+    "signature_moves": ["Tilt-a-Whirl Slam", "Dragon Screw"],
+    "finisher_moves": ["Cyclone Kick"],
     "image_url": "/people/wrestler/male/49.png"
   },
   {
@@ -1474,6 +1327,8 @@
     "name": "Omiur Islam",
     "dob": "2005-07-02",
     "gender": "male",
+    "country": "bangladeshi",
+    "ring_name": "",
     "role": "wrestler",
     "salary_demand": {
       "monthly_wage": 10383,
@@ -1490,13 +1345,8 @@
       "body_stamina": 59,
       "head_stamina": 61
     },
-    "signature_moves": [
-      "German Suplex",
-      "Suplex Driver"
-    ],
-    "finisher_moves": [
-      "Final Verdict"
-    ],
+    "signature_moves": ["German Suplex", "Suplex Driver"],
+    "finisher_moves": ["Final Verdict"],
     "image_url": "/people/wrestler/male/50.png"
   }
 ]

@@ -1,6 +1,6 @@
 import sponsorCatalog from './sponsor.json'
+import { randomInRange } from '../utils/utility'
 
-const randomInRange = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
 
 export const SPONSOR_TYPE_CONFIG = {
   title: { labelKey: 'title', maxActive: 1, eventScoped: false },
@@ -50,7 +50,26 @@ const toOffer = (sponsor, idx) => {
   const sponsorType = SPONSOR_TYPE_CONFIG[sponsor.category] ? sponsor.category : 'digital'
   const isEventScoped = SPONSOR_TYPE_CONFIG[sponsorType].eventScoped
   const tier = clampTier(sponsor.tier || 1)
-  const contractWeeks = isEventScoped ? null : randomInRange(1, 260)
+  const contractWeeks = isEventScoped ? null : randomInRange(1, 156, [
+    {
+      type: "multiplyWeight",
+      min: 52,
+      max: 156,
+      by: 0.2,
+    },
+    {
+      type: "multiplyWeight",
+      min: 4,
+      max: 12,
+      by: 5,
+    },
+    {
+      type: "multiplyWeight",
+      min: 13,
+      max: 24,
+      by: 2,
+    }
+  ])
   const dailyPayout = 900 + tier * 1250 + randomInRange(0, 900)
   const signingBonus = 2500 + tier * 2200 + randomInRange(0, 2200)
   const eventMultiplier = Number((0.03 + tier * 0.025 + randomInRange(0, 4) / 100).toFixed(2))

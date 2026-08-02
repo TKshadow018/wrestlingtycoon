@@ -167,12 +167,47 @@ const getAnnouncerMode = (segmentType) => getSegmentConfig(segmentType)?.announc
 const showsAnnouncerSlot = (segmentType) => getAnnouncerMode(segmentType) !== 'none'
 const requiresAnnouncer = (segmentType) => getAnnouncerMode(segmentType) === 'required'
 
+const slugifyToken = (value) => String(value || '')
+  .toLowerCase()
+  .trim()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '')
+
+const getEmployeeId = (employee) => {
+  if (employee?.employeeId != null) {
+    const employeeId = String(employee.employeeId).trim()
+    if (employeeId) {
+      return employeeId
+    }
+  }
+
+  if (employee?.id != null) {
+    const id = String(employee.id).trim()
+    if (id) {
+      return id
+    }
+  }
+
+  if (employee?.personId != null) {
+    const personId = String(employee.personId).trim()
+    if (personId) {
+      return `legacy-${personId}`
+    }
+  }
+
+  const roleToken = slugifyToken(employee?.role) || 'employee'
+  const nameToken = slugifyToken(employee?.name) || 'unknown'
+  const genderToken = slugifyToken(employee?.gender) || 'u'
+  const dobToken = slugifyToken(employee?.dob) || 'na'
+  return `legacy-${roleToken}-${nameToken}-${genderToken}-${dobToken}`
+}
+
 const sortEmployeesByRank = (employees = [], wrestlerRankById = new Map()) => {
   const list = Array.isArray(employees) ? [...employees] : []
 
   return list.sort((left, right) => {
-    const leftRank = Number(wrestlerRankById.get(left.employeeId) || 0)
-    const rightRank = Number(wrestlerRankById.get(right.employeeId) || 0)
+    const leftRank = Number(wrestlerRankById.get(getEmployeeId(left)) || 0)
+    const rightRank = Number(wrestlerRankById.get(getEmployeeId(right)) || 0)
     const leftIsWrestler = left.role === 'wrestler'
     const rightIsWrestler = right.role === 'wrestler'
 
@@ -201,12 +236,13 @@ function PersonCard({ employee, onRemove, onDragStart, isCashIn, currentRank }) 
   const stamina = Number(employee?.stamina ?? 100)
   const isLowStaminaWrestler = employee.role === 'wrestler' && stamina < 10
   const showRankBadge = employee.role === 'wrestler' && Number.isFinite(Number(currentRank)) && Number(currentRank) > 0
+  const employeeId = getEmployeeId(employee)
 
   return (
     <div
       className={`${styles.personCard} ${onDragStart ? styles.personCardDraggable : ''} ${onRemove ? styles.personCardAssigned : ''}`}
-      draggable={Boolean(onDragStart)}
-      onDragStart={onDragStart ? (e) => onDragStart(e, employee.employeeId) : undefined}
+      draggable={Boolean(onDragStart && employeeId)}
+      onDragStart={onDragStart && employeeId ? (e) => onDragStart(e, employeeId) : undefined}
     >
       <img
         className={styles.personAvatar}
@@ -246,11 +282,18 @@ function PersonCard({ employee, onRemove, onDragStart, isCashIn, currentRank }) 
 // ─── AvailablePool ────────────────────────────────────────────────────────────
 function AvailablePool({ label, employees, blockedIds, cashInEmployeeId, wrestlerRankById }) {
   const available = sortEmployeesByRank(
-    employees.filter((e) => !blockedIds.includes(e.employeeId)),
+    employees.filter((employee) => {
+      const id = getEmployeeId(employee)
+      return Boolean(id) && !blockedIds.includes(id)
+    }),
     wrestlerRankById,
   )
 
   const handleDragStart = (e, employeeId) => {
+    if (!employeeId) {
+      return
+    }
+
     e.dataTransfer.setData('text/plain', employeeId)
     e.dataTransfer.effectAllowed = 'move'
   }
@@ -262,15 +305,18 @@ function AvailablePool({ label, employees, blockedIds, cashInEmployeeId, wrestle
         {available.length === 0 ? (
           <p className={styles.emptyHint}>None available</p>
         ) : (
-          available.map((emp) => (
+          available.map((emp) => {
+            const employeeId = getEmployeeId(emp)
+            return (
             <PersonCard
-              key={emp.employeeId}
+              key={employeeId}
               employee={emp}
               onDragStart={handleDragStart}
-              isCashIn={cashInEmployeeId != null && emp.employeeId === cashInEmployeeId}
-              currentRank={wrestlerRankById.get(emp.employeeId) || null}
+              isCashIn={cashInEmployeeId != null && employeeId === cashInEmployeeId}
+              currentRank={wrestlerRankById.get(employeeId) || null}
             />
-          ))
+            )
+          })
         )}
       </div>
     </div>
@@ -319,15 +365,22 @@ function DropZone({ label, subLabel, employees, onDrop, onRemove, maxSlots, hint
         {sortedEmployees.length === 0 ? (
           <p className={styles.dropHint}>{hint ?? 'Drag here'}</p>
         ) : (
-          sortedEmployees.map((emp) => (
+          sortedEmployees.map((emp) => {
+            const employeeId = getEmployeeId(emp)
+            return (
             <PersonCard
-              key={emp.employeeId}
+              key={employeeId}
               employee={emp}
-              onRemove={() => onRemove(emp.employeeId)}
-              isCashIn={cashInEmployeeId != null && emp.employeeId === cashInEmployeeId}
-              currentRank={wrestlerRankById.get(emp.employeeId) || null}
+              onRemove={() => {
+                if (employeeId) {
+                  onRemove(employeeId)
+                }
+              }}
+              isCashIn={cashInEmployeeId != null && employeeId === cashInEmployeeId}
+              currentRank={wrestlerRankById.get(employeeId) || null}
             />
-          ))
+            )
+          })
         )}
       </div>
     </div>
@@ -383,16 +436,16 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
     const rankMap = new Map()
 
     maleRanked.forEach((employee) => {
-      rankMap.set(employee.employeeId, employee.rank)
+      rankMap.set(getEmployeeId(employee), employee.rank)
     })
     femaleRanked.forEach((employee) => {
-      rankMap.set(employee.employeeId, employee.rank)
+      rankMap.set(getEmployeeId(employee), employee.rank)
     })
 
     return rankMap
   }, [wrestlerPool])
 
-  const findById = useCallback((id) => allEmployees.find((e) => e.employeeId === id), [allEmployees])
+  const findById = useCallback((id) => allEmployees.find((employee) => getEmployeeId(employee) === id), [allEmployees])
 
   const findTeamForParticipants = useCallback((participantIds) => {
     const normalizedIds = normalizeTeamParticipantIds(participantIds)

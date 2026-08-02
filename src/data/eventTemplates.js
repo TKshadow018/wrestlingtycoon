@@ -1,4 +1,4 @@
-const randomInRange = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
+import { randomInRange } from '../utils/utility'
 
 const BASE_EVENT_TEMPLATES = [
   { eventId: 'tv-night', name: 'Television Night', productionScale: 2, popularityWeight: 1.1, setupCost: 9000 },

@@ -156,8 +156,8 @@ function HireEmployeesModule() {
   const negotiateEmployeeContract = useGameStore((state) => state.negotiateEmployeeContract)
   const maleWrestlerCount = useGameStore((state) => state.roster.employees.filter((emp) => emp.role === 'wrestler' && emp.gender === 'male').length)
   const femaleWrestlerCount = useGameStore((state) => state.roster.employees.filter((emp) => emp.role === 'wrestler' && emp.gender === 'female').length)
-  const MAX_MALE = 20
-  const MAX_FEMALE = 15
+  const MAX_MALE = import.meta.env.VITE_ROSTER_MAX_SIZE_MALE
+  const MAX_FEMALE = import.meta.env.VITE_ROSTER_MAX_SIZE_FEMALE
 
   const isWrestlerRosterFull = (gender) => {
     if (gender === 'male') return maleWrestlerCount >= MAX_MALE

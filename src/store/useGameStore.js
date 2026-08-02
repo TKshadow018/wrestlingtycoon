@@ -4,7 +4,7 @@ import { GAME_CONFIG, MANAGEMENT_MODULES } from '../config/gameConfig'
 import { createEmployeeCandidates } from '../data/employeeMarket'
 import { createEventTemplates } from '../data/eventTemplates'
 import { createSponsorOffers, SPONSOR_TYPE_CONFIG } from '../data/sponsorOffers'
-import { clampHeelFaceMeter, DEFAULT_HEEL_FACE_METER_VALUE } from '../utils/heelFaceMeter'
+import { clampHeelFaceMeter, DEFAULT_HEEL_FACE_METER_VALUE, computeHeelFaceShift, applyHeelFaceNeutralDecay } from '../utils/heelFaceMeter'
 import preloadedEvents from '../data/preloadedEvents.json'
 import titleCatalog from '../data/titles.json'
 
@@ -117,8 +117,45 @@ const filterActiveEmployees = (employees = [], day = 1) => {
   return employees.filter((employee) => hasActiveContract(employee, day))
 }
 
+const normalizeEmployeeId = (employee, index) => {
+  if (employee?.employeeId != null) {
+    const employeeId = String(employee.employeeId).trim()
+    if (employeeId) {
+      return employeeId
+    }
+  }
+
+  if (employee?.id != null) {
+    const id = String(employee.id).trim()
+    if (id) {
+      return id
+    }
+  }
+
+  if (employee?.personId != null) {
+    const personId = String(employee.personId).trim()
+    if (personId) {
+      return `legacy-${personId}`
+    }
+  }
+
+  const rolePart = typeof employee?.role === 'string' && employee.role.trim() ? employee.role : 'employee'
+  const namePart = typeof employee?.name === 'string' && employee.name.trim()
+    ? employee.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+    : 'unknown'
+  const genderPart = typeof employee?.gender === 'string' && employee.gender.trim()
+    ? employee.gender.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    : 'u'
+  const dobPart = typeof employee?.dob === 'string' && employee.dob.trim()
+    ? employee.dob.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    : 'na'
+
+  return `legacy-${rolePart}-${namePart || 'unknown'}-${genderPart}-${dobPart}-${index}`
+}
+
 const normalizePersistedEmployees = (employees = [], day = 1) => {
-  return (employees || []).map((employee) => {
+  return (employees || []).map((employee, index) => {
+    const employeeId = normalizeEmployeeId(employee, index)
     const contractStartDay = Number.isInteger(employee?.contract?.startDay)
       ? employee.contract.startDay
       : Math.max(1, day - 1)
@@ -144,6 +181,7 @@ const normalizePersistedEmployees = (employees = [], day = 1) => {
 
     return {
       ...employee,
+      employeeId,
       popularity: clampPopularity(employee?.popularity ?? 0),
       happiness: shouldTrackHappiness(employee?.role)
         ? clampHappiness(employee?.happiness ?? DEFAULT_HAPPINESS)
@@ -720,8 +758,8 @@ const HAPPINESS_BONUS_MAX_BOOST = 20
 const DAILY_STAMINA_REGEN = 10
 const MIN_MATCH_STAMINA_LOSS = 20
 const MAX_MATCH_STAMINA_LOSS = 50
-const MAX_MALE_WRESTLERS = 20
-const MAX_FEMALE_WRESTLERS = 15
+const MAX_MALE_WRESTLERS = Number(import.meta.env.VITE_ROSTER_MAX_SIZE_MALE)
+const MAX_FEMALE_WRESTLERS = Number(import.meta.env.VITE_ROSTER_MAX_SIZE_FEMALE)
 
 const getEventSetupCost = (eventType) => {
   const typeConfig = EVENT_TYPE_CONFIG[eventType]
@@ -903,6 +941,16 @@ const applyDailyPerformanceChanges = (employees = [], configuredSegments = []) =
   }
 }
 
+const applyHeelFaceWeeklyDecay = (employees) => {
+  return employees.map((employee) => {
+    if (employee.role !== 'wrestler') return employee
+    return {
+      ...employee,
+      heelFaceMeter: applyHeelFaceNeutralDecay(employee.heelFaceMeter ?? DEFAULT_HEEL_FACE_METER_VALUE),
+    }
+  })
+}
+
 const applyMatchStats = (employees, configuredSegments, eventDay, eventName) => {
   if (!Array.isArray(configuredSegments) || configuredSegments.length === 0) {
     return employees
@@ -946,8 +994,37 @@ const applyMatchStats = (employees, configuredSegments, eventDay, eventName) => 
 
       if (isMatchType && isWinner) wins += 1
       if (isLoser) losses += 1
-  if (isMatchType && isWinner) nextHeelFaceMeter -= 4
-  if (isMatchType && isLoser) nextHeelFaceMeter += 4
+
+      if (isMatchType && (isWinner || isLoser)) {
+        // Gather opponent IDs for this match
+        let opponentIds = []
+        if (isTagTeam) {
+          const myTeam = Array.isArray(seg.team1Ids) && seg.team1Ids.includes(employee.employeeId)
+            ? seg.team1Ids
+            : (Array.isArray(seg.team2Ids) && seg.team2Ids.includes(employee.employeeId) ? seg.team2Ids : [])
+          const allTeamIds = [
+            ...(Array.isArray(seg.team1Ids) ? seg.team1Ids : []),
+            ...(Array.isArray(seg.team2Ids) ? seg.team2Ids : []),
+          ]
+          opponentIds = allTeamIds.filter((id) => !myTeam.includes(id))
+        } else {
+          opponentIds = seg.participantIds.filter((id) => {
+            if (id === employee.employeeId) return false
+            const p = employeesById.get(id)
+            return p && !HELPER_ROLES.has(p.role)
+          })
+        }
+
+        const opponentMeters = opponentIds.map((id) =>
+          clampHeelFaceMeter(employeesById.get(id)?.heelFaceMeter ?? DEFAULT_HEEL_FACE_METER_VALUE),
+        )
+        const opponentAvgMeter =
+          opponentMeters.length > 0
+            ? opponentMeters.reduce((sum, m) => sum + m, 0) / opponentMeters.length
+            : DEFAULT_HEEL_FACE_METER_VALUE
+
+        nextHeelFaceMeter += computeHeelFaceShift(opponentAvgMeter, isWinner, seg.matchRating)
+      }
 
       const participantDetails = seg.participantIds
         .map((id) => employeesById.get(id))
@@ -3093,12 +3170,15 @@ export const useGameStore = create(
           const nextActiveEmployeesWithStats = shouldRunEvent
             ? applyMatchStats(nextActiveEmployeesWithPerformance, configuredSegments, state.calendar.day, productionWithSponsor.name)
             : nextActiveEmployeesWithPerformance
+          const nextActiveEmployeesWithDecay = shouldRunEvent
+            ? applyHeelFaceWeeklyDecay(nextActiveEmployeesWithStats)
+            : nextActiveEmployeesWithStats
           const nextTitlesBeforeHappiness = shouldRunEvent
-            ? applyTitleMatchResults(state.roster.titles, configuredSegments, nextActiveEmployeesWithStats, state.calendar.day)
+            ? applyTitleMatchResults(state.roster.titles, configuredSegments, nextActiveEmployeesWithDecay, state.calendar.day)
             : state.roster.titles
 
           const happinessOutcome = applyHappinessAndDeparture({
-            employees: nextActiveEmployeesWithStats,
+            employees: nextActiveEmployeesWithDecay,
             prevTitles: state.roster.titles,
             nextTitles: nextTitlesBeforeHappiness,
             currentDay: state.calendar.day,

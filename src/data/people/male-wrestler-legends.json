@@ -6,9 +6,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 24800,
-      "per_match_salary": 4600,
-      "additional_bonus": 8400
+      "monthly_wage": 50000,
+      "per_match_salary": 12000,
+      "additional_bonus": 30000
     },
     "popularity": 87,
     "has_money_amount": 1950000,
@@ -31,9 +31,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 23000,
-      "per_match_salary": 4300,
-      "additional_bonus": 7600
+      "monthly_wage": 50000,
+      "per_match_salary": 15000,
+      "additional_bonus": 10000
     },
     "popularity": 82,
     "has_money_amount": 1800000,
@@ -56,9 +56,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 16400,
-      "per_match_salary": 3000,
-      "additional_bonus": 5200
+      "monthly_wage": 40000,
+      "per_match_salary": 12000,
+      "additional_bonus": 10000
     },
     "popularity": 68,
     "has_money_amount": 780000,
@@ -81,11 +81,11 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 14000,
-      "per_match_salary": 2600,
-      "additional_bonus": 4300
+      "monthly_wage": 40000,
+      "per_match_salary": 12000,
+      "additional_bonus": 10000
     },
-    "popularity": 63,
+    "popularity": 73,
     "has_money_amount": 620000,
     "wrestling_ability": {
       "strength": 71,
@@ -106,9 +106,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 32000,
-      "per_match_salary": 5900,
-      "additional_bonus": 11000
+      "monthly_wage": 70000,
+      "per_match_salary": 15000,
+      "additional_bonus": 30000
     },
     "popularity": 94,
     "has_money_amount": 3200000,
@@ -131,11 +131,11 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 42000,
-      "per_match_salary": 8000,
-      "additional_bonus": 15000
+      "monthly_wage": 100000,
+      "per_match_salary": 20000,
+      "additional_bonus": 50000
     },
-    "popularity": 96,
+    "popularity": 98,
     "has_money_amount": 6800000,
     "wrestling_ability": {
       "strength": 99,
@@ -156,9 +156,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 34000,
-      "per_match_salary": 6300,
-      "additional_bonus": 11500
+      "monthly_wage": 80000,
+      "per_match_salary": 17500,
+      "additional_bonus": 30000
     },
     "popularity": 95,
     "has_money_amount": 5200000,
@@ -181,9 +181,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 30500,
-      "per_match_salary": 5700,
-      "additional_bonus": 9800
+      "monthly_wage": 70000,
+      "per_match_salary": 17000,
+      "additional_bonus": 50000
     },
     "popularity": 92,
     "has_money_amount": 3600000,
@@ -206,9 +206,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 29000,
-      "per_match_salary": 5300,
-      "additional_bonus": 9100
+      "monthly_wage": 80000,
+      "per_match_salary": 20000,
+      "additional_bonus": 15000
     },
     "popularity": 93,
     "has_money_amount": 4300000,
@@ -231,9 +231,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 25500,
-      "per_match_salary": 4700,
-      "additional_bonus": 8300
+      "monthly_wage": 65000,
+      "per_match_salary": 16000,
+      "additional_bonus": 70000
     },
     "popularity": 90,
     "has_money_amount": 4100000,
@@ -256,9 +256,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 23800,
-      "per_match_salary": 4400,
-      "additional_bonus": 7600
+      "monthly_wage": 45000,
+      "per_match_salary": 14000,
+      "additional_bonus": 15000
     },
     "popularity": 84,
     "has_money_amount": 1700000,
@@ -281,9 +281,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 39000,
-      "per_match_salary": 7300,
-      "additional_bonus": 13500
+      "monthly_wage": 100000,
+      "per_match_salary": 20000,
+      "additional_bonus": 30000
     },
     "popularity": 98,
     "has_money_amount": 7400000,
@@ -306,9 +306,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 25000,
-      "per_match_salary": 4600,
-      "additional_bonus": 8100
+      "monthly_wage": 60000,
+      "per_match_salary": 16000,
+      "additional_bonus": 30000
     },
     "popularity": 86,
     "has_money_amount": 2800000,
@@ -331,9 +331,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 35000,
-      "per_match_salary": 6900,
-      "additional_bonus": 12800
+      "monthly_wage": 90000,
+      "per_match_salary": 20000,
+      "additional_bonus": 50000
     },
     "popularity": 99,
     "has_money_amount": 9100000,
@@ -356,9 +356,9 @@
     "gender": "male",
     "role": "wrestler",
     "salary_demand": {
-      "monthly_wage": 13200,
-      "per_match_salary": 2450,
-      "additional_bonus": 4100
+      "monthly_wage": 50000,
+      "per_match_salary": 13000,
+      "additional_bonus": 20000
     },
     "popularity": 60,
     "has_money_amount": 540000,
