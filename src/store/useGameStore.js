@@ -31,6 +31,14 @@ import {
 import { getBoardMeetingSchedule } from '../utils/boardMeetings'
 import { getBoardEventAttendance } from '../utils/boardEventAttendance'
 import {
+  FACTION_STORY_BEATS,
+  normalizeBackstageChemistry,
+  normalizeFactions,
+  normalizeFactionRivalries,
+  resolveFactionStorylines,
+  updateBackstageChemistry,
+} from '../utils/backstageDynamics'
+import {
   getGameDayDifference,
   normalizeGameDate,
   parseGameDate,
@@ -449,6 +457,8 @@ const buildInitialState = () => {
     titles: createInitialTitles(),
     sponsors: [],
     teams: [],
+    factions: [],
+    backstageChemistry: {},
   }
 
   return {
@@ -514,6 +524,7 @@ const buildInitialState = () => {
       lastOutcome: null,
       eventLog: [],
       rivalries: [],
+      factionRivalries: [],
       competitorHeadlines: [],
       eventPreparation: null,
     },
@@ -2116,6 +2127,10 @@ const applyMatchStats = (employees, configuredSegments, eventDay, eventName) => 
         eventName,
         segmentType: seg.segmentType,
         matchType: seg.matchType || null,
+        storyBeat: seg.storyBeat || null,
+        sourceFactionId: seg.sourceFactionId || null,
+        targetFactionId: seg.targetFactionId || null,
+        betrayerId: seg.betrayerId || null,
         result: isWinner ? 'win' : isLoser ? 'loss' : 'nodecision',
         opponent: otherParticipantDetails.map((participant) => participant.name),
         participantDetails,
@@ -2521,7 +2536,7 @@ const normalizeSegmentType = (segmentType) => {
   return 'match'
 }
 
-const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unlocks) => {
+const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unlocks, factions) => {
   const maxSegments = Math.max(1, Number(eventSetup?.totalSegments) || Number(defaultMaxSegments) || 1)
 
   if (!Array.isArray(eventSetup?.segments) || eventSetup.segments.length === 0) {
@@ -2605,6 +2620,19 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unl
               return wrestlerIds.includes(change.employeeId)
             })
         : []
+      const sourceFaction = (factions || []).find((faction) => faction.factionId === segment?.sourceFactionId)
+      const targetFaction = (factions || []).find((faction) => faction.factionId === segment?.targetFactionId)
+      const storyBeat = segmentType === 'promo'
+        && FACTION_STORY_BEATS.includes(segment?.storyBeat)
+        && sourceFaction
+        && targetFaction
+        && sourceFaction.factionId !== targetFaction.factionId
+        && (
+          segment.storyBeat !== 'betrayal'
+          || sourceFaction.memberIds.includes(segment?.betrayerId)
+        )
+        ? segment.storyBeat
+        : null
 
       return {
         id: `segment-${index + 1}`,
@@ -2613,6 +2641,10 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unl
           && normalizedUnlocks.promoSegments.includes(segment?.promoSegmentId)
           ? segment.promoSegmentId
           : (segmentType === 'promo' ? DEFAULT_CAREER_ARC_UNLOCKS.promoSegments[0] : null),
+        storyBeat,
+        sourceFactionId: storyBeat ? sourceFaction.factionId : null,
+        targetFactionId: storyBeat ? targetFaction.factionId : null,
+        betrayerId: storyBeat === 'betrayal' ? segment.betrayerId : null,
         matchType: MATCH_SEGMENT_TYPES.has(segmentType) ? rawMatchType : null,
         matchStipulation: MATCH_SEGMENT_TYPES.has(segmentType) ? rawMatchStipulation : null,
         titleId: segmentType === 'titleMatch' && typeof segment?.titleId === 'string' ? segment.titleId : null,
@@ -2768,6 +2800,8 @@ const validateCustomEventRules = ({ customEvents, draftEvent, currentWeek, curre
 
 const MIN_TEAM_MEMBERS = 2
 const MAX_TEAM_MEMBERS = 10
+const MIN_FACTION_MEMBERS = 2
+const MAX_FACTION_MEMBERS = 10
 const TAG_STREAK_THRESHOLD = 3
 const TAG_STREAK_WINDOW_DAYS = 90
 
@@ -4498,6 +4532,8 @@ export const useGameStore = create(
           const perMatchSalary = Number(employee.contract?.perMatchSalary) || 0
           const signingBonus = Number(employee.contract?.signingBonus) || 0
           const severanceCost = 20 * perMatchSalary + 3 * signingBonus
+          const remainingEmployees = state.roster.employees.filter((item) => item.employeeId !== employeeId)
+          const remainingFactions = normalizeFactions(state.roster.factions, remainingEmployees)
           const firePrestigeDelta = (employee.role === 'wrestler' && (employee.skill || 0) >= 82)
             ? -Math.round(((employee.skill || 0) - 80) / 3)
             : 0
@@ -4505,12 +4541,17 @@ export const useGameStore = create(
           return {
             roster: {
               ...state.roster,
-              employees: state.roster.employees.filter((item) => item.employeeId !== employeeId),
+              employees: remainingEmployees,
+              factions: remainingFactions,
+              backstageChemistry: normalizeBackstageChemistry(
+                state.roster.backstageChemistry,
+                remainingEmployees,
+              ),
             },
             market: {
               ...state.market,
               employeeCandidates: syncEmployeeCandidates({
-                employees: state.roster.employees.filter((item) => item.employeeId !== employeeId),
+                employees: remainingEmployees,
                 currentCandidates: state.market.employeeCandidates,
                 currentDay: state.calendar.day,
                 hiringLocks: state.market.hiringLocks,
@@ -4533,6 +4574,13 @@ export const useGameStore = create(
                 amount: severanceCost,
                 note: `Severance for ${employee.name}`,
               }),
+            },
+            events: {
+              ...state.events,
+              factionRivalries: normalizeFactionRivalries(
+                state.events.factionRivalries,
+                remainingFactions,
+              ),
             },
           }
         })
@@ -4910,6 +4958,125 @@ export const useGameStore = create(
         }))
       },
 
+      createFaction: ({ name, memberIds } = {}) => {
+        const cleanName = String(name || '').trim()
+        if (!cleanName) {
+          return { ok: false, reason: 'nameRequired' }
+        }
+
+        const uniqueIds = Array.from(new Set(Array.isArray(memberIds) ? memberIds : []))
+        if (uniqueIds.length < MIN_FACTION_MEMBERS || uniqueIds.length > MAX_FACTION_MEMBERS) {
+          return { ok: false, reason: 'memberCount' }
+        }
+
+        let result = { ok: false, reason: 'unknown' }
+        set((state) => {
+          const employeesById = new Map(state.roster.employees.map((employee) => [employee.employeeId, employee]))
+          if (uniqueIds.some((id) => !['wrestler', 'manager'].includes(employeesById.get(id)?.role))) {
+            result = { ok: false, reason: 'invalidMember' }
+            return state
+          }
+
+          const factions = normalizeFactions(state.roster.factions, state.roster.employees)
+          if (factions.some((faction) => faction.memberIds.some((id) => uniqueIds.includes(id)))) {
+            result = { ok: false, reason: 'memberAssigned' }
+            return state
+          }
+
+          const faction = {
+            factionId: `faction-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
+            name: cleanName,
+            memberIds: uniqueIds,
+            formedDay: state.calendar.day,
+          }
+          result = { ok: true, faction }
+
+          return {
+            roster: {
+              ...state.roster,
+              factions: [...factions, faction],
+            },
+          }
+        })
+
+        return result
+      },
+
+      updateFaction: (factionId, { name, memberIds } = {}) => {
+        const cleanName = String(name || '').trim()
+        if (!cleanName) {
+          return { ok: false, reason: 'nameRequired' }
+        }
+
+        const uniqueIds = Array.from(new Set(Array.isArray(memberIds) ? memberIds : []))
+        if (uniqueIds.length < MIN_FACTION_MEMBERS || uniqueIds.length > MAX_FACTION_MEMBERS) {
+          return { ok: false, reason: 'memberCount' }
+        }
+
+        let result = { ok: false, reason: 'unknown' }
+        set((state) => {
+          const factions = normalizeFactions(state.roster.factions, state.roster.employees)
+          if (!factions.some((faction) => faction.factionId === factionId)) {
+            result = { ok: false, reason: 'notFound' }
+            return state
+          }
+
+          const employeesById = new Map(state.roster.employees.map((employee) => [employee.employeeId, employee]))
+          if (uniqueIds.some((id) => !['wrestler', 'manager'].includes(employeesById.get(id)?.role))) {
+            result = { ok: false, reason: 'invalidMember' }
+            return state
+          }
+
+          const otherFactions = factions.filter((faction) => faction.factionId !== factionId)
+          if (otherFactions.some((faction) => faction.memberIds.some((id) => uniqueIds.includes(id)))) {
+            result = { ok: false, reason: 'memberAssigned' }
+            return state
+          }
+
+          const updatedFactions = factions.map((faction) => (
+            faction.factionId === factionId
+              ? { ...faction, name: cleanName, memberIds: uniqueIds }
+              : faction
+          ))
+          result = { ok: true }
+
+          return {
+            roster: {
+              ...state.roster,
+              factions: updatedFactions,
+            },
+          }
+        })
+
+        return result
+      },
+
+      deleteFaction: (factionId) => {
+        let removed = false
+        set((state) => {
+          const factions = state.roster.factions || []
+          const nextFactions = factions.filter((faction) => faction.factionId !== factionId)
+          removed = nextFactions.length !== factions.length
+          if (!removed) {
+            return state
+          }
+
+          return {
+            roster: {
+              ...state.roster,
+              factions: nextFactions,
+            },
+            events: {
+              ...state.events,
+              factionRivalries: (state.events.factionRivalries || [])
+                .filter((rivalry) => !rivalry.factionIds?.includes(factionId)),
+            },
+          }
+        })
+
+        return { ok: removed }
+      },
+
       skipEvent: () => {
         set((state) => {
           const reductionPct = (5 + Math.random() * 5) / 100
@@ -4992,6 +5159,7 @@ export const useGameStore = create(
                 nextActiveEmployees,
                 productionWithSponsor.maxMatches,
                 state.progression?.unlocks,
+                state.roster?.factions,
               )
             : []
           const performanceApplied = applyDailyPerformanceChanges(nextActiveEmployees, eventSetupSegments)
@@ -5076,6 +5244,58 @@ export const useGameStore = create(
               }
             }
           }
+
+          const backstageUpdate = shouldRunEvent
+            ? updateBackstageChemistry({
+                chemistry: state.roster.backstageChemistry,
+                factions: state.roster.factions,
+                employees: nextActiveEmployeesWithPerformance,
+                segments: configuredSegments,
+              })
+            : {
+                chemistry: state.roster.backstageChemistry || {},
+                segments: configuredSegments,
+                employeeHappinessDeltas: {},
+              }
+          configuredSegments = backstageUpdate.segments.map((segment) => {
+            if (
+              !MATCH_SEGMENT_TYPES.has(segment.segmentType)
+              || !Number(segment.chemistryRatingAdjustment)
+            ) {
+              return segment
+            }
+
+            const baseRating = Number.isFinite(Number(segment.matchRating))
+              ? Number(segment.matchRating)
+              : calculateMatchRating(
+                  (segment.wrestlerIds || [])
+                    .map((id) => nextActiveEmployeesWithPerformance.find((employee) => employee.employeeId === id))
+                    .filter((employee) => employee?.role === 'wrestler'),
+                )
+            const nextRating = Math.max(
+              1,
+              Math.min(10, Number((baseRating + segment.chemistryRatingAdjustment).toFixed(1))),
+            )
+
+            return {
+              ...segment,
+              matchRating: nextRating,
+              chemistryRatingAdjustment: Number((nextRating - baseRating).toFixed(1)),
+            }
+          })
+          const factionStorylineOutcome = shouldRunEvent
+            ? resolveFactionStorylines({
+                factions: state.roster.factions,
+                factionRivalries: state.events.factionRivalries,
+                employees: nextActiveEmployeesWithPerformance,
+                segments: configuredSegments,
+                day: state.calendar.day,
+              })
+            : null
+          let nextFactions = factionStorylineOutcome?.factions
+            || normalizeFactions(state.roster.factions, nextActiveEmployeesWithPerformance)
+          let nextFactionRivalries = factionStorylineOutcome?.factionRivalries
+            || (state.events.factionRivalries || [])
 
           if (shouldRunEvent) {
             // Collect title holder IDs for bonus calculation
@@ -5173,7 +5393,8 @@ export const useGameStore = create(
               day: nextCalendar.day,
             })
             nextRivalries = rivalryOutcome.rivalries
-            const rivalryHeatScore = Math.max(0, rivalryOutcome.rivalryHeatScore || 0)
+            const factionRivalryHeatScore = Number(factionStorylineOutcome?.rivalryHeatScore) || 0
+            const rivalryHeatScore = Math.max(0, (rivalryOutcome.rivalryHeatScore || 0) + factionRivalryHeatScore)
             const rivalryFanBoost = Math.min(180, Math.round(rivalryHeatScore * 0.9))
             const rivalryPrestigeBoost = Math.min(4, Math.round(rivalryHeatScore / 35))
             rivalryFanBoostForPostmortem = rivalryFanBoost
@@ -5230,7 +5451,9 @@ export const useGameStore = create(
             )
 
             const baseFanDelta = Math.round(
-              130 + productionWithSponsor.hype * 0.9 - productionWithSponsor.risk * 0.45 + sponsorFanBoost + setupBonus.fans + setupParticipantCount + rivalryFanBoost + audienceSegmentBreakdown.fanImpactTotal,
+              130 + productionWithSponsor.hype * 0.9 - productionWithSponsor.risk * 0.45
+              + sponsorFanBoost + setupBonus.fans + setupParticipantCount + rivalryFanBoost
+              + audienceSegmentBreakdown.fanImpactTotal + (Number(factionStorylineOutcome?.fanImpact) || 0),
             )
             // Prestige: driven by match quality (ratings), wrestler popularity, event type bonuses, and hype/risk
             const matchSegs = configuredSegments.filter((seg) => MATCH_SEGMENT_TYPES.has(seg.segmentType))
@@ -5303,6 +5526,7 @@ export const useGameStore = create(
               competitorPressure,
               rivalryHeatScore,
               rivalryHighlights: rivalryHighlightsForPostmortem,
+              factionStories: factionStorylineOutcome?.storyOutcomes || [],
               segments: configuredSegments.map((seg) => {
                 const isTagTeamSeg = seg.matchType === 'tagTeam'
                 const segWinnerTeamIds = Array.isArray(seg.winnerTeamIds) ? seg.winnerTeamIds : []
@@ -5312,6 +5536,10 @@ export const useGameStore = create(
                 return {
                   segmentType: seg.segmentType,
                   promoSegmentId: seg.segmentType === 'promo' ? seg.promoSegmentId : null,
+                  storyBeat: seg.storyBeat || null,
+                  sourceFactionId: seg.sourceFactionId || null,
+                  targetFactionId: seg.targetFactionId || null,
+                  betrayerId: seg.betrayerId || null,
                   matchType: seg.matchType || null,
                   participantIds: Array.isArray(seg.participantIds) ? seg.participantIds : [],
                   winnerEmployeeId: isTagTeamSeg ? null : (seg.winnerEmployeeId || null),
@@ -5324,6 +5552,7 @@ export const useGameStore = create(
                   promoRatingAdjustmentType: seg.promoRatingAdjustmentType || null,
                   promoRatingAdjustmentRule: seg.promoRatingAdjustmentRule || null,
                   promoRatingCapHit: Boolean(seg.promoRatingCapHit),
+                  chemistryRatingAdjustment: Number(seg.chemistryRatingAdjustment) || 0,
                   interviewPopularityChanges: seg.interviewPopularityChanges || [],
                   participantDetails: seg.participantIds
                     .map((id) => nextActiveEmployeesWithPerformance.find((e) => e.employeeId === id))
@@ -5409,13 +5638,24 @@ export const useGameStore = create(
           const competitorAdjustedEmployees = competitorPoachedEmployeeId
             ? nextActiveEmployeesWithDecay.filter((employee) => employee.employeeId !== competitorPoachedEmployeeId)
             : nextActiveEmployeesWithDecay
+          const chemistryAdjustedEmployees = competitorAdjustedEmployees.map((employee) => {
+            const happinessDelta = Number(backstageUpdate.employeeHappinessDeltas[employee.employeeId]) || 0
+            if (!happinessDelta || !shouldTrackHappiness(employee.role)) {
+              return employee
+            }
+
+            return {
+              ...employee,
+              happiness: clampHappiness((employee.happiness ?? DEFAULT_HAPPINESS) + happinessDelta),
+            }
+          })
 
           const nextTitlesBeforeHappiness = shouldRunEvent
             ? applyTitleMatchResults(state.roster.titles, configuredSegments, nextActiveEmployeesWithDecay, state.calendar.day)
             : state.roster.titles
 
           const happinessOutcome = applyHappinessAndDeparture({
-            employees: competitorAdjustedEmployees,
+            employees: chemistryAdjustedEmployees,
             prevTitles: state.roster.titles,
             nextTitles: nextTitlesBeforeHappiness,
             currentDay: state.calendar.day,
@@ -5423,6 +5663,8 @@ export const useGameStore = create(
           })
 
           let nextActiveEmployeesFinal = happinessOutcome.employees
+          nextFactions = normalizeFactions(nextFactions, nextActiveEmployeesFinal)
+          nextFactionRivalries = normalizeFactionRivalries(nextFactionRivalries, nextFactions)
           const remainingEmployeeIds = new Set(nextActiveEmployeesFinal.map((employee) => employee.employeeId))
           const nextTitles = sanitizeTitlesForActiveEmployees(nextTitlesBeforeHappiness, remainingEmployeeIds)
 
@@ -5901,6 +6143,7 @@ export const useGameStore = create(
               bookedEvent: buildBookedEventProjection(nextCalendar.day, nextCustomEvents, state.calendar.startDateIso),
               lastOutcome,
               rivalries: nextRivalries,
+              factionRivalries: nextFactionRivalries,
               eventLog: lastOutcome
                 ? [
                     ...state.events.eventLog,
@@ -5945,6 +6188,8 @@ export const useGameStore = create(
               sponsors: nextSponsors,
               titles: nextTitles,
               teams: nextTeams,
+              factions: nextFactions,
+              backstageChemistry: backstageUpdate.chemistry,
             },
             market: {
               ...state.market,
@@ -6078,6 +6323,10 @@ export const useGameStore = create(
           normalizePersistedEmployees(typedPersistedState?.roster?.employees || [], restoredDay),
           restoredDay,
         )
+        const normalizedPersistedFactions = normalizeFactions(
+          typedPersistedState?.roster?.factions,
+          normalizedPersistedEmployees,
+        )
         const mergedFinances = {
           ...currentState.finances,
           ...typedPersistedState?.finances,
@@ -6141,6 +6390,11 @@ export const useGameStore = create(
             teams: Array.isArray(typedPersistedState?.roster?.teams)
               ? typedPersistedState.roster.teams
               : [],
+            factions: normalizedPersistedFactions,
+            backstageChemistry: normalizeBackstageChemistry(
+              typedPersistedState?.roster?.backstageChemistry,
+              normalizedPersistedEmployees,
+            ),
           },
           events: {
             ...currentState.events,
@@ -6153,6 +6407,10 @@ export const useGameStore = create(
               restoredProgression.unlocks,
             ),
             rivalries: normalizeRivalries(typedPersistedState?.events?.rivalries || currentState.events.rivalries),
+            factionRivalries: normalizeFactionRivalries(
+              typedPersistedState?.events?.factionRivalries || currentState.events.factionRivalries,
+              normalizedPersistedFactions,
+            ),
             competitorHeadlines: Array.isArray(typedPersistedState?.events?.competitorHeadlines)
               ? typedPersistedState.events.competitorHeadlines.slice(-60)
               : currentState.events.competitorHeadlines,

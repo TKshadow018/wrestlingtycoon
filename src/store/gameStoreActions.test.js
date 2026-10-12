@@ -517,11 +517,67 @@ describe('game store action coverage', () => {
     expect(useGameStore.getState().stats.prestige).toBeLessThanOrEqual(prestige)
   })
 
+  it('creates, edits, validates, and deletes factions containing wrestlers and managers', () => {
+    const firstWrestler = hireCandidate('wrestler')
+    const secondWrestler = hireCandidate('wrestler')
+    const firstManager = hireCandidate('manager')
+    const createFaction = useGameStore.getState().createFaction
+
+    expect(createFaction({ name: ' ', memberIds: [firstWrestler.employeeId, firstManager.employeeId] }))
+      .toMatchObject({ ok: false, reason: 'nameRequired' })
+    expect(createFaction({ name: 'Solo', memberIds: [firstWrestler.employeeId] }))
+      .toMatchObject({ ok: false, reason: 'memberCount' })
+    expect(createFaction({ name: 'Unknown', memberIds: [firstWrestler.employeeId, 'unknown'] }))
+      .toMatchObject({ ok: false, reason: 'invalidMember' })
+    expect(createFaction({
+      name: 'The First Order',
+      memberIds: [firstWrestler.employeeId, firstManager.employeeId],
+    })).toMatchObject({ ok: true })
+
+    const firstFaction = useGameStore.getState().roster.factions[0]
+    expect(firstFaction).toMatchObject({
+      name: 'The First Order',
+      memberIds: [firstWrestler.employeeId, firstManager.employeeId],
+    })
+    expect(createFaction({ name: 'Shared Member', memberIds: [firstWrestler.employeeId, secondWrestler.employeeId] }))
+      .toMatchObject({ ok: false, reason: 'memberAssigned' })
+
+    expect(useGameStore.getState().updateFaction(firstFaction.factionId, {
+      name: 'The New Order',
+      memberIds: [firstWrestler.employeeId, secondWrestler.employeeId],
+    })).toMatchObject({ ok: true })
+    expect(useGameStore.getState().roster.factions[0]).toMatchObject({
+      name: 'The New Order',
+      memberIds: [firstWrestler.employeeId, secondWrestler.employeeId],
+    })
+    expect(useGameStore.getState().deleteFaction(firstFaction.factionId)).toEqual({ ok: true })
+    expect(useGameStore.getState().roster.factions).toHaveLength(0)
+
+    expect(createFaction({
+      name: 'Last Faction',
+      memberIds: [firstWrestler.employeeId, firstManager.employeeId],
+    }).ok).toBe(true)
+    useGameStore.setState((state) => ({
+      roster: {
+        ...state.roster,
+        backstageChemistry: {
+          [`${firstWrestler.employeeId}::${firstManager.employeeId}`]: 40,
+        },
+      },
+    }))
+    useGameStore.getState().fireEmployee(firstManager.employeeId)
+    expect(useGameStore.getState().roster.factions[0].memberIds).toContain(firstWrestler.employeeId)
+    expect(useGameStore.getState().roster.factions[0].memberIds).not.toContain(firstManager.employeeId)
+    expect(useGameStore.getState().roster.backstageChemistry).toEqual({})
+  })
+
   it('runs a custom event card through audience, match, title, rivalry, staff, and sponsor accounting', () => {
     const wrestlers = Array.from({ length: 4 }, () => hireCandidate('wrestler'))
     const referee = hireCandidate('referee')
     const announcer = hireCandidate('announcer')
     const staff = hireCandidate('staff')
+    const firstManager = hireCandidate('manager')
+    const secondManager = hireCandidate('manager')
     const [first, second, third, fourth] = wrestlers
     const title = useGameStore.getState().roster.titles.find((item) => item.division === 'singles')
 
@@ -535,6 +591,28 @@ describe('game store action coverage', () => {
           makeOffer({ offerId: 'event-sponsor', sponsorId: 'event-sponsor', sponsorType: 'eventMain' }),
           makeOffer({ offerId: 'daily-sponsor', sponsorId: 'daily-sponsor', sponsorType: 'digital' }),
         ],
+        factions: [
+          {
+            factionId: 'faction-aces',
+            name: 'The Aces',
+            memberIds: [first.employeeId, second.employeeId, firstManager.employeeId],
+          },
+          {
+            factionId: 'faction-blazes',
+            name: 'Blaze Club',
+            memberIds: [third.employeeId, fourth.employeeId, secondManager.employeeId],
+          },
+        ],
+        backstageChemistry: Object.fromEntries(
+          [
+            [first.employeeId, second.employeeId],
+            [first.employeeId, referee.employeeId],
+            [first.employeeId, announcer.employeeId],
+            [second.employeeId, referee.employeeId],
+            [second.employeeId, announcer.employeeId],
+            [referee.employeeId, announcer.employeeId],
+          ].map((pair) => [pair.sort().join('::'), 100]),
+        ),
       },
       events: {
         ...state.events,
@@ -545,7 +623,7 @@ describe('game store action coverage', () => {
           scheduledDay: 1,
           scheduledWeek: 1,
           specificDate: '2026-06-01',
-          maxMatches: 7,
+          maxMatches: 8,
           isRecurringAnnually: false,
           isSystem: false,
         }],
@@ -554,7 +632,7 @@ describe('game store action coverage', () => {
           type: 'ppv',
           name: 'Test Pay Per View',
           scheduledDay: 1,
-          maxMatches: 7,
+          maxMatches: 8,
         },
         eventPreparation: {
           eventId: 'test-ppv',
@@ -577,7 +655,7 @@ describe('game store action coverage', () => {
     }))
 
     useGameStore.getState().proceedTimeline({
-      totalSegments: 6,
+      totalSegments: 8,
       segments: [
         {
           segmentType: 'titleMatch',
@@ -624,8 +702,28 @@ describe('game store action coverage', () => {
         },
         {
           segmentType: 'promo',
-          wrestlerIds: [fourth.employeeId],
+          wrestlerIds: [first.employeeId, third.employeeId],
           promoSegmentId: 'contractSigning',
+          storyBeat: 'factionPromo',
+          sourceFactionId: 'faction-aces',
+          targetFactionId: 'faction-blazes',
+        },
+        {
+          segmentType: 'promo',
+          wrestlerIds: [second.employeeId, fourth.employeeId],
+          promoSegmentId: 'contractSigning',
+          storyBeat: 'interference',
+          sourceFactionId: 'faction-aces',
+          targetFactionId: 'faction-blazes',
+        },
+        {
+          segmentType: 'promo',
+          wrestlerIds: [first.employeeId, second.employeeId, firstManager.employeeId],
+          promoSegmentId: 'contractSigning',
+          storyBeat: 'betrayal',
+          sourceFactionId: 'faction-aces',
+          targetFactionId: 'faction-blazes',
+          betrayerId: firstManager.employeeId,
         },
       ],
     })
@@ -637,16 +735,38 @@ describe('game store action coverage', () => {
       promoStyleId: 'hometownBuzz',
       presentationId: 'championship',
     })
-    expect(state.events.lastOutcome.segments).toHaveLength(6)
+    expect(state.events.lastOutcome.segments).toHaveLength(8)
     expect(state.events.lastOutcome.audienceSegments).toHaveLength(4)
     expect(state.events.lastOutcome.sponsorTrustReactions).toHaveLength(2)
     expect(state.events.lastOutcome.rivalryHighlights.length).toBeGreaterThan(0)
+    expect(state.events.lastOutcome.factionStories.map((story) => story.action)).toEqual([
+      'factionPromo',
+      'interference',
+      'betrayal',
+    ])
+    expect(state.events.factionRivalries).toEqual([
+      expect.objectContaining({
+        factionIds: ['faction-aces', 'faction-blazes'],
+        heat: 32,
+      }),
+    ])
+    expect(state.roster.factions.find((faction) => faction.factionId === 'faction-aces').memberIds)
+      .not.toContain(firstManager.employeeId)
+    expect(state.roster.factions.find((faction) => faction.factionId === 'faction-blazes').memberIds)
+      .toContain(firstManager.employeeId)
     expect(state.events.lastOutcome.postmortem.fanFactors.find((factor) => factor.key === 'cardVariety').value)
-      .toBe(64)
+      .toBe(90)
     expect(state.events.lastOutcome.segments.find((segment) => segment.segmentType === 'titleMatch')
       .promoRatingAdjustment).toBeCloseTo(0.6)
+    expect(state.events.lastOutcome.segments.find((segment) => segment.segmentType === 'titleMatch'))
+      .toMatchObject({ chemistryRatingAdjustment: 0.5, matchRating: 9.6 })
     expect(state.events.lastOutcome.segments.find((segment) => segment.segmentType === 'promo')
       .promoSegmentId).toBe('contractSigning')
+    expect(state.roster.backstageChemistry).toHaveProperty(
+      [first.employeeId, firstManager.employeeId].sort().join('::'),
+    )
+    expect(state.roster.employees.find((employee) => employee.employeeId === first.employeeId).happiness)
+      .toBeLessThan(50)
     expect(state.events.lastOutcome.postmortem.moneyFactors.length).toBeGreaterThan(0)
     expect(state.roster.employees.find((employee) => employee.employeeId === second.employeeId)
       .matchStats.totalWins).toBeGreaterThan(0)

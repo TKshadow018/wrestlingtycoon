@@ -38,6 +38,7 @@ Wrestling Tycoon is a comprehensive sports management simulation game where you 
 - **Ranking System**: Dynamic wrestler ranking based on match performance and popularity
 - **Happiness & Morale**: Manage employee satisfaction and team morale
 - **Career Arcs**: Pursue eight-week objectives and unlock venues, promotional campaigns, promo formats, and event presentations
+- **Faction Stories & Backstage Chemistry**: Build wrestler/manager factions, stage rivalry promos, interference and betrayals, and shape backstage relationships
 - **Competitor Intelligence**: Track rival promotions, talent poaching, counter-programming, and industry news
 - **Board Governance**: Resolve monthly agendas, weighted votes, mandates, and annual elections
 - **Mod Data Packages**: Import and export validated title, sponsor-offer, and event-template data
@@ -54,6 +55,7 @@ Wrestling Tycoon is a comprehensive sports management simulation game where you 
 - **Board Governance**: Added weighted votes, Relation, January officer elections, recovery mandates, and manager-dismissal outcomes.
 - **Dashboard Integration**: Added the Board module, meeting room, member portraits, meeting history, mandate status, and next-meeting date.
 - **Career Arc Unlocks**: Completed arcs now award new venues, featured-match campaigns, promo formats, and event-intro presentations.
+- **Faction Rivalries and Backstage Chemistry**: Wrestlers and managers can form factions; promo callouts, interference, and betrayals build rivalry heat and crowd response. Shared segment bookings change chemistry, which influences match ratings and tracked-role happiness.
 
 ### Phase 11 (2026-08-03)
 

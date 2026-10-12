@@ -657,6 +657,188 @@ function ManageTeamsSubsection({ employees, teams, createTeam, updateTeam, delet
   )
 }
 
+function FactionsSubsection({
+  employees,
+  factions,
+  factionRivalries,
+  backstageChemistry,
+  createFaction,
+  updateFaction,
+  deleteFaction,
+}) {
+  const { t } = useTranslation()
+  const [editingFactionId, setEditingFactionId] = useState(null)
+  const [name, setName] = useState('')
+  const [memberIds, setMemberIds] = useState([])
+  const [formError, setFormError] = useState('')
+  const eligibleMembers = employees.filter((employee) => ['wrestler', 'manager'].includes(employee.role))
+  const employeesById = new Map(employees.map((employee) => [employee.employeeId, employee]))
+
+  const resetForm = () => {
+    setEditingFactionId(null)
+    setName('')
+    setMemberIds([])
+    setFormError('')
+  }
+
+  const toggleMember = (employeeId) => {
+    setMemberIds((current) => (
+      current.includes(employeeId)
+        ? current.filter((id) => id !== employeeId)
+        : [...current, employeeId]
+    ))
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    const result = editingFactionId
+      ? updateFaction(editingFactionId, { name, memberIds })
+      : createFaction({ name, memberIds })
+
+    if (result?.ok) {
+      resetForm()
+    } else {
+      setFormError(result?.reason || 'unknown')
+    }
+  }
+
+  const startEditing = (faction) => {
+    setEditingFactionId(faction.factionId)
+    setName(faction.name)
+    setMemberIds([...faction.memberIds])
+    setFormError('')
+  }
+
+  const chemistryRows = Object.entries(backstageChemistry || {})
+    .filter(([, value]) => Number(value) !== 0)
+    .sort((left, right) => Math.abs(Number(right[1])) - Math.abs(Number(left[1])))
+    .slice(0, 12)
+
+  return (
+    <section className={styles.factionsSection}>
+      <header className={styles.factionsHeader}>
+        <div>
+          <h3>{t('dashboard.factions.title')}</h3>
+          <p>{t('dashboard.factions.description')}</p>
+        </div>
+        {!editingFactionId && (
+          <button
+            type="button"
+            className={styles.createTeamButton}
+            onClick={() => {
+              setEditingFactionId('new')
+              setFormError('')
+            }}
+          >
+            {t('dashboard.factions.create')}
+          </button>
+        )}
+      </header>
+
+      {editingFactionId && (
+        <form className={styles.factionForm} onSubmit={handleSubmit}>
+          <label className={styles.factionNameField}>
+            <span>{t('dashboard.factions.name')}</span>
+            <input value={name} onChange={(event) => setName(event.target.value)} />
+          </label>
+          <p className={styles.factionFormHint}>{t('dashboard.factions.memberHint')}</p>
+          <div className={styles.factionMemberChoices}>
+            {eligibleMembers.map((employee) => {
+              const assignedElsewhere = factions.some((faction) => (
+                faction.factionId !== editingFactionId && faction.memberIds.includes(employee.employeeId)
+              ))
+              return (
+                <label key={employee.employeeId} className={styles.factionMemberChoice}>
+                  <input
+                    type="checkbox"
+                    checked={memberIds.includes(employee.employeeId)}
+                    disabled={assignedElsewhere}
+                    onChange={() => toggleMember(employee.employeeId)}
+                  />
+                  <span>{employee.name}</span>
+                  <small>{t(`dashboard.employees.roleOptions.${employee.role}`)}</small>
+                </label>
+              )
+            })}
+          </div>
+          {formError && <p className={styles.factionFormError}>{t(`dashboard.factions.errors.${formError}`)}</p>}
+          <div className={styles.factionActions}>
+            <button type="submit" className={styles.teamSaveButton}>{t('dashboard.factions.save')}</button>
+            <button type="button" className={styles.teamCancelButton} onClick={resetForm}>
+              {t('dashboard.teams.cancel')}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {factions.length === 0 ? (
+        <p className={styles.teamsEmpty}>{t('dashboard.factions.empty')}</p>
+      ) : (
+        <div className={styles.factionList}>
+          {factions.map((faction) => (
+            <article key={faction.factionId} className={styles.factionCard}>
+              <div className={styles.factionCardHeader}>
+                <div>
+                  <h4>{faction.name}</h4>
+                  <p>
+                    {faction.memberIds
+                      .map((id) => employeesById.get(id)?.name)
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </p>
+                </div>
+                <div className={styles.factionActions}>
+                  <button type="button" className={styles.teamEditButton} onClick={() => startEditing(faction)}>
+                    {t('dashboard.factions.edit')}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.teamDeleteButton}
+                    onClick={() => deleteFaction(faction.factionId)}
+                  >
+                    {t('dashboard.factions.delete')}
+                  </button>
+                </div>
+              </div>
+              {factionRivalries
+                .filter((rivalry) => rivalry.factionIds?.includes(faction.factionId))
+                .map((rivalry) => (
+                  <p key={rivalry.pairKey} className={styles.factionHeat}>
+                    {rivalry.factionNames.join(' vs ')} · {t('dashboard.factions.heat', { heat: rivalry.heat })}
+                  </p>
+                ))}
+            </article>
+          ))}
+        </div>
+      )}
+
+      <section className={styles.chemistryPanel}>
+        <h4>{t('dashboard.factions.chemistryTitle')}</h4>
+        <p>{t('dashboard.factions.chemistryDescription')}</p>
+        {chemistryRows.length === 0 ? (
+          <p className={styles.teamsEmpty}>{t('dashboard.factions.chemistryEmpty')}</p>
+        ) : (
+          <ul>
+            {chemistryRows.map(([pairKey, value]) => {
+              const [leftId, rightId] = pairKey.split('::')
+              const leftName = employeesById.get(leftId)?.name || leftId
+              const rightName = employeesById.get(rightId)?.name || rightId
+              return (
+                <li key={pairKey}>
+                  <span>{leftName} · {rightName}</span>
+                  <strong className={Number(value) >= 0 ? styles.chemistryPositive : styles.chemistryNegative}>
+                    {Number(value) > 0 ? '+' : ''}{value}
+                  </strong>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </section>
+    </section>
+  )
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 
 function ManageEmployeesModule() {
@@ -664,6 +846,9 @@ function ManageEmployeesModule() {
   const employees = useGameStore((state) => state.roster.employees)
   const titles = useGameStore((state) => state.roster.titles)
   const teams = useGameStore((state) => state.roster.teams)
+  const factions = useGameStore((state) => state.roster.factions || [])
+  const backstageChemistry = useGameStore((state) => state.roster.backstageChemistry || {})
+  const factionRivalries = useGameStore((state) => state.events.factionRivalries || [])
   const cash = useGameStore((state) => state.finances.cash)
   const day = useGameStore((state) => state.calendar.day)
   const startDateIso = useGameStore((state) => state.calendar.startDateIso)
@@ -674,6 +859,9 @@ function ManageEmployeesModule() {
   const createTeam = useGameStore((state) => state.createTeam)
   const updateTeam = useGameStore((state) => state.updateTeam)
   const deleteTeam = useGameStore((state) => state.deleteTeam)
+  const createFaction = useGameStore((state) => state.createFaction)
+  const updateFaction = useGameStore((state) => state.updateFaction)
+  const deleteFaction = useGameStore((state) => state.deleteFaction)
   const [activeTab, setActiveTab] = useState('employees')
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null)
   const [managerSelectionEmployeeId, setManagerSelectionEmployeeId] = useState(null)
@@ -852,6 +1040,13 @@ function ManageEmployeesModule() {
         >
           {t('dashboard.employees.tabTeams')}
         </button>
+        <button
+          type="button"
+          className={`${styles.tabButton} ${activeTab === 'factions' ? styles.tabButtonActive : ''}`}
+          onClick={() => setActiveTab('factions')}
+        >
+          {t('dashboard.factions.tab')}
+        </button>
       </div>
 
       {activeTab === 'teams' && (
@@ -861,6 +1056,17 @@ function ManageEmployeesModule() {
           createTeam={createTeam}
           updateTeam={updateTeam}
           deleteTeam={deleteTeam}
+        />
+      )}
+      {activeTab === 'factions' && (
+        <FactionsSubsection
+          employees={employees}
+          factions={factions}
+          factionRivalries={factionRivalries}
+          backstageChemistry={backstageChemistry}
+          createFaction={createFaction}
+          updateFaction={updateFaction}
+          deleteFaction={deleteFaction}
         />
       )}
 

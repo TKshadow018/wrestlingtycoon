@@ -187,6 +187,13 @@ function SegmentCard({ segment, index, visible, t }) {
         {isMatch && segment.matchType === 'tagTeam' && (
           <span className={styles.segSubtype}>Tag Team</span>
         )}
+        {isMatch && Number(segment.chemistryRatingAdjustment) !== 0 && (
+          <span className={styles.segSubtype}>
+            {t('dashboard.eventResults.backstageChemistry', 'Backstage chemistry {{value}}', {
+              value: formatSignedValue(segment.chemistryRatingAdjustment),
+            })}
+          </span>
+        )}
         {isMatch && segment.winnerName && (
           <span className={styles.winnerLabel}>
             Winner: <strong>{segment.winnerName}</strong>
@@ -273,6 +280,7 @@ function EventResultsScreen({ outcome, onContinue }) {
     prestigeDelta,
     segments = [],
     rivalryHighlights = [],
+    factionStories = [],
     audienceSegments = [],
     boardAttendance = null,
     postmortem,
@@ -393,7 +401,7 @@ function EventResultsScreen({ outcome, onContinue }) {
 
         <div className={`${styles.divider} ${visible ? styles.animate3 : ''}`} />
 
-        {(postmortem || rivalryHighlights.length > 0 || competitorPressure) && (
+        {(postmortem || rivalryHighlights.length > 0 || factionStories.length > 0 || competitorPressure) && (
           <section className={`${styles.postmortemSection} ${visible ? styles.animate4 : ''}`}>
             <p className={styles.sectionLabel}>{t('dashboard.eventResults.postmortemTitle', 'Why This Happened')}</p>
 
@@ -461,6 +469,31 @@ function EventResultsScreen({ outcome, onContinue }) {
                         {t('dashboard.eventResults.rivalryGain', 'Heat +{{gain}}', { gain: item.gain })}
                         {' · '}
                         {t('dashboard.eventResults.rivalryTotal', 'Total {{heat}}', { heat: item.heat })}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            )}
+
+            {factionStories.length > 0 && (
+              <article className={styles.rivalryCard}>
+                <h3>{t('dashboard.eventResults.factionStoriesTitle')}</h3>
+                <ul className={styles.rivalryList}>
+                  {factionStories.map((story, index) => (
+                    <li
+                      key={`${story.sourceFactionId}-${story.targetFactionId}-${story.action}-${index}`}
+                      className={styles.rivalryItem}
+                    >
+                      <span className={styles.rivalryNames}>
+                        {t(`dashboard.eventResults.factionStory${story.action.charAt(0).toUpperCase()}${story.action.slice(1)}`, {
+                          defaultValue: t('dashboard.eventResults.factionStoryUnknown'),
+                          source: story.sourceFactionName,
+                          target: story.targetFactionName,
+                          member: story.betrayedEmployeeName || '',
+                          heat: story.heatGain,
+                          fans: story.fanImpact,
+                        })}
                       </span>
                     </li>
                   ))}

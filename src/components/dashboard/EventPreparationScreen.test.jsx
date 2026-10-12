@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import '../../i18n'
 import EventCustomIntroScreen from './EventCustomIntroScreen'
+import EventResultsScreen from './EventResultsScreen'
 import EventPreparationScreen from './EventPreparationScreen'
 import {
   applyCareerArcUnlocks,
@@ -46,5 +47,43 @@ describe('career arc event-preparation unlocks', () => {
 
     expect(html).toContain('data-presentation="championship"')
     expect(html).toMatch(/presentationChampionship/)
+  })
+
+  it('shows the faction promo beat and betrayal in event results', () => {
+    const html = renderToStaticMarkup(createElement(EventResultsScreen, {
+      outcome: {
+        eventName: 'Season Finale',
+        eventType: 'ppv',
+        hype: 80,
+        overallRating: 8,
+        income: 10000,
+        expenses: 5000,
+        fanDelta: 25,
+        prestigeDelta: 2,
+        segments: [],
+        factionStories: [
+          {
+            action: 'factionPromo',
+            sourceFactionName: 'The Aces',
+            targetFactionName: 'Blaze Club',
+            heatGain: 5,
+            fanImpact: 8,
+          },
+          {
+            action: 'betrayal',
+            sourceFactionName: 'The Aces',
+            targetFactionName: 'Blaze Club',
+            betrayedEmployeeName: 'Coach',
+            heatGain: 15,
+            fanImpact: 15,
+          },
+        ],
+      },
+      onContinue: () => {},
+    }))
+
+    expect(html).toContain('Faction Storylines')
+    expect(html).toContain('The Aces called out Blaze Club')
+    expect(html).toContain('Coach betrayed The Aces for Blaze Club')
   })
 })

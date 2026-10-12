@@ -54,6 +54,155 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.factionsSection {
+  display: grid;
+  gap: 1rem;
+}
+
+.factionsHeader,
+.factionCardHeader {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+
+  h3,
+  h4,
+  p {
+    margin: 0;
+  }
+
+  p {
+    color: var(--text-faint);
+    font-size: 0.83rem;
+    margin-top: 0.25rem;
+  }
+}
+
+.factionForm,
+.factionCard,
+.chemistryPanel {
+  background: rgba(8, 13, 20, 0.72);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.85rem;
+}
+
+.factionNameField {
+  display: grid;
+  gap: 0.35rem;
+
+  span {
+    color: var(--text-faint);
+    font-size: 0.76rem;
+    text-transform: uppercase;
+  }
+
+  input {
+    background: rgba(5, 9, 14, 0.8);
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    color: var(--text-main);
+    padding: 0.6rem 0.7rem;
+  }
+}
+
+.factionFormHint,
+.chemistryPanel > p {
+  color: var(--text-faint);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.factionMemberChoices {
+  display: grid;
+  gap: 0.4rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.factionMemberChoice {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--line-soft);
+  border-radius: 7px;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.55rem;
+
+  span {
+    color: var(--text-main);
+    flex: 1;
+  }
+
+  small {
+    color: var(--text-faint);
+  }
+}
+
+.factionMemberChoice:has(input:disabled) {
+  opacity: 0.48;
+}
+
+.factionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+
+  button {
+    width: auto;
+  }
+}
+
+.factionFormError {
+  color: #ff9b9b;
+  margin: 0;
+}
+
+.factionList {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.factionHeat {
+  color: #ffc58b;
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.chemistryPanel h4 {
+  margin: 0;
+}
+
+.chemistryPanel ul {
+  display: grid;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chemistryPanel li {
+  align-items: center;
+  border-top: 1px solid var(--line-soft);
+  color: var(--text-muted);
+  display: flex;
+  font-size: 0.82rem;
+  justify-content: space-between;
+  padding-top: 0.35rem;
+}
+
+.chemistryPositive {
+  color: #94d5a2;
+}
+
+.chemistryNegative {
+  color: #ff9b9b;
+}
+
 .employeeCard {
   background: rgba(8, 13, 20, 0.8);
   border: 1px solid var(--line-soft);
@@ -796,6 +945,7 @@
 .tabBar {
   border-bottom: 2px solid var(--border-default);
   display: flex;
+  flex-wrap: wrap;
   gap: 0.25rem;
   margin-bottom: 0.75rem;
 }

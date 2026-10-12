@@ -25,6 +25,10 @@ const buildInitialSegment = (index) => ({
   id: `segment-${index + 1}`,
   segmentType: 'match',
   promoSegmentId: DEFAULT_CAREER_ARC_UNLOCKS.promoSegments[0],
+  storyBeat: null,
+  sourceFactionId: null,
+  targetFactionId: null,
+  betrayerId: null,
   matchType: 'singles',
   matchStipulation: 'singles',
   wrestlerIds: [],
@@ -120,6 +124,12 @@ const normalizeSegmentsForSubmit = (segments) => {
     segmentType: segment.segmentType,
     promoSegmentId: segment.segmentType === 'promo'
       ? segment.promoSegmentId || DEFAULT_CAREER_ARC_UNLOCKS.promoSegments[0]
+      : null,
+    storyBeat: segment.segmentType === 'promo' ? segment.storyBeat || null : null,
+    sourceFactionId: segment.segmentType === 'promo' ? segment.sourceFactionId || null : null,
+    targetFactionId: segment.segmentType === 'promo' ? segment.targetFactionId || null : null,
+    betrayerId: segment.segmentType === 'promo' && segment.storyBeat === 'betrayal'
+      ? segment.betrayerId || null
       : null,
     matchType: MATCH_SEGMENT_TYPES.has(segment.segmentType)
       ? (segment.matchType === 'tagTeam' ? 'tagTeam' : 'singles')
@@ -400,6 +410,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
   const { t } = useTranslation()
   const titles = useGameStore((state) => state.roster.titles)
   const teams = useGameStore((state) => state.roster.teams)
+  const factions = useGameStore((state) => state.roster.factions || [])
   const eventLog = useGameStore((state) => state.events.eventLog)
   const startDateIso = useGameStore((state) => state.calendar.startDateIso)
   const progressionUnlocks = useGameStore((state) => state.progression.unlocks)
@@ -799,6 +810,10 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
       promoSegmentId: value === 'promo'
         ? segment.promoSegmentId || DEFAULT_CAREER_ARC_UNLOCKS.promoSegments[0]
         : null,
+      storyBeat: value === 'promo' ? segment.storyBeat || null : null,
+      sourceFactionId: value === 'promo' ? segment.sourceFactionId || null : null,
+      targetFactionId: value === 'promo' ? segment.targetFactionId || null : null,
+      betrayerId: value === 'promo' && segment.storyBeat === 'betrayal' ? segment.betrayerId || null : null,
       matchType: nextMatchType,
       matchStipulation: MATCH_SEGMENT_TYPES.has(value)
         ? (segment.matchStipulation || DEFAULT_MATCH_STIPULATION)
@@ -1549,6 +1564,82 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                     </option>
                   ))}
                 </select>
+              </div>
+            )}
+
+            {segment.segmentType === 'promo' && factions.length >= 2 && (
+              <div className={styles.promoStorySetup}>
+                <label className={styles.poolFilterField}>
+                  <span>{t('dashboard.events.setup.factionStoryBeat')}</span>
+                  <select
+                    value={segment.storyBeat || ''}
+                    onChange={(event) => patchSegment({
+                      storyBeat: event.target.value || null,
+                      sourceFactionId: null,
+                      targetFactionId: null,
+                      betrayerId: null,
+                    })}
+                  >
+                    <option value="">{t('dashboard.events.setup.factionStoryNone')}</option>
+                    <option value="factionPromo">{t('dashboard.events.setup.factionStoryPromo')}</option>
+                    <option value="interference">{t('dashboard.events.setup.factionStoryInterference')}</option>
+                    <option value="betrayal">{t('dashboard.events.setup.factionStoryBetrayal')}</option>
+                  </select>
+                </label>
+
+                {segment.storyBeat && (
+                  <>
+                    <label className={styles.poolFilterField}>
+                      <span>{t('dashboard.events.setup.factionStorySource')}</span>
+                      <select
+                        value={segment.sourceFactionId || ''}
+                        onChange={(event) => patchSegment({
+                          sourceFactionId: event.target.value || null,
+                          targetFactionId: null,
+                          betrayerId: null,
+                        })}
+                      >
+                        <option value="">{t('dashboard.events.setup.factionStorySelect')}</option>
+                        {factions.map((faction) => (
+                          <option key={faction.factionId} value={faction.factionId}>{faction.name}</option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className={styles.poolFilterField}>
+                      <span>{t('dashboard.events.setup.factionStoryTarget')}</span>
+                      <select
+                        value={segment.targetFactionId || ''}
+                        onChange={(event) => patchSegment({ targetFactionId: event.target.value || null })}
+                      >
+                        <option value="">{t('dashboard.events.setup.factionStorySelect')}</option>
+                        {factions
+                          .filter((faction) => faction.factionId !== segment.sourceFactionId)
+                          .map((faction) => (
+                            <option key={faction.factionId} value={faction.factionId}>{faction.name}</option>
+                          ))}
+                      </select>
+                    </label>
+                  </>
+                )}
+
+                {segment.storyBeat === 'betrayal' && (
+                  <label className={styles.poolFilterField}>
+                    <span>{t('dashboard.events.setup.factionStoryBetrayer')}</span>
+                    <select
+                      value={segment.betrayerId || ''}
+                      onChange={(event) => patchSegment({ betrayerId: event.target.value || null })}
+                    >
+                      <option value="">{t('dashboard.events.setup.factionStorySelect')}</option>
+                      {(factions.find((faction) => faction.factionId === segment.sourceFactionId)?.memberIds || [])
+                        .map((employeeId) => (
+                          <option key={employeeId} value={employeeId}>
+                            {allEmployees.find((employee) => employee.employeeId === employeeId)?.name || employeeId}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                )}
               </div>
             )}
 
