@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import venueCatalog from '../../data/venue.json'
+import {
+  DEFAULT_CAREER_ARC_UNLOCKS,
+  getUnlockedCareerArcItems,
+} from '../../data/careerArcUnlocks'
 import styles from './EventPreparationScreen.module.scss'
 
 const FEMALE_FALLBACK = '/people/girl.png'
@@ -45,13 +48,28 @@ function EventPreparationScreen({
   sponsors,
   ticketFees,
   eventPreparation,
+  unlocks,
   onSave,
   onCancel,
 }) {
   const { t } = useTranslation()
   const eventType = event?.type || 'ppv'
+  const unlockedVenues = getUnlockedCareerArcItems('venues', unlocks)
+  const unlockedPromoStyles = getUnlockedCareerArcItems('promoStyles', unlocks)
+  const unlockedPresentations = getUnlockedCareerArcItems('presentations', unlocks)
+  const initialVenueId = unlockedVenues.some((venue) => venue.id === eventPreparation?.venueId)
+    ? eventPreparation.venueId
+    : ''
+  const initialPromoStyleId = unlockedPromoStyles.some((style) => style.id === eventPreparation?.promoStyleId)
+    ? eventPreparation.promoStyleId
+    : DEFAULT_CAREER_ARC_UNLOCKS.promoStyles[0]
+  const initialPresentationId = unlockedPresentations.some((presentation) => presentation.id === eventPreparation?.presentationId)
+    ? eventPreparation.presentationId
+    : DEFAULT_CAREER_ARC_UNLOCKS.presentations[0]
 
-  const [selectedVenueId, setSelectedVenueId] = useState(eventPreparation?.venueId || '')
+  const [selectedVenueId, setSelectedVenueId] = useState(initialVenueId)
+  const [selectedPromoStyleId, setSelectedPromoStyleId] = useState(initialPromoStyleId)
+  const [selectedPresentationId, setSelectedPresentationId] = useState(initialPresentationId)
   const [promotedWrestlerIds, setPromotedWrestlerIds] = useState(
     Array.isArray(eventPreparation?.promotedWrestlerIds) ? eventPreparation.promotedWrestlerIds : [],
   )
@@ -76,14 +94,15 @@ function EventPreparationScreen({
   )
   const top5Ids = new Set(sortedWrestlers.slice(0, 5).map((e) => e.employeeId))
 
-  const filteredVenues = venueCatalog.filter(
+  const filteredVenues = unlockedVenues.filter(
     (v) =>
       !venueSearch ||
       v.name.toLowerCase().includes(venueSearch.toLowerCase()) ||
       v.location.toLowerCase().includes(venueSearch.toLowerCase()),
   )
 
-  const selectedVenue = venueCatalog.find((v) => v.id === selectedVenueId)
+  const selectedVenue = unlockedVenues.find((v) => v.id === selectedVenueId)
+  const selectedPromoStyle = unlockedPromoStyles.find((style) => style.id === selectedPromoStyleId)
 
   const toggleWrestler = (id) => {
     setPromotedWrestlerIds((prev) => {
@@ -107,6 +126,8 @@ function EventPreparationScreen({
     onSave({
       venueId: selectedVenueId || null,
       promotedWrestlerIds,
+      promoStyleId: selectedPromoStyleId,
+      presentationId: selectedPresentationId,
       ticketPrice: Math.round(parsedTicket),
     })
   }
@@ -219,6 +240,26 @@ function EventPreparationScreen({
               {ticketError && <p className={styles.ticketError}>{ticketError}</p>}
             </section>
 
+            <section className={styles.card}>
+              <div className={styles.cardHeader}>
+                <h2 className={styles.cardTitle}>{t('dashboard.eventPreparation.presentationTitle')}</h2>
+                <p className={styles.cardHint}>{t('dashboard.eventPreparation.presentationHint')}</p>
+              </div>
+              <label className={styles.unlockChoice}>
+                <span>{t('dashboard.eventPreparation.presentationTitle')}</span>
+                <select
+                  value={selectedPresentationId}
+                  onChange={(event) => setSelectedPresentationId(event.target.value)}
+                >
+                  {unlockedPresentations.map((presentation) => (
+                    <option key={presentation.id} value={presentation.id}>
+                      {t(presentation.labelKey)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </section>
+
             {/* Sponsors */}
             {activeSponsors.length > 0 && (
               <section className={styles.card}>
@@ -253,6 +294,25 @@ function EventPreparationScreen({
                 <h2 className={styles.cardTitle}>{t('dashboard.eventPreparation.promoTitle')}</h2>
                 <p className={styles.cardHint}>{t('dashboard.eventPreparation.promoHint')}</p>
               </div>
+
+              <label className={styles.unlockChoice}>
+                <span>{t('dashboard.eventPreparation.promoStyleTitle')}</span>
+                <select
+                  value={selectedPromoStyleId}
+                  onChange={(event) => setSelectedPromoStyleId(event.target.value)}
+                >
+                  {unlockedPromoStyles.map((style) => (
+                    <option key={style.id} value={style.id}>
+                      {t(style.labelKey)}
+                    </option>
+                  ))}
+                </select>
+                <small>
+                  {t('dashboard.eventPreparation.promoStyleBonus', {
+                    bonus: Number(selectedPromoStyle?.matchRatingBonus || 0).toFixed(1),
+                  })}
+                </small>
+              </label>
 
               {wrestlers.length === 0 ? (
                 <p className={styles.emptyNote}>{t('dashboard.eventPreparation.promoNoWrestlers')}</p>
@@ -339,4 +399,3 @@ function EventPreparationScreen({
 }
 
 export default EventPreparationScreen
-

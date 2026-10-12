@@ -2,6 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
 import matchTypeCatalog from '../../../data/matchTypes.json'
+import {
+  DEFAULT_CAREER_ARC_UNLOCKS,
+  getUnlockedCareerArcItems,
+} from '../../../data/careerArcUnlocks'
 import { calculateRanking } from '../../../utils/wrestlerRank'
 import styles from './EventSetupModal.module.scss'
 
@@ -20,6 +24,7 @@ const getSegmentConfig = (segmentType) =>
 const buildInitialSegment = (index) => ({
   id: `segment-${index + 1}`,
   segmentType: 'match',
+  promoSegmentId: DEFAULT_CAREER_ARC_UNLOCKS.promoSegments[0],
   matchType: 'singles',
   matchStipulation: 'singles',
   wrestlerIds: [],
@@ -113,6 +118,9 @@ const getSegmentWrestlerIds = (segment) => {
 const normalizeSegmentsForSubmit = (segments) => {
   return segments.map((segment) => ({
     segmentType: segment.segmentType,
+    promoSegmentId: segment.segmentType === 'promo'
+      ? segment.promoSegmentId || DEFAULT_CAREER_ARC_UNLOCKS.promoSegments[0]
+      : null,
     matchType: MATCH_SEGMENT_TYPES.has(segment.segmentType)
       ? (segment.matchType === 'tagTeam' ? 'tagTeam' : 'singles')
       : null,
@@ -394,6 +402,8 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
   const teams = useGameStore((state) => state.roster.teams)
   const eventLog = useGameStore((state) => state.events.eventLog)
   const startDateIso = useGameStore((state) => state.calendar.startDateIso)
+  const progressionUnlocks = useGameStore((state) => state.progression.unlocks)
+  const unlockedPromoSegments = getUnlockedCareerArcItems('promoSegments', progressionUnlocks)
   const totalSegments = Math.max(1, Number(eventConfig?.totalSegments) || 1)
 
   const [segments, setSegments] = useState(() => buildInitialSegments(totalSegments))
@@ -403,6 +413,18 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
   const [executionIndex, setExecutionIndex] = useState(0)
   const [executionResults, setExecutionResults] = useState({})
   const [showExecutionTransition, setShowExecutionTransition] = useState(false)
+  const [executionMode, setExecutionMode] = useState('simulate')
+  const [pendingExecutionMode, setPendingExecutionMode] = useState(null)
+  const [executionChoice, setExecutionChoice] = useState({
+    finishType: 'pin',
+    riskLevel: 'balanced',
+    winnerEmployeeId: null,
+    winnerTeam: 'team1',
+  })
+  const [showExecutionChoicePanel, setShowExecutionChoicePanel] = useState(false)
+  const [playSequence, setPlaySequence] = useState([])
+  const [playSequenceIndex, setPlaySequenceIndex] = useState(0)
+  const [playSequenceActive, setPlaySequenceActive] = useState(false)
   const [error, setError] = useState('')
   const [participantGenderFilter, setParticipantGenderFilter] = useState('all')
   const [participantSearch, setParticipantSearch] = useState('')
@@ -418,6 +440,18 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
     setExecutionIndex(0)
     setExecutionResults({})
     setShowExecutionTransition(false)
+    setExecutionMode('simulate')
+    setPendingExecutionMode(null)
+    setExecutionChoice({
+      finishType: 'pin',
+      riskLevel: 'balanced',
+      winnerEmployeeId: null,
+      winnerTeam: 'team1',
+    })
+    setShowExecutionChoicePanel(false)
+    setPlaySequence([])
+    setPlaySequenceIndex(0)
+    setPlaySequenceActive(false)
     setError('')
     setSelectedParticipantHistoryId(null)
     setHistoryOpen(false)
@@ -762,6 +796,9 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
 
     patchSegment({
       segmentType: value,
+      promoSegmentId: value === 'promo'
+        ? segment.promoSegmentId || DEFAULT_CAREER_ARC_UNLOCKS.promoSegments[0]
+        : null,
       matchType: nextMatchType,
       matchStipulation: MATCH_SEGMENT_TYPES.has(value)
         ? (segment.matchStipulation || DEFAULT_MATCH_STIPULATION)
@@ -969,6 +1006,18 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
     setExecutionIndex(0)
     setExecutionResults({})
     setShowExecutionTransition(false)
+    setExecutionMode('simulate')
+    setPendingExecutionMode(null)
+    setExecutionChoice({
+      finishType: 'pin',
+      riskLevel: 'balanced',
+      winnerEmployeeId: null,
+      winnerTeam: 'team1',
+    })
+    setShowExecutionChoicePanel(false)
+    setPlaySequence([])
+    setPlaySequenceIndex(0)
+    setPlaySequenceActive(false)
     setPhase('execution')
     setError('')
   }
@@ -1005,24 +1054,181 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
     return t('dashboard.events.setup.execution.transitionFallback', 'Segment Participants')
   }, [executionSegment, executionWrestlers, formatTagSideLabel, t])
 
+  const getExecutionChoiceNarrative = () => {
+    if (!executionSegment) {
+      return []
+    }
+
+    const winnerLabel = executionSegment.matchType === 'tagTeam'
+      ? (executionChoice.winnerTeam === 'team2' ? t('dashboard.events.setup.execution.team2', 'Team 2') : t('dashboard.events.setup.execution.team1', 'Team 1'))
+      : (executionWrestlers.find((employee) => employee.employeeId === executionChoice.winnerEmployeeId)?.name || executionWrestlers[0]?.name || 'The competitor')
+
+    const finishLabel = executionChoice.finishType === 'submission'
+      ? t('dashboard.events.setup.execution.finishes.submission', 'submission')
+      : executionChoice.finishType === 'countout'
+        ? t('dashboard.events.setup.execution.finishes.countout', 'count-out')
+        : executionChoice.finishType === 'dq'
+          ? t('dashboard.events.setup.execution.finishes.dq', 'disqualification')
+          : t('dashboard.events.setup.execution.finishes.pin', 'pinfall')
+
+    const riskLabel = executionChoice.riskLevel === 'risky'
+      ? t('dashboard.events.setup.execution.risks.risky', 'risky')
+      : executionChoice.riskLevel === 'chaotic'
+        ? t('dashboard.events.setup.execution.risks.chaotic', 'chaotic')
+        : t('dashboard.events.setup.execution.risks.balanced', 'balanced')
+
+    return [
+      t('dashboard.events.setup.execution.playNarrativeLine1', '{{winner}} is pushing the pace with a {{finish}} finish.', { winner: winnerLabel, finish: finishLabel }),
+      t('dashboard.events.setup.execution.playNarrativeLine2', 'The crowd is reacting to the {{risk}} tempo and the danger level is rising.', { risk: riskLabel }),
+    ]
+  }
+
+  const getMomentumState = (choice, sequenceLength = 4, beatIndex = 0) => {
+    const base = choice?.riskLevel === 'chaotic' ? 74 : choice?.riskLevel === 'risky' ? 62 : 48
+    const finishBoost = choice?.finishType === 'submission' ? 8 : choice?.finishType === 'countout' ? 5 : choice?.finishType === 'dq' ? 6 : 2
+    const beatBoost = Math.min(16, beatIndex * 4 + sequenceLength * 3)
+    const momentum = Math.min(100, base + finishBoost + beatBoost)
+    const label = momentum >= 80
+      ? t('dashboard.events.setup.execution.momentumHot', 'Crowd is on fire')
+      : momentum >= 60
+        ? t('dashboard.events.setup.execution.momentumBuilding', 'Momentum is building')
+        : t('dashboard.events.setup.execution.momentumSteady', 'The pace is steady')
+    const color = momentum >= 80 ? '#ff8a00' : momentum >= 60 ? '#ffd166' : '#4ecdc4'
+
+    return { momentum, label, color }
+  }
+
+  const buildPlaySequence = () => {
+    if (!executionSegment) {
+      return []
+    }
+
+    const winnerLabel = executionSegment.matchType === 'tagTeam'
+      ? (executionChoice.winnerTeam === 'team2' ? t('dashboard.events.setup.execution.team2', 'Team 2') : t('dashboard.events.setup.execution.team1', 'Team 1'))
+      : (executionWrestlers.find((employee) => employee.employeeId === executionChoice.winnerEmployeeId)?.name || executionWrestlers[0]?.name || 'The competitor')
+
+    const finishLabel = executionChoice.finishType === 'submission'
+      ? t('dashboard.events.setup.execution.finishes.submission', 'submission')
+      : executionChoice.finishType === 'countout'
+        ? t('dashboard.events.setup.execution.finishes.countout', 'count-out')
+        : executionChoice.finishType === 'dq'
+          ? t('dashboard.events.setup.execution.finishes.dq', 'disqualification')
+          : t('dashboard.events.setup.execution.finishes.pin', 'pinfall')
+
+    const riskLabel = executionChoice.riskLevel === 'risky'
+      ? t('dashboard.events.setup.execution.risks.risky', 'risky')
+      : executionChoice.riskLevel === 'chaotic'
+        ? t('dashboard.events.setup.execution.risks.chaotic', 'chaotic')
+        : t('dashboard.events.setup.execution.risks.balanced', 'balanced')
+
+    const sequenceLength = 4
+    const baseBeats = Array.from({ length: sequenceLength }, (_, index) => {
+      const momentumState = getMomentumState(executionChoice, sequenceLength, index)
+      const isFinalBeat = index === sequenceLength - 1
+      const title = index === 0
+        ? t('dashboard.events.setup.execution.playBeatOpening', 'The bell rings')
+        : index === 1
+          ? t('dashboard.events.setup.execution.playBeatMomentum', 'Momentum swing')
+          : index === 2
+            ? t('dashboard.events.setup.execution.playBeatNearFall', 'Near fall')
+            : t('dashboard.events.setup.execution.playBeatFinish', 'Finish line')
+      const detail = index === 0
+        ? t('dashboard.events.setup.execution.playBeatOpeningDetail', '{{winner}} starts fast and the crowd is already reacting.', { winner: winnerLabel })
+        : index === 1
+          ? (executionChoice.riskLevel === 'chaotic'
+            ? t('dashboard.events.setup.execution.playBeatMomentumChaotic', 'The pace turns wild and every exchange feels dangerous.')
+            : executionChoice.riskLevel === 'risky'
+              ? t('dashboard.events.setup.execution.playBeatMomentumRisky', 'The pressure rises as the pace gets more aggressive.')
+              : t('dashboard.events.setup.execution.playBeatMomentumBalanced', 'The rhythm stays controlled, but the tension is building.'))
+          : index === 2
+            ? t('dashboard.events.setup.execution.playBeatNearFallDetail', 'A dramatic {{finish}} attempt nearly changes the whole segment.', { finish: finishLabel })
+            : t('dashboard.events.setup.execution.playBeatFinishDetail', '{{winner}} survives the {{risk}} tempo and forces the final moment.', { winner: winnerLabel, risk: riskLabel })
+      const crowdLine = isFinalBeat
+        ? t('dashboard.events.setup.execution.crowdFinal', 'The arena erupts as the final stretch begins.')
+        : t('dashboard.events.setup.execution.crowdBeat', 'The crowd chants louder as the pace rises.')
+
+      return {
+        title,
+        detail,
+        crowdLine,
+        momentum: momentumState.momentum,
+        momentumLabel: momentumState.label,
+      }
+    })
+
+    return baseBeats
+  }
+
   const handlePlaySegmentClick = () => {
     if (!executionSegment) {
       return
     }
 
+    const nextWinnerEmployeeId = executionWrestlers[0]?.employeeId || null
+    setExecutionChoice((current) => ({
+      ...current,
+      winnerEmployeeId: nextWinnerEmployeeId,
+      winnerTeam: current.winnerTeam || 'team1',
+    }))
+    setPendingExecutionMode('play')
+    setShowExecutionTransition(true)
+  }
+
+  const handleSimulateSegmentClick = () => {
+    if (!executionSegment) {
+      return
+    }
+
+    setPendingExecutionMode('simulate')
     setShowExecutionTransition(true)
   }
 
   const confirmExecutionTransition = () => {
     setShowExecutionTransition(false)
-    simulateCurrentSegment()
+
+    if (pendingExecutionMode === 'play') {
+      setExecutionMode('play')
+      setShowExecutionChoicePanel(true)
+      return
+    }
+
+    setExecutionMode('simulate')
+    setShowExecutionChoicePanel(false)
+    setPlaySequence([])
+    setPlaySequenceIndex(0)
+    setPlaySequenceActive(false)
+    simulateCurrentSegment({ mode: 'simulate', choice: executionChoice })
   }
 
-  const simulateCurrentSegment = () => {
+  const resolveExecutionChoice = () => {
+    setShowExecutionChoicePanel(false)
+    const sequence = buildPlaySequence()
+    setPlaySequence(sequence)
+    setPlaySequenceIndex(0)
+    setPlaySequenceActive(sequence.length > 0)
+  }
+
+  const advancePlaySequence = () => {
+    if (!playSequence.length) {
+      return
+    }
+
+    if (playSequenceIndex < playSequence.length - 1) {
+      setPlaySequenceIndex((index) => index + 1)
+      return
+    }
+
+    setPlaySequenceActive(false)
+    simulateCurrentSegment({ mode: 'play', choice: executionChoice, playSequence })
+  }
+
+  const simulateCurrentSegment = (options = {}) => {
     if (!executionSegment) {
       return
     }
 
+    const mode = options.mode || executionMode
+    const choice = options.choice || executionChoice
     const isMatchSegment = ['match', 'mainEvent', 'titleMatch'].includes(executionSegment.segmentType)
 
     if (executionSegment.segmentType === 'interview') {
@@ -1057,20 +1263,42 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
     if (isTagTeam && isMatchSegment) {
       const team1 = (executionSegment.team1Ids || []).map(findById).filter(Boolean)
       const team2 = (executionSegment.team2Ids || []).map(findById).filter(Boolean)
-      const winningTeam = Math.random() < 0.5 ? team1 : team2
+      const winningTeam = mode === 'play' && choice.winnerTeam === 'team2'
+        ? team2
+        : team1
       const fallback = team1.length > 0 ? team1 : team2
       const finalTeam = winningTeam.length > 0 ? winningTeam : fallback
       const winnerTeamIds = finalTeam.map((e) => e.employeeId)
       const winnerTeamNames = formatTagSideLabel(winnerTeamIds)
       const wrestlerParticipants = executionWrestlers.filter((employee) => employee.role === 'wrestler')
-      const matchRating = calculatePreviewMatchRating(wrestlerParticipants)
+      const baseMatchRating = calculatePreviewMatchRating(wrestlerParticipants)
+      const finishBonus = choice.finishType === 'submission' ? 0.7 : choice.finishType === 'countout' ? 0.3 : choice.finishType === 'dq' ? 0.4 : 0.2
+      const riskBonus = choice.riskLevel === 'risky' ? 0.5 : choice.riskLevel === 'chaotic' ? 0.8 : 0.1
+      const sequenceBonus = Array.isArray(options.playSequence) ? Math.min(0.9, options.playSequence.length * 0.12) : 0
+      const playBeatCount = Array.isArray(options.playSequence) ? options.playSequence.length : 0
+      const sequenceDrain = playBeatCount > 0 ? playBeatCount * 2 : 0
+      const matchRating = clampMatchRating(baseMatchRating + finishBonus + riskBonus + sequenceBonus)
       const staminaLossById = wrestlerParticipants.reduce((acc, wrestler) => {
-        acc[wrestler.employeeId] = rollStaminaLoss()
+        const baseLoss = rollStaminaLoss()
+        const extraLoss = choice.riskLevel === 'risky' ? 5 : choice.riskLevel === 'chaotic' ? 10 : 0
+        acc[wrestler.employeeId] = Math.min(50, baseLoss + extraLoss + sequenceDrain)
         return acc
       }, {})
       const resultText = winnerTeamNames
         ? t('dashboard.events.setup.execution.resultTagWinner', '{{names}} win the match!', { names: winnerTeamNames })
         : t('dashboard.events.setup.execution.resultNoWinner', 'Segment complete.')
+
+      const momentumState = Array.isArray(options.playSequence) && options.playSequence.length > 0
+        ? options.playSequence[options.playSequence.length - 1]
+        : getMomentumState(choice, 4, 3)
+      const crowdCommentary = Array.isArray(options.playSequence) && options.playSequence.length > 0
+        ? options.playSequence.map((beat) => beat.crowdLine)
+        : buildCrowdFeedback({
+            matchRating,
+            winnerName: winnerTeamNames,
+            wrestlers: wrestlerParticipants,
+            t,
+          })
 
       setExecutionResults((current) => ({
         ...current,
@@ -1086,6 +1314,9 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
             wrestlers: wrestlerParticipants,
             t,
           }),
+          crowdCommentary,
+          momentumScore: momentumState?.momentum ?? null,
+          momentumLabel: momentumState?.momentumLabel ?? '',
           interviewPopularityChanges: [],
           message: resultText,
         },
@@ -1094,14 +1325,25 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
     }
 
     const resultCandidates = executionWrestlers.length > 0 ? executionWrestlers : executionParticipants
-    const winnerCandidate = isMatchSegment
-      ? resultCandidates[Math.floor(Math.random() * resultCandidates.length)]
+    const preferredWinner = mode === 'play' && choice.winnerEmployeeId
+      ? resultCandidates.find((employee) => employee.employeeId === choice.winnerEmployeeId) || null
       : null
+    const winnerCandidate = preferredWinner || (isMatchSegment
+      ? resultCandidates[Math.floor(Math.random() * resultCandidates.length)]
+      : null)
     const wrestlerParticipants = executionWrestlers.filter((employee) => employee.role === 'wrestler')
-    const matchRating = isMatchSegment ? calculatePreviewMatchRating(wrestlerParticipants) : null
+    const baseMatchRating = isMatchSegment ? calculatePreviewMatchRating(wrestlerParticipants) : null
+    const finishBonus = choice.finishType === 'submission' ? 0.7 : choice.finishType === 'countout' ? 0.3 : choice.finishType === 'dq' ? 0.4 : 0.2
+    const riskBonus = choice.riskLevel === 'risky' ? 0.5 : choice.riskLevel === 'chaotic' ? 0.8 : 0.1
+    const sequenceBonus = Array.isArray(options.playSequence) ? Math.min(0.9, options.playSequence.length * 0.12) : 0
+    const playBeatCount = Array.isArray(options.playSequence) ? options.playSequence.length : 0
+    const sequenceDrain = playBeatCount > 0 ? playBeatCount * 2 : 0
+    const matchRating = isMatchSegment ? clampMatchRating(baseMatchRating + finishBonus + riskBonus + sequenceBonus) : null
     const staminaLossById = isMatchSegment
       ? wrestlerParticipants.reduce((acc, wrestler) => {
-        acc[wrestler.employeeId] = rollStaminaLoss()
+        const baseLoss = rollStaminaLoss()
+        const extraLoss = choice.riskLevel === 'risky' ? 5 : choice.riskLevel === 'chaotic' ? 10 : 0
+        acc[wrestler.employeeId] = Math.min(50, baseLoss + extraLoss + sequenceDrain)
         return acc
       }, {})
       : {}
@@ -1109,22 +1351,39 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
       ? t('dashboard.events.setup.execution.resultWinner', '{{name}} stood tall in this segment.', { name: winnerCandidate.name })
       : t('dashboard.events.setup.execution.resultNoWinner', 'Segment complete.')
 
+    const momentumState = Array.isArray(options.playSequence) && options.playSequence.length > 0
+      ? options.playSequence[options.playSequence.length - 1]
+      : getMomentumState(choice, 4, 3)
+    const crowdCommentary = Array.isArray(options.playSequence) && options.playSequence.length > 0
+      ? options.playSequence.map((beat) => beat.crowdLine)
+      : (isMatchSegment
+        ? buildCrowdFeedback({
+            matchRating,
+            winnerName: winnerCandidate?.name || '',
+            wrestlers: wrestlerParticipants,
+            t,
+          })
+        : [])
+
     setExecutionResults((current) => ({
       ...current,
       [executionIndex]: {
         winnerTeamIds: [],
         winnerName: winnerCandidate?.name || '',
         winnerEmployeeId: winnerCandidate?.employeeId || null,
-          matchRating,
-          staminaLossById,
-          crowdFeedback: isMatchSegment
-            ? buildCrowdFeedback({
-                matchRating,
-                winnerName: winnerCandidate?.name || '',
-                wrestlers: wrestlerParticipants,
-                t,
-              })
-            : [],
+        matchRating,
+        staminaLossById,
+        crowdFeedback: isMatchSegment
+          ? buildCrowdFeedback({
+              matchRating,
+              winnerName: winnerCandidate?.name || '',
+              wrestlers: wrestlerParticipants,
+              t,
+            })
+          : [],
+        crowdCommentary,
+        momentumScore: momentumState?.momentum ?? null,
+        momentumLabel: momentumState?.momentumLabel ?? '',
         interviewPopularityChanges: [],
         message: resultText,
       },
@@ -1268,6 +1527,25 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                   {availableMatchStipulations.map((entry) => (
                     <option key={entry.id} value={entry.id}>
                       {entry.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {segment.segmentType === 'promo' && (
+              <div className={styles.matchTypeRow}>
+                <span className={styles.matchTypeLabel}>
+                  {t('dashboard.events.setup.promoSegmentStyle')}
+                </span>
+                <select
+                  className={styles.matchTypeSelect}
+                  value={segment.promoSegmentId || DEFAULT_CAREER_ARC_UNLOCKS.promoSegments[0]}
+                  onChange={(event) => patchSegment({ promoSegmentId: event.target.value })}
+                >
+                  {unlockedPromoSegments.map((promoSegment) => (
+                    <option key={promoSegment.id} value={promoSegment.id}>
+                      {t(promoSegment.labelKey)}
                     </option>
                   ))}
                 </select>
@@ -1636,7 +1914,11 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
 
                             return (
                               <li key={idx} className={styles.historySegmentItem}>
-                                <span className={styles.historySegType}>{seg.segmentType}</span>
+                                <span className={styles.historySegType}>
+                                  {seg.segmentType === 'promo' && seg.promoSegmentId
+                                    ? t(`dashboard.events.setup.promoSegments.${seg.promoSegmentId}`)
+                                    : t(`dashboard.events.setup.segmentTypes.${seg.segmentType}`, seg.segmentType)}
+                                </span>
                                 {isMatch && (
                                   <span className={styles.historySegResult}>
                                     {seg.winnerName
@@ -1768,6 +2050,15 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                   {t('dashboard.events.setup.execution.matchRating', 'Match Rating')}: {Number(executionResults[executionIndex].matchRating).toFixed(1)} / 10
                 </strong>
               </div>
+              {Number.isFinite(Number(executionResults[executionIndex]?.momentumScore)) ? (
+                <div className={styles.executionFeedbackList}>
+                  <p>{t('dashboard.events.setup.execution.momentumResult', 'Momentum')}</p>
+                  <div style={{ background: '#2d2d2d', borderRadius: '999px', overflow: 'hidden', height: '8px' }}>
+                    <div style={{ width: `${Number(executionResults[executionIndex].momentumScore)}%`, height: '100%', background: '#4ecdc4', transition: 'width 0.2s ease' }} />
+                  </div>
+                  <p style={{ color: '#ffd166' }}>{executionResults[executionIndex].momentumLabel}</p>
+                </div>
+              ) : null}
               {(executionResults[executionIndex]?.crowdFeedback || []).length > 0 ? (
                 <div className={styles.executionFeedbackList}>
                   <p>{t('dashboard.events.setup.execution.peopleFeedback', 'People Feedback')}</p>
@@ -1778,6 +2069,124 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                   </ul>
                 </div>
               ) : null}
+              {(executionResults[executionIndex]?.crowdCommentary || []).length > 0 ? (
+                <div className={styles.executionFeedbackList}>
+                  <p>{t('dashboard.events.setup.execution.crowdCommentary', 'Crowd Commentary')}</p>
+                  <ul>
+                    {executionResults[executionIndex].crowdCommentary.map((line, index) => (
+                      <li key={`${executionIndex}-crowd-${index}`}>{line}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {showExecutionChoicePanel && executionSegment && executionMode === 'play' ? (
+            <div className={styles.executionInsightsCard}>
+              <div className={styles.executionInsightsHeader}>
+                <strong>{t('dashboard.events.setup.execution.playOptionsTitle', 'Play the segment')}</strong>
+              </div>
+              <div className={styles.executionFeedbackList}>
+                {getExecutionChoiceNarrative().map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+              </div>
+              {executionSegment.matchType === 'tagTeam' ? (
+                <div className={styles.matchTypeRow}>
+                  <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseWinner', 'Choose the winner')}</span>
+                  <div className={styles.matchTypeChips}>
+                    <button
+                      type="button"
+                      className={`${styles.typeChip} ${executionChoice.winnerTeam === 'team1' ? styles.typeChipActive : ''}`}
+                      onClick={() => setExecutionChoice((current) => ({ ...current, winnerTeam: 'team1' }))}
+                    >
+                      {t('dashboard.events.setup.execution.team1', 'Team 1')}
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.typeChip} ${executionChoice.winnerTeam === 'team2' ? styles.typeChipActive : ''}`}
+                      onClick={() => setExecutionChoice((current) => ({ ...current, winnerTeam: 'team2' }))}
+                    >
+                      {t('dashboard.events.setup.execution.team2', 'Team 2')}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className={styles.matchTypeRow}>
+                  <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseWinner', 'Choose the winner')}</span>
+                  <div className={styles.matchTypeChips}>
+                    {executionWrestlers.length > 0 ? executionWrestlers.map((employee) => (
+                      <button
+                        key={employee.employeeId}
+                        type="button"
+                        className={`${styles.typeChip} ${executionChoice.winnerEmployeeId === employee.employeeId ? styles.typeChipActive : ''}`}
+                        onClick={() => setExecutionChoice((current) => ({ ...current, winnerEmployeeId: employee.employeeId }))}
+                      >
+                        {employee.name}
+                      </button>
+                    )) : (
+                      <span>{t('dashboard.events.setup.execution.noWrestlers', 'No wrestlers assigned in this segment.')}</span>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div className={styles.matchTypeRow}>
+                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseFinish', 'Choose the finish')}</span>
+                <div className={styles.matchTypeChips}>
+                  {['pin', 'submission', 'countout', 'dq'].map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      className={`${styles.typeChip} ${executionChoice.finishType === option ? styles.typeChipActive : ''}`}
+                      onClick={() => setExecutionChoice((current) => ({ ...current, finishType: option }))}
+                    >
+                      {t(`dashboard.events.setup.execution.finishes.${option}`, option)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className={styles.matchTypeRow}>
+                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseRisk', 'Choose the pace')}</span>
+                <div className={styles.matchTypeChips}>
+                  {['balanced', 'risky', 'chaotic'].map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      className={`${styles.typeChip} ${executionChoice.riskLevel === option ? styles.typeChipActive : ''}`}
+                      onClick={() => setExecutionChoice((current) => ({ ...current, riskLevel: option }))}
+                    >
+                      {t(`dashboard.events.setup.execution.risks.${option}`, option)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button type="button" className={styles.primaryBtn} onClick={resolveExecutionChoice}>
+                {t('dashboard.events.setup.execution.resolve', 'Resolve Segment')}
+              </button>
+            </div>
+          ) : null}
+
+          {executionMode === 'play' && playSequenceActive && playSequence[playSequenceIndex] ? (
+            <div className={styles.executionInsightsCard}>
+              <div className={styles.executionInsightsHeader}>
+                <strong>{t('dashboard.events.setup.execution.playByPlayTitle', 'Play-by-play')}</strong>
+              </div>
+              <div className={styles.executionFeedbackList}>
+                <p><strong>{playSequence[playSequenceIndex].title}</strong></p>
+                <p>{playSequence[playSequenceIndex].detail}</p>
+                <p>{playSequence[playSequenceIndex].crowdLine}</p>
+                <p>{t('dashboard.events.setup.execution.playByPlayProgress', 'Beat {{current}} of {{total}}', { current: playSequenceIndex + 1, total: playSequence.length })}</p>
+                <div style={{ marginTop: '0.5rem', background: '#2d2d2d', borderRadius: '999px', overflow: 'hidden', height: '8px' }}>
+                  <div style={{ width: `${playSequence[playSequenceIndex].momentum}%`, height: '100%', background: '#ff8a00', transition: 'width 0.2s ease' }} />
+                </div>
+                <p style={{ marginTop: '0.35rem', color: '#ffd166' }}>{playSequence[playSequenceIndex].momentumLabel}</p>
+              </div>
+              <button type="button" className={styles.primaryBtn} onClick={advancePlaySequence}>
+                {playSequenceIndex < playSequence.length - 1
+                  ? t('dashboard.events.setup.execution.advanceBeat', 'Advance Beat')
+                  : t('dashboard.events.setup.execution.resolveSegment', 'Resolve Segment')}
+              </button>
             </div>
           ) : null}
 
@@ -1795,6 +2204,9 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
             </button>
             <button type="button" className={styles.primaryBtn} onClick={handlePlaySegmentClick}>
               {t('dashboard.events.setup.execution.play', 'Play Segment')}
+            </button>
+            <button type="button" className={styles.secondaryBtn} onClick={handleSimulateSegmentClick}>
+              {t('dashboard.events.setup.execution.simulate', 'Simulate Segment')}
             </button>
             {executionIndex < executionSegments.length - 1 ? (
               <button

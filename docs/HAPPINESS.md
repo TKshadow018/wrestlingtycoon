@@ -26,11 +26,19 @@ This document explains how wrestler/staff happiness works in Wrestling Tycoon.
 - If no match participation for 30 days: `-3`
 - Inactivity penalty can apply once every 30 days
 
-## Contract Termination and Rehire Lock
+## Morale Demands and Title Promises
 
-- If tracked employee happiness reaches `0`, they terminate immediately
-- Their person profile is locked from rehiring for `90` days
-- Locked candidates are filtered out of the hiring market during lock period
+When a wrestler or staff member with no active demand reaches happiness `22` or lower, each daily simulation update has a 35% chance to create a demand. A demand is due seven in-game days after it is created.
+
+- **Salary raise:** either tracked role can request a raise. The request is the greater of `$1,000` or 15% of monthly salary, rounded to a whole dollar. Approving it requires sufficient cash, raises happiness by `12`, increases monthly salary by 10%, and increases per-match salary by 8%. Rejecting it reduces happiness by `10`.
+- **Title shot:** wrestlers can request a title shot instead of a salary raise. Approval raises happiness by `9` and creates a 21-day promise. A title win before the promise expires grants the normal title-win happiness plus a `+6` promise bonus. Missing the deadline applies a `-12` happiness penalty. Rejecting the demand reduces happiness by `10`.
+- **Overdue demands:** happiness falls by `1` per overdue day, then by `2` per day once the demand is at least six days overdue. If the demand is at least four days overdue and happiness is `5` or lower, the employee walks out during a simulation update.
+
+## Departure and Rehire Lock
+
+- Tracked employees leave when happiness reaches `0`; an overdue walkout can also make an employee leave at happiness `5` or lower.
+- Employees who leave are locked from rehiring for 90 in-game days.
+- Locked candidates are filtered out of the hiring market during the lock period.
 
 ## Bonus System (Manage Employees)
 
@@ -47,6 +55,8 @@ Notes:
 
 - `perMatchFee` comes from the employee contract `perMatchSalary`
 - Non-wrestlers use rank `0`
+
+The title-holder multiplier applies to current title holders (3x versus 1x for other eligible employees). The resulting happiness is clamped to `0..100`.
 
 ## Low Happiness Warning
 

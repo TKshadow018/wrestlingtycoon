@@ -670,6 +670,7 @@ function ManageEmployeesModule() {
   const fireEmployee = useGameStore((state) => state.fireEmployee)
   const setEmployeeManager = useGameStore((state) => state.setEmployeeManager)
   const giveEmployeeBonus = useGameStore((state) => state.giveEmployeeBonus)
+  const resolveEmployeeMoraleDemand = useGameStore((state) => state.resolveEmployeeMoraleDemand)
   const createTeam = useGameStore((state) => state.createTeam)
   const updateTeam = useGameStore((state) => state.updateTeam)
   const deleteTeam = useGameStore((state) => state.deleteTeam)
@@ -684,6 +685,7 @@ function ManageEmployeesModule() {
   const [genderFilter, setGenderFilter] = useState('all')
   const [sortField, setSortField] = useState('skill')
   const [sortOrder, setSortOrder] = useState('desc')
+  const [moraleDemandFeedbackById, setMoraleDemandFeedbackById] = useState({})
 
   const selectedEmployee = useMemo(
     () => employees.find((employee) => employee.employeeId === selectedEmployeeId) || null,
@@ -817,6 +819,20 @@ function ManageEmployeesModule() {
     } else {
       setBonusErrorKey('bonusFailed')
     }
+  }
+
+  const handleMoraleDemandDecision = (employeeId, decision) => {
+    const result = resolveEmployeeMoraleDemand(employeeId, decision)
+    const feedbackKey = result?.ok
+      ? (decision === 'approve' ? 'moraleDemandApproved' : 'moraleDemandRejected')
+      : result?.reason === 'insufficientCash'
+        ? 'moraleDemandInsufficientCash'
+        : 'moraleDemandFailed'
+
+    setMoraleDemandFeedbackById((previous) => ({
+      ...previous,
+      [employeeId]: feedbackKey,
+    }))
   }
 
   return (
@@ -980,6 +996,23 @@ function ManageEmployeesModule() {
             })}
           </p>
 
+          {employee.activeMoraleDemand ? (
+            <div className={styles.moraleDemandBox}>
+              <p className={styles.moraleDemandTitle}>{t('dashboard.employees.moraleDemandTitle')}</p>
+              <p>
+                {employee.activeMoraleDemand.demandType === 'salaryRaise'
+                  ? t('dashboard.employees.moraleDemandSalaryRaise', {
+                      amount: formatMoney(employee.activeMoraleDemand.requestedAmount || 0),
+                    })
+                  : t('dashboard.employees.moraleDemandTitleShot')}
+              </p>
+              <p>{t('dashboard.employees.moraleDemandDueDay', { day: employee.activeMoraleDemand.dueDay })}</p>
+              {moraleDemandFeedbackById[employee.employeeId] ? (
+                <p className={styles.moraleDemandFeedback}>{t(`dashboard.employees.${moraleDemandFeedbackById[employee.employeeId]}`)}</p>
+              ) : null}
+            </div>
+          ) : null}
+
           {employee.managerId && <span className={styles.managerAssignedBadge}>{t('dashboard.employees.managerAssigned')}</span>}
           {isChampion ? (
             <div className={styles.championBadgeList}>
@@ -1035,6 +1068,24 @@ function ManageEmployeesModule() {
                 {t('dashboard.employees.showManagedWrestlers')}
               </button>
             )}
+            {employee.activeMoraleDemand ? (
+              <>
+                <button
+                  type="button"
+                  className={styles.moraleApproveButton}
+                  onClick={() => handleMoraleDemandDecision(employee.employeeId, 'approve')}
+                >
+                  {t('dashboard.employees.moraleApprove')}
+                </button>
+                <button
+                  type="button"
+                  className={styles.moraleRejectButton}
+                  onClick={() => handleMoraleDemandDecision(employee.employeeId, 'reject')}
+                >
+                  {t('dashboard.employees.moraleReject')}
+                </button>
+              </>
+            ) : null}
           </div>
         </article>
           )

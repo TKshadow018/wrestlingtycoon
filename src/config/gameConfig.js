@@ -1,3 +1,5 @@
+import { normalizeGameDate } from '../utils/gameCalendar'
+
 const asNumber = (value, fallback) => {
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : fallback
@@ -18,9 +20,11 @@ const asBoolean = (value, fallback = false) => {
   return fallback
 }
 
+export const GAME_DAYS_PER_MONTH = 30
+
 export const GAME_CONFIG = {
   version: import.meta.env.VITE_GAME_VERSION || '0.1.0',
-  startDateIso: import.meta.env.VITE_GAME_START_DATE || '',
+  startDateIso: normalizeGameDate(import.meta.env.VITE_GAME_START_DATE || ''),
   startingCash: asNumber(import.meta.env.VITE_GAME_STARTING_CASH, 500000),
   eventCycleDays: asNumber(import.meta.env.VITE_EVENT_CYCLE_DAYS, 7),
   startingFans: asNumber(import.meta.env.VITE_GAME_STARTING_FANS, 1000),
@@ -101,16 +105,32 @@ export const GAME_CONFIG = {
     oneTime: asNumber(import.meta.env.VITE_EVENT_COST_ONE_TIME, 12000),
     digitalOnly: asNumber(import.meta.env.VITE_EVENT_COST_DIGITAL, 3000),
   },
+  competition: {
+    pressureBaseRating: asNumber(import.meta.env.VITE_COMPETITION_BASE_RATING, 7.2),
+    pressureSwingScale: asNumber(import.meta.env.VITE_COMPETITION_SWING_SCALE, 26),
+    pressureRandomMin: asNumber(import.meta.env.VITE_COMPETITION_RANDOM_MIN, -40),
+    pressureRandomMax: asNumber(import.meta.env.VITE_COMPETITION_RANDOM_MAX, 40),
+    pressureRivalryScale: asNumber(import.meta.env.VITE_COMPETITION_RIVALRY_SCALE, 240),
+    pressureMaxRivalryEdge: asNumber(import.meta.env.VITE_COMPETITION_MAX_RIVALRY_EDGE, 1.3),
+    pressureEventVolatilityMajor: asNumber(import.meta.env.VITE_COMPETITION_MAJOR_EVENT_VOLATILITY, 1.25),
+    pressureEventVolatilityMinor: asNumber(import.meta.env.VITE_COMPETITION_MINOR_EVENT_VOLATILITY, 1),
+    prestigeDivisor: asNumber(import.meta.env.VITE_COMPETITION_PRESTIGE_DIVISOR, 55),
+    prestigeMin: asNumber(import.meta.env.VITE_COMPETITION_PRESTIGE_MIN, -2),
+    prestigeMax: asNumber(import.meta.env.VITE_COMPETITION_PRESTIGE_MAX, 3),
+  },
 }
 
 export const MANAGEMENT_MODULES = [
   { id: 'manageEmployees' },
   { id: 'hireEmployees' },
   { id: 'manageEvents' },
+  { id: 'careerArc' },
   { id: 'manageTitles' },
   { id: 'statistics' },
   { id: 'matchResults' },
   { id: 'wrestlerRank' },
   { id: 'manageFinances' },
   { id: 'manageSponsors' },
+  { id: 'competitorIntel' },
+  { id: 'board' },
 ]

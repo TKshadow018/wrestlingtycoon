@@ -50,15 +50,16 @@ Alignment changes are **opponent-based**, not simply win/loss based. What matter
 The base shift is scaled by match quality:
 
 ```
-shift = baseShift × (matchRating / 5)
+shift = round(baseShift × clamp(matchRating / 5, 0.5, 2.0))
 ```
 
 - Rating **5/10** = 1× multiplier (no change)
 - Rating **10/10** = 2× multiplier (shift doubled)
-- Rating **1/10** = 0.2× multiplier (shift nearly negated)
-- Clamped between **0.5×** and **2.0×**
+- Rating **1/10** has a raw 0.2× ratio, clamped to the **0.5× minimum**
+- Ratings are clamped between **0.5×** and **2.0×**, and the final shift is rounded to a whole meter point
+- Missing match ratings default to 5/10 (1× multiplier)
 
-A **5-star main event** between a Face and Heel changes alignment twice as much as a mid-card opener.
+A high-rated main event between a Face and Heel can change alignment twice as much as a mid-card opener.
 
 ### Tag Team Matches
 
@@ -66,14 +67,15 @@ For tag team matches, the opponent's alignment is the **average `heelFaceMeter`*
 
 ---
 
-## Weekly Natural Decay
+## Natural Decay When an Event Runs
 
-Once per event week (when an event runs), **every wrestler** on the roster drifts **1 point toward Neutral (50)**:
+Whenever an event is actually run, **every active wrestler** drifts **1 point toward Neutral (50)** after that event's match results are applied:
 
 - If `meter > 50` → `meter - 1`
 - If `meter < 50` → `meter + 1`
+- If `meter = 50` → no change
 
-This ensures that alignment requires **active booking to maintain**. A heel who stops losing or facing faces will gradually drift back toward neutral over time.
+No alignment decay is applied on a day when no event runs. If multiple events are run on different days, each event run applies its own decay step. This ensures that alignment requires **active booking to maintain**. A heel who stops losing or facing faces will gradually drift back toward neutral over time.
 
 ---
 

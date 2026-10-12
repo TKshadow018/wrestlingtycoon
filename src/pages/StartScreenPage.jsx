@@ -8,6 +8,19 @@ import { GAME_CONFIG } from '../config/gameConfig'
 import { useGameStore } from '../store/useGameStore'
 import styles from './StartScreenPage.module.scss'
 
+const COUNTRY_OPTIONS = [
+  'UnitedStates',
+  'Canada',
+  'UnitedKingdom',
+  'Japan',
+  'India',
+  'Mexico',
+  'Brazil',
+  'Germany',
+  'Australia',
+  'France',
+]
+
 function StartScreenPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -20,6 +33,7 @@ function StartScreenPage() {
 
   const [playerName, setPlayerName] = useState('Tusar')
   const [companyName, setCompanyName] = useState('Dhisum Dhisum Wrestling')
+  const [preferredCountry, setPreferredCountry] = useState('UnitedStates')
   const [validation, setValidation] = useState(false)
   const [startWithAi, setStartWithAi] = useState(false)
   const [isBlockingForAi, setIsBlockingForAi] = useState(false)
@@ -37,7 +51,7 @@ function StartScreenPage() {
   const onSubmit = (event) => {
     event.preventDefault()
 
-    const result = startGame({ playerName, companyName })
+    const result = startGame({ playerName, companyName, preferredCountry })
     if (!result.ok) {
       setValidation(true)
       return
@@ -97,12 +111,15 @@ function StartScreenPage() {
             <StartGameForm
               playerName={playerName}
               companyName={companyName}
+              preferredCountry={preferredCountry}
+              countryOptions={COUNTRY_OPTIONS}
               startWithAi={startWithAi}
               validation={validation}
               startingCash={GAME_CONFIG.startingCash}
               onStartWithAiChange={setStartWithAi}
               onPlayerNameChange={setPlayerName}
               onCompanyNameChange={setCompanyName}
+              onPreferredCountryChange={setPreferredCountry}
               onSubmit={onSubmit}
             />
           </div>

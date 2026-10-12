@@ -1,10 +1,43 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { GAME_CONFIG, MANAGEMENT_MODULES } from '../config/gameConfig'
+import { GAME_CONFIG, GAME_DAYS_PER_MONTH, MANAGEMENT_MODULES } from '../config/gameConfig'
+import { BOARD_CHAIR, BOARD_MEMBERS, BOARD_VICE_CHAIR } from '../data/board'
+import {
+  applyCareerArcUnlocks,
+  DEFAULT_CAREER_ARC_UNLOCKS,
+  getCareerArcUnlockItem,
+  getNextCareerArcUnlocks,
+  normalizeCareerArcUnlocks,
+} from '../data/careerArcUnlocks'
 import { createEmployeeCandidates } from '../data/employeeMarket'
 import { createEventTemplates } from '../data/eventTemplates'
 import { createSponsorOffers, SPONSOR_TYPE_CONFIG } from '../data/sponsorOffers'
 import { clampHeelFaceMeter, DEFAULT_HEEL_FACE_METER_VALUE, computeHeelFaceShift, applyHeelFaceNeutralDecay } from '../utils/heelFaceMeter'
+import { validateModDataPackage } from '../utils/modDataPackage'
+import { buildBoardMeetingAgendaPool } from '../utils/boardMeetingAgendas'
+import {
+  applyBoardRelationChange,
+  assignRandomBoardAgendaPresenters,
+  conductWeightedBoardVote,
+  createInitialBoardState,
+  getRepeatedRejectionPenalty,
+  normalizeBoardMeetingState,
+  recordBoardFinancialPeriod,
+  resolveBoardElection,
+  resolveBoardMandates,
+  rollBoardDismissal,
+  selectBoardAgendas,
+} from '../utils/boardMeetingSystem'
+import { getBoardMeetingSchedule } from '../utils/boardMeetings'
+import { getBoardEventAttendance } from '../utils/boardEventAttendance'
+import {
+  getGameDayDifference,
+  normalizeGameDate,
+  parseGameDate,
+  resolveGameCalendarStartDate,
+  toGameDateIso,
+} from '../utils/gameCalendar'
+import { generatePerson } from 'faker-user'
 import preloadedEvents from '../data/preloadedEvents.json'
 import titleCatalog from '../data/titles.json'
 
@@ -41,15 +74,13 @@ const normalizeTitleRecord = (title) => {
 
 const createInitialTitles = () => titleCatalog.map((title) => normalizeTitleRecord(title))
 
-const toStartOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
-
 const parseStartDateIso = (startDateIso) => {
-  const parsed = new Date(`${startDateIso}T00:00:00`)
-  if (Number.isNaN(parsed.getTime())) {
-    return toStartOfDay(new Date())
+  const parsed = parseGameDate(normalizeGameDate(startDateIso))
+  if (!parsed) {
+    throw new Error(`Invalid game start date "${startDateIso}"`)
   }
 
-  return toStartOfDay(parsed)
+  return parsed
 }
 
 const getGameDateFromDay = (startDateIso, day) => {
@@ -72,6 +103,7 @@ const calculateNextCalendar = (currentDay, startDateIso) => {
     day: nextDay,
     week: Math.floor((nextDay - 1) / 7) + 1,
     isEventDay,
+    startDateIso,
   }
 }
 
@@ -92,7 +124,7 @@ const MIN_CONTRACT_LENGTH_MONTHS = 1
 const MAX_CONTRACT_LENGTH_MONTHS = 60
 
 const toContractDurationDays = (contractLengthMonths) => {
-  return Math.max(MIN_CONTRACT_LENGTH_MONTHS, Number(contractLengthMonths) || DEFAULT_CONTRACT_LENGTH_MONTHS) * 30
+  return Math.max(MIN_CONTRACT_LENGTH_MONTHS, Number(contractLengthMonths) || DEFAULT_CONTRACT_LENGTH_MONTHS) * GAME_DAYS_PER_MONTH
 }
 
 const clampContractLengthMonths = (value) => {
@@ -116,6 +148,27 @@ const hasActiveContract = (employee, day) => {
 const filterActiveEmployees = (employees = [], day = 1) => {
   return employees.filter((employee) => hasActiveContract(employee, day))
 }
+
+const getMonthlySalaryPaymentsDue = (employees = [], day) => employees.flatMap((employee) => {
+  const startDay = Number(employee?.contract?.startDay)
+  const endDay = Number(employee?.contract?.endDay)
+  const salary = Number(employee?.contract?.monthlySalary ?? employee?.salary)
+  const daysSinceStart = day - startDay
+
+  if (
+    !Number.isInteger(startDay)
+    || !Number.isInteger(day)
+    || !Number.isFinite(salary)
+    || salary <= 0
+    || daysSinceStart <= 0
+    || daysSinceStart % GAME_DAYS_PER_MONTH !== 0
+    || (Number.isInteger(endDay) && day >= endDay)
+  ) {
+    return []
+  }
+
+  return [{ employee, amount: Math.round(salary) }]
+})
 
 const normalizeEmployeeId = (employee, index) => {
   if (employee?.employeeId != null) {
@@ -193,6 +246,12 @@ const normalizePersistedEmployees = (employees = [], day = 1) => {
         ? clampStamina(employee?.stamina ?? MAX_STAMINA)
         : employee?.stamina,
       managerId: employee?.managerId || null,
+      activeMoraleDemand: employee?.activeMoraleDemand && typeof employee.activeMoraleDemand === 'object'
+        ? employee.activeMoraleDemand
+        : null,
+      promisedTitleShotByDay: Number.isInteger(employee?.promisedTitleShotByDay)
+        ? employee.promisedTitleShotByDay
+        : null,
       heelFaceMeter: clampHeelFaceMeter(employee?.heelFaceMeter ?? DEFAULT_HEEL_FACE_METER_VALUE),
       contract: {
         monthlySalary: employee?.contract?.monthlySalary || employee.salary || 0,
@@ -288,6 +347,8 @@ const toEmployeeRecord = (candidate, currentDay) => {
   staffAbility: candidate.staff_ability || null,
   staffDepartment: candidate.staff_department || null,
   managerId: null,
+  activeMoraleDemand: null,
+  promisedTitleShotByDay: null,
   heelFaceMeter: DEFAULT_HEEL_FACE_METER_VALUE,
   matchStats: {
     totalMatches: 0,
@@ -394,10 +455,15 @@ const buildInitialState = () => {
     gameStatus: {
       hasStarted: false,
       version: GAME_CONFIG.version,
+      isGameOver: false,
+      gameOverReason: null,
     },
     profile: {
       playerName: '',
       companyName: '',
+      ownerName: '',
+      generalManagerName: '',
+      homeCountry: '',
     },
     calendar: {
       day: 1,
@@ -447,11 +513,23 @@ const buildInitialState = () => {
       bookedEvent: buildBookedEventProjection(1, seededCustomEvents, startDateIso),
       lastOutcome: null,
       eventLog: [],
+      rivalries: [],
+      competitorHeadlines: [],
       eventPreparation: null,
     },
     history: {
       timeline: [],
     },
+    progression: {
+      currentArc: null,
+      history: [],
+      unlocks: normalizeCareerArcUnlocks(),
+    },
+    boardMeeting: createInitialBoardState({
+      boardPresidentName: BOARD_CHAIR.person_name,
+      boardVicePresidentName: BOARD_VICE_CHAIR.person_name,
+    }),
+    onboardingChallenge: null,
     stats: {
       fans: GAME_CONFIG.startingFans,
       morale: GAME_CONFIG.startingMorale,
@@ -469,6 +547,568 @@ const buildInitialState = () => {
       progressText: '',
       error: '',
       showEnableModal: false,
+      lastInterviewImpact: null,
+    },
+  }
+}
+
+const buildGeneratedManagementProfile = ({ preferredCountry }) => {
+  const preferredCountryList = preferredCountry ? [preferredCountry] : undefined
+
+  try {
+    const representative = generatePerson({
+      country: preferredCountryList,
+      minAge: 38,
+      maxAge: 68,
+    })
+
+    return {
+      homeCountry: representative?.country || 'UnitedStates',
+    }
+  } catch {
+    return {
+      homeCountry: 'UnitedStates',
+    }
+  }
+}
+
+const getBoardMeetingFinanceReport = (state) => {
+  const boardState = normalizeBoardMeetingState(state.boardMeeting)
+  const startDay = Number.isInteger(boardState.lastMeetingDay)
+    ? boardState.lastMeetingDay
+    : 1
+  const periodEntries = (state.history.timeline || []).filter((entry) => (
+    Number(entry?.day) > startDay && Number(entry?.day) <= state.calendar.day
+  ))
+  const operatingNet = periodEntries.reduce((sum, entry) => sum + (Number(entry?.delta) || 0), 0)
+
+  return {
+    startDay,
+    endDay: state.calendar.day,
+    completedDays: periodEntries.length,
+    totalIncome: periodEntries.reduce((sum, entry) => sum + (Number(entry?.totalIncome) || 0), 0),
+    totalExpenses: periodEntries.reduce((sum, entry) => sum + (Number(entry?.totalExpenses) || 0), 0),
+    operatingNet,
+    cashOnHand: Number(state.finances.cash) || 0,
+  }
+}
+
+const isBoardMeetingScheduledForDay = ({ startDateIso, customEvents, day }) => (
+  getBoardMeetingSchedule({
+    startDateIso,
+    customEvents,
+    throughDate: getGameDateFromDay(startDateIso, day),
+  }).some((meeting) => meeting.scheduledDay === day)
+)
+
+const getNextBoardMeetingDay = ({ startDateIso, customEvents, currentDay }) => {
+  const futureDate = getGameDateFromDay(startDateIso, currentDay + 180)
+  const nextMeeting = getBoardMeetingSchedule({
+    startDateIso,
+    customEvents,
+    throughDate: futureDate,
+  }).find((meeting) => meeting.scheduledDay > currentDay)
+
+  return nextMeeting?.scheduledDay || currentDay + GAME_DAYS_PER_MONTH
+}
+
+const getBoardMeetingAgendaPool = (state, financialReport, isJanuary) => {
+  const wrestlers = (state.roster.employees || [])
+    .filter((employee) => employee.role === 'wrestler')
+    .sort((a, b) => (Number(b.popularity) || 0) - (Number(a.popularity) || 0))
+  const activeTitle = (state.roster.titles || []).find(
+    (title) => title.isActive !== false && title.division !== 'doubles',
+  )
+  const currentHolderIds = activeTitle
+    ? normalizeTitleHolderIds(activeTitle)
+    : []
+  const replacementWrestler = wrestlers.find((wrestler) => !currentHolderIds.includes(wrestler.employeeId))
+  const upcomingEvent = state.events.bookedEvent || null
+  const activeSponsors = normalizeSponsors(state.roster.sponsors)
+  const sponsorToReview = [...activeSponsors]
+    .sort((a, b) => Number(a.trust || 0) - Number(b.trust || 0))[0] || null
+  const sponsorOffer = (state.market.sponsorOffers || []).find((offer) => {
+    const sponsorType = offer.sponsorType || DEFAULT_SPONSOR_TYPE
+    const typeConfig = SPONSOR_TYPE_CONFIG[sponsorType]
+    if (!typeConfig) {
+      return false
+    }
+
+    const activeCount = activeSponsors.filter((sponsor) => sponsor.sponsorType === sponsorType).length
+    if (activeCount >= typeConfig.maxActive) {
+      return false
+    }
+    if (typeConfig.eventScoped && !SPONSORABLE_EVENT_TYPES.includes(upcomingEvent?.type)) {
+      return false
+    }
+    if (typeConfig.eventScoped && !SPONSORABLE_EVENT_TYPES.includes(upcomingEvent?.type)) {
+      return false
+    }
+
+    return !getSponsorSignRestrictionReason({
+      offer,
+      lastOutcome: state.events.lastOutcome,
+    })
+  })
+
+  return buildBoardMeetingAgendaPool({
+    financialIsNegative: financialReport.operatingNet < 0,
+    isJanuary,
+    financialReport,
+    boardMembers: BOARD_MEMBERS,
+    sponsorOffer: sponsorOffer || null,
+    activeSponsors,
+    sponsorToReview,
+    upcomingEvent,
+    lastOutcome: state.events.lastOutcome,
+    titleChange: activeTitle && replacementWrestler
+      ? {
+          titleId: activeTitle.titleId,
+          titleName: activeTitle.name,
+          currentHolderIds,
+          targetEmployeeId: replacementWrestler.employeeId,
+          targetName: replacementWrestler.name,
+        }
+      : null,
+    wrestlerPush: wrestlers[0]
+      ? {
+          employeeId: wrestlers[0].employeeId,
+          name: wrestlers[0].name,
+        }
+      : null,
+    pendingMandates: state.boardMeeting.pendingMandates,
+  })
+}
+
+const COMPETITOR_COMPANIES = [
+  { id: 'comp-1', name: 'Titan Ring Federation', aggression: 1.1 },
+  { id: 'comp-2', name: 'Prime Grapple Alliance', aggression: 0.95 },
+  { id: 'comp-3', name: 'Global Slam Network', aggression: 1.05 },
+]
+
+const runCompetitorPressure = ({ overallRating, rivalryHeatScore, eventType, day }) => {
+  const competitionConfig = GAME_CONFIG.competition
+  const rival = COMPETITOR_COMPANIES[Math.floor(Math.random() * COMPETITOR_COMPANIES.length)]
+  const rating = Number.isFinite(Number(overallRating)) ? Number(overallRating) : 6
+  const volatility = eventType === 'megaLive' || eventType === 'ppv'
+    ? competitionConfig.pressureEventVolatilityMajor
+    : competitionConfig.pressureEventVolatilityMinor
+  const rivalryEdge = Math.min(
+    competitionConfig.pressureMaxRivalryEdge,
+    1 + (Math.max(0, rivalryHeatScore) / competitionConfig.pressureRivalryScale),
+  )
+  const performanceEdge = (rating - competitionConfig.pressureBaseRating) * competitionConfig.pressureSwingScale
+  const randomDrift = competitionConfig.pressureRandomMin
+    + (Math.random() * (competitionConfig.pressureRandomMax - competitionConfig.pressureRandomMin))
+  const swing = Math.round((performanceEdge + randomDrift) * volatility * rivalryEdge * rival.aggression)
+
+  const fanImpact = Math.round(swing)
+  const prestigeImpact = Math.max(
+    competitionConfig.prestigeMin,
+    Math.min(competitionConfig.prestigeMax, Math.round(fanImpact / competitionConfig.prestigeDivisor)),
+  )
+
+  const headline = fanImpact >= 0
+    ? `${rival.name} failed to outdraw your show this week.`
+    : `${rival.name} stole spotlight momentum with a hot competing card.`
+
+  return {
+    day,
+    rivalName: rival.name,
+    fanImpact,
+    prestigeImpact,
+    headline,
+  }
+}
+
+const runCompetitorWorldSimulation = ({
+  day,
+  shouldRunEvent,
+  lastOutcome,
+  employees = [],
+  marketCandidates = [],
+}) => {
+  const rival = COMPETITOR_COMPANIES[Math.floor(Math.random() * COMPETITOR_COMPANIES.length)]
+  let fanImpact = 0
+  let prestigeImpact = 0
+  let poachedEmployeeId = null
+  let signedCandidateId = null
+  const newsItems = []
+
+  const wrestlerCandidates = (marketCandidates || []).filter((candidate) => candidate?.role === 'wrestler')
+  if (wrestlerCandidates.length > 0 && Math.random() < 0.35) {
+    const signedCandidate = wrestlerCandidates[Math.floor(Math.random() * wrestlerCandidates.length)]
+    signedCandidateId = signedCandidate.candidateId
+    const prospectImpact = Math.max(6, Math.round((Number(signedCandidate.popularity || 35) / 100) * 24))
+    fanImpact -= prospectImpact
+    newsItems.push({
+      day,
+      rivalName: rival.name,
+      fanImpact: -prospectImpact,
+      prestigeImpact: 0,
+      headline: `${rival.name} signed prospect ${signedCandidate.name} ahead of your talent team.`,
+    })
+  }
+
+  if (shouldRunEvent && lastOutcome) {
+    const rating = Number(lastOutcome.overallRating || 6)
+    const baseCounterSwing = rating >= 8.3 ? -8 : rating >= 7.2 ? -18 : -32
+    const randomness = Math.round((Math.random() * 14) - 7)
+    const counterSwing = Math.round((baseCounterSwing + randomness) * rival.aggression)
+    fanImpact += counterSwing
+    prestigeImpact += Math.round(counterSwing / 60)
+    newsItems.push({
+      day,
+      rivalName: rival.name,
+      fanImpact: counterSwing,
+      prestigeImpact: Math.round(counterSwing / 60),
+      headline: counterSwing >= 0
+        ? `${rival.name} failed to dent your night despite heavy counter-programming.`
+        : `${rival.name} counter-programmed with a strong card and stole momentum.`,
+    })
+  }
+
+  const vulnerableWrestlers = (employees || []).filter(
+    (employee) => employee?.role === 'wrestler' && Number(employee?.happiness || 0) <= 16,
+  )
+  if (vulnerableWrestlers.length > 0 && Math.random() < 0.28) {
+    const target = vulnerableWrestlers[Math.floor(Math.random() * vulnerableWrestlers.length)]
+    poachedEmployeeId = target.employeeId
+    const poachImpact = Math.max(14, Math.round((Number(target.popularity || 40) / 100) * 42))
+    fanImpact -= poachImpact
+    prestigeImpact -= 1
+    newsItems.push({
+      day,
+      rivalName: rival.name,
+      fanImpact: -poachImpact,
+      prestigeImpact: -1,
+      headline: `${rival.name} poached unhappy star ${target.name} from your roster.`,
+    })
+  }
+
+  return {
+    fanImpact: Math.max(-180, Math.min(140, Math.round(fanImpact))),
+    prestigeImpact: Math.max(-3, Math.min(2, Math.round(prestigeImpact))),
+    poachedEmployeeId,
+    signedCandidateId,
+    newsItems,
+  }
+}
+
+const CAREER_ARC_LENGTH_DAYS = 56
+
+const CAREER_ARC_TEMPLATES = [
+  {
+    key: 'audienceSurge',
+    goals: { fanGain: 1800, prestigeGain: 6, cashGain: 120000 },
+    reward: { cash: 60000, prestige: 2, sponsorTrust: 3 },
+  },
+  {
+    key: 'prestigeChase',
+    goals: { fanGain: 1100, prestigeGain: 9, cashGain: 140000 },
+    reward: { cash: 50000, prestige: 3, sponsorTrust: 2 },
+  },
+  {
+    key: 'profitStability',
+    goals: { fanGain: 950, prestigeGain: 5, cashGain: 220000 },
+    reward: { cash: 90000, prestige: 1, sponsorTrust: 4 },
+  },
+]
+
+const pickCareerArcTemplate = () => {
+  return CAREER_ARC_TEMPLATES[Math.floor(Math.random() * CAREER_ARC_TEMPLATES.length)]
+}
+
+const buildCareerArc = ({ startDay, stats, finances, unlocks = DEFAULT_CAREER_ARC_UNLOCKS }) => {
+  const template = pickCareerArcTemplate()
+
+  return {
+    arcId: `career-arc-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    templateKey: template.key,
+    status: 'active',
+    startDay,
+    endDay: startDay + CAREER_ARC_LENGTH_DAYS - 1,
+    startSnapshot: {
+      fans: Number(stats?.fans || 0),
+      prestige: Number(stats?.prestige || 0),
+      cash: Number(finances?.cash || 0),
+    },
+    goals: template.goals,
+    reward: {
+      ...template.reward,
+      unlockables: getNextCareerArcUnlocks(unlocks),
+    },
+    progress: {
+      fanGain: 0,
+      prestigeGain: 0,
+      cashGain: 0,
+    },
+  }
+}
+
+const ensureProgressionShape = (progression, { legacyVenueId = null } = {}) => {
+  const unlocks = normalizeCareerArcUnlocks(progression?.unlocks, { legacyVenueId })
+  const currentArc = progression?.currentArc || null
+  const currentReward = currentArc?.reward || {}
+
+  return {
+    currentArc: currentArc
+      ? {
+          ...currentArc,
+          reward: {
+            cash: 0,
+            prestige: 0,
+            sponsorTrust: 0,
+            ...currentReward,
+            unlockables: Array.isArray(currentReward.unlockables)
+              ? currentReward.unlockables
+              : getNextCareerArcUnlocks(unlocks),
+          },
+        }
+      : null,
+    history: Array.isArray(progression?.history) ? progression.history : [],
+    unlocks,
+  }
+}
+
+const normalizeEventPreparation = (eventPreparation, unlocks) => {
+  if (!eventPreparation || typeof eventPreparation !== 'object') {
+    return null
+  }
+
+  const normalizedUnlocks = normalizeCareerArcUnlocks(unlocks)
+  const isUnlocked = (category, id) => (
+    typeof id === 'string' && normalizedUnlocks[category].includes(id)
+  )
+
+  return {
+    eventId: typeof eventPreparation.eventId === 'string' ? eventPreparation.eventId : null,
+    venueId: isUnlocked('venues', eventPreparation.venueId) ? eventPreparation.venueId : null,
+    promotedWrestlerIds: Array.isArray(eventPreparation.promotedWrestlerIds)
+      ? eventPreparation.promotedWrestlerIds.filter((id) => typeof id === 'string')
+      : [],
+    promoStyleId: isUnlocked('promoStyles', eventPreparation.promoStyleId)
+      ? eventPreparation.promoStyleId
+      : DEFAULT_CAREER_ARC_UNLOCKS.promoStyles[0],
+    presentationId: isUnlocked('presentations', eventPreparation.presentationId)
+      ? eventPreparation.presentationId
+      : DEFAULT_CAREER_ARC_UNLOCKS.presentations[0],
+  }
+}
+
+const computeCareerArcProgress = (arc, nextStats, nextCash) => {
+  const startFans = Number(arc?.startSnapshot?.fans || 0)
+  const startPrestige = Number(arc?.startSnapshot?.prestige || 0)
+  const startCash = Number(arc?.startSnapshot?.cash || 0)
+
+  return {
+    fanGain: Math.round(Number(nextStats?.fans || 0) - startFans),
+    prestigeGain: Math.round(Number(nextStats?.prestige || 0) - startPrestige),
+    cashGain: Math.round(Number(nextCash || 0) - startCash),
+  }
+}
+
+const areCareerArcGoalsMet = (arc, progress) => {
+  if (!arc?.goals) {
+    return false
+  }
+
+  return (
+    Number(progress?.fanGain || 0) >= Number(arc.goals.fanGain || 0)
+    && Number(progress?.prestigeGain || 0) >= Number(arc.goals.prestigeGain || 0)
+    && Number(progress?.cashGain || 0) >= Number(arc.goals.cashGain || 0)
+  )
+}
+
+const ONBOARDING_CHALLENGE_DURATION_DAYS = 21
+
+const buildOnboardingChallenge = ({ startDay, startFans, startCash }) => {
+  return {
+    challengeId: `onboarding-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    financeObjectiveVersion: 2,
+    status: 'active',
+    active: true,
+    startDay,
+    deadlineDay: startDay + ONBOARDING_CHALLENGE_DURATION_DAYS - 1,
+    baselineFans: Number(startFans || 0),
+    baselineCash: Number(startCash || 0),
+    objectives: {
+      rosterBuild: {
+        targetWrestlers: 2,
+        targetStaff: 1,
+        currentWrestlers: 0,
+        currentStaff: 0,
+        completed: false,
+      },
+      firstShow: {
+        targetSuccessfulEvents: 1,
+        currentSuccessfulEvents: 0,
+        completed: false,
+      },
+      stabilize: {
+        targetFanGain: 350,
+        targetOperatingCashFlow: 0,
+        currentFanGain: 0,
+        currentOperatingCashFlow: 0,
+        completed: false,
+      },
+    },
+    reward: {
+      cash: 80000,
+      prestige: 4,
+    },
+    penalty: {
+      fans: -250,
+      prestige: -3,
+    },
+  }
+}
+
+const progressOnboardingChallenge = ({
+  challenge,
+  day,
+  employees,
+  fans,
+  successfulEventIncrement = 0,
+  operatingCashFlowDelta = 0,
+}) => {
+  if (!challenge || challenge.status !== 'active') {
+    return { challenge, resolution: null }
+  }
+
+  const rosterBuild = challenge.objectives?.rosterBuild || {}
+  const firstShow = challenge.objectives?.firstShow || {}
+  const stabilize = challenge.objectives?.stabilize || {}
+  const wrestlerCount = (employees || []).filter((employee) => employee?.role === 'wrestler').length
+  const staffCount = (employees || []).filter((employee) => employee?.role === 'staff').length
+  const fanGain = Math.round(Number(fans || 0) - Number(challenge.baselineFans || 0))
+  const operatingCashFlow = Math.round(
+    Number(stabilize.currentOperatingCashFlow || 0) + Number(operatingCashFlowDelta || 0),
+  )
+  const nextSuccessfulEvents = Math.max(0, Number(firstShow.currentSuccessfulEvents || 0) + Number(successfulEventIncrement || 0))
+
+  const nextChallenge = {
+    ...challenge,
+    objectives: {
+      ...challenge.objectives,
+      rosterBuild: {
+        ...rosterBuild,
+        currentWrestlers: wrestlerCount,
+        currentStaff: staffCount,
+        completed: wrestlerCount >= Number(rosterBuild.targetWrestlers || 0)
+          && staffCount >= Number(rosterBuild.targetStaff || 0),
+      },
+      firstShow: {
+        ...firstShow,
+        currentSuccessfulEvents: nextSuccessfulEvents,
+        completed: nextSuccessfulEvents >= Number(firstShow.targetSuccessfulEvents || 1),
+      },
+      stabilize: {
+        ...stabilize,
+        currentFanGain: fanGain,
+        currentOperatingCashFlow: operatingCashFlow,
+        completed: fanGain >= Number(stabilize.targetFanGain || 0)
+          && operatingCashFlow >= Number(stabilize.targetOperatingCashFlow || 0),
+      },
+    },
+  }
+
+  const allObjectivesCompleted = Object.values(nextChallenge.objectives || {}).every((objective) => objective?.completed)
+  if (allObjectivesCompleted) {
+    return {
+      challenge: {
+        ...nextChallenge,
+        status: 'completed',
+        active: false,
+        completedDay: day,
+      },
+      resolution: 'completed',
+    }
+  }
+
+  if (day > Number(challenge.deadlineDay || day)) {
+    return {
+      challenge: {
+        ...nextChallenge,
+        status: 'failed',
+        active: false,
+        failedDay: day,
+      },
+      resolution: 'failed',
+    }
+  }
+
+  return { challenge: nextChallenge, resolution: null }
+}
+
+const ensureOnboardingChallengeShape = (challenge, timeline = [], currentDay = 1) => {
+  if (!challenge || typeof challenge !== 'object') {
+    return null
+  }
+
+  const persistedStabilize = challenge.objectives?.stabilize || {}
+  const {
+    targetCashGain: legacyTargetCashGain,
+    currentCashGain: legacyCurrentCashGain,
+    ...stabilizeFields
+  } = persistedStabilize
+  const financeObjectiveVersion = Number(challenge.financeObjectiveVersion)
+  const isLegacyFinanceObjective = !Number.isFinite(financeObjectiveVersion) || financeObjectiveVersion < 2
+  const defaults = buildOnboardingChallenge({
+    startDay: Number(challenge.startDay || 1),
+    startFans: Number(challenge.baselineFans || GAME_CONFIG.startingFans),
+    startCash: Number(challenge.baselineCash || GAME_CONFIG.startingCash),
+  })
+  const migratedOperatingCashFlow = (timeline || []).reduce((sum, entry) => {
+    const entryDay = Number(entry?.day)
+    if (entryDay <= Number(challenge.startDay || 1) || entryDay > Number(currentDay || 1)) {
+      return sum
+    }
+
+    return sum + (Number(entry?.delta) || 0)
+  }, 0)
+  const persistedOperatingCashFlow = Number(persistedStabilize.currentOperatingCashFlow)
+  const persistedOperatingTarget = Number(
+    persistedStabilize.targetOperatingCashFlow ?? legacyTargetCashGain,
+  )
+
+  return {
+    ...defaults,
+    ...challenge,
+    financeObjectiveVersion: 2,
+    objectives: {
+      ...defaults.objectives,
+      ...(challenge.objectives || {}),
+      rosterBuild: {
+        ...defaults.objectives.rosterBuild,
+        ...(challenge.objectives?.rosterBuild || {}),
+      },
+      firstShow: {
+        ...defaults.objectives.firstShow,
+        ...(challenge.objectives?.firstShow || {}),
+      },
+      stabilize: {
+        ...defaults.objectives.stabilize,
+        ...stabilizeFields,
+        targetOperatingCashFlow: isLegacyFinanceObjective
+          ? defaults.objectives.stabilize.targetOperatingCashFlow
+          : (Number.isFinite(persistedOperatingTarget)
+              ? persistedOperatingTarget
+              : defaults.objectives.stabilize.targetOperatingCashFlow),
+        currentOperatingCashFlow: isLegacyFinanceObjective
+          ? Math.round(migratedOperatingCashFlow)
+          : (Number.isFinite(persistedOperatingCashFlow)
+              ? persistedOperatingCashFlow
+              : Math.round(Number(legacyCurrentCashGain) || 0)),
+      },
+    },
+    reward: {
+      ...defaults.reward,
+      ...(challenge.reward || {}),
+    },
+    penalty: {
+      ...defaults.penalty,
+      ...(challenge.penalty || {}),
     },
   }
 }
@@ -599,21 +1239,10 @@ const createPreloadedCustomEvents = (startDateIso) => {
 }
 
 const parseIsoDateLocal = (isoDateString) => {
-  if (!isoDateString) {
-    return null
-  }
-
-  const [yearStr, monthStr, dayStr] = isoDateString.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-  const day = Number(dayStr)
-
-  if (!year || !month || !day) {
-    return null
-  }
-
-  return new Date(year, month - 1, day)
+  return parseGameDate(isoDateString)
 }
+
+const toStartOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
 const getScheduledDayFromSpecificDate = ({ specificDate, startDateIso, fallbackScheduledWeek }) => {
   const parsedSpecificDate = parseIsoDateLocal(specificDate)
@@ -622,7 +1251,7 @@ const getScheduledDayFromSpecificDate = ({ specificDate, startDateIso, fallbackS
 
   if (parsedSpecificDate && !Number.isNaN(parsedSpecificDate.getTime())) {
     const specificDateStart = toStartOfDay(parsedSpecificDate)
-    const diffDays = Math.floor((specificDateStart.getTime() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24))
+    const diffDays = getGameDayDifference(parsedStartDate, specificDateStart)
     scheduledDay = diffDays + 1
   }
 
@@ -651,10 +1280,7 @@ const getEventWeekKey = (event) => {
 }
 
 const toIsoDateLocal = (date) => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  return toGameDateIso(date)
 }
 
 const getEventMonthYearKey = (event) => {
@@ -740,6 +1366,9 @@ const EVENT_BOOKING_REFUND_RATE = 0.6
 
 const MATCH_SEGMENT_TYPES = new Set(['match', 'mainEvent', 'titleMatch'])
 const HELPER_ROLES = new Set(['announcer', 'referee'])
+const RIVALRY_DECAY_PER_EVENT = 1
+const RIVALRY_MAX_HEAT = 100
+const RIVALRY_MIN_HEAT_TO_KEEP = 4
 const HAPPINESS_TRACKED_ROLES = new Set(['wrestler', 'staff'])
 const MAX_STAMINA = 100
 const MAX_HAPPINESS = 100
@@ -755,6 +1384,15 @@ const HAPPINESS_LOCKOUT_DAYS = 90
 const HAPPINESS_BONUS_CASH_STEP = 1000
 const HAPPINESS_BONUS_MIN_BOOST = 1
 const HAPPINESS_BONUS_MAX_BOOST = 20
+const MORALE_DEMAND_HAPPINESS_THRESHOLD = 22
+const MORALE_DEMAND_RESPONSE_DAYS = 7
+const MORALE_DEMAND_WALKOUT_THRESHOLD = 5
+const MORALE_DEMAND_WALKOUT_OVERDUE_DAYS = 4
+const MORALE_DEMAND_SALARY_RAISE_MULTIPLIER = 0.15
+const MORALE_DEMAND_SALARY_RAISE_MIN = 1000
+const MORALE_TITLE_PROMISE_WINDOW_DAYS = 21
+const MORALE_TITLE_PROMISE_SUCCESS_BOOST = 6
+const MORALE_TITLE_PROMISE_FAIL_PENALTY = -12
 const DAILY_STAMINA_REGEN = 10
 const MIN_MATCH_STAMINA_LOSS = 20
 const MAX_MATCH_STAMINA_LOSS = 50
@@ -803,6 +1441,420 @@ const clampPopularity = (value) => {
   }
 
   return Math.max(0, Math.min(100, Math.round(numeric)))
+}
+
+const buildRivalryPairKey = (leftId, rightId) => {
+  return [leftId, rightId].sort().join('::')
+}
+
+const normalizeRivalries = (rivalries = []) => {
+  if (!Array.isArray(rivalries)) {
+    return []
+  }
+
+  return rivalries
+    .map((rivalry) => {
+      const ids = Array.isArray(rivalry?.wrestlerIds) ? rivalry.wrestlerIds.filter(Boolean).slice(0, 2) : []
+      if (ids.length !== 2) {
+        return null
+      }
+
+      const pairKey = buildRivalryPairKey(ids[0], ids[1])
+      const names = Array.isArray(rivalry?.wrestlerNames)
+        ? rivalry.wrestlerNames.filter(Boolean).slice(0, 2)
+        : []
+
+      return {
+        pairKey,
+        wrestlerIds: pairKey.split('::'),
+        wrestlerNames: names,
+        heat: Math.max(0, Math.min(RIVALRY_MAX_HEAT, Math.round(Number(rivalry?.heat) || 0))),
+        lastEventDay: Number.isInteger(Number(rivalry?.lastEventDay)) ? Number(rivalry.lastEventDay) : null,
+        lastSegmentType: typeof rivalry?.lastSegmentType === 'string' ? rivalry.lastSegmentType : null,
+        lastRating: Number.isFinite(Number(rivalry?.lastRating)) ? Number(rivalry.lastRating) : null,
+      }
+    })
+    .filter((rivalry) => rivalry && rivalry.heat > 0)
+}
+
+const getSegmentRivalryPairs = (segment, employeesById) => {
+  if (!MATCH_SEGMENT_TYPES.has(segment?.segmentType)) {
+    return []
+  }
+
+  const rating = Number(segment?.matchRating)
+  const hasRating = Number.isFinite(rating)
+  const baseGainByType = {
+    match: 5,
+    mainEvent: 7,
+    titleMatch: 8,
+  }
+  const ratingBonus = hasRating ? Math.max(0, Math.min(3, Math.floor(rating - 5))) : 0
+  const winnerBonus = segment?.winnerEmployeeId || (Array.isArray(segment?.winnerTeamIds) && segment.winnerTeamIds.length > 0) ? 1 : 0
+  const heatGain = Math.max(1, baseGainByType[segment.segmentType] + ratingBonus + winnerBonus)
+
+  const buildPair = (leftId, rightId) => {
+    if (!leftId || !rightId || leftId === rightId) {
+      return null
+    }
+
+    const left = employeesById.get(leftId)
+    const right = employeesById.get(rightId)
+    if (!left || !right || left.role !== 'wrestler' || right.role !== 'wrestler') {
+      return null
+    }
+
+    return {
+      pairKey: buildRivalryPairKey(leftId, rightId),
+      wrestlerIds: [leftId, rightId],
+      wrestlerNames: [left.name, right.name],
+      heatGain,
+      segmentType: segment.segmentType,
+      rating: hasRating ? Number(rating.toFixed(1)) : null,
+    }
+  }
+
+  if (segment.matchType === 'tagTeam') {
+    const team1 = Array.isArray(segment.team1Ids) ? segment.team1Ids : []
+    const team2 = Array.isArray(segment.team2Ids) ? segment.team2Ids : []
+    const pairs = []
+
+    team1.forEach((leftId) => {
+      team2.forEach((rightId) => {
+        const pair = buildPair(leftId, rightId)
+        if (pair) pairs.push(pair)
+      })
+    })
+
+    return pairs
+  }
+
+  const wrestlers = Array.from(new Set((segment.participantIds || [])
+    .map((id) => employeesById.get(id))
+    .filter((employee) => employee?.role === 'wrestler')
+    .map((employee) => employee.employeeId)))
+
+  const pairs = []
+  for (let i = 0; i < wrestlers.length; i += 1) {
+    for (let j = i + 1; j < wrestlers.length; j += 1) {
+      const pair = buildPair(wrestlers[i], wrestlers[j])
+      if (pair) pairs.push(pair)
+    }
+  }
+
+  return pairs
+}
+
+const updateRivalriesAfterEvent = ({ existingRivalries = [], configuredSegments = [], employees = [], day }) => {
+  const normalizedExisting = normalizeRivalries(existingRivalries)
+  const rivalriesByPair = new Map(
+    normalizedExisting.map((rivalry) => [
+      rivalry.pairKey,
+      {
+        ...rivalry,
+        heat: Math.max(0, rivalry.heat - RIVALRY_DECAY_PER_EVENT),
+      },
+    ]),
+  )
+
+  const employeesById = new Map((employees || []).map((employee) => [employee.employeeId, employee]))
+  const eventPairHeatGain = new Map()
+
+  configuredSegments.forEach((segment) => {
+    const pairs = getSegmentRivalryPairs(segment, employeesById)
+    pairs.forEach((pair) => {
+      const existing = rivalriesByPair.get(pair.pairKey) || {
+        pairKey: pair.pairKey,
+        wrestlerIds: pair.wrestlerIds,
+        wrestlerNames: pair.wrestlerNames,
+        heat: 0,
+        lastEventDay: null,
+        lastSegmentType: null,
+        lastRating: null,
+      }
+
+      const nextHeat = Math.min(RIVALRY_MAX_HEAT, existing.heat + pair.heatGain)
+      rivalriesByPair.set(pair.pairKey, {
+        ...existing,
+        wrestlerNames: pair.wrestlerNames,
+        heat: nextHeat,
+        lastEventDay: day,
+        lastSegmentType: pair.segmentType,
+        lastRating: pair.rating,
+      })
+
+      eventPairHeatGain.set(pair.pairKey, (eventPairHeatGain.get(pair.pairKey) || 0) + pair.heatGain)
+    })
+  })
+
+  const rivalries = Array.from(rivalriesByPair.values())
+    .filter((rivalry) => rivalry.heat >= RIVALRY_MIN_HEAT_TO_KEEP)
+    .sort((left, right) => right.heat - left.heat)
+    .slice(0, 120)
+
+  const rivalryHeatScore = Array.from(eventPairHeatGain.entries())
+    .reduce((sum, [pairKey, gain]) => {
+      const rivalry = rivalriesByPair.get(pairKey)
+      const heatWeight = rivalry ? Math.round(rivalry.heat / 8) : 0
+      return sum + gain + heatWeight
+    }, 0)
+
+  const rivalryHighlights = Array.from(eventPairHeatGain.entries())
+    .map(([pairKey, gain]) => {
+      const rivalry = rivalriesByPair.get(pairKey)
+      if (!rivalry) return null
+      return {
+        pairKey,
+        names: (rivalry.wrestlerNames || []).filter(Boolean).join(' vs '),
+        heat: rivalry.heat,
+        gain,
+      }
+    })
+    .filter(Boolean)
+    .sort((left, right) => {
+      if (right.gain !== left.gain) {
+        return right.gain - left.gain
+      }
+      return right.heat - left.heat
+    })
+    .slice(0, 3)
+
+  return {
+    rivalries,
+    rivalryHeatScore,
+    rivalryHighlights,
+  }
+}
+
+const getImpact = (value) => {
+  if (value > 0) return 'positive'
+  if (value < 0) return 'negative'
+  return 'neutral'
+}
+
+const buildEventPostmortem = ({
+  overallRating,
+  fanGrowthThreshold,
+  setupBonus,
+  sponsorFanBoost,
+  sponsorEventBoost,
+  rivalryFanBoost,
+  audienceSegmentFanImpact,
+  competitorFanImpact,
+  rivalryPrestigeBoost,
+  competitorPrestigeImpact,
+  fanDelta,
+  prestigeDelta,
+  incomeBreakdown,
+  expenseBreakdown,
+  net,
+}) => {
+  const fanFactors = [
+    {
+      key: 'ratingGate',
+      label: `Event rating gate (${Number.isFinite(overallRating) ? overallRating.toFixed(1) : 'N/A'} vs ${fanGrowthThreshold.toFixed(1)} threshold)`,
+      impact: getImpact(fanDelta),
+      value: fanDelta,
+    },
+    {
+      key: 'cardVariety',
+      label: 'Card segment variety bonus',
+      impact: getImpact(setupBonus?.fans || 0),
+      value: Math.round(setupBonus?.fans || 0),
+    },
+    {
+      key: 'sponsorBuzz',
+      label: 'Sponsor fan boost',
+      impact: getImpact(Math.round(sponsorFanBoost || 0)),
+      value: Math.round(sponsorFanBoost || 0),
+    },
+    {
+      key: 'rivalryBuzz',
+      label: 'Rivalry heat crowd reaction',
+      impact: getImpact(Math.round(rivalryFanBoost || 0)),
+      value: Math.round(rivalryFanBoost || 0),
+    },
+    {
+      key: 'audienceMix',
+      label: 'Audience segment fit bonus',
+      impact: getImpact(Math.round(audienceSegmentFanImpact || 0)),
+      value: Math.round(audienceSegmentFanImpact || 0),
+    },
+    {
+      key: 'competitorHeat',
+      label: 'Competitor pressure swing',
+      impact: getImpact(Math.round(competitorFanImpact || 0)),
+      value: Math.round(competitorFanImpact || 0),
+    },
+  ].filter((factor) => factor.value !== 0 || factor.key === 'ratingGate')
+
+  const prestigeFactors = [
+    {
+      key: 'matchQuality',
+      label: 'Match quality and card execution',
+      impact: getImpact(prestigeDelta),
+      value: prestigeDelta,
+    },
+    {
+      key: 'setupPrestige',
+      label: 'Segment setup prestige bonus',
+      impact: getImpact(Math.round(setupBonus?.prestige || 0)),
+      value: Math.round(setupBonus?.prestige || 0),
+    },
+    {
+      key: 'rivalryPrestige',
+      label: 'Rivalry momentum prestige boost',
+      impact: getImpact(Math.round(rivalryPrestigeBoost || 0)),
+      value: Math.round(rivalryPrestigeBoost || 0),
+    },
+    {
+      key: 'competitorPrestige',
+      label: 'Competitor prestige pressure',
+      impact: getImpact(Math.round(competitorPrestigeImpact || 0)),
+      value: Math.round(competitorPrestigeImpact || 0),
+    },
+  ].filter((factor) => factor.value !== 0 || factor.key === 'matchQuality')
+
+  const moneyFactors = [
+    {
+      key: 'eventGate',
+      label: 'Ticket gate and event takings',
+      impact: getImpact(incomeBreakdown?.eventGate || 0),
+      value: Math.round(incomeBreakdown?.eventGate || 0),
+    },
+    {
+      key: 'sponsorRevenue',
+      label: 'Sponsor revenue',
+      impact: getImpact((incomeBreakdown?.sponsor || 0) + Math.round((sponsorEventBoost || 0) * 1000)),
+      value: Math.round(incomeBreakdown?.sponsor || 0),
+    },
+    {
+      key: 'payrollCost',
+      label: 'Wrestler and staff payroll',
+      impact: 'negative',
+      value: -Math.round((expenseBreakdown?.wrestlerPayroll || 0) + (expenseBreakdown?.staffCost || 0)),
+    },
+    {
+      key: 'monthlyPayroll',
+      label: 'Recurring monthly payroll',
+      impact: 'negative',
+      value: -Math.round(expenseBreakdown?.monthlyPayroll || 0),
+    },
+    {
+      key: 'productionCost',
+      label: 'Production and operating costs',
+      impact: 'negative',
+      value: -Math.round((expenseBreakdown?.eventCost || 0) + (expenseBreakdown?.operatingCost || 0)),
+    },
+    {
+      key: 'net',
+      label: 'Net event impact',
+      impact: getImpact(net),
+      value: Math.round(net),
+    },
+  ]
+
+  return {
+    fanFactors,
+    prestigeFactors,
+    moneyFactors,
+  }
+}
+
+const clampPercent = (value) => Math.max(0, Math.min(100, Math.round(value)))
+
+const buildAudienceSegmentsBreakdown = ({
+  eventType,
+  audienceCount,
+  configuredSegments,
+  overallRating,
+  hype,
+  risk,
+  rivalryHeatScore,
+  sponsorFanBoost,
+  ticketPrice,
+}) => {
+  const totalSegments = Math.max(1, configuredSegments.length)
+  const promoInterviewCount = configuredSegments.filter((seg) => seg.segmentType === 'promo' || seg.segmentType === 'interview').length
+  const titleMatchCount = configuredSegments.filter((seg) => seg.segmentType === 'titleMatch').length
+  const mainEventCount = configuredSegments.filter((seg) => seg.segmentType === 'mainEvent').length
+
+  const promoShare = promoInterviewCount / totalSegments
+  const titleShare = titleMatchCount / totalSegments
+  const mainEventShare = mainEventCount / totalSegments
+  const qualityFactor = Number.isFinite(Number(overallRating)) ? Number(overallRating) / 10 : 0.55
+  const riskControl = Math.max(0, Math.min(1, 1 - (Number(risk) || 0) / 100))
+
+  const segmentBlueprints = [
+    {
+      key: 'casual',
+      label: 'Casual',
+      spendMultiplier: 1,
+      rawScore: 45 + hype * 0.18 + promoShare * 20 + qualityFactor * 12 - risk * 0.08,
+      satisfaction: clampPercent(48 + qualityFactor * 28 + promoShare * 18 + riskControl * 8),
+    },
+    {
+      key: 'hardcore',
+      label: 'Hardcore',
+      spendMultiplier: 1.2,
+      rawScore: 38 + qualityFactor * 30 + titleShare * 36 + mainEventShare * 18 + rivalryHeatScore * 0.12,
+      satisfaction: clampPercent(42 + qualityFactor * 34 + titleShare * 20 + rivalryHeatScore * 0.18),
+    },
+    {
+      key: 'family',
+      label: 'Family',
+      spendMultiplier: 0.85,
+      rawScore: 40 + riskControl * 25 + promoShare * 14 + sponsorFanBoost * 0.28 - rivalryHeatScore * 0.08,
+      satisfaction: clampPercent(44 + riskControl * 34 + promoShare * 12 - rivalryHeatScore * 0.1),
+    },
+    {
+      key: 'online',
+      label: 'Online',
+      spendMultiplier: 0.7,
+      rawScore: 36 + (eventType === 'digitalOnly' ? 24 : 0) + (eventType === 'ppv' ? 8 : 0) + promoShare * 16 + rivalryHeatScore * 0.18,
+      satisfaction: clampPercent(40 + qualityFactor * 20 + promoShare * 18 + rivalryHeatScore * 0.15 + (eventType === 'digitalOnly' ? 15 : 0)),
+    },
+  ]
+
+  const totalRawScore = Math.max(1, segmentBlueprints.reduce((sum, segment) => sum + Math.max(1, segment.rawScore), 0))
+  let assignedAudience = 0
+
+  const segments = segmentBlueprints.map((segment, index) => {
+    const ratio = Math.max(0, Math.max(1, segment.rawScore) / totalRawScore)
+    const attendance = index === segmentBlueprints.length - 1
+      ? Math.max(0, audienceCount - assignedAudience)
+      : Math.round(audienceCount * ratio)
+
+    assignedAudience += attendance
+
+    const fanImpact = Math.round((((segment.satisfaction - 55) / 45) * (attendance / Math.max(1, audienceCount))) * 120)
+
+    return {
+      key: segment.key,
+      label: segment.label,
+      attendance,
+      sharePercent: clampPercent(ratio * 100),
+      satisfaction: segment.satisfaction,
+      fanImpact,
+      spendMultiplier: segment.spendMultiplier,
+    }
+  })
+
+  const fanImpactTotal = segments.reduce((sum, segment) => sum + segment.fanImpact, 0)
+  const weightedSpendMultiplier = segments.reduce((sum, segment) => {
+    const share = segment.attendance / Math.max(1, audienceCount)
+    return sum + share * segment.spendMultiplier
+  }, 0)
+
+  const incomeAdjustment = Math.round(
+    audienceCount * ticketPrice * (weightedSpendMultiplier - 1) * 0.08,
+  )
+
+  return {
+    segments,
+    fanImpactTotal,
+    incomeAdjustment,
+  }
 }
 
 const rollStaminaLoss = () => {
@@ -1295,6 +2347,12 @@ const applyHappinessAndDeparture = ({
     let nextInactivityPenaltyDay = Number.isInteger(employee?.lastHappinessInactivityPenaltyDay)
       ? employee.lastHappinessInactivityPenaltyDay
       : null
+    let nextMoraleDemand = employee?.activeMoraleDemand && typeof employee.activeMoraleDemand === 'object'
+      ? employee.activeMoraleDemand
+      : null
+    let nextPromisedTitleShotByDay = Number.isInteger(employee?.promisedTitleShotByDay)
+      ? employee.promisedTitleShotByDay
+      : null
 
     if (employee.role === 'wrestler') {
       const todayMatchEntries = history.filter((entry) => (
@@ -1320,6 +2378,15 @@ const applyHappinessAndDeparture = ({
       const titleWins = titleWinCounts.get(employee.employeeId) || 0
       if (titleWins > 0) {
         nextHappiness += titleWins * HAPPINESS_TITLE_WIN
+        if (nextPromisedTitleShotByDay) {
+          nextHappiness += MORALE_TITLE_PROMISE_SUCCESS_BOOST
+          nextPromisedTitleShotByDay = null
+        }
+      }
+
+      if (nextPromisedTitleShotByDay && currentDay > nextPromisedTitleShotByDay) {
+        nextHappiness += MORALE_TITLE_PROMISE_FAIL_PENALTY
+        nextPromisedTitleShotByDay = null
       }
     }
 
@@ -1341,11 +2408,41 @@ const applyHappinessAndDeparture = ({
       nextInactivityPenaltyDay = currentDay
     }
 
+    if (nextMoraleDemand) {
+      const overdueDays = currentDay - Number(nextMoraleDemand.dueDay || currentDay)
+      if (overdueDays > 0) {
+        nextHappiness += overdueDays >= 6 ? -2 : -1
+      }
+    }
+
     const clampedHappiness = clampHappiness(nextHappiness)
-    if (clampedHappiness <= 0) {
+    const overdueWalkout = Boolean(
+      nextMoraleDemand
+      && currentDay > Number(nextMoraleDemand.dueDay || currentDay)
+      && (currentDay - Number(nextMoraleDemand.dueDay || currentDay)) >= MORALE_DEMAND_WALKOUT_OVERDUE_DAYS
+      && clampedHappiness <= MORALE_DEMAND_WALKOUT_THRESHOLD,
+    )
+    if (clampedHappiness <= 0 || overdueWalkout) {
       departingEmployeeIds.add(employee.employeeId)
       if (typeof employee.personId === 'string') {
         nextHiringLocks[employee.personId] = currentDay + HAPPINESS_LOCKOUT_DAYS
+      }
+    }
+
+    if (!nextMoraleDemand && clampedHappiness <= MORALE_DEMAND_HAPPINESS_THRESHOLD) {
+      const shouldDemand = Math.random() < 0.35
+      if (shouldDemand) {
+        const wantsTitleShot = employee.role === 'wrestler' && Math.random() < 0.5
+        const salaryRaiseAmount = Math.max(
+          MORALE_DEMAND_SALARY_RAISE_MIN,
+          Math.round(Number(employee?.contract?.monthlySalary || 0) * MORALE_DEMAND_SALARY_RAISE_MULTIPLIER),
+        )
+        nextMoraleDemand = {
+          demandType: wantsTitleShot ? 'titleShot' : 'salaryRaise',
+          requestedAmount: wantsTitleShot ? 0 : salaryRaiseAmount,
+          createdDay: currentDay,
+          dueDay: currentDay + MORALE_DEMAND_RESPONSE_DAYS,
+        }
       }
     }
 
@@ -1353,6 +2450,8 @@ const applyHappinessAndDeparture = ({
       ...employee,
       happiness: clampedHappiness,
       lastHappinessInactivityPenaltyDay: nextInactivityPenaltyDay,
+      activeMoraleDemand: nextMoraleDemand,
+      promisedTitleShotByDay: nextPromisedTitleShotByDay,
     }
   })
 
@@ -1422,7 +2521,7 @@ const normalizeSegmentType = (segmentType) => {
   return 'match'
 }
 
-const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments) => {
+const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unlocks) => {
   const maxSegments = Math.max(1, Number(eventSetup?.totalSegments) || Number(defaultMaxSegments) || 1)
 
   if (!Array.isArray(eventSetup?.segments) || eventSetup.segments.length === 0) {
@@ -1430,6 +2529,7 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments) => 
   }
 
   const validEmployeeIds = new Set((activeEmployees || []).map((employee) => employee.employeeId))
+  const normalizedUnlocks = normalizeCareerArcUnlocks(unlocks)
 
   const filterIds = (ids) =>
     Array.isArray(ids)
@@ -1509,6 +2609,10 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments) => 
       return {
         id: `segment-${index + 1}`,
         segmentType,
+        promoSegmentId: segmentType === 'promo'
+          && normalizedUnlocks.promoSegments.includes(segment?.promoSegmentId)
+          ? segment.promoSegmentId
+          : (segmentType === 'promo' ? DEFAULT_CAREER_ARC_UNLOCKS.promoSegments[0] : null),
         matchType: MATCH_SEGMENT_TYPES.has(segmentType) ? rawMatchType : null,
         matchStipulation: MATCH_SEGMENT_TYPES.has(segmentType) ? rawMatchStipulation : null,
         titleId: segmentType === 'titleMatch' && typeof segment?.titleId === 'string' ? segment.titleId : null,
@@ -1752,6 +2856,132 @@ const detectAutoTeams = ({ employees, prevTitles, nextTitles, currentDay, existi
 // ────────────────────────────────────────────────────────────────────────────
 
 const DEFAULT_SPONSOR_TYPE = 'digital'
+const MIN_SPONSOR_TRUST = 0
+const MAX_SPONSOR_TRUST = 100
+const HIGH_TIER_SPONSOR_MIN_TIER = 6
+const HIGH_TIER_BRAND_SAFETY_MIN = 60
+const HIGH_TIER_FAMILY_SHARE_MIN = 18
+const SPONSOR_CRITICAL_TRUST_EXIT_THRESHOLD = 12
+
+const clampSponsorTrust = (value, fallback = 55) => {
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric)) {
+    return Math.max(MIN_SPONSOR_TRUST, Math.min(MAX_SPONSOR_TRUST, Math.round(fallback)))
+  }
+
+  return Math.max(MIN_SPONSOR_TRUST, Math.min(MAX_SPONSOR_TRUST, Math.round(numeric)))
+}
+
+const getSponsorTrustFactor = (trust) => {
+  const normalized = clampSponsorTrust(trust) / 100
+  return 0.65 + normalized * 0.5
+}
+
+const getBrandFitTrustModifier = (brandFit = '', metrics = {}) => {
+  const fit = String(brandFit || '').toLowerCase()
+  const professionalism = Number(metrics.professionalism || 0)
+  const hype = Number(metrics.hype || 0)
+  const controversy = Number(metrics.controversy || 0)
+
+  if (['tech', 'media', 'luxury', 'community'].includes(fit)) {
+    return Math.round((professionalism / 4) - (controversy / 5))
+  }
+
+  if (['combat', 'entertainment', 'performance'].includes(fit)) {
+    return Math.round((hype / 4) + (controversy / 8))
+  }
+
+  if (['lifestyle'].includes(fit)) {
+    return Math.round((professionalism / 6) + (hype / 6) - (controversy / 10))
+  }
+
+  return Math.round((professionalism + hype - controversy) / 8)
+}
+
+const getEventSponsorProfile = (eventOutcome) => {
+  const segments = Array.isArray(eventOutcome?.segments) ? eventOutcome.segments : []
+  const audienceSegments = Array.isArray(eventOutcome?.audienceSegments) ? eventOutcome.audienceSegments : []
+  const totalSegments = Math.max(1, segments.length)
+  const violentSegments = segments.filter((segment) => (
+    segment?.segmentType === 'match' || segment?.segmentType === 'mainEvent' || segment?.segmentType === 'titleMatch'
+  )).length
+  const promoSegments = segments.filter((segment) => (
+    segment?.segmentType === 'promo' || segment?.segmentType === 'interview'
+  )).length
+  const familySegment = audienceSegments.find((segment) => segment?.key === 'family') || null
+  const familyShare = Number(familySegment?.sharePercent || 0)
+
+  const overallRating = Number(eventOutcome?.overallRating || 0)
+  const hype = Number(eventOutcome?.hype || 0)
+  const violentRatio = violentSegments / totalSegments
+  const promoRatio = promoSegments / totalSegments
+  const risk = Number(eventOutcome?.risk || 0)
+  const scandalScore = Math.max(0, risk - 22) + Math.max(0, 7 - overallRating) * 6
+  const starPower = Math.max(0, (overallRating - 5) * 18 + hype * 0.2)
+
+  const brandSafetyScore = Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(64 + familyShare * 0.9 + promoRatio * 16 - violentRatio * 22 - scandalScore * 0.45),
+    ),
+  )
+
+  return {
+    familyShare,
+    violentRatio,
+    promoRatio,
+    scandalScore,
+    starPower,
+    brandSafetyScore,
+    hype,
+  }
+}
+
+const getEventBrandFitTrustModifier = (brandFit = '', profile = {}) => {
+  const fit = String(brandFit || '').toLowerCase()
+  const brandSafety = Number(profile.brandSafetyScore || 0)
+  const familyShare = Number(profile.familyShare || 0)
+  const violentRatio = Number(profile.violentRatio || 0)
+  const scandalScore = Number(profile.scandalScore || 0)
+  const starPower = Number(profile.starPower || 0)
+
+  if (['tech', 'media', 'luxury', 'community'].includes(fit)) {
+    return Math.round((brandSafety - 55) / 8 + familyShare / 14 - scandalScore / 20)
+  }
+
+  if (['combat', 'entertainment', 'performance'].includes(fit)) {
+    return Math.round(starPower / 32 + violentRatio * 4 - scandalScore / 36)
+  }
+
+  if (['lifestyle'].includes(fit)) {
+    return Math.round((brandSafety - 50) / 10 + familyShare / 18 + starPower / 50 - scandalScore / 28)
+  }
+
+  return Math.round((brandSafety - 50) / 10)
+}
+
+const getSponsorSignRestrictionReason = ({ offer, lastOutcome }) => {
+  const tier = Number(offer?.tier || 1)
+  if (tier < HIGH_TIER_SPONSOR_MIN_TIER) {
+    return null
+  }
+
+  if (!lastOutcome) {
+    return 'needsTrackRecord'
+  }
+
+  const profile = getEventSponsorProfile(lastOutcome)
+  if (profile.brandSafetyScore < HIGH_TIER_BRAND_SAFETY_MIN) {
+    return 'brandSafety'
+  }
+
+  if (profile.familyShare < HIGH_TIER_FAMILY_SHARE_MIN) {
+    return 'familyAudience'
+  }
+
+  return null
+}
 
 const getStaffCombinedAbility = (employee) => {
   const ability = employee?.staffAbility || employee?.staff_ability || {}
@@ -1789,6 +3019,7 @@ const normalizeSponsor = (sponsor) => {
       contractWeeks: null,
       remainingDays: null,
       eventScoped: true,
+      trust: clampSponsorTrust(sponsor?.trust, sponsor?.reputation || 55),
     }
   }
 
@@ -1803,6 +3034,7 @@ const normalizeSponsor = (sponsor) => {
     contractWeeks,
     remainingDays,
     eventScoped: false,
+    trust: clampSponsorTrust(sponsor?.trust, sponsor?.reputation || 55),
   }
 }
 
@@ -1812,6 +3044,31 @@ const normalizeSponsors = (sponsors) => {
   }
 
   return sponsors.map(normalizeSponsor)
+}
+
+const normalizeSponsorOfferForMarket = (offer, index) => {
+  const sponsorType = SPONSOR_TYPE_CONFIG[offer?.sponsorType] ? offer.sponsorType : DEFAULT_SPONSOR_TYPE
+  const isEventScoped = SPONSOR_TYPE_CONFIG[sponsorType].eventScoped
+  const contractWeeks = isEventScoped
+    ? null
+    : Math.max(1, Math.round(Number(offer?.contractWeeks || 1)))
+
+  return {
+    offerId: String(offer?.offerId || `mod-offer-${Date.now()}-${index}`),
+    sponsorId: String(offer?.sponsorId || `mod-sponsor-${index}`),
+    name: String(offer?.name || 'Mod Sponsor Offer'),
+    sponsorType,
+    reputation: Math.max(0, Math.min(100, Math.round(Number(offer?.reputation || 50)))),
+    marketRegion: String(offer?.marketRegion || 'Global'),
+    brandFit: String(offer?.brandFit || 'Lifestyle'),
+    tier: Math.max(1, Math.min(7, Math.round(Number(offer?.tier || 1)))),
+    dailyPayout: Math.max(0, Math.round(Number(offer?.dailyPayout || 0))),
+    signingBonus: Math.max(0, Math.round(Number(offer?.signingBonus || 0))),
+    eventMultiplier: Number(Math.max(0, Math.min(3, Number(offer?.eventMultiplier || 0))).toFixed(2)),
+    fanBoost: Math.max(0, Math.round(Number(offer?.fanBoost || 0))),
+    trust: clampSponsorTrust(offer?.trust, offer?.reputation || 55),
+    contractWeeks,
+  }
 }
 
 const withEventSponsorName = (event, sponsors = []) => {
@@ -1832,18 +3089,35 @@ const withEventSponsorName = (event, sponsors = []) => {
 
 export const useGameStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...buildInitialState(),
 
-      startGame: ({ playerName, companyName }) => {
+      startGame: ({ playerName, companyName, preferredCountry = '' }) => {
         const cleanPlayerName = playerName.trim()
         const cleanCompanyName = companyName.trim()
+        const cleanPreferredCountry = String(preferredCountry || '').trim()
 
         if (!cleanPlayerName || !cleanCompanyName) {
           return { ok: false }
         }
 
         const initialState = buildInitialState()
+        const managementProfile = buildGeneratedManagementProfile({
+          preferredCountry: cleanPreferredCountry || undefined,
+        })
+
+        const careerUnlocks = normalizeCareerArcUnlocks(initialState.progression.unlocks)
+        const firstCareerArc = buildCareerArc({
+          startDay: 1,
+          stats: initialState.stats,
+          finances: initialState.finances,
+          unlocks: careerUnlocks,
+        })
+        const onboardingChallenge = buildOnboardingChallenge({
+          startDay: 1,
+          startFans: initialState.stats.fans,
+          startCash: initialState.finances.cash,
+        })
 
         set(() => ({
           ...initialState,
@@ -1854,7 +3128,16 @@ export const useGameStore = create(
           profile: {
             playerName: cleanPlayerName,
             companyName: cleanCompanyName,
+            ownerName: BOARD_CHAIR.person_name,
+            generalManagerName: cleanPlayerName,
+            homeCountry: managementProfile.homeCountry,
           },
+          progression: {
+            currentArc: firstCareerArc,
+            history: [],
+            unlocks: careerUnlocks,
+          },
+          onboardingChallenge,
         }))
 
         return { ok: true }
@@ -1862,6 +3145,587 @@ export const useGameStore = create(
 
       resetGame: () => {
         set(() => buildInitialState())
+      },
+
+      openBoardMeeting: () => {
+        const state = get()
+        const boardMeeting = normalizeBoardMeetingState(state.boardMeeting)
+        const currentDay = Number(state.calendar.day)
+
+        if (!state.gameStatus.hasStarted || state.gameStatus.isGameOver) {
+          return { ok: false, reason: 'gameNotActive' }
+        }
+        if (boardMeeting.activeMeeting) {
+          return { ok: true, meeting: boardMeeting.activeMeeting }
+        }
+        if (boardMeeting.lastMeetingDay === currentDay) {
+          return { ok: false, reason: 'alreadyHeld' }
+        }
+        if (!isBoardMeetingScheduledForDay({
+          startDateIso: state.calendar.startDateIso,
+          customEvents: state.events.customEvents,
+          day: currentDay,
+        })) {
+          return { ok: false, reason: 'notMeetingDay' }
+        }
+
+        const financeReport = getBoardMeetingFinanceReport(state)
+        const financeResult = recordBoardFinancialPeriod(boardMeeting, {
+          day: currentDay,
+          operatingNet: financeReport.operatingNet,
+        })
+        const mandateResult = resolveBoardMandates(financeResult.boardState, {
+          day: currentDay,
+          operatingNet: financeReport.operatingNet,
+        })
+        const updatedBoardState = mandateResult.boardState
+
+        if (financeResult.managerDismissed) {
+          const meetingRecord = {
+            meetingId: `board-meeting-${currentDay}`,
+            day: currentDay,
+            financeReport,
+            decisions: [],
+            status: 'managerDismissed',
+            mandateOutcomes: mandateResult.outcomes,
+          }
+          set((currentState) => ({
+            boardMeeting: {
+              ...updatedBoardState,
+              managerDismissed: true,
+              meetingHistory: [...updatedBoardState.meetingHistory, meetingRecord].slice(-24),
+            },
+            gameStatus: {
+              ...currentState.gameStatus,
+              isGameOver: true,
+              gameOverReason: 'three-negative-finance-periods',
+            },
+          }))
+          return { ok: true, managerDismissed: true, meeting: meetingRecord }
+        }
+
+        const meetingDate = getGameDateFromDay(state.calendar.startDateIso, currentDay)
+        const isJanuary = meetingDate.getMonth() === 0
+        const agendaPool = getBoardMeetingAgendaPool(state, financeReport, isJanuary)
+        const agendas = assignRandomBoardAgendaPresenters(
+          selectBoardAgendas({
+            agendaPool,
+            financialIsNegative: financeReport.operatingNet < 0,
+            requiredAgendaIds: isJanuary ? ['boardElection'] : [],
+          }),
+          BOARD_MEMBERS,
+          state.profile.generalManagerName || state.profile.playerName,
+        )
+        const activeMeeting = {
+          meetingId: `board-meeting-${currentDay}`,
+          day: currentDay,
+          financeReport,
+          isJanuary,
+          negativeFinanceMonths: updatedBoardState.consecutiveNegativeFinanceMonths,
+          agendas,
+          currentAgendaIndex: 0,
+          decisions: [],
+          mandateOutcomes: mandateResult.outcomes,
+          status: 'inProgress',
+        }
+
+        set(() => ({
+          boardMeeting: {
+            ...updatedBoardState,
+            activeMeeting,
+          },
+        }))
+        return { ok: true, meeting: activeMeeting }
+      },
+
+      resolveBoardAgenda: ({ agendaId, choiceId, candidateId = null } = {}) => {
+        const initialState = get()
+        const boardMeeting = normalizeBoardMeetingState(initialState.boardMeeting)
+        const activeMeeting = boardMeeting.activeMeeting
+        const agenda = activeMeeting?.agendas?.[activeMeeting.currentAgendaIndex]
+
+        if (!activeMeeting || activeMeeting.status !== 'inProgress' || !agenda) {
+          return { ok: false, reason: 'noActiveAgenda' }
+        }
+        if (agenda.id !== agendaId) {
+          return { ok: false, reason: 'agendaOutOfOrder' }
+        }
+
+        const choice = agenda.choices.find((candidate) => candidate.id === choiceId)
+        if (!choice) {
+          return { ok: false, reason: 'invalidChoice' }
+        }
+        const isBoardElectionVote = choice.effect === 'boardElectionVote'
+        if (
+          isBoardElectionVote
+          && !(agenda.context?.candidates || []).some(
+            (candidate) => candidate.person_name === candidateId,
+          )
+        ) {
+          return { ok: false, reason: 'invalidElectionCandidate' }
+        }
+        const cashCost = Math.max(0, Number(choice.cashCost) || 0)
+        if (cashCost > Number(initialState.finances.cash || 0)) {
+          return { ok: false, reason: 'insufficientCash' }
+        }
+
+        const electionResult = isBoardElectionVote
+          ? resolveBoardElection({
+              candidates: agenda.context.candidates,
+              boardMembers: BOARD_MEMBERS,
+              userChoiceId: candidateId,
+            })
+          : null
+        const voteResult = choice.requiresVote
+          ? conductWeightedBoardVote({
+              boardMembers: BOARD_MEMBERS,
+              relation: boardMeeting.relation,
+              proposerName: agenda.proposer?.person_name,
+              supportChance: choice.supportChance,
+            })
+          : null
+        let passed = electionResult !== null || !voteResult || voteResult.passed
+        let externalActionResult = null
+
+        if (passed && choice.effect === 'signSponsor') {
+          externalActionResult = get().signSponsor(agenda.context?.sponsorOffer?.offerId)
+          passed = Boolean(externalActionResult?.ok)
+          if (!passed) {
+            return {
+              ok: false,
+              reason: externalActionResult?.reason || 'sponsorSigningFailed',
+              voteResult,
+            }
+          }
+        }
+
+        const previousRejections = Number(
+          boardMeeting.rejectionCounts?.[agenda.proposer?.person_name],
+        ) || 0
+        const electionRelationDelta = electionResult
+          ? electionResult.president.candidateId === candidateId
+            ? 5
+            : electionResult.vicePresident.candidateId === candidateId
+              ? 2
+              : -3
+          : null
+        const relationDelta = passed
+          ? (electionRelationDelta ?? Number(choice.relationDelta || 0))
+            - (choice.isRejection ? getRepeatedRejectionPenalty(previousRejections) : 0)
+          : Number(choice.failedVoteRelationDelta ?? -2)
+        let result = { ok: true, passed, voteResult, electionResult, relationDelta }
+
+        set((state) => {
+          const currentBoardMeeting = normalizeBoardMeetingState(state.boardMeeting)
+          const currentMeeting = currentBoardMeeting.activeMeeting
+          const currentAgenda = currentMeeting?.agendas?.[currentMeeting.currentAgendaIndex]
+          if (!currentMeeting || currentAgenda?.id !== agendaId) {
+            result = { ok: false, reason: 'meetingChanged' }
+            return state
+          }
+
+          let nextRoster = state.roster
+          let nextFinances = state.finances
+          let nextStats = state.stats
+          let nextBoardMeeting = applyBoardRelationChange(currentBoardMeeting, relationDelta)
+          let nextMeeting = currentMeeting
+          let effectMessageKey = passed ? 'decisionApplied' : 'motionRejected'
+
+          if (passed && choice.isRejection && agenda.proposer?.person_name) {
+            const proposerName = agenda.proposer.person_name
+            nextBoardMeeting = {
+              ...nextBoardMeeting,
+              rejectionCounts: {
+                ...nextBoardMeeting.rejectionCounts,
+                [proposerName]: (Number(nextBoardMeeting.rejectionCounts?.[proposerName]) || 0) + 1,
+              },
+            }
+          }
+
+          if (passed && choice.effect === 'championChange') {
+            const { titleId, targetEmployeeId } = agenda.context.titleChange
+            const targetEmployee = state.roster.employees.find((employee) => employee.employeeId === targetEmployeeId)
+            const updatedTitles = state.roster.titles.map((title) => {
+              if (title.titleId !== titleId || !targetEmployee) {
+                return normalizeTitleRecord(title)
+              }
+
+              const currentHolderIds = normalizeTitleHolderIds(title)
+              const holderHistory = Array.isArray(title.holderHistory) ? [...title.holderHistory] : []
+              if (currentHolderIds.length > 0) {
+                holderHistory.push({
+                  holderEmployeeIds: currentHolderIds,
+                  holders: currentHolderIds.map((employeeId) => {
+                    const holder = state.roster.employees.find((employee) => employee.employeeId === employeeId)
+                    return {
+                      employeeId,
+                      name: holder?.name || employeeId,
+                      gender: holder?.gender || null,
+                      imageUrl: holder?.imageUrl || null,
+                    }
+                  }),
+                  startDay: Number(title.currentHolderStartDay || state.calendar.day),
+                  endDay: state.calendar.day,
+                  daysHeld: Math.max(1, state.calendar.day - Number(title.currentHolderStartDay || state.calendar.day) + 1),
+                })
+              }
+
+              return normalizeTitleRecord({
+                ...title,
+                holderEmployeeId: targetEmployeeId,
+                holderEmployeeIds: [],
+                currentHolderStartDay: state.calendar.day,
+                holderHistory: holderHistory.slice(-120),
+              })
+            })
+            nextRoster = { ...state.roster, titles: updatedTitles }
+          }
+
+          if (electionResult) {
+            const electionRecord = {
+              day: state.calendar.day,
+              userChoiceId: electionResult.userChoiceId,
+              votes: electionResult.votes,
+              rankedCandidates: electionResult.rankedCandidates,
+              president: electionResult.president,
+              vicePresident: electionResult.vicePresident,
+            }
+            nextBoardMeeting = {
+              ...nextBoardMeeting,
+              boardPresidentName: electionResult.president.person_name,
+              boardVicePresidentName: electionResult.vicePresident.person_name,
+              boardElectionHistory: [
+                ...(nextBoardMeeting.boardElectionHistory || []),
+                electionRecord,
+              ].slice(-12),
+            }
+            effectMessageKey = 'boardElectionRecorded'
+          }
+
+          if (passed && choice.effect === 'releaseSponsor' && agenda.context?.sponsorToReview) {
+            const sponsorId = agenda.context.sponsorToReview.sponsorId
+            nextRoster = {
+              ...state.roster,
+              sponsors: state.roster.sponsors.filter((sponsor) => sponsor.sponsorId !== sponsorId),
+            }
+          }
+
+          if (passed && choice.effect === 'wrestlerPush') {
+            const target = agenda.context.wrestlerPush
+            const nextEvent = state.events.bookedEvent
+            const deadlineDay = Math.max(
+              state.calendar.day + 1,
+              Number(nextEvent?.scheduledDay) || state.calendar.day + 30,
+            )
+            nextBoardMeeting = {
+              ...nextBoardMeeting,
+              pendingMandates: [
+                ...nextBoardMeeting.pendingMandates,
+                {
+                  id: `${currentMeeting.meetingId}-push-${target.employeeId}`,
+                  type: 'wrestlerPush',
+                  employeeId: target.employeeId,
+                  employeeName: target.name,
+                  targetAppearances: 1,
+                  appearances: 0,
+                  createdDay: state.calendar.day,
+                  deadlineDay,
+                  successRelationDelta: 6,
+                  failureRelationDelta: -8,
+                },
+              ],
+            }
+          }
+
+          if (passed && choice.effect === 'eventRatingMandate') {
+            const targetEvent = agenda.context.upcomingEvent
+            nextBoardMeeting = {
+              ...nextBoardMeeting,
+              pendingMandates: [
+                ...nextBoardMeeting.pendingMandates,
+                {
+                  id: `${currentMeeting.meetingId}-rating-${targetEvent.eventId}`,
+                  type: 'eventRating',
+                  eventId: targetEvent.eventId,
+                  eventName: targetEvent.name,
+                  targetRating: agenda.context.targetRating,
+                  targetDay: targetEvent.scheduledDay,
+                  deadlineDay: targetEvent.scheduledDay,
+                  createdDay: state.calendar.day,
+                  successRelationDelta: 6,
+                  failureRelationDelta: -8,
+                },
+              ],
+            }
+          }
+
+          if (passed && choice.effect === 'financialRecovery') {
+            const deadlineDay = getNextBoardMeetingDay({
+              startDateIso: state.calendar.startDateIso,
+              customEvents: state.events.customEvents,
+              currentDay: state.calendar.day,
+            })
+            nextBoardMeeting = {
+              ...nextBoardMeeting,
+              pendingMandates: [
+                ...nextBoardMeeting.pendingMandates,
+                {
+                  id: `${currentMeeting.meetingId}-recovery`,
+                  type: 'financialRecovery',
+                  createdDay: state.calendar.day,
+                  deadlineDay,
+                  successRelationDelta: 6,
+                  failureRelationDelta: -8,
+                },
+              ],
+            }
+          }
+
+          if (passed && choice.effect === 'extendMandates') {
+            nextBoardMeeting = {
+              ...nextBoardMeeting,
+              pendingMandates: nextBoardMeeting.pendingMandates.map((mandate) => ({
+                ...mandate,
+                deadlineDay: Number(mandate.deadlineDay || state.calendar.day) + 14,
+              })),
+            }
+          }
+
+          if (passed && choice.effect === 'cancelMandates') {
+            nextBoardMeeting = {
+              ...nextBoardMeeting,
+              pendingMandates: [],
+            }
+          }
+
+          if (passed && choice.effect === 'costControls') {
+            nextBoardMeeting = {
+              ...nextBoardMeeting,
+              costRelief: {
+                amount: Math.max(250, Number(nextBoardMeeting.costRelief?.amount) || 0),
+                throughDay: Math.max(
+                  state.calendar.day + 30,
+                  Number(nextBoardMeeting.costRelief?.throughDay) || 0,
+                ),
+              },
+            }
+          }
+
+          if (passed && ['eventInvestment', 'marketingInvestment', 'competitorResponse'].includes(choice.effect)) {
+            const fanGain = choice.effect === 'marketingInvestment'
+              ? 300
+              : choice.effect === 'eventInvestment'
+                ? 150
+                : 75
+            const prestigeGain = choice.effect === 'competitorResponse' ? 1 : 0
+            const entry = {
+              id: `tx-${Date.now()}-board-decision`,
+              day: state.calendar.day,
+              type: 'expense',
+              category: 'boardDecision',
+              amount: cashCost,
+              note: `${agenda.id} approved by the board`,
+            }
+            nextFinances = {
+              ...state.finances,
+              cash: state.finances.cash - cashCost,
+              lastExpenses: state.finances.lastExpenses + cashCost,
+              lastDelta: state.finances.lastDelta - cashCost,
+              ledger: cashCost > 0 ? appendLedger(state.finances.ledger, entry) : state.finances.ledger,
+            }
+            nextStats = {
+              ...state.stats,
+              fans: Math.max(0, state.stats.fans + fanGain),
+              prestige: Math.max(0, state.stats.prestige + prestigeGain),
+            }
+          }
+
+          const decision = {
+            agendaId,
+            agendaTitleKey: agenda.titleKey,
+            choiceId,
+            proposerName: agenda.proposer?.person_name || '',
+            passed,
+            relationDelta,
+            voteResult,
+            electionResult,
+            candidateId,
+            effectMessageKey: passed ? effectMessageKey : 'motionRejected',
+          }
+          const nextAgendas = currentMeeting.agendas.map((item) => (
+            item.id === agendaId
+              ? { ...item, status: 'resolved', selectedChoiceId: choiceId, voteResult, passed }
+              : item
+          ))
+          const isElectionResultPending = Boolean(electionResult)
+          const currentAgendaIndex = isElectionResultPending
+            ? currentMeeting.currentAgendaIndex
+            : currentMeeting.currentAgendaIndex + 1
+          nextMeeting = {
+            ...currentMeeting,
+            agendas: nextAgendas,
+            currentAgendaIndex,
+            decisions: [...currentMeeting.decisions, decision],
+            lastDecision: decision,
+            status: isElectionResultPending
+              ? 'electionResult'
+              : currentAgendaIndex >= nextAgendas.length
+                ? 'readyToClose'
+                : 'inProgress',
+          }
+
+          result = {
+            ok: true,
+            passed,
+            voteResult,
+            electionResult,
+            candidateId,
+            relationDelta,
+            effectMessageKey: decision.effectMessageKey,
+          }
+
+          return {
+            ...(nextRoster !== state.roster ? { roster: nextRoster } : {}),
+            ...(nextFinances !== state.finances ? { finances: nextFinances } : {}),
+            ...(nextStats !== state.stats ? { stats: nextStats } : {}),
+            boardMeeting: {
+              ...nextBoardMeeting,
+              activeMeeting: nextMeeting,
+            },
+          }
+        })
+
+        return result
+      },
+
+      acknowledgeBoardElectionResult: () => {
+        let result = { ok: false, reason: 'noElectionResult' }
+
+        set((state) => {
+          const boardMeeting = normalizeBoardMeetingState(state.boardMeeting)
+          const activeMeeting = boardMeeting.activeMeeting
+          const lastDecision = activeMeeting?.decisions?.at(-1)
+          if (
+            !activeMeeting
+            || activeMeeting.status !== 'electionResult'
+            || !lastDecision?.electionResult
+          ) {
+            return state
+          }
+
+          const currentAgendaIndex = activeMeeting.currentAgendaIndex + 1
+          const status = currentAgendaIndex >= activeMeeting.agendas.length
+            ? 'readyToClose'
+            : 'inProgress'
+          result = { ok: true, currentAgendaIndex, status }
+
+          return {
+            boardMeeting: {
+              ...boardMeeting,
+              activeMeeting: {
+                ...activeMeeting,
+                currentAgendaIndex,
+                status,
+              },
+            },
+          }
+        })
+
+        return result
+      },
+
+      finishBoardMeeting: () => {
+        let result = { ok: false, reason: 'noActiveMeeting' }
+
+        set((state) => {
+          const boardMeeting = normalizeBoardMeetingState(state.boardMeeting)
+          const activeMeeting = boardMeeting.activeMeeting
+          if (!activeMeeting || activeMeeting.status !== 'readyToClose') {
+            return state
+          }
+
+          const managerDismissed = rollBoardDismissal({ relation: boardMeeting.relation })
+          const gameOverReason = managerDismissed ? 'board-relation' : null
+          const meetingRecord = {
+            ...activeMeeting,
+            status: managerDismissed ? 'managerDismissed' : 'completed',
+            finalRelation: boardMeeting.relation,
+            completedDay: state.calendar.day,
+            gameOverReason,
+          }
+          const nextBoardMeeting = {
+            ...boardMeeting,
+            managerDismissed,
+            gameOverReason,
+            activeMeeting: null,
+            meetingHistory: [...boardMeeting.meetingHistory, meetingRecord].slice(-24),
+          }
+          result = { ok: true, managerDismissed, gameOverReason }
+
+          return {
+            boardMeeting: nextBoardMeeting,
+            gameStatus: managerDismissed
+              ? {
+                  ...state.gameStatus,
+                  isGameOver: true,
+                  gameOverReason,
+                }
+              : state.gameStatus,
+          }
+        })
+
+        return result
+      },
+
+      applyModDataPackage: (modPackage) => {
+        const validation = validateModDataPackage(modPackage)
+        if (!validation.ok) {
+          return {
+            ok: false,
+            errors: validation.errors,
+            warnings: validation.warnings,
+          }
+        }
+
+        set((state) => {
+          const modules = validation.data?.modules || {}
+          const nextTitles = Array.isArray(modules.titles)
+            ? modules.titles.map((title) => normalizeTitleRecord(title))
+            : state.roster.titles
+          const nextSponsorOffers = Array.isArray(modules.sponsorOffers)
+            ? modules.sponsorOffers.map((offer, index) => normalizeSponsorOfferForMarket(offer, index))
+            : state.market.sponsorOffers
+          const nextEventTemplates = Array.isArray(modules.eventTemplates)
+            ? modules.eventTemplates.map((template, index) => ({
+                eventId: String(template?.eventId || `mod-event-${index}`),
+                name: String(template?.name || `Mod Event ${index + 1}`),
+                productionScale: Math.max(1, Math.min(10, Math.round(Number(template?.productionScale || 2)))),
+                popularityWeight: Number(Math.max(0.2, Math.min(5, Number(template?.popularityWeight || 1))).toFixed(2)),
+                setupCost: Math.max(0, Math.round(Number(template?.setupCost || 0))),
+                hype: Math.max(0, Math.min(100, Math.round(Number(template?.hype || 70)))),
+                risk: Math.max(0, Math.min(100, Math.round(Number(template?.risk || 20)))),
+                templateKey: String(template?.templateKey || `${template?.eventId || 'event'}-${Date.now()}-${index}`),
+              }))
+            : state.market.eventTemplates
+
+          return {
+            roster: {
+              ...state.roster,
+              titles: nextTitles,
+            },
+            market: {
+              ...state.market,
+              sponsorOffers: nextSponsorOffers,
+              eventTemplates: nextEventTemplates,
+            },
+          }
+        })
+
+        return {
+          ok: true,
+          warnings: validation.warnings,
+          modules: Object.keys(validation.data?.modules || {}),
+        }
       },
 
       setActiveModule: (moduleId) => {
@@ -1960,6 +3824,90 @@ export const useGameStore = create(
         }))
       },
 
+      applyInterviewConsequences: ({ metrics = {}, forcedPreShow = false } = {}) => {
+        let result = {
+          fansDelta: 0,
+          prestigeDelta: 0,
+          sponsorTrustDeltaAverage: 0,
+          score: 0,
+        }
+
+        set((state) => {
+          const normalizedSponsors = normalizeSponsors(state.roster.sponsors)
+          const score = Number(metrics.score || 0)
+          const professionalism = Number(metrics.professionalism || 0)
+          const hype = Number(metrics.hype || 0)
+          const controversy = Number(metrics.controversy || 0)
+          const answerCount = Math.max(1, Number(metrics.answerCount || 1))
+          const forcedMultiplier = forcedPreShow ? 1.35 : 1
+
+          const fansDelta = Math.round(((score * 18) + (hype * 4) + (professionalism * 2) - (controversy * 2)) * forcedMultiplier)
+          const prestigeDelta = Math.round(((score / 2) + (professionalism / 3) + (hype / 4) - (controversy / 4)) * forcedMultiplier)
+
+          const sponsorTrustChanges = []
+          const nextSponsors = normalizedSponsors.map((sponsor) => {
+            const baseDelta = Math.round((score / 2) + (professionalism / 5) + (hype / 7) - (controversy / 6))
+            const fitDelta = getBrandFitTrustModifier(sponsor.brandFit, { professionalism, hype, controversy })
+            const trustDelta = Math.max(-10, Math.min(10, baseDelta + fitDelta))
+            const nextTrust = clampSponsorTrust((sponsor.trust ?? sponsor.reputation ?? 55) + trustDelta)
+
+            sponsorTrustChanges.push(nextTrust - (sponsor.trust ?? sponsor.reputation ?? 55))
+
+            return {
+              ...sponsor,
+              trust: nextTrust,
+            }
+          })
+
+          const avgTrustDelta = sponsorTrustChanges.length > 0
+            ? Number((sponsorTrustChanges.reduce((sum, value) => sum + value, 0) / sponsorTrustChanges.length).toFixed(1))
+            : 0
+
+          result = {
+            fansDelta,
+            prestigeDelta,
+            sponsorTrustDeltaAverage: avgTrustDelta,
+            score,
+          }
+
+          return {
+            stats: {
+              ...state.stats,
+              fans: Math.max(0, state.stats.fans + fansDelta),
+              prestige: Math.max(0, state.stats.prestige + prestigeDelta),
+            },
+            roster: {
+              ...state.roster,
+              sponsors: nextSponsors,
+            },
+            ai: {
+              ...state.ai,
+              lastInterviewImpact: {
+                day: state.calendar.day,
+                score,
+                answerCount,
+                fansDelta,
+                prestigeDelta,
+                sponsorTrustDeltaAverage: avgTrustDelta,
+              },
+            },
+            finances: {
+              ...state.finances,
+              ledger: appendLedger(state.finances.ledger, {
+                id: `tx-${Date.now()}-media-interview`,
+                day: state.calendar.day,
+                type: fansDelta + prestigeDelta >= 0 ? 'income' : 'expense',
+                category: 'dailyClose',
+                amount: Math.abs(fansDelta * 5 + prestigeDelta * 40),
+                note: `Media interview impact | score ${score >= 0 ? `+${score}` : score}, fans ${fansDelta >= 0 ? `+${fansDelta}` : fansDelta}, prestige ${prestigeDelta >= 0 ? `+${prestigeDelta}` : prestigeDelta}, avg sponsor trust ${avgTrustDelta >= 0 ? `+${avgTrustDelta}` : avgTrustDelta}`,
+              }),
+            },
+          }
+        })
+
+        return result
+      },
+
       rerollEmployeeMarket: () => {
         set((state) => ({
           market: {
@@ -2005,15 +3953,19 @@ export const useGameStore = create(
       },
 
       signSponsor: (offerId) => {
+        let result = { ok: false, reason: 'unknown' }
+
         set((state) => {
           const offer = state.market.sponsorOffers.find((item) => item.offerId === offerId)
           if (!offer) {
+            result = { ok: false, reason: 'notFound' }
             return state
           }
 
           const sponsorType = offer.sponsorType || DEFAULT_SPONSOR_TYPE
           const typeConfig = SPONSOR_TYPE_CONFIG[sponsorType]
           if (!typeConfig) {
+            result = { ok: false, reason: 'invalidType' }
             return state
           }
 
@@ -2021,6 +3973,7 @@ export const useGameStore = create(
           const occupiedSlots = normalizedSponsors.filter((item) => item.sponsorType === sponsorType).length
 
           if (occupiedSlots >= typeConfig.maxActive) {
+            result = { ok: false, reason: 'slotFull' }
             return state
           }
 
@@ -2029,6 +3982,17 @@ export const useGameStore = create(
           )
 
           if (typeConfig.eventScoped && !hasSponsorableUpcomingEvent) {
+            result = { ok: false, reason: 'eventBookingRequired' }
+            return state
+          }
+
+          const signRestrictionReason = getSponsorSignRestrictionReason({
+            offer,
+            lastOutcome: state.events.lastOutcome,
+          })
+
+          if (signRestrictionReason) {
+            result = { ok: false, reason: signRestrictionReason }
             return state
           }
 
@@ -2038,7 +4002,10 @@ export const useGameStore = create(
             sponsorType,
             contractWeeks,
             remainingDays: contractWeeks ? contractWeeks * 7 : null,
+            trust: clampSponsorTrust(offer.trust, offer.reputation || 55),
           })
+
+          result = { ok: true }
 
           return {
             roster: {
@@ -2065,6 +4032,8 @@ export const useGameStore = create(
             },
           }
         })
+
+        return result
       },
 
       createCustomEvent: ({ type, name, scheduledWeek, maxMatches, specificDate, isRecurringAnnually }) => {
@@ -2387,6 +4356,14 @@ export const useGameStore = create(
             : candidate
 
           const hiredEmployee = toEmployeeRecord(candidateForHire, state.calendar.day)
+          const nextEmployees = [...state.roster.employees, hiredEmployee]
+          const challengeProgress = progressOnboardingChallenge({
+            challenge: state.onboardingChallenge,
+            day: state.calendar.day,
+            employees: nextEmployees,
+            fans: state.stats.fans,
+            successfulEventIncrement: 0,
+          })
 
           hireResult = { ok: true, reason: null }
 
@@ -2397,12 +4374,12 @@ export const useGameStore = create(
           return {
             roster: {
               ...state.roster,
-              employees: [...state.roster.employees, hiredEmployee],
+              employees: nextEmployees,
             },
             market: {
               ...state.market,
               employeeCandidates: syncEmployeeCandidates({
-                employees: [...state.roster.employees, hiredEmployee],
+                employees: nextEmployees,
                 currentCandidates: state.market.employeeCandidates.filter((item) => item.candidateId !== candidateId),
                 currentDay: state.calendar.day,
                 hiringLocks: state.market.hiringLocks,
@@ -2426,6 +4403,7 @@ export const useGameStore = create(
                 note: `Upfront monthly salary for ${candidate.name} (${candidate.role})`,
               }),
             },
+            onboardingChallenge: challengeProgress.challenge,
           }
         })
 
@@ -2663,6 +4641,104 @@ export const useGameStore = create(
         return result
       },
 
+      resolveEmployeeMoraleDemand: (employeeId, decision) => {
+        const normalizedDecision = decision === 'approve' ? 'approve' : 'reject'
+        let result = { ok: false, reason: 'unknown' }
+
+        set((state) => {
+          const employee = state.roster.employees.find((item) => item.employeeId === employeeId)
+          if (!employee) {
+            result = { ok: false, reason: 'notFound' }
+            return state
+          }
+
+          const demand = employee.activeMoraleDemand
+          if (!demand || typeof demand !== 'object') {
+            result = { ok: false, reason: 'noDemand' }
+            return state
+          }
+
+          const demandType = demand.demandType === 'titleShot' ? 'titleShot' : 'salaryRaise'
+          const demandAmount = Math.max(0, Math.round(Number(demand.requestedAmount || 0)))
+
+          if (normalizedDecision === 'approve' && demandType === 'salaryRaise' && state.finances.cash < demandAmount) {
+            result = { ok: false, reason: 'insufficientCash' }
+            return state
+          }
+
+          let cashDelta = 0
+          let lastIncomeDelta = 0
+          let lastExpenseDelta = 0
+          let happinessDelta = 0
+          let titlePromiseByDay = employee.promisedTitleShotByDay || null
+          let nextContract = employee.contract
+          let ledger = state.finances.ledger
+
+          if (normalizedDecision === 'approve') {
+            if (demandType === 'salaryRaise') {
+              cashDelta -= demandAmount
+              lastExpenseDelta += demandAmount
+              happinessDelta = 12
+              nextContract = {
+                ...employee.contract,
+                monthlySalary: Math.max(0, Math.round((employee.contract?.monthlySalary || 0) * 1.1)),
+                perMatchSalary: Math.max(0, Math.round((employee.contract?.perMatchSalary || 0) * 1.08)),
+              }
+              ledger = appendLedger(ledger, {
+                id: `tx-${Date.now()}-morale-demand-approve`,
+                day: state.calendar.day,
+                type: 'expense',
+                category: 'employeeRetention',
+                amount: demandAmount,
+                note: `Approved salary raise demand for ${employee.name}`,
+              })
+            } else {
+              happinessDelta = 9
+              titlePromiseByDay = state.calendar.day + MORALE_TITLE_PROMISE_WINDOW_DAYS
+            }
+          } else {
+            happinessDelta = -10
+          }
+
+          const nextHappiness = clampHappiness((employee.happiness ?? DEFAULT_HAPPINESS) + happinessDelta)
+          result = {
+            ok: true,
+            decision: normalizedDecision,
+            demandType,
+            nextHappiness,
+          }
+
+          return {
+            roster: {
+              ...state.roster,
+              employees: state.roster.employees.map((item) => {
+                if (item.employeeId !== employeeId) {
+                  return item
+                }
+
+                return {
+                  ...item,
+                  happiness: nextHappiness,
+                  contract: nextContract,
+                  activeMoraleDemand: null,
+                  promisedTitleShotByDay: titlePromiseByDay,
+                }
+              }),
+            },
+            finances: {
+              ...state.finances,
+              cash: state.finances.cash + cashDelta,
+              lastIncome: state.finances.lastIncome + lastIncomeDelta,
+              lastExpenses: state.finances.lastExpenses + lastExpenseDelta,
+              lastDelta: state.finances.lastDelta + cashDelta,
+              ledger,
+            },
+          }
+        })
+
+        return result
+      },
+
       setSubscriptionFee: (fee) => {
         set((state) => {
           const parsed = Number(fee)
@@ -2701,15 +4777,7 @@ export const useGameStore = create(
         set((state) => ({
           events: {
             ...state.events,
-            eventPreparation: data
-              ? {
-                  eventId: typeof data.eventId === 'string' ? data.eventId : null,
-                  venueId: typeof data.venueId === 'string' ? data.venueId : null,
-                  promotedWrestlerIds: Array.isArray(data.promotedWrestlerIds)
-                    ? data.promotedWrestlerIds.filter((id) => typeof id === 'string')
-                    : [],
-                }
-              : null,
+            eventPreparation: normalizeEventPreparation(data, state.progression?.unlocks),
           },
         }))
       },
@@ -2857,6 +4925,10 @@ export const useGameStore = create(
 
       proceedTimeline: (eventSetup = null) => {
         set((state) => {
+          if (state.gameStatus.isGameOver) {
+            return state
+          }
+
           const nextCalendar = calculateNextCalendar(state.calendar.day, state.calendar.startDateIso)
           const nextActiveEmployees = filterActiveEmployees(state.roster.employees, nextCalendar.day)
           const normalizedSponsors = normalizeSponsors(state.roster.sponsors)
@@ -2870,10 +4942,16 @@ export const useGameStore = create(
           const executedCustomEventId = dueCustomEvent?.eventId || null
           const isSponsorableEventType = Boolean(productionWithSponsor && SPONSORABLE_EVENT_TYPES.includes(productionWithSponsor.type))
           const sponsorEventBoost = isSponsorableEventType
-            ? normalizedSponsors.reduce((sum, sponsor) => sum + sponsor.eventMultiplier, 0)
+            ? normalizedSponsors.reduce((sum, sponsor) => {
+                const trustFactor = getSponsorTrustFactor(sponsor.trust)
+                return sum + (sponsor.eventMultiplier * trustFactor)
+              }, 0)
             : 0
           const sponsorFanBoost = isSponsorableEventType
-            ? normalizedSponsors.reduce((sum, sponsor) => sum + sponsor.fanBoost, 0)
+            ? normalizedSponsors.reduce((sum, sponsor) => {
+                const trustFactor = getSponsorTrustFactor(sponsor.trust)
+                return sum + (sponsor.fanBoost * trustFactor)
+              }, 0)
             : 0
           let eventIncome = 0
           let perMatchSalaryExpenses = 0
@@ -2886,9 +4964,35 @@ export const useGameStore = create(
           let moraleDelta = 0
           let lastOutcome = null
           let configuredSegments = []
+          let nextRivalries = normalizeRivalries(state.events.rivalries)
+          let fanGrowthThresholdForPostmortem = 7.5
+          let setupBonusForPostmortem = { income: 0, fans: 0, prestige: 0 }
+          let sponsorFanBoostForPostmortem = 0
+          let sponsorEventBoostForPostmortem = 0
+          let rivalryFanBoostForPostmortem = 0
+          let audienceSegmentFanImpactForPostmortem = 0
+          let rivalryPrestigeBoostForPostmortem = 0
+          let competitorFanImpactForPostmortem = 0
+          let competitorPrestigeImpactForPostmortem = 0
+          let rivalryHighlightsForPostmortem = []
+          let competitorHeadline = null
+          let audienceSegmentsForOutcome = []
+          let sponsorTrustReactionsForOutcome = []
+          let departedSponsorsForOutcome = []
+          let competitorWorldNewsForOutcome = []
+          let competitorPoachedEmployeeId = null
+          let competitorSignedCandidateId = null
+          let competitorWorldFanImpactForOutcome = 0
+          let competitorWorldPrestigeImpactForOutcome = 0
+          let boardAttendanceForOutcome = null
 
           const eventSetupSegments = shouldRunEvent
-            ? sanitizeEventSetup(eventSetup, nextActiveEmployees, productionWithSponsor.maxMatches)
+            ? sanitizeEventSetup(
+                eventSetup,
+                nextActiveEmployees,
+                productionWithSponsor.maxMatches,
+                state.progression?.unlocks,
+              )
             : []
           const performanceApplied = applyDailyPerformanceChanges(nextActiveEmployees, eventSetupSegments)
           const nextActiveEmployeesWithPerformance = performanceApplied.employees
@@ -2897,8 +5001,17 @@ export const useGameStore = create(
           // Apply event preparation promotion bonus/penalty
           const prepEventId = dueCustomEvent?.eventId || 'regular-weekly-event'
           const prep = state.events.eventPreparation
-          if (shouldRunEvent && prep && prep.eventId === prepEventId) {
-            const promotedIds = Array.isArray(prep.promotedWrestlerIds) ? prep.promotedWrestlerIds : []
+          const matchedPreparation = shouldRunEvent && prep?.eventId === prepEventId
+            ? normalizeEventPreparation(prep, state.progression?.unlocks)
+            : null
+          const promoStyle = getCareerArcUnlockItem(
+            'promoStyles',
+            matchedPreparation?.promoStyleId || DEFAULT_CAREER_ARC_UNLOCKS.promoStyles[0],
+          )
+          const promoStyleRatingBonus = Number(promoStyle?.matchRatingBonus) || 0
+
+          if (matchedPreparation) {
+            const promotedIds = matchedPreparation.promotedWrestlerIds
             if (promotedIds.length >= 2) {
               const promotedMatchSeg = configuredSegments.find(
                 (seg) =>
@@ -2920,7 +5033,7 @@ export const useGameStore = create(
                   .sort((a, b) => (Number(b.popularity) || 0) - (Number(a.popularity) || 0))
                 const top5Ids = new Set(sortedByPop.slice(0, 5).map((e) => e.employeeId))
                 const hasQualifier = promotedIds.some((id) => top5Ids.has(id) || prepTitleHolderIds.has(id))
-                const promoBonus = hasQualifier ? 0.5 : 0.2
+                const promoBonus = (hasQualifier ? 0.5 : 0.2) + promoStyleRatingBonus
                 configuredSegments = configuredSegments.map((seg) => {
                   if (seg !== promotedMatchSeg) return seg
 
@@ -3038,14 +5151,34 @@ export const useGameStore = create(
             const setupBonus = configuredSegments.reduce(
               (totals, segment) => {
                 const typeBonus = SEGMENT_TYPE_BONUS[segment.segmentType] || SEGMENT_TYPE_BONUS.match
+                const promoSegmentBonus = segment.segmentType === 'promo'
+                  ? getCareerArcUnlockItem('promoSegments', segment.promoSegmentId)
+                  : null
                 return {
-                  income: totals.income + typeBonus.income,
-                  fans: totals.fans + typeBonus.fans,
+                  income: totals.income + typeBonus.income + (Number(promoSegmentBonus?.incomeBonus) || 0),
+                  fans: totals.fans + typeBonus.fans + (Number(promoSegmentBonus?.fanBonus) || 0),
                   prestige: totals.prestige + typeBonus.prestige,
                 }
               },
               { income: 0, fans: 0, prestige: 0 },
             )
+            setupBonusForPostmortem = setupBonus
+            sponsorFanBoostForPostmortem = sponsorFanBoost
+            sponsorEventBoostForPostmortem = sponsorEventBoost
+
+            const rivalryOutcome = updateRivalriesAfterEvent({
+              existingRivalries: state.events.rivalries,
+              configuredSegments,
+              employees: nextActiveEmployeesWithPerformance,
+              day: nextCalendar.day,
+            })
+            nextRivalries = rivalryOutcome.rivalries
+            const rivalryHeatScore = Math.max(0, rivalryOutcome.rivalryHeatScore || 0)
+            const rivalryFanBoost = Math.min(180, Math.round(rivalryHeatScore * 0.9))
+            const rivalryPrestigeBoost = Math.min(4, Math.round(rivalryHeatScore / 35))
+            rivalryFanBoostForPostmortem = rivalryFanBoost
+            rivalryPrestigeBoostForPostmortem = rivalryPrestigeBoost
+            rivalryHighlightsForPostmortem = rivalryOutcome.rivalryHighlights
 
             // Audience-based event income
             const eventType = productionWithSponsor.type
@@ -3065,10 +5198,39 @@ export const useGameStore = create(
             const audienceCount = Math.round(
               Math.max(audienceMin, Math.min(audienceMax, audienceMin + (audienceMax - audienceMin) * audienceNorm * crowdRand)),
             )
-            eventIncome = Math.round(audienceCount * ticketPrice * (1 + sponsorEventBoost) + setupBonus.income)
+            const audienceSegmentBreakdown = buildAudienceSegmentsBreakdown({
+              eventType,
+              audienceCount,
+              configuredSegments,
+              overallRating: null,
+              hype: productionWithSponsor.hype,
+              risk: productionWithSponsor.risk,
+              rivalryHeatScore,
+              sponsorFanBoost,
+              ticketPrice,
+            })
+            audienceSegmentsForOutcome = audienceSegmentBreakdown.segments
+            audienceSegmentFanImpactForPostmortem = audienceSegmentBreakdown.fanImpactTotal
+
+            const baseEventGateIncome = Math.round(
+              audienceCount * ticketPrice * (1 + sponsorEventBoost),
+            )
+            boardAttendanceForOutcome = getBoardEventAttendance({
+              eventType,
+              boardMembers: BOARD_MEMBERS,
+              boardPresidentName: state.boardMeeting?.boardPresidentName || BOARD_CHAIR.person_name,
+              boardVicePresidentName: state.boardMeeting?.boardVicePresidentName || BOARD_VICE_CHAIR.person_name,
+              baseGateRevenue: baseEventGateIncome,
+            })
+            eventIncome = Math.round(
+              baseEventGateIncome
+              + (boardAttendanceForOutcome?.gateBonusAmount || 0)
+              + setupBonus.income
+              + audienceSegmentBreakdown.incomeAdjustment,
+            )
 
             const baseFanDelta = Math.round(
-              130 + productionWithSponsor.hype * 0.9 - productionWithSponsor.risk * 0.45 + sponsorFanBoost + setupBonus.fans + setupParticipantCount,
+              130 + productionWithSponsor.hype * 0.9 - productionWithSponsor.risk * 0.45 + sponsorFanBoost + setupBonus.fans + setupParticipantCount + rivalryFanBoost + audienceSegmentBreakdown.fanImpactTotal,
             )
             // Prestige: driven by match quality (ratings), wrestler popularity, event type bonuses, and hype/risk
             const matchSegs = configuredSegments.filter((seg) => MATCH_SEGMENT_TYPES.has(seg.segmentType))
@@ -3091,7 +5253,7 @@ export const useGameStore = create(
               + (avgWrestlerPopularity / 100) * 2
               + matchRatingBonus,
             )
-            prestigeDelta = Math.round(calculatedPrestigeDelta / 5)
+            prestigeDelta = Math.round(calculatedPrestigeDelta / 5) + rivalryPrestigeBoost
             moraleDelta = 1
             const matchSegmentsForRating = configuredSegments.filter((seg) => MATCH_SEGMENT_TYPES.has(seg.segmentType))
             const ratedMatchSegs = matchSegmentsForRating.filter((seg) => Number.isFinite(Number(seg.matchRating)))
@@ -3106,18 +5268,41 @@ export const useGameStore = create(
               oneTime: 8,
               megaLive: 8.5,
             }[eventType] ?? 7.5
+            fanGrowthThresholdForPostmortem = fanGrowthThreshold
+            const competitorPressure = runCompetitorPressure({
+              overallRating,
+              rivalryHeatScore,
+              eventType,
+              day: state.calendar.day,
+            })
+            competitorHeadline = competitorPressure
+            competitorFanImpactForPostmortem = competitorPressure.fanImpact
+            competitorPrestigeImpactForPostmortem = competitorPressure.prestigeImpact
             const fansShouldGrow = overallRating !== null && overallRating > fanGrowthThreshold
-            fanDelta = fansShouldGrow ? Math.max(baseFanDelta, 0) : -Math.max(baseFanDelta, 0)
+            const adjustedBaseFanDelta = baseFanDelta + competitorPressure.fanImpact
+            fanDelta = fansShouldGrow ? Math.max(adjustedBaseFanDelta, 0) : -Math.max(adjustedBaseFanDelta, 0)
+            prestigeDelta += competitorPressure.prestigeImpact
             lastOutcome = {
               type: 'success',
+              eventId: productionWithSponsor.eventId,
+              venueId: matchedPreparation?.venueId || null,
+              promoStyleId: matchedPreparation?.promoStyleId || DEFAULT_CAREER_ARC_UNLOCKS.promoStyles[0],
+              presentationId: matchedPreparation?.presentationId || DEFAULT_CAREER_ARC_UNLOCKS.presentations[0],
+              scheduledDay: productionWithSponsor.scheduledDay,
               eventName: productionWithSponsor.name,
               eventType: productionWithSponsor.type,
               hype: productionWithSponsor.hype,
+              risk: productionWithSponsor.risk,
               overallRating,
               audience: audienceCount,
+              audienceSegments: audienceSegmentsForOutcome,
+              boardAttendance: boardAttendanceForOutcome,
               income: eventIncome,
               fanDelta,
               prestigeDelta,
+              competitorPressure,
+              rivalryHeatScore,
+              rivalryHighlights: rivalryHighlightsForPostmortem,
               segments: configuredSegments.map((seg) => {
                 const isTagTeamSeg = seg.matchType === 'tagTeam'
                 const segWinnerTeamIds = Array.isArray(seg.winnerTeamIds) ? seg.winnerTeamIds : []
@@ -3126,7 +5311,9 @@ export const useGameStore = create(
                   : nextActiveEmployeesWithPerformance.find((e) => e.employeeId === seg.winnerEmployeeId)?.name || null
                 return {
                   segmentType: seg.segmentType,
+                  promoSegmentId: seg.segmentType === 'promo' ? seg.promoSegmentId : null,
                   matchType: seg.matchType || null,
+                  participantIds: Array.isArray(seg.participantIds) ? seg.participantIds : [],
                   winnerEmployeeId: isTagTeamSeg ? null : (seg.winnerEmployeeId || null),
                   winnerTeamIds: isTagTeamSeg ? segWinnerTeamIds : [],
                   winnerName,
@@ -3159,12 +5346,42 @@ export const useGameStore = create(
                 uniqueParticipants: setupParticipantCount,
                 segments: configuredSegments.map((segment) => ({
                   segmentType: segment.segmentType,
+                  promoSegmentId: segment.segmentType === 'promo' ? segment.promoSegmentId : null,
                   participants: segment.participantIds
                     .map((participantId) => nextActiveEmployeesWithPerformance.find((employee) => employee.employeeId === participantId)?.name)
                     .filter(Boolean),
                 })),
               },
             }
+
+            const sponsorEventProfile = getEventSponsorProfile(lastOutcome)
+            const sponsorsWithEventReputation = normalizedSponsors.map((sponsor) => {
+              const baseRatingDelta = Math.round((Number(lastOutcome.overallRating || 0) - 6) * 1.1)
+              const baseSafetyDelta = Math.round((Number(sponsorEventProfile.brandSafetyScore || 0) - 55) / 16)
+              const fitDelta = getEventBrandFitTrustModifier(sponsor.brandFit, sponsorEventProfile)
+              const highTierPenalty = Number(sponsor.tier || 1) >= HIGH_TIER_SPONSOR_MIN_TIER
+                && Number(sponsorEventProfile.brandSafetyScore || 0) < HIGH_TIER_BRAND_SAFETY_MIN
+                ? -3
+                : 0
+              const trustDelta = Math.max(-10, Math.min(10, baseRatingDelta + baseSafetyDelta + fitDelta + highTierPenalty))
+              const previousTrust = Number(sponsor.trust ?? sponsor.reputation ?? 55)
+              const nextTrust = clampSponsorTrust(previousTrust + trustDelta)
+
+              sponsorTrustReactionsForOutcome.push({
+                sponsorId: sponsor.sponsorId,
+                name: sponsor.name,
+                trustDelta,
+                previousTrust,
+                nextTrust,
+              })
+
+              return {
+                ...sponsor,
+                trust: nextTrust,
+              }
+            })
+
+            normalizedSponsors.splice(0, normalizedSponsors.length, ...sponsorsWithEventReputation)
           }
 
           const nextActiveEmployeesWithStats = shouldRunEvent
@@ -3173,19 +5390,39 @@ export const useGameStore = create(
           const nextActiveEmployeesWithDecay = shouldRunEvent
             ? applyHeelFaceWeeklyDecay(nextActiveEmployeesWithStats)
             : nextActiveEmployeesWithStats
+
+          const competitorWorldResult = runCompetitorWorldSimulation({
+            day: nextCalendar.day,
+            shouldRunEvent,
+            lastOutcome,
+            employees: nextActiveEmployeesWithDecay,
+            marketCandidates: state.market.employeeCandidates,
+          })
+          competitorWorldNewsForOutcome = competitorWorldResult.newsItems
+          competitorPoachedEmployeeId = competitorWorldResult.poachedEmployeeId
+          competitorSignedCandidateId = competitorWorldResult.signedCandidateId
+          competitorWorldFanImpactForOutcome = competitorWorldResult.fanImpact
+          competitorWorldPrestigeImpactForOutcome = competitorWorldResult.prestigeImpact
+          fanDelta += competitorWorldResult.fanImpact
+          prestigeDelta += competitorWorldResult.prestigeImpact
+
+          const competitorAdjustedEmployees = competitorPoachedEmployeeId
+            ? nextActiveEmployeesWithDecay.filter((employee) => employee.employeeId !== competitorPoachedEmployeeId)
+            : nextActiveEmployeesWithDecay
+
           const nextTitlesBeforeHappiness = shouldRunEvent
             ? applyTitleMatchResults(state.roster.titles, configuredSegments, nextActiveEmployeesWithDecay, state.calendar.day)
             : state.roster.titles
 
           const happinessOutcome = applyHappinessAndDeparture({
-            employees: nextActiveEmployeesWithDecay,
+            employees: competitorAdjustedEmployees,
             prevTitles: state.roster.titles,
             nextTitles: nextTitlesBeforeHappiness,
             currentDay: state.calendar.day,
             existingHiringLocks: state.market.hiringLocks,
           })
 
-          const nextActiveEmployeesFinal = happinessOutcome.employees
+          let nextActiveEmployeesFinal = happinessOutcome.employees
           const remainingEmployeeIds = new Set(nextActiveEmployeesFinal.map((employee) => employee.employeeId))
           const nextTitles = sanitizeTitlesForActiveEmployees(nextTitlesBeforeHappiness, remainingEmployeeIds)
 
@@ -3257,10 +5494,15 @@ export const useGameStore = create(
           const eventCostExpense = shouldRunEvent
             ? (GAME_CONFIG.eventCost[productionWithSponsor.type] || 0)
             : 0
-          const operatingCost = Math.round(
+          const costReliefAmount = Number(state.boardMeeting?.costRelief?.throughDay) >= nextCalendar.day
+            ? Math.max(0, Number(state.boardMeeting?.costRelief?.amount) || 0)
+            : 0
+          const operatingCost = Math.max(0, Math.round(
             GAME_CONFIG.economy.expense.operatingBase
             + state.stats.prestige * GAME_CONFIG.economy.expense.operatingPrestigeMultiplier,
-          )
+          ) - costReliefAmount)
+          const monthlySalaryPayments = getMonthlySalaryPaymentsDue(nextActiveEmployees, nextCalendar.day)
+          const monthlyPayrollExpenses = monthlySalaryPayments.reduce((sum, payment) => sum + payment.amount, 0)
           const otherCost = Math.round(
             GAME_CONFIG.economy.expense.otherMin
             + Math.random() * (GAME_CONFIG.economy.expense.otherMax - GAME_CONFIG.economy.expense.otherMin),
@@ -3268,19 +5510,28 @@ export const useGameStore = create(
 
           const sponsorIncomeDailyValue = normalizedSponsors
             .filter((sponsor) => !sponsor.eventScoped)
-            .reduce((sum, sponsor) => sum + sponsor.dailyPayout, 0)
+            .reduce((sum, sponsor) => {
+              const trustFactor = getSponsorTrustFactor(sponsor.trust)
+              return sum + Math.round(sponsor.dailyPayout * trustFactor)
+            }, 0)
 
           const income = sponsorIncomeDailyValue + eventIncome + merchandiseIncome + websiteSubscriptionIncome + thirdPartyIncome
-          const expenses = perMatchSalaryExpenses + titleHolderMatchBonus + staffMatchExpenses + eventCostExpense + operatingCost + otherCost
+          const expenses = perMatchSalaryExpenses + titleHolderMatchBonus + staffMatchExpenses
+            + monthlyPayrollExpenses + eventCostExpense + operatingCost + otherCost
           const delta = income - expenses
-          const nextCash = state.finances.cash + delta
-          const nextFans = Math.max(0, state.stats.fans + fanDelta)
-          const nextPrestige = Math.max(0, state.stats.prestige + prestigeDelta)
+          let nextCash = state.finances.cash + delta
+          let nextFans = Math.max(0, state.stats.fans + fanDelta)
+          let nextPrestige = Math.max(0, state.stats.prestige + prestigeDelta)
           const nextMorale = Math.max(0, Math.min(100, state.stats.morale + moraleDelta))
           const nextCustomEvents = state.events.customEvents
-          const nextSponsors = normalizedSponsors.filter((sponsor) => {
+          let nextSponsors = normalizedSponsors.filter((sponsor) => {
             if (sponsor.eventScoped) {
               return !(shouldRunEvent && isSponsorableEventType)
+            }
+
+            if (Number(sponsor.tier || 1) >= HIGH_TIER_SPONSOR_MIN_TIER && Number(sponsor.trust || 0) <= SPONSOR_CRITICAL_TRUST_EXIT_THRESHOLD) {
+              departedSponsorsForOutcome.push(sponsor.name)
+              return false
             }
 
             return sponsor.remainingDays > 1
@@ -3294,6 +5545,108 @@ export const useGameStore = create(
               remainingDays: sponsor.remainingDays - 1,
             }
           })
+
+          const onboardingProgress = progressOnboardingChallenge({
+            challenge: state.onboardingChallenge,
+            day: nextCalendar.day,
+            employees: nextActiveEmployeesFinal,
+            fans: nextFans,
+            successfulEventIncrement: shouldRunEvent && lastOutcome?.type === 'success' ? 1 : 0,
+            operatingCashFlowDelta: delta,
+          })
+          const nextOnboardingChallenge = onboardingProgress.challenge
+          const boardMandateProgress = resolveBoardMandates(state.boardMeeting, {
+            day: nextCalendar.day,
+            eventOutcome: lastOutcome,
+          })
+
+          if (onboardingProgress.resolution === 'completed') {
+            const challengeReward = nextOnboardingChallenge?.reward || {}
+            nextCash += Number(challengeReward.cash || 0)
+            nextPrestige = Math.max(0, nextPrestige + Number(challengeReward.prestige || 0))
+          }
+
+          if (onboardingProgress.resolution === 'failed') {
+            const challengePenalty = nextOnboardingChallenge?.penalty || {}
+            nextFans = Math.max(0, nextFans + Number(challengePenalty.fans || 0))
+            nextPrestige = Math.max(0, nextPrestige + Number(challengePenalty.prestige || 0))
+          }
+
+          const progressionState = ensureProgressionShape(state.progression)
+          let activeArc = progressionState.currentArc
+          let progressionHistory = progressionState.history
+          let progressionUnlocks = progressionState.unlocks
+          const progressionStats = {
+            fans: nextFans,
+            prestige: nextPrestige,
+          }
+
+          if (!activeArc || activeArc.status !== 'active') {
+            activeArc = buildCareerArc({
+              startDay: nextCalendar.day,
+              stats: progressionStats,
+              finances: { cash: nextCash },
+              unlocks: progressionUnlocks,
+            })
+          }
+
+          const arcProgress = computeCareerArcProgress(activeArc, progressionStats, nextCash)
+          const goalsMet = areCareerArcGoalsMet(activeArc, arcProgress)
+          const arcExpired = nextCalendar.day > Number(activeArc.endDay || 0)
+
+          if (goalsMet) {
+            const reward = activeArc.reward || { cash: 0, prestige: 0, sponsorTrust: 0 }
+            nextCash += Number(reward.cash || 0)
+            nextPrestige = Math.max(0, nextPrestige + Number(reward.prestige || 0))
+            progressionUnlocks = applyCareerArcUnlocks(
+              progressionUnlocks,
+              Array.isArray(reward.unlockables) ? reward.unlockables : [],
+            )
+            nextSponsors = nextSponsors.map((sponsor) => ({
+              ...sponsor,
+              trust: clampSponsorTrust((sponsor.trust ?? sponsor.reputation ?? 55) + Number(reward.sponsorTrust || 0)),
+            }))
+
+            progressionHistory = [
+              {
+                ...activeArc,
+                status: 'completed',
+                completedDay: nextCalendar.day,
+                progress: arcProgress,
+              },
+              ...progressionHistory,
+            ].slice(0, 16)
+
+            activeArc = buildCareerArc({
+              startDay: nextCalendar.day,
+              stats: { fans: nextFans, prestige: nextPrestige },
+              finances: { cash: nextCash },
+              unlocks: progressionUnlocks,
+            })
+          } else if (arcExpired) {
+            progressionHistory = [
+              {
+                ...activeArc,
+                status: 'failed',
+                completedDay: nextCalendar.day,
+                progress: arcProgress,
+              },
+              ...progressionHistory,
+            ].slice(0, 16)
+
+            activeArc = buildCareerArc({
+              startDay: nextCalendar.day,
+              stats: { fans: nextFans, prestige: nextPrestige },
+              finances: { cash: nextCash },
+              unlocks: progressionUnlocks,
+            })
+          } else {
+            activeArc = {
+              ...activeArc,
+              progress: arcProgress,
+            }
+          }
+
           const nextHistoryEntry = {
             day: nextCalendar.day,
             week: nextCalendar.week,
@@ -3314,6 +5667,7 @@ export const useGameStore = create(
             },
             expenseBreakdown: {
               wrestlerPayroll: perMatchSalaryExpenses + titleHolderMatchBonus,
+              monthlyPayroll: monthlyPayrollExpenses,
               staffCost: staffMatchExpenses,
               eventCost: eventCostExpense,
               operatingCost,
@@ -3324,6 +5678,7 @@ export const useGameStore = create(
 
           // Patch lastOutcome with full day breakdown for event result summary
           if (lastOutcome) {
+            const netOutcome = income - expenses
             lastOutcome = {
               ...lastOutcome,
               incomeBreakdown: {
@@ -3336,12 +5691,52 @@ export const useGameStore = create(
               expenseBreakdown: {
                 eventCost: eventCostExpense,
                 wrestlerPayroll: perMatchSalaryExpenses + titleHolderMatchBonus,
+                monthlyPayroll: monthlyPayrollExpenses,
                 staffCost: staffMatchExpenses,
                 operatingCost,
                 otherCost,
               },
               totalDayIncome: income,
               totalDayExpenses: expenses,
+              postmortem: buildEventPostmortem({
+                overallRating: lastOutcome.overallRating,
+                fanGrowthThreshold: fanGrowthThresholdForPostmortem,
+                setupBonus: setupBonusForPostmortem,
+                sponsorFanBoost: sponsorFanBoostForPostmortem,
+                sponsorEventBoost: sponsorEventBoostForPostmortem,
+                rivalryFanBoost: rivalryFanBoostForPostmortem,
+                audienceSegmentFanImpact: audienceSegmentFanImpactForPostmortem,
+                competitorFanImpact: competitorFanImpactForPostmortem,
+                rivalryPrestigeBoost: rivalryPrestigeBoostForPostmortem,
+                competitorPrestigeImpact: competitorPrestigeImpactForPostmortem,
+                fanDelta,
+                prestigeDelta,
+                incomeBreakdown: {
+                  eventGate: eventIncome,
+                  merchandise: merchandiseIncome,
+                  sponsor: sponsorIncomeDailyValue,
+                  thirdParty: thirdPartyIncome,
+                  webSubscription: websiteSubscriptionIncome,
+                },
+                expenseBreakdown: {
+                  eventCost: eventCostExpense,
+                  wrestlerPayroll: perMatchSalaryExpenses + titleHolderMatchBonus,
+                  monthlyPayroll: monthlyPayrollExpenses,
+                  staffCost: staffMatchExpenses,
+                  operatingCost,
+                  otherCost,
+                },
+                net: netOutcome,
+              }),
+              rivalryHighlights: rivalryHighlightsForPostmortem,
+              competitorPressure: competitorHeadline,
+              sponsorTrustReactions: sponsorTrustReactionsForOutcome,
+              departedSponsors: departedSponsorsForOutcome,
+              competitorWorldImpact: {
+                fanImpact: competitorWorldFanImpactForOutcome,
+                prestigeImpact: competitorWorldPrestigeImpactForOutcome,
+              },
+              competitorWorldNews: competitorWorldNewsForOutcome,
             }
           }
 
@@ -3382,6 +5777,17 @@ export const useGameStore = create(
             })
           }
 
+          monthlySalaryPayments.forEach(({ employee, amount }) => {
+            nextLedger = appendLedger(nextLedger, {
+              id: `tx-${nextCalendar.day}-${employee.employeeId}-monthly-payroll`,
+              day: nextCalendar.day,
+              type: 'expense',
+              category: 'monthlyPayroll',
+              amount,
+              note: `Monthly salary payment for ${employee.name}`,
+            })
+          })
+
           if (thirdPartyIncome > 0) {
             nextLedger = appendLedger(nextLedger, {
               id: `tx-${Date.now()}-third-party`,
@@ -3399,8 +5805,93 @@ export const useGameStore = create(
             type: delta >= 0 ? 'income' : 'expense',
             category: 'dailyClose',
             amount: Math.abs(delta),
-            note: `Daily close | Income $${income.toLocaleString()} (event $${eventIncome.toLocaleString()}, merch $${merchandiseIncome.toLocaleString()}, web $${websiteSubscriptionIncome.toLocaleString()}) | Expenses $${expenses.toLocaleString()} (ops $${operatingCost.toLocaleString()}, other $${otherCost.toLocaleString()})`,
+            note: `Daily close | Income $${income.toLocaleString()} (event $${eventIncome.toLocaleString()}, merch $${merchandiseIncome.toLocaleString()}, web $${websiteSubscriptionIncome.toLocaleString()}) | Expenses $${expenses.toLocaleString()} (monthly payroll $${monthlyPayrollExpenses.toLocaleString()}, ops $${operatingCost.toLocaleString()}, other $${otherCost.toLocaleString()})`,
           })
+
+          if (goalsMet) {
+            const reward = progressionHistory[0]?.reward || activeArc.reward || {}
+            nextLedger = appendLedger(nextLedger, {
+              id: `tx-${Date.now()}-career-arc-reward`,
+              day: nextCalendar.day,
+              type: 'income',
+              category: 'careerArcReward',
+              amount: Math.max(0, Number(reward.cash || 0)),
+              note: `Career arc completed (${progressionHistory[0]?.templateKey || 'arc'}) reward payout`,
+            })
+          }
+
+          if (departedSponsorsForOutcome.length > 0) {
+            nextLedger = appendLedger(nextLedger, {
+              id: `tx-${Date.now()}-sponsor-churn`,
+              day: nextCalendar.day,
+              type: 'expense',
+              category: 'sponsorChurn',
+              amount: 0,
+              note: `Sponsors exited after poor brand fit: ${departedSponsorsForOutcome.join(', ')}`,
+            })
+          }
+
+          if (competitorPoachedEmployeeId) {
+            const poachedEmployee = nextActiveEmployeesWithDecay.find((employee) => employee.employeeId === competitorPoachedEmployeeId)
+            if (poachedEmployee) {
+              nextLedger = appendLedger(nextLedger, {
+                id: `tx-${Date.now()}-competitor-poach`,
+                day: nextCalendar.day,
+                type: 'expense',
+                category: 'competitorPoach',
+                amount: 0,
+                note: `Competitor poached ${poachedEmployee.name}`,
+              })
+            }
+          }
+
+          if (onboardingProgress.resolution === 'completed') {
+            const challengeReward = nextOnboardingChallenge?.reward || {}
+            nextLedger = appendLedger(nextLedger, {
+              id: `tx-${Date.now()}-onboarding-success`,
+              day: nextCalendar.day,
+              type: 'income',
+              category: 'careerArcReward',
+              amount: Math.max(0, Number(challengeReward.cash || 0)),
+              note: 'Onboarding rescue challenge completed bonus',
+            })
+          }
+
+          if (onboardingProgress.resolution === 'failed') {
+            const challengePenalty = nextOnboardingChallenge?.penalty || {}
+            nextLedger = appendLedger(nextLedger, {
+              id: `tx-${Date.now()}-onboarding-failed`,
+              day: nextCalendar.day,
+              type: 'expense',
+              category: 'employeeRetention',
+              amount: 0,
+              note: `Onboarding rescue challenge failed (fans ${Number(challengePenalty.fans || 0)}, prestige ${Number(challengePenalty.prestige || 0)})`,
+            })
+          }
+
+          const competitorFeedEntries = [
+            ...(lastOutcome?.competitorPressure
+              ? [{ ...lastOutcome.competitorPressure, id: `competitor-pressure-${state.calendar.day}-${Date.now()}` }]
+              : []),
+            ...((lastOutcome?.competitorWorldNews || []).map((entry, idx) => ({
+              ...entry,
+              id: `competitor-world-${state.calendar.day}-${idx}-${Date.now()}`,
+            }))),
+          ]
+
+          const nextCompetitorHeadlines = competitorFeedEntries.length > 0
+            ? [...state.events.competitorHeadlines, ...competitorFeedEntries].slice(-80)
+            : state.events.competitorHeadlines
+
+          const syncedCandidates = syncEmployeeCandidates({
+            employees: nextActiveEmployeesFinal,
+            currentCandidates: state.market.employeeCandidates,
+            currentDay: nextCalendar.day,
+            hiringLocks: happinessOutcome.hiringLocks,
+          })
+          const nextEmployeeCandidates = competitorSignedCandidateId
+            ? syncedCandidates.filter((candidate) => candidate.candidateId !== competitorSignedCandidateId)
+            : syncedCandidates
 
           return {
             calendar: nextCalendar,
@@ -3409,6 +5900,7 @@ export const useGameStore = create(
               customEvents: nextCustomEvents,
               bookedEvent: buildBookedEventProjection(nextCalendar.day, nextCustomEvents, state.calendar.startDateIso),
               lastOutcome,
+              rivalries: nextRivalries,
               eventLog: lastOutcome
                 ? [
                     ...state.events.eventLog,
@@ -3420,11 +5912,19 @@ export const useGameStore = create(
                     },
                   ].slice(-100)
                 : state.events.eventLog,
+              competitorHeadlines: nextCompetitorHeadlines,
               eventPreparation: (shouldRunEvent && prep?.eventId === prepEventId) ? null : state.events.eventPreparation,
             },
             history: {
               timeline,
             },
+            progression: {
+              currentArc: activeArc,
+              history: progressionHistory,
+              unlocks: progressionUnlocks,
+            },
+            boardMeeting: boardMandateProgress.boardState,
+            onboardingChallenge: nextOnboardingChallenge,
             finances: {
               ...state.finances,
               cash: nextCash,
@@ -3448,12 +5948,7 @@ export const useGameStore = create(
             },
             market: {
               ...state.market,
-              employeeCandidates: syncEmployeeCandidates({
-                employees: nextActiveEmployeesFinal,
-                currentCandidates: state.market.employeeCandidates,
-                currentDay: nextCalendar.day,
-                hiringLocks: happinessOutcome.hiringLocks,
-              }),
+              employeeCandidates: nextEmployeeCandidates,
               hiringLocks: happinessOutcome.hiringLocks,
             },
           }
@@ -3466,7 +5961,12 @@ export const useGameStore = create(
       merge: (persistedState, currentState) => {
         const typedPersistedState = persistedState || {}
         const restoredDay = Number(typedPersistedState?.calendar?.day) || currentState.calendar.day
-        const restoredStartDateIso = typedPersistedState?.calendar?.startDateIso || currentState.calendar.startDateIso
+        const restoredStartDateIso = resolveGameCalendarStartDate({
+          configuredStartDateIso: GAME_CONFIG.startDateIso,
+          persistedStartDateIso: typedPersistedState?.calendar?.startDateIso,
+          fallbackStartDateIso: currentState.calendar.startDateIso,
+        })
+        const isConfiguredStartDate = Boolean(GAME_CONFIG.startDateIso)
         const persistedTitles = typedPersistedState?.roster?.titles
         const hasPersistedTitles = Array.isArray(persistedTitles) && persistedTitles.length > 0
         const persistedTitlesById = hasPersistedTitles
@@ -3482,6 +5982,17 @@ export const useGameStore = create(
           ).map((title) => normalizeTitleRecord(title)),
         ]
         const normalizedPersistedSponsors = normalizeSponsors(typedPersistedState?.roster?.sponsors)
+        const normalizedPersistedProfile = {
+          ...currentState.profile,
+          ...(typedPersistedState?.profile || {}),
+          ownerName: BOARD_CHAIR.person_name,
+          generalManagerName: String(
+            typedPersistedState?.profile?.playerName
+            || currentState.profile.playerName
+            || '',
+          ),
+          homeCountry: String(typedPersistedState?.profile?.homeCountry || 'UnitedStates'),
+        }
         const persistedCustomEvents = Array.isArray(typedPersistedState?.events?.customEvents)
           ? typedPersistedState.events.customEvents
           : []
@@ -3492,8 +6003,9 @@ export const useGameStore = create(
             }
 
             const fallbackScheduledWeek = Number(event?.scheduledWeek) || 1
-            const scheduledDay = Number.isInteger(Number(event?.scheduledDay))
-              ? Number(event.scheduledDay)
+            const storedScheduledDay = Number(event?.scheduledDay)
+            const scheduledDay = isConfiguredStartDate && Number.isInteger(storedScheduledDay) && storedScheduledDay >= 1
+              ? storedScheduledDay
               : getScheduledDayFromSpecificDate({
                   specificDate: event?.specificDate,
                   startDateIso: restoredStartDateIso,
@@ -3507,9 +6019,11 @@ export const useGameStore = create(
             fallbackDate.setDate(fallbackDate.getDate() + weekOffset * 7)
 
             const persistedSpecificDate = parseIsoDateLocal(event?.specificDate)
-            const specificDate = persistedSpecificDate && !Number.isNaN(persistedSpecificDate.getTime())
-              ? event.specificDate
-              : toIsoDateLocal(fallbackDate)
+            const specificDate = isConfiguredStartDate && Number.isInteger(scheduledDay) && scheduledDay >= 1
+              ? toIsoDateLocal(getGameDateFromDay(restoredStartDateIso, scheduledDay))
+              : persistedSpecificDate && !Number.isNaN(persistedSpecificDate.getTime())
+                ? toIsoDateLocal(persistedSpecificDate)
+                : toIsoDateLocal(fallbackDate)
 
             return {
               eventId: event.eventId || `custom-event-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -3535,6 +6049,13 @@ export const useGameStore = create(
           const preloaded = preloadedById.get(event.eventId)
           if (!preloaded) {
             return event
+          }
+
+          if (isConfiguredStartDate) {
+            return {
+              ...preloaded,
+              imageUrl: event.imageUrl || preloaded.imageUrl || '',
+            }
           }
 
           return {
@@ -3569,10 +6090,47 @@ export const useGameStore = create(
           typedPersistedState?.market?.hiringLocks || {},
           restoredDay,
         )
+        const restoredProgression = ensureProgressionShape(
+          typedPersistedState?.progression,
+          { legacyVenueId: typedPersistedState?.events?.eventPreparation?.venueId },
+        )
+        const restoredBoardMeeting = normalizeBoardMeetingState(
+          typedPersistedState?.boardMeeting,
+          currentState.boardMeeting,
+        )
+        const restoredOnboardingChallenge = ensureOnboardingChallengeShape(
+          typedPersistedState?.onboardingChallenge,
+          typedPersistedState?.history?.timeline || [],
+          restoredDay,
+        )
+        const mergedStats = {
+          ...currentState.stats,
+          ...(typedPersistedState?.stats || {}),
+        }
+        const mergedProgression = {
+          ...restoredProgression,
+          currentArc: restoredProgression.currentArc || (
+            typedPersistedState?.gameStatus?.hasStarted
+              ? buildCareerArc({
+                  startDay: restoredDay,
+                  stats: mergedStats,
+                  finances: mergedFinances,
+                  unlocks: restoredProgression.unlocks,
+                })
+              : null
+          ),
+        }
 
         return {
           ...currentState,
           ...typedPersistedState,
+          gameStatus: {
+            ...currentState.gameStatus,
+            ...(typedPersistedState?.gameStatus || {}),
+            isGameOver: Boolean(typedPersistedState?.gameStatus?.isGameOver),
+            gameOverReason: typedPersistedState?.gameStatus?.gameOverReason || null,
+          },
+          profile: normalizedPersistedProfile,
           calendar: restoredCalendar,
           roster: {
             ...currentState.roster,
@@ -3590,6 +6148,14 @@ export const useGameStore = create(
             regularWeeklyEvent: currentState.events.regularWeeklyEvent,
             customEvents: mergedCustomEvents,
             bookedEvent: buildBookedEventProjection(restoredDay, mergedCustomEvents, restoredStartDateIso),
+            eventPreparation: normalizeEventPreparation(
+              typedPersistedState?.events?.eventPreparation,
+              restoredProgression.unlocks,
+            ),
+            rivalries: normalizeRivalries(typedPersistedState?.events?.rivalries || currentState.events.rivalries),
+            competitorHeadlines: Array.isArray(typedPersistedState?.events?.competitorHeadlines)
+              ? typedPersistedState.events.competitorHeadlines.slice(-60)
+              : currentState.events.competitorHeadlines,
           },
           ai: {
             ...currentState.ai,
@@ -3597,7 +6163,11 @@ export const useGameStore = create(
             showEnableModal: Boolean(typedPersistedState?.ai?.showEnableModal),
             error: typedPersistedState?.ai?.status === 'error' ? String(typedPersistedState?.ai?.error || '') : '',
           },
+          onboardingChallenge: restoredOnboardingChallenge,
+          boardMeeting: restoredBoardMeeting,
           finances: mergedFinances,
+          progression: mergedProgression,
+          stats: mergedStats,
           market: {
             ...currentState.market,
             ...typedPersistedState?.market,
@@ -3620,6 +6190,9 @@ export const useGameStore = create(
         market: state.market,
         events: state.events,
         history: state.history,
+        progression: state.progression,
+        onboardingChallenge: state.onboardingChallenge,
+        boardMeeting: state.boardMeeting,
         stats: state.stats,
         ui: state.ui,
         ai: state.ai,

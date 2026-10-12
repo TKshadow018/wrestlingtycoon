@@ -1,4 +1,7 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { getBoardMeetingSchedule } from '../../../utils/boardMeetings'
+import { getGameDateFromDay, parseGameDate } from '../../../utils/gameCalendar'
 import styles from './EventCalendar.module.scss'
 
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -38,45 +41,33 @@ const buildCalendarGrid = (month, year) => {
   return grid
 }
 
-const toStartOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
-
-const parseIsoDateLocal = (isoDateString) => {
-  if (!isoDateString) {
-    return null
-  }
-
-  const [yearStr, monthStr, dayStr] = isoDateString.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-  const day = Number(dayStr)
-
-  if (!year || !month || !day) {
-    return null
-  }
-
-  return new Date(year, month - 1, day)
-}
+const parseIsoDateLocal = (isoDateString) => parseGameDate(isoDateString)
 
 const formatGameDateFromDay = (startDateIso, gameDay) => {
-  const baseDate = parseIsoDateLocal(startDateIso) || new Date()
-  const gameDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate())
-  gameDate.setDate(gameDate.getDate() + Math.max(0, Number(gameDay || 1) - 1))
+  const gameDate = getGameDateFromDay(startDateIso, Math.max(1, Number(gameDay) || 1))
   return gameDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
 const getEventImageUrl = (event) => event?.imageUrl || event?.image_url || ''
 
 function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents, onDaySelect }) {
+  const { t } = useTranslation()
   const gameToday = useMemo(() => {
-    const base = parseIsoDateLocal(startDateIso)
-    const d = base ? toStartOfDay(base) : toStartOfDay(new Date())
-    d.setDate(d.getDate() + Math.max(0, Number(gameDay || 1) - 1))
-    return d
+    return getGameDateFromDay(startDateIso, Math.max(1, Number(gameDay) || 1))
   }, [startDateIso, gameDay])
   const [viewMonth, setViewMonth] = useState(() => gameToday.getMonth() + 1)
   const [viewYear, setViewYear] = useState(() => gameToday.getFullYear())
 
   const calendarGrid = useMemo(() => buildCalendarGrid(viewMonth, viewYear), [viewMonth, viewYear])
+
+  const boardMeetings = useMemo(
+    () => getBoardMeetingSchedule({
+      startDateIso,
+      customEvents,
+      throughDate: new Date(viewYear, viewMonth, 0),
+    }),
+    [customEvents, startDateIso, viewMonth, viewYear],
+  )
 
   // Map events to calendar dates
   const eventsByDay = useMemo(() => {
@@ -128,8 +119,22 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
       }
     })
 
+    boardMeetings.forEach((meeting) => {
+      const meetingDate = parseIsoDateLocal(meeting.specificDate)
+      if (!meetingDate || meetingDate.getMonth() + 1 !== viewMonth || meetingDate.getFullYear() !== viewYear) {
+        return
+      }
+
+      const eventDay = meetingDate.getDate()
+      eventMap[eventDay] = eventMap[eventDay] || []
+      eventMap[eventDay].push({
+        ...meeting,
+        name: t('dashboard.events.boardMeeting'),
+      })
+    })
+
     return eventMap
-  }, [viewMonth, viewYear, regularWeeklyEvent, customEvents])
+  }, [boardMeetings, customEvents, regularWeeklyEvent, t, viewMonth, viewYear])
 
   const isToday = (calendarDay) => {
     if (!calendarDay) return false
@@ -170,7 +175,13 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
     }
 
     const dayEvents = eventsByDay[calendarDay] || []
-    const customEvent = dayEvents.find((event) => Boolean(event.eventId) && event.type !== 'regularWeekly')
+    if (dayEvents.some((event) => event.isNonWrestling)) {
+      return
+    }
+
+    const customEvent = dayEvents.find(
+      (event) => Boolean(event.eventId) && event.type !== 'regularWeekly' && !event.isNonWrestling,
+    )
 
     if (customEvent) {
       onDaySelect?.({ mode: 'edit', event: customEvent })
@@ -212,7 +223,14 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
             const displayEvent = dayEvents.find((event) => Boolean(event.eventId) && event.type !== 'regularWeekly') || dayEvents[0] || null
             const isTodayCell = isToday(calendarDay)
             const displayEventImageUrl = getEventImageUrl(displayEvent)
-            const isCustomDisplayEvent = Boolean(displayEvent?.eventId) && displayEvent?.type !== 'regularWeekly'
+            const isCustomDisplayEvent = Boolean(displayEvent?.eventId)
+              && displayEvent?.type !== 'regularWeekly'
+              && !displayEvent?.isNonWrestling
+            const displayEventClass = displayEvent?.type === 'regularWeekly'
+              ? styles.regularWeekly
+              : displayEvent?.isNonWrestling
+                ? styles.boardMeeting
+                : styles.custom
 
             return (
               <div
@@ -226,7 +244,7 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
                     <div className={styles.eventsList}>
                       {displayEvent ? (
                         <div
-                          className={`${styles.eventBadge} ${styles.fullDayEvent} ${displayEvent.type === 'regularWeekly' ? styles.regularWeekly : styles.custom}`}
+                          className={`${styles.eventBadge} ${styles.fullDayEvent} ${displayEventClass}`}
                           title={displayEvent.name}
                         >
                           {isCustomDisplayEvent && displayEventImageUrl ? (
@@ -278,7 +296,11 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
         </div>
         <div className={styles.legendItem}>
           <div className={`${styles.legendColor} ${styles.custom}`}></div>
-          <span>Custom Event</span>
+          <span>{t('dashboard.events.customEventLegend')}</span>
+        </div>
+        <div className={styles.legendItem}>
+          <div className={`${styles.legendColor} ${styles.boardMeeting}`}></div>
+          <span>{t('dashboard.events.boardMeetingLegend')}</span>
         </div>
       </div>
     </div>

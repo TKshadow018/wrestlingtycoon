@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useGameStore } from '../../../store/useGameStore'
+import { getGameDayDifference, parseGameDate } from '../../../utils/gameCalendar'
 import EventCreateModal from './EventCreateModal'
 import EventCalendar from './EventCalendar'
 import styles from './ManageEventsModule.module.scss'
@@ -14,20 +15,7 @@ const getWeekFromDay = (day) => Math.floor((day - 1) / 7) + 1
 const toStartOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
 const parseIsoDateLocal = (isoDateString) => {
-  if (!isoDateString) {
-    return null
-  }
-
-  const [yearStr, monthStr, dayStr] = isoDateString.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-  const day = Number(dayStr)
-
-  if (!year || !month || !day) {
-    return null
-  }
-
-  return new Date(year, month - 1, day)
+  return parseGameDate(isoDateString)
 }
 
 const formatGameDateFromDay = (startDateIso, day) => {
@@ -51,8 +39,7 @@ const getScheduledWeekFromSpecificDate = (specificDate, currentGameDay, startDat
     return getWeekFromDay(currentGameDay)
   }
 
-  const diffMs = selectedDate.getTime() - today.getTime()
-  const diffDays = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)))
+  const diffDays = Math.max(0, getGameDayDifference(today, selectedDate))
   const targetGameDay = currentGameDay + diffDays
 
   return getWeekFromDay(targetGameDay)

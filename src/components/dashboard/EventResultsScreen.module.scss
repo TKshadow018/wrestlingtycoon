@@ -188,6 +188,13 @@
   text-shadow: 0 4px 32px rgba(243, 159, 97, 0.18);
 }
 
+.eventMeta {
+  color: var(--text-faint);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  margin: 0.55rem 0 0;
+}
+
 // ─── Divider ──────────────────────────────────────────────────────────────────
 
 .divider {
@@ -264,6 +271,69 @@
     color: #4dd9d0;
   }
 
+  .boardAttendanceCard {
+    align-items: center;
+    background:
+      radial-gradient(circle at 0% 50%, rgba(243, 159, 97, 0.17), transparent 50%),
+      rgba(9, 14, 21, 0.82);
+    border: 1px solid rgba(243, 159, 97, 0.42);
+    border-radius: 14px;
+    display: flex;
+    gap: 1rem;
+    max-width: 620px;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0.8rem;
+    width: 100%;
+  }
+
+  .boardAttendancePhoto {
+    aspect-ratio: 4 / 3;
+    border: 1px solid rgba(243, 159, 97, 0.52);
+    border-radius: 10px;
+    flex: 0 0 132px;
+    object-fit: cover;
+    object-position: center 25%;
+    width: 132px;
+  }
+
+  .boardAttendanceCopy {
+    display: grid;
+    gap: 0.26rem;
+
+    p,
+    h2 {
+      margin: 0;
+    }
+
+    h2 {
+      color: var(--text-main);
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 3vw, 1.6rem);
+      line-height: 1.05;
+    }
+
+    > p:not(.boardAttendanceLabel) {
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+    }
+
+    strong {
+      color: #f2c47b;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+  }
+
+  .boardAttendanceLabel {
+    color: var(--accent-copper);
+    font-size: 0.63rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
   .negative & {
     color: #f07070;
   }
@@ -274,6 +344,144 @@
   font-family: var(--font-body);
   font-size: 0.73rem;
   font-weight: 600;
+}
+
+.postmortemSection {
+  width: 100%;
+}
+
+.postmortemGrid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.postmortemCard,
+.rivalryCard {
+  background: rgba(9, 14, 21, 0.72);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 0.8rem 0.9rem;
+
+  h3 {
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin: 0 0 0.55rem;
+    text-transform: uppercase;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.rivalryCard {
+  margin-top: 0.75rem;
+}
+
+.factorItem {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.factorLabel {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.factorValue {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.factorPositive {
+  color: #6fe7a7;
+}
+
+.factorNegative {
+  color: #f58f8f;
+}
+
+.factorNeutral {
+  color: var(--text-faint);
+}
+
+.rivalryList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.rivalryItem {
+  align-items: baseline;
+  display: flex;
+  gap: 0.55rem;
+  justify-content: space-between;
+}
+
+.rivalryNames {
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.rivalryHeat {
+  color: var(--accent-copper);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.audienceSegmentItem {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.45rem 0.55rem;
+}
+
+.audienceSegmentMain {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+
+.audienceSegmentLabel {
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.audienceSegmentAttendance {
+  color: var(--text-muted);
+  font-size: 0.74rem;
+}
+
+.audienceSegmentMeta {
+  align-items: center;
+  color: var(--text-faint);
+  display: flex;
+  font-size: 0.7rem;
+  gap: 0.55rem;
+  justify-content: space-between;
 }
 
 // ─── Rating bar ───────────────────────────────────────────────────────────────

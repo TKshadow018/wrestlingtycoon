@@ -161,6 +161,28 @@
   margin: 0;
 }
 
+.unlockChoice {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.9rem 1.4rem;
+  color: var(--text-main);
+  font-size: 0.84rem;
+
+  select {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.55rem 0.7rem;
+    color: var(--text-main);
+    background: rgba(5, 9, 14, 0.8);
+    border: 1px solid var(--line-soft);
+    border-radius: 6px;
+  }
+
+  small {
+    color: var(--text-faint);
+  }
+}
+
 .emptyNote {
   padding: 1.2rem 1.4rem;
   font-size: 0.88rem;

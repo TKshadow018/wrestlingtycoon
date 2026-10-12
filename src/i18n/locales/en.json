@@ -15,6 +15,19 @@
     "playerNamePlaceholder": "Your booker identity",
     "companyName": "Company Name",
     "companyNamePlaceholder": "Promotion brand name",
+    "managementCountry": "Management Base Country",
+    "countryOptions": {
+      "UnitedStates": "United States",
+      "Canada": "Canada",
+      "UnitedKingdom": "United Kingdom",
+      "Japan": "Japan",
+      "India": "India",
+      "Mexico": "Mexico",
+      "Brazil": "Brazil",
+      "Germany": "Germany",
+      "Australia": "Australia",
+      "France": "France"
+    },
     "startingCashLabel": "Starting Cash",
     "startingCashValue": "$ {{amount}}",
     "validation": "Please complete both fields before starting.",
@@ -29,6 +42,8 @@
   "dashboard": {
     "welcome": "Welcome back, {{playerName}}",
     "company": "Promotion: {{companyName}}",
+    "managementLine": "Owner: {{owner}} | GM: {{manager}} | Base: {{country}}",
+    "managementUnknown": "TBD",
     "nextEvent": "Event Cycle: Every {{days}} days",
     "saveStatus": "Autosave enabled",
     "saveLoad": {
@@ -39,10 +54,18 @@
       "slotPlaceholder": "default",
       "save": "Save Game",
       "load": "Load Game",
+      "exportMods": "Export Mod Data",
+      "importMods": "Import Mod Data",
       "savedLocal": "Game saved locally.",
       "errorSaveLocal": "Failed to save local backup.",
       "noLocalSave": "No local backup found.",
       "errorLoadLocal": "Failed to load local backup.",
+      "modExported": "Mod package exported.",
+      "modExportFailed": "Failed to export mod package.",
+      "modImportSuccess": "Mod package imported. Updated {{moduleCount}} module(s).",
+      "modImportSuccessWithWarnings": "Mod package imported with {{warningCount}} warning(s). Updated {{moduleCount}} module(s).",
+      "modImportInvalid": "Mod package invalid: {{reason}}",
+      "modImportFailed": "Failed to import mod package.",
       "savedFirebase": "Cloud save updated (slot: {{slot}}).",
       "savedLocalFallback": "Cloud save failed ({{reason}}). Local backup was saved instead.",
       "noFirebaseSave": "No cloud save found for slot: {{slot}}.",
@@ -72,10 +95,13 @@
       "interviewClosing": "That wraps up our interview. Thanks for your time.",
       "interviewInitializing": "Connecting to journalist...",
       "interviewInitError": "Could not start interview right now. Try proceeding again.",
-      "interviewTurnError": "Interview response failed. Try again."
+      "interviewTurnError": "Interview response failed. Try again.",
+      "interviewImpactApplied": "Media impact applied: Fans {{fans}} | Prestige {{prestige}} | Sponsor trust {{trust}}",
+      "interviewImpactSummary": "Interview impact: Fans {{fans}} | Prestige {{prestige}} | Avg sponsor trust {{trust}}"
     },
     "controls": {
       "proceedDay": "Proceed to Next Day",
+      "openBoardMeeting": "Open Board Meeting",
       "proceedEvent": "Proceed to Event",
       "attendInterview": "Attend Interview",
       "eventPreparation": "Event Preparation",
@@ -88,7 +114,278 @@
       "week": "Week {{week}}",
       "cash": "Cash",
       "fans": "Fans",
-      "prestige": "Prestige"
+      "prestige": "Prestige",
+      "owner": "Owner",
+      "manager": "General Manager",
+      "country": "Home Country",
+      "competitorPressure": "Competitor Pressure",
+      "eventDay": "Event Day",
+      "nonEventDay": "No Event Today",
+      "boardMeeting": "Board Meeting"
+    },
+    "onboardingChallenge": {
+      "title": "3-Show Rescue Challenge",
+      "openButton": "Challenges",
+      "closeButton": "Close",
+      "subtitle": "Stabilize your promotion before momentum collapses.",
+      "cashProgressNote": "Uses daily operating income and costs; excludes one-time spending such as hiring and event bookings.",
+      "cashFlowProgress": "Operating net: {{amount}} (target: {{target}})",
+      "deadline": "{{days}} days left to complete all objectives.",
+      "objectiveDone": "Done",
+      "objectivePending": "Pending",
+      "objectiveRosterWrestlers": "wrestlers",
+      "objectiveRosterStaff": "staff",
+      "rewardHint": "Complete all objectives for +${{cash}} cash and +{{prestige}} prestige.",
+      "successSummary": "Challenge complete. Reward granted: +${{cash}} cash and +{{prestige}} prestige.",
+      "failSummary": "Challenge failed. Penalty applied: {{fans}} fans and {{prestige}} prestige.",
+      "status": {
+        "active": "Active",
+        "completed": "Completed",
+        "failed": "Failed"
+      },
+      "objectives": {
+        "rosterBuild": "Build a basic roster",
+        "firstShow": "Deliver one successful show",
+        "stabilize": "Keep operating cash flow at break-even or better"
+      }
+    },
+    "boardMeeting": {
+      "title": "Board of Directors",
+      "meetingTitle": "Monthly Board Meeting",
+      "boardroomTitle": "Boardroom seating",
+      "boardroomTable": "Board Meeting",
+      "boardroomSubtitle": "Promotion leadership",
+      "speakingNow": "Presenting agenda",
+      "boardPresident": "Board President",
+      "boardVicePresident": "Vice President",
+      "boardElectionRecorded": "The annual board election is complete.",
+      "ownershipVotes": "{{share}}% shareholding",
+      "voteCount": "{{count}} votes",
+      "castVote": "Cast your ballot",
+      "electionWinners": "President: {{president}} · Vice President: {{vicePresident}}",
+      "electionInstructions": "Choose your nominee for Board President. Each director casts one random ballot. The top vote-getter becomes President; second place becomes Vice President. Shareholding breaks vote ties.",
+      "electionResultTitle": "Annual election results",
+      "electionTieBreak": "Candidates are ranked by vote count; shareholding breaks ties.",
+      "electionCandidateColumn": "Candidate",
+      "electionVotesColumn": "Votes",
+      "electionSharesColumn": "Shares",
+      "electionResultColumn": "Result",
+      "electionNotElected": "Not elected",
+      "continueAfterElection": "Continue to meeting agenda",
+      "relation": "Board Relation",
+      "dismissalRisk": "{{percent}}% dismissal chance at current Relation",
+      "financeStreak": "Negative finance periods: {{count}} / 3",
+      "nextMeeting": "Next Board Meeting: {{date}}",
+      "financeReport": "Financial report",
+      "periodDays": "{{count}} operating days since the last meeting",
+      "negativeMonths": "{{count}} consecutive negative finance periods. The Board is pressuring management.",
+      "agendaCount": "Agenda {{current}} of {{total}}",
+      "proposedBy": "Proposed by {{name}} · {{role}}",
+      "theBoard": "The Board",
+      "relationChange": "Relation {{value}}",
+      "cost": "Costs {{amount}}",
+      "voteRequired": "Board vote required",
+      "meetingComplete": "Meeting decisions recorded",
+      "decisionsRecorded": "{{count}} agenda decisions recorded.",
+      "voteResult": "{{percent}}% of ownership supported the motion.",
+      "voteYes": "Yes",
+      "voteNo": "No",
+      "finishMeeting": "Conclude Meeting",
+      "decisionApplied": "The Board decision was enacted.",
+      "motionRejected": "The motion did not receive enough shareholder support.",
+      "agendaFallback": "Board discussion",
+      "pendingMandates": "Active Board Mandates",
+      "noPendingMandates": "No active mandates.",
+      "recentMeetings": "Recent Meeting Minutes",
+      "noMeetingHistory": "No Board Meetings have been completed yet.",
+      "meetingDay": "Day {{day}}",
+      "meetingDecisions": "{{count}} decisions",
+      "meetingNet": "Operating net: {{amount}}",
+      "mandates": {
+        "eventRating": "Deliver {{rating}} at {{event}}",
+        "wrestlerPush": "Feature {{name}} in an event",
+        "financialRecovery": "Return to positive operating cash flow",
+        "deadline": "Due by Day {{day}}"
+      },
+      "context": {
+        "sponsor": "Proposal: {{name}} · Signing bonus {{bonus}} · Daily payout {{daily}}.",
+        "activeSponsors": "Current sponsors: {{names}}.",
+        "sponsorTrust": "Trust {{trust}}",
+        "sponsorPerformance": "Sponsor under review: {{name}} · Trust {{trust}}.",
+        "champion": "Proposed champion for {{title}}: {{wrestler}}.",
+        "push": "The Board wants {{name}} featured.",
+        "event": "Upcoming event: {{name}}.",
+        "lastEvent": "Recent event: {{name}} · Rating {{rating}}.",
+        "rating": "Proposed event rating target: {{rating}}."
+      },
+      "notRated": "not rated",
+      "errors": {
+        "unknown": "The Board decision could not be completed.",
+        "insufficientCash": "There is not enough cash to approve this spending.",
+        "notMeetingDay": "There is no Board Meeting scheduled today.",
+        "alreadyHeld": "Today's Board Meeting has already been held.",
+        "gameNotActive": "The game is not active.",
+        "noActiveAgenda": "There is no active agenda item.",
+        "agendaOutOfOrder": "Resolve the current agenda item first.",
+        "invalidChoice": "That choice is not available.",
+        "invalidElectionCandidate": "Select an eligible board member for your ballot.",
+        "meetingChanged": "The meeting changed before this decision was saved.",
+        "notFound": "The proposed sponsor offer is no longer available.",
+        "slotFull": "There is no open slot for this sponsor type.",
+        "eventBookingRequired": "This sponsor requires an eligible event booking.",
+        "invalidType": "This sponsor offer has an unsupported type.",
+        "sponsorSigningFailed": "The sponsor could not be signed."
+      },
+      "gameOver": {
+        "title": "The Board Has Dismissed You",
+        "finance": "The promotion recorded three consecutive negative operating periods. The Board has ended your tenure as General Manager.",
+        "relation": "Board Relation fell into the dismissal range, and the Board voted to remove you as General Manager.",
+        "reset": "Return to Start Screen"
+      },
+      "agendas": {
+        "boardElection": {
+          "title": "Annual President & Vice President Election",
+          "description": "Choose your presidential nominee. The board will elect its President and Vice President for the coming year."
+        },
+        "financialReview": {
+          "title": "Financial Review",
+          "description": "The Audit Committee is concerned about the recent operating loss."
+        },
+        "sponsorReview": {
+          "title": "Sponsor Proposal",
+          "description": "A board member has brought a sponsor proposal to the meeting."
+        },
+        "eventReview": {
+          "title": "Event Review",
+          "description": "Discuss the latest results and the next event's budget."
+        },
+        "championChange": {
+          "title": "Champion Change",
+          "description": "The Board has a preferred challenger for an active championship."
+        },
+        "wrestlerPush": {
+          "title": "Talent Spotlight",
+          "description": "The Compensation Committee wants a wrestler featured on the next card."
+        },
+        "eventRatingTarget": {
+          "title": "Event Rating Mandate",
+          "description": "The Board wants management to commit to a rating target."
+        },
+        "mandateReview": {
+          "title": "Mandate Review",
+          "description": "The Board is reviewing previous commitments."
+        },
+        "investmentProposal": {
+          "title": "Marketing Investment",
+          "description": "The Board is considering a new audience-growth campaign."
+        },
+        "competitorResponse": {
+          "title": "Competitor Response",
+          "description": "The Board wants to decide how aggressively to respond to rivals."
+        },
+        "promotionStrategy": {
+          "title": "Long-Term Strategy",
+          "description": "The Vice Chair wants to confirm the promotion's strategic direction."
+        }
+      },
+      "choices": {
+        "presentRecoveryPlan": {
+          "label": "Present a recovery plan",
+          "description": "Commit to positive operating cash flow by the next Board Meeting."
+        },
+        "enactCostControls": {
+          "label": "Accept temporary cost controls",
+          "description": "Reduce daily operating costs for the next 30 game days."
+        },
+        "rejectPressure": {
+          "label": "Reject the Board's pressure",
+          "description": "Refuse to change course, at a significant cost to Board Relation."
+        },
+        "acceptSponsorProposal": {
+          "label": "Accept and sign the sponsor",
+          "description": "Sign the proposed contract and receive its stated terms."
+        },
+        "rejectSponsorProposal": {
+          "label": "Reject the sponsor",
+          "description": "Keep the current sponsor strategy, disappointing the proposer."
+        },
+        "maintainSponsorPortfolio": {
+          "label": "Keep the current sponsor portfolio",
+          "description": "Maintain current sponsor contracts."
+        },
+        "releaseUnderperformingSponsor": {
+          "label": "End the lowest-trust sponsor contract",
+          "description": "Remove the sponsor the Board is concerned about."
+        },
+        "investInEvent": {
+          "label": "Invest in the next event",
+          "description": "Spend $5,000 on promotion to increase audience growth."
+        },
+        "protectEventBudget": {
+          "label": "Protect the event budget",
+          "description": "Avoid new event spending and preserve cash."
+        },
+        "approveChampionChange": {
+          "label": "Approve the champion change",
+          "description": "Install the Board's chosen wrestler as champion."
+        },
+        "rejectChampionChange": {
+          "label": "Reject the champion change",
+          "description": "Keep the current champion and risk friction with the Board."
+        },
+        "acceptWrestlerPush": {
+          "label": "Accept the push request",
+          "description": "Feature the wrestler in at least one event before the deadline."
+        },
+        "declineWrestlerPush": {
+          "label": "Decline the push request",
+          "description": "Keep booking freedom, but disappoint the Compensation Committee."
+        },
+        "acceptEventRatingTarget": {
+          "label": "Commit to the target",
+          "description": "Meet the event rating target or lose Board Relation."
+        },
+        "declineEventRatingTarget": {
+          "label": "Decline the target",
+          "description": "Avoid a performance mandate, at a cost to Board Relation."
+        },
+        "reaffirmBoardMandates": {
+          "label": "Reaffirm the commitments",
+          "description": "Keep the existing targets and reassure the Board."
+        },
+        "extendBoardMandates": {
+          "label": "Request two more weeks",
+          "description": "Extend all active mandate deadlines by 14 game days."
+        },
+        "cancelBoardMandates": {
+          "label": "Abandon the commitments",
+          "description": "Cancel all active mandates and lose Board Relation."
+        },
+        "approveMarketingInvestment": {
+          "label": "Approve the marketing campaign",
+          "description": "Spend $10,000 to grow the audience and show the Board's support."
+        },
+        "deferMarketingInvestment": {
+          "label": "Defer the campaign",
+          "description": "Preserve cash now and revisit marketing later."
+        },
+        "counterCompetitorPromotion": {
+          "label": "Fund a competitor response",
+          "description": "Spend $5,000 on a short-term response and gain prestige."
+        },
+        "holdCurrentStrategy": {
+          "label": "Hold the current strategy",
+          "description": "Avoid new spending and keep the current plan."
+        },
+        "commitToLongTermGrowth": {
+          "label": "Commit to long-term growth",
+          "description": "Support a growth-oriented strategy and improve Board Relation."
+        },
+        "keepCurrentDirection": {
+          "label": "Keep the current direction",
+          "description": "Make no strategic change this month."
+        }
+      }
     },
     "modulePanel": {
       "title": "Operations Console",
@@ -153,6 +450,16 @@
       "bonusInsufficientCash": "Insufficient cash for this bonus.",
       "bonusInvalidAmount": "Enter a valid bonus amount.",
       "bonusFailed": "Could not apply bonus.",
+      "moraleDemandTitle": "Contract Demand",
+      "moraleDemandSalaryRaise": "Salary raise request: ${{amount}} retention package",
+      "moraleDemandTitleShot": "Creative control request: title shot promised within 21 days",
+      "moraleDemandDueDay": "Response due by day {{day}}",
+      "moraleApprove": "Approve Demand",
+      "moraleReject": "Reject Demand",
+      "moraleDemandApproved": "Demand approved.",
+      "moraleDemandRejected": "Demand rejected.",
+      "moraleDemandInsufficientCash": "Not enough cash to approve this salary demand.",
+      "moraleDemandFailed": "Could not resolve this demand.",
       "lowHappinessTitle": "Low Happiness Warning",
       "lowHappinessBody": "This employee is close to terminating their contract. Current happiness: {{happiness}}",
       "dismissWarning": "Dismiss",
@@ -213,18 +520,10 @@
       "memberCheckLabel": "Select {{name}}",
       "removeMember": "Remove"
     },
-    "hiring": {
-      "availableCash": "Available Cash: $ {{amount}}",
-      "refreshMarket": "Refresh Market",
-      "role": "Role: {{role}}",
-      "skill": "Skill: {{skill}}",
-      "tier": "Tier: {{tier}}",
-      "salary": "Daily Salary: $ {{amount}}",
-      "signingBonus": "Signing Bonus: $ {{amount}}",
-      "hire": "Hire",
-      "insufficientCash": "Insufficient Cash"
-    },
     "events": {
+      "boardMeeting": "Board Meeting",
+      "boardMeetingLegend": "Board Meeting (Non-Wrestling)",
+      "customEventLegend": "Custom Event",
       "availableCash": "Available Cash: $ {{amount}}",
       "refreshEvents": "Refresh Events",
       "bookedLabel": "Booked Event",
@@ -308,6 +607,13 @@
           "interview": "Interview",
           "promo": "Promo"
         },
+        "promoSegmentStyle": "Promo Format",
+        "promoSegments": {
+          "standardPromo": "Standard Promo",
+          "contractSigning": "Contract Signing",
+          "faceOff": "Rival Face-Off",
+          "videoPackage": "Video Package"
+        },
         "validation": {
           "participantsRequired": "Each segment requires at least one participant.",
           "needTwoWrestlers": "Match segments require at least two participants.",
@@ -361,6 +667,14 @@
       "lastIncome": "Last Income",
       "lastExpenses": "Last Expenses",
       "lastDelta": "Last Delta",
+      "projectedWeeklyNet": "Projected 7-Day Operating Net",
+      "cashRunway": "Estimated Cash Runway",
+      "runwaySampleDays": "Based on {{days}} recent game days.",
+      "runwayNoData": "Advance a day to start estimate",
+      "runwayDays": "~{{days}} days at projected burn",
+      "runwayGrowing": "Cash flow positive",
+      "runwayStable": "Break-even",
+      "runwayBasis": "Accrues active salaries; excludes one-time hiring costs.",
       "empty": "No ledger entries yet. Advance time to generate transactions.",
       "noData": "No financial data yet. Advance time to generate records.",
       "dayLabel": "{{date}}",
@@ -397,6 +711,7 @@
       },
       "expenses": {
         "wrestlerPayroll": "Wrestler Pay",
+        "monthlyPayroll": "Monthly Salaries",
         "staffCost": "Staff Cost",
         "eventCost": "Event Cost",
         "operatingCost": "Operating",
@@ -423,13 +738,53 @@
         "eventBooking": "Event Booking",
         "eventRefund": "Event Refund",
         "matchPayroll": "Wrestler Payroll",
+        "monthlyPayroll": "Monthly Payroll",
         "staffPayroll": "Staff Payroll",
         "eventCost": "Event Cost",
+        "boardDecision": "Board Decision",
         "thirdPartyIncome": "3rd Party Income",
         "hiring": "Hiring",
         "severance": "Severance",
         "sponsorSigning": "Sponsor Signing",
-        "employeeBonus": "Employee Bonus"
+        "employeeBonus": "Employee Bonus",
+        "careerArcReward": "Career Arc Reward",
+        "employeeRetention": "Employee Retention",
+        "sponsorChurn": "Sponsor Churn",
+        "competitorPoach": "Competitor Poach"
+      }
+    },
+    "careerArc": {
+      "empty": "No active arc yet. Start a game day to initialize career progression.",
+      "arcWindow": "Day {{start}} to Day {{end}}",
+      "goalFans": "Fan Growth",
+      "goalPrestige": "Prestige Growth",
+      "goalCash": "Cash Growth",
+      "rewardTitle": "Arc Reward",
+      "rewardValue": "$ {{cash}} | Prestige {{prestige}} | Sponsor Trust {{trust}}",
+      "unlocksTitle": "Content Unlocked on Completion",
+      "unlockCategories": {
+        "venues": "Venue",
+        "promoStyles": "Match Campaign",
+        "promoSegments": "Promo Format",
+        "presentations": "Presentation"
+      },
+      "historyTitle": "Recent Arc Results",
+      "historyEmpty": "No finished arcs yet.",
+      "completed": "Completed",
+      "failed": "Failed",
+      "templates": {
+        "audienceSurge": {
+          "title": "Audience Surge",
+          "description": "Build broad momentum with sustained fan and prestige growth while staying profitable."
+        },
+        "prestigeChase": {
+          "title": "Prestige Chase",
+          "description": "Focus on high-end show quality to drive prestige without sacrificing long-term cash flow."
+        },
+        "profitStability": {
+          "title": "Profit Stability",
+          "description": "Operate disciplined cards and maximize margins while still improving brand momentum."
+        }
       }
     },
     "sponsors": {
@@ -443,15 +798,36 @@
       "slotFull": "No free slot in this section.",
       "eventBookingRequired": "Book an event before signing event sponsors.",
       "eventTypeNotEligible": "Event sponsors only apply to PPV, Mega Live Event, and One Time Event.",
+      "highTierNeedsTrackRecord": "Tier 6-7 sponsors require a recent event track record.",
+      "highTierNeedsBrandSafety": "Tier 6-7 sponsors require stronger brand safety from your latest event.",
+      "highTierNeedsFamilyAudience": "Tier 6-7 sponsors require better family audience share from your latest event.",
       "tier": "Tier: {{tier}}",
       "signingBonus": "Signing Bonus: $ {{amount}}",
       "dailyPayout": "Daily Payout: $ {{amount}}",
       "eventBoost": "Event Boost: +{{percent}}%",
+      "trust": "Trust: {{value}}/100",
+      "baseTrust": "Starting trust: {{value}}/100",
+      "relationship": "Relationship: {{value}}",
       "contractLength": "Contract: {{value}}",
       "contractWeeks": "{{weeks}} weeks",
       "contractYears": "{{years}} years",
       "contractEvent": "For upcoming event only",
       "sign": "Sign Sponsor",
+      "relationshipLevels": {
+        "excellent": "Excellent",
+        "strong": "Strong",
+        "neutral": "Neutral",
+        "fragile": "Fragile",
+        "critical": "Critical"
+      },
+      "signErrors": {
+        "slotFull": "No available slot in this sponsor category.",
+        "eventBookingRequired": "Book an eligible event before signing this sponsor.",
+        "needsTrackRecord": "Run at least one event before signing Tier 6-7 sponsors.",
+        "brandSafety": "Latest event brand safety is too low for this sponsor.",
+        "familyAudience": "Latest event family audience share is too low for this sponsor.",
+        "signFailed": "Could not sign sponsor right now."
+      },
       "types": {
         "title": "Title Sponsor",
         "ring": "Ring Sponsor",
@@ -463,6 +839,17 @@
         "experience": "Specialized Experience Sponsor",
         "media": "Media Sponsor"
       }
+    },
+    "competitorIntel": {
+      "empty": "No competitor pressure data yet. Run an event to generate intelligence.",
+      "averageFanImpact": "Average Fan Swing",
+      "averagePrestigeImpact": "Average Prestige Swing",
+      "winningNights": "Winning Nights",
+      "losingNights": "Losing Nights",
+      "latestHeadline": "Latest Headline",
+      "dayLabel": "Day {{day}}",
+      "fanImpact": "Fans: {{value}}",
+      "prestigeImpact": "Prestige: {{value}}"
     },
     "eventRequirements": {
       "badge": "Requirements Not Met",
@@ -478,13 +865,23 @@
       "skip": "Skip the Event"
     },
     "eventResults": {
+      "boardMemberPresent": "Board Member in Attendance",
+      "boardGateBonus": "Board presence: +{{percent}}% gate · +{{amount}}",
       "defaultName": "Event Results",
+      "eventVenue": "Venue: {{venue}} · {{location}}",
+      "promoCampaign": "Campaign: {{name}}",
       "overallRating": "Event Rating",
       "hype": "Event Hype",
       "matches": "Matches",
       "prestige": "Prestige",
       "fans": "Fans",
       "revenue": "Event Revenue",
+      "audienceSegments": "Audience Segments",
+      "audienceSatisfaction": "Satisfaction",
+      "audienceFanImpact": "Fan impact",
+      "competitorTitle": "Competitor Pressure",
+      "competitorFans": "Fans {{value}}",
+      "competitorPrestige": "Prestige {{value}}",
       "segmentsLabel": "Segments",
       "continue": "Continue"
     },
@@ -517,6 +914,10 @@
         "nav": "Manage Events",
         "title": "Event Planning"
       },
+      "careerArc": {
+        "nav": "Career Arc",
+        "title": "Season Arc"
+      },
       "manageTitles": {
         "nav": "Manage Titles",
         "title": "Championship Management"
@@ -540,6 +941,18 @@
       "manageSponsors": {
         "nav": "Manage Sponsors",
         "title": "Brand Partnerships"
+      },
+      "competitorIntel": {
+        "nav": "Competitor Intel",
+        "title": "Competition Desk"
+      },
+      "board": {
+        "nav": "Board",
+        "title": "Board of Directors",
+        "galleryTitle": "Leadership & Board",
+        "galleryDescription": "The people leading the promotion and representing its shareholders.",
+        "memberCount": "{{count}} board members",
+        "photoUnavailable": "Photo unavailable"
       }
     },
     "matchResults": {
@@ -659,13 +1072,27 @@
         "megaLive": "Mega Live Event"
       },
       "venueTitle": "1. Select Venue",
-      "venueHint": "Choose the venue for this event. The selected venue will be used as the event location.",
+      "venueHint": "Choose an unlocked venue for this event. Career Arc rewards unlock additional locations.",
       "indoor": "Indoor",
       "outdoor": "Outdoor",
       "venueCapacity": "Capacity: {{capacity}}",
       "venueSelected": "Selected: {{name}}, {{location}}",
       "promoTitle": "2. Promote a Match",
       "promoHint": "Select exactly 2 wrestlers to advertise as the featured match. If they compete together on the night, the match gets a rating bonus.",
+      "promoStyleTitle": "Featured-Match Campaign",
+      "promoStyleBonus": "Adds +{{bonus}} match rating when the promoted pair competes.",
+      "promoStyles": {
+        "spotlight": "Featured Spotlight",
+        "hometownBuzz": "Hometown Buzz",
+        "nationalSpotlight": "National Spotlight"
+      },
+      "presentationTitle": "Event Presentation",
+      "presentationHint": "Choose the event intro look. Career Arc rewards unlock additional presentations.",
+      "presentations": {
+        "classic": "Classic Broadcast",
+        "championship": "Championship Night",
+        "retro": "Retro Spotlight"
+      },
       "promoNoWrestlers": "No wrestlers on the roster to promote.",
       "promoSelected": "{{count}} / 2 wrestlers selected",
       "promoSelectMore": "Select one more wrestler to complete the featured pairing.",

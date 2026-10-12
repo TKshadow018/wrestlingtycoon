@@ -102,6 +102,27 @@
   z-index: 3;
 }
 
+.presentationClassic {}
+
+.presentationChampionship .content {
+  border-color: rgba(246, 205, 111, 0.72);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.46), 0 0 34px rgba(246, 205, 111, 0.22);
+}
+
+.presentationChampionship .label {
+  color: #f6cd6f;
+}
+
+.presentationRetro .content {
+  background: linear-gradient(160deg, rgba(29, 19, 15, 0.9) 0%, rgba(40, 26, 18, 0.72) 100%);
+  border-color: rgba(220, 156, 98, 0.7);
+}
+
+.presentationRetro .name {
+  font-family: Georgia, serif;
+  letter-spacing: 0.1em;
+}
+
 .label {
   color: var(--text-faint);
   font-family: var(--font-body);

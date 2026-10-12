@@ -13,7 +13,8 @@
       text-transform: uppercase;
     }
 
-    input {
+    input,
+    select {
       background: rgba(8, 13, 20, 0.88);
       border: 1px solid var(--line-soft);
       border-radius: 14px;
@@ -29,6 +30,11 @@
         border-color: var(--accent-copper);
         outline: none;
       }
+    }
+
+    select {
+      appearance: none;
+      cursor: pointer;
     }
   }
 }

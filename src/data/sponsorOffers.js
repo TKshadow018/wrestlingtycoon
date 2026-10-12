@@ -74,6 +74,7 @@ const toOffer = (sponsor, idx) => {
   const signingBonus = 2500 + tier * 2200 + randomInRange(0, 2200)
   const eventMultiplier = Number((0.03 + tier * 0.025 + randomInRange(0, 4) / 100).toFixed(2))
   const fanBoost = 4 + tier * 2 + Math.floor((sponsor.reputation || 50) / 20)
+  const trust = Math.max(25, Math.min(90, Math.round((Number(sponsor.reputation) || 50) + randomInRange(-8, 8))))
 
   return {
     offerId: `sponsor-${sponsor.id}-${Date.now()}-${idx}`,
@@ -88,6 +89,7 @@ const toOffer = (sponsor, idx) => {
     signingBonus,
     eventMultiplier,
     fanBoost,
+    trust,
     contractWeeks,
   }
 }

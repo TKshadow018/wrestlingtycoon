@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import venueCatalog from '../../data/venue.json'
+import { getCareerArcUnlockItem } from '../../data/careerArcUnlocks'
 import styles from './EventResultsScreen.module.scss'
 
 const FEMALE_FALLBACK = '/people/girl.png'
@@ -55,6 +57,47 @@ function RatingStars({ rating }) {
       <div className={styles.ratingFill} style={{ width: `${pct}%`, background: getRatingColor(rating) }} />
     </div>
   )
+}
+
+function formatSignedValue(value, isMoney = false) {
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric) || numeric === 0) {
+    return isMoney ? '$0' : '0'
+  }
+
+  const abs = Math.abs(Math.round(numeric)).toLocaleString()
+  if (isMoney) {
+    return numeric > 0 ? `+$${abs}` : `-$${abs}`
+  }
+
+  return numeric > 0 ? `+${abs}` : `-${abs}`
+}
+
+function PostmortemFactor({ factor, isMoney = false }) {
+  const impactClass = factor?.impact === 'positive'
+    ? styles.factorPositive
+    : factor?.impact === 'negative'
+      ? styles.factorNegative
+      : styles.factorNeutral
+
+  return (
+    <li className={styles.factorItem}>
+      <span className={styles.factorLabel}>{factor.label}</span>
+      <span className={`${styles.factorValue} ${impactClass}`}>
+        {formatSignedValue(factor.value, isMoney)}
+      </span>
+    </li>
+  )
+}
+
+function getSatisfactionLabel(value) {
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric)) return 'Unknown'
+  if (numeric >= 80) return 'Very Hot'
+  if (numeric >= 65) return 'Hot'
+  if (numeric >= 50) return 'Mixed+'
+  if (numeric >= 35) return 'Mixed'
+  return 'Cold'
 }
 
 function formatPromoAdjustment({ segment, t }) {
@@ -127,6 +170,9 @@ function SegmentCard({ segment, index, visible, t }) {
   const avgPop = wrestlers.length > 0
     ? Math.round(wrestlers.reduce((s, w) => s + (Number(w.popularity) || 0), 0) / wrestlers.length)
     : null
+  const segmentLabel = segment.segmentType === 'promo' && segment.promoSegmentId
+    ? t(`dashboard.events.setup.promoSegments.${segment.promoSegmentId}`, SEGMENT_TYPE_LABELS.promo)
+    : SEGMENT_TYPE_LABELS[segment.segmentType] || segment.segmentType
   const promoAdjustmentText = isMatch ? formatPromoAdjustment({ segment, t }) : null
   const promoAdjustmentType = segment?.promoRatingAdjustmentType
 
@@ -137,7 +183,7 @@ function SegmentCard({ segment, index, visible, t }) {
     >
       <div className={styles.segHeader}>
         <span className={styles.segIndex}>#{index + 1}</span>
-        <span className={styles.segType}>{SEGMENT_TYPE_LABELS[segment.segmentType] || segment.segmentType}</span>
+        <span className={styles.segType}>{segmentLabel}</span>
         {isMatch && segment.matchType === 'tagTeam' && (
           <span className={styles.segSubtype}>Tag Team</span>
         )}
@@ -217,6 +263,8 @@ function EventResultsScreen({ outcome, onContinue }) {
   const {
     eventName,
     eventType,
+    venueId,
+    promoStyleId,
     hype,
     overallRating,
     income,
@@ -224,9 +272,16 @@ function EventResultsScreen({ outcome, onContinue }) {
     fanDelta,
     prestigeDelta,
     segments = [],
+    rivalryHighlights = [],
+    audienceSegments = [],
+    boardAttendance = null,
+    postmortem,
+    competitorPressure,
   } = outcome
 
   const eventTypeLabel = EVENT_TYPE_LABELS[eventType] || 'Event'
+  const venue = venueCatalog.find((entry) => entry.id === venueId)
+  const promoStyle = promoStyleId ? getCareerArcUnlockItem('promoStyles', promoStyleId) : null
   const net = (income || 0) - (expenses || 0)
   const matchSegs = segments.filter((s) => MATCH_SEGMENT_TYPES.has(s.segmentType))
 
@@ -252,6 +307,22 @@ function EventResultsScreen({ outcome, onContinue }) {
         <h1 className={`${styles.eventName} ${visible ? styles.animate2 : ''}`}>
           {eventName || t('dashboard.eventResults.defaultName', 'Event Results')}
         </h1>
+        {(venue || (promoStyle && promoStyle.id !== 'spotlight')) && (
+          <p className={styles.eventMeta}>
+            {venue
+              ? t('dashboard.eventResults.eventVenue', 'Venue: {{venue}} · {{location}}', {
+                  venue: venue.name,
+                  location: venue.location,
+                })
+              : ''}
+            {venue && promoStyle?.id !== 'spotlight' ? ' · ' : ''}
+            {promoStyle && promoStyle.id !== 'spotlight'
+              ? t('dashboard.eventResults.promoCampaign', 'Campaign: {{name}}', {
+                  name: t(promoStyle.labelKey),
+                })
+              : ''}
+          </p>
+        )}
 
         <div className={`${styles.divider} ${visible ? styles.animate3 : ''}`} />
 
@@ -297,7 +368,127 @@ function EventResultsScreen({ outcome, onContinue }) {
           </div>
         </div>
 
+        {boardAttendance && (
+          <article className={`${styles.boardAttendanceCard} ${visible ? styles.animate4 : ''}`}>
+            <img
+              className={styles.boardAttendancePhoto}
+              src={boardAttendance.imageUrl}
+              alt={boardAttendance.personName}
+            />
+            <div className={styles.boardAttendanceCopy}>
+              <p className={styles.boardAttendanceLabel}>
+                {t('dashboard.eventResults.boardMemberPresent', 'Board Member in Attendance')}
+              </p>
+              <h2>{boardAttendance.personName}</h2>
+              <p>{boardAttendance.role}</p>
+              <strong>
+                {t('dashboard.eventResults.boardGateBonus', {
+                  percent: boardAttendance.gateBonusPercent,
+                  amount: `$${Number(boardAttendance.gateBonusAmount || 0).toLocaleString()}`,
+                })}
+              </strong>
+            </div>
+          </article>
+        )}
+
         <div className={`${styles.divider} ${visible ? styles.animate3 : ''}`} />
+
+        {(postmortem || rivalryHighlights.length > 0 || competitorPressure) && (
+          <section className={`${styles.postmortemSection} ${visible ? styles.animate4 : ''}`}>
+            <p className={styles.sectionLabel}>{t('dashboard.eventResults.postmortemTitle', 'Why This Happened')}</p>
+
+            <div className={styles.postmortemGrid}>
+              <article className={styles.postmortemCard}>
+                <h3>{t('dashboard.eventResults.postmortemFans', 'Fan Drivers')}</h3>
+                <ul>
+                  {(postmortem?.fanFactors || []).map((factor) => (
+                    <PostmortemFactor key={`fan-${factor.key}`} factor={factor} />
+                  ))}
+                </ul>
+              </article>
+
+              <article className={styles.postmortemCard}>
+                <h3>{t('dashboard.eventResults.postmortemPrestige', 'Prestige Drivers')}</h3>
+                <ul>
+                  {(postmortem?.prestigeFactors || []).map((factor) => (
+                    <PostmortemFactor key={`prestige-${factor.key}`} factor={factor} />
+                  ))}
+                </ul>
+              </article>
+
+              <article className={styles.postmortemCard}>
+                <h3>{t('dashboard.eventResults.postmortemMoney', 'Money Drivers')}</h3>
+                <ul>
+                  {(postmortem?.moneyFactors || []).map((factor) => (
+                    <PostmortemFactor key={`money-${factor.key}`} factor={factor} isMoney />
+                  ))}
+                </ul>
+              </article>
+
+              {audienceSegments.length > 0 && (
+                <article className={styles.postmortemCard}>
+                  <h3>{t('dashboard.eventResults.audienceSegments', 'Audience Segments')}</h3>
+                  <ul>
+                    {audienceSegments.map((segment) => (
+                      <li key={segment.key} className={styles.audienceSegmentItem}>
+                        <div className={styles.audienceSegmentMain}>
+                          <span className={styles.audienceSegmentLabel}>{segment.label}</span>
+                          <span className={styles.audienceSegmentAttendance}>
+                            {Number(segment.attendance || 0).toLocaleString()} ({Number(segment.sharePercent || 0)}%)
+                          </span>
+                        </div>
+                        <div className={styles.audienceSegmentMeta}>
+                          <span>{t('dashboard.eventResults.audienceSatisfaction', 'Satisfaction')}: {getSatisfactionLabel(segment.satisfaction)} ({segment.satisfaction})</span>
+                          <span className={Number(segment.fanImpact || 0) >= 0 ? styles.factorPositive : styles.factorNegative}>
+                            {t('dashboard.eventResults.audienceFanImpact', 'Fan impact')}: {Number(segment.fanImpact || 0) >= 0 ? '+' : ''}{Number(segment.fanImpact || 0)}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              )}
+            </div>
+
+            {rivalryHighlights.length > 0 && (
+              <article className={styles.rivalryCard}>
+                <h3>{t('dashboard.eventResults.rivalryTitle', 'Rivalry Heat')}</h3>
+                <ul className={styles.rivalryList}>
+                  {rivalryHighlights.map((item) => (
+                    <li key={item.pairKey} className={styles.rivalryItem}>
+                      <span className={styles.rivalryNames}>{item.names || t('dashboard.eventResults.rivalryUnknown', 'Unknown Rivalry')}</span>
+                      <span className={styles.rivalryHeat}>
+                        {t('dashboard.eventResults.rivalryGain', 'Heat +{{gain}}', { gain: item.gain })}
+                        {' · '}
+                        {t('dashboard.eventResults.rivalryTotal', 'Total {{heat}}', { heat: item.heat })}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            )}
+
+            {competitorPressure && (
+              <article className={styles.rivalryCard}>
+                <h3>{t('dashboard.eventResults.competitorTitle', 'Competitor Pressure')}</h3>
+                <ul className={styles.rivalryList}>
+                  <li className={styles.rivalryItem}>
+                    <span className={styles.rivalryNames}>{competitorPressure.headline}</span>
+                    <span className={styles.rivalryHeat}>
+                      {t('dashboard.eventResults.competitorFans', 'Fans {{value}}', {
+                        value: formatSignedValue(competitorPressure.fanImpact),
+                      })}
+                      {' · '}
+                      {t('dashboard.eventResults.competitorPrestige', 'Prestige {{value}}', {
+                        value: formatSignedValue(competitorPressure.prestigeImpact),
+                      })}
+                    </span>
+                  </li>
+                </ul>
+              </article>
+            )}
+          </section>
+        )}
 
         {/* Segments */}
         <div className={`${styles.segmentsSection} ${visible ? styles.animate4 : ''}`}>

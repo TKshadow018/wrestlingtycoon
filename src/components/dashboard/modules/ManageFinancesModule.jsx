@@ -15,7 +15,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { GAME_CONFIG } from '../../../config/gameConfig'
+import { GAME_CONFIG, GAME_DAYS_PER_MONTH } from '../../../config/gameConfig'
 import { useGameStore } from '../../../store/useGameStore'
 import styles from './ManageFinancesModule.module.scss'
 
@@ -30,6 +30,7 @@ const INCOME_COLORS = {
 
 const EXPENSE_COLORS = {
   wrestlerPayroll: '#ff9b9b',
+  monthlyPayroll: '#e879a8',
   staffCost: '#ff8c50',
   eventCost: '#ffb830',
   operatingCost: '#d070ff',
@@ -37,15 +38,17 @@ const EXPENSE_COLORS = {
 }
 
 const INCOME_KEYS = ['sponsor', 'event', 'merchandise', 'thirdParty', 'webSubscription']
-const EXPENSE_KEYS = ['wrestlerPayroll', 'staffCost', 'eventCost', 'operatingCost', 'otherCost']
+const EXPENSE_KEYS = ['wrestlerPayroll', 'monthlyPayroll', 'staffCost', 'eventCost', 'operatingCost', 'otherCost']
 
 const categoryKeyMap = {
   dailyClose: 'dailyClose',
   eventBooking: 'eventBooking',
   eventRefund: 'eventRefund',
   matchPayroll: 'matchPayroll',
+  monthlyPayroll: 'monthlyPayroll',
   staffPayroll: 'staffPayroll',
   eventCost: 'eventCost',
+  boardDecision: 'boardDecision',
   thirdPartyIncome: 'thirdPartyIncome',
   hiring: 'hiring',
   severance: 'severance',
@@ -77,7 +80,14 @@ const formatGameDateFromDay = (startDateIso, day) => {
 
 // ─── Timeline aggregation ──────────────────────────────────────────────────────
 const zeroIncome = () => ({ sponsor: 0, event: 0, merchandise: 0, thirdParty: 0, webSubscription: 0 })
-const zeroExpense = () => ({ wrestlerPayroll: 0, staffCost: 0, eventCost: 0, operatingCost: 0, otherCost: 0 })
+const zeroExpense = () => ({
+  wrestlerPayroll: 0,
+  monthlyPayroll: 0,
+  staffCost: 0,
+  eventCost: 0,
+  operatingCost: 0,
+  otherCost: 0,
+})
 
 const aggregateTimeline = (timeline, startDateIso, period) => {
   const groups = new Map()
@@ -139,6 +149,7 @@ const flattenForChart = (rows) =>
     incomeThirdParty: row.income.thirdParty,
     incomeWebSubscription: row.income.webSubscription,
     expensesWrestlerPayroll: row.expenses.wrestlerPayroll,
+    expensesMonthlyPayroll: row.expenses.monthlyPayroll,
     expensesStaffCost: row.expenses.staffCost,
     expensesEventCost: row.expenses.eventCost,
     expensesOperatingCost: row.expenses.operatingCost,
@@ -170,6 +181,7 @@ function ManageFinancesModule() {
   const ticketTypeOrder = ['regularWeekly', 'houseShow', 'digitalOnly', 'ppv', 'oneTime', 'megaLive']
 
   const startDateIso = useGameStore((s) => s.calendar.startDateIso)
+  const currentDay = useGameStore((s) => s.calendar.day)
   const cash = useGameStore((s) => s.finances.cash)
   const lastIncome = useGameStore((s) => s.finances.lastIncome)
   const lastExpenses = useGameStore((s) => s.finances.lastExpenses)
@@ -178,6 +190,7 @@ function ManageFinancesModule() {
   const subscriptionFee = useGameStore((s) => s.finances.subscriptionFee ?? GAME_CONFIG.economy.webSubscription.defaultFee)
   const ticketFees = useGameStore((s) => s.finances.ticketFees || {})
   const fans = useGameStore((s) => s.stats.fans)
+  const employees = useGameStore((s) => s.roster.employees || [])
   const timeline = useGameStore((s) => s.history.timeline || [])
   const setSubscriptionFee = useGameStore((s) => s.setSubscriptionFee)
   const setEventTicketFee = useGameStore((s) => s.setEventTicketFee)
@@ -218,6 +231,39 @@ function ManageFinancesModule() {
     })
     return { income: inc, expenses: exp }
   }, [timeline])
+
+  const runwayEstimate = useMemo(() => {
+    const sample = timeline.slice(-7)
+    if (sample.length === 0) {
+      return { hasHistory: false, observedDays: 0, weeklyNet: 0, dailyNet: 0, runwayDays: null }
+    }
+
+    const netBeforeAccruedPayroll = sample.reduce((total, entry) => {
+      const income = Number(entry.totalIncome) || 0
+      const expenses = Number(entry.totalExpenses) || 0
+      const recordedMonthlyPayroll = Number(entry.expenseBreakdown?.monthlyPayroll) || 0
+      return total + income - expenses + recordedMonthlyPayroll
+    }, 0)
+    const dailyNetBeforePayroll = netBeforeAccruedPayroll / sample.length
+    const monthlyPayroll = employees.reduce((total, employee) => {
+      const contractEndDay = Number(employee?.contract?.endDay)
+      if (Number.isFinite(contractEndDay) && contractEndDay < currentDay) {
+        return total
+      }
+
+      const salary = Number(employee?.contract?.monthlySalary ?? employee?.salary)
+      return Number.isFinite(salary) ? total + Math.max(0, salary) : total
+    }, 0)
+    const dailyNet = dailyNetBeforePayroll - monthlyPayroll / GAME_DAYS_PER_MONTH
+
+    return {
+      hasHistory: true,
+      observedDays: sample.length,
+      weeklyNet: Math.round(dailyNet * 7),
+      dailyNet,
+      runwayDays: dailyNet < 0 ? Math.floor(Math.max(0, cash) / -dailyNet) : null,
+    }
+  }, [cash, currentDay, employees, timeline])
 
   // Pie data (from selected period aggregation)
   const incomePieData = useMemo(
@@ -292,6 +338,28 @@ function ManageFinancesModule() {
           <h4 className={lastDelta >= 0 ? styles.positive : styles.negative}>
             {lastDelta >= 0 ? '+' : '-'}$ {Math.abs(lastDelta).toLocaleString()}
           </h4>
+        </article>
+        <article>
+          <p>{t('dashboard.finances.projectedWeeklyNet')}</p>
+          <h4 className={runwayEstimate.weeklyNet >= 0 ? styles.positive : styles.negative}>
+            {runwayEstimate.hasHistory
+              ? `${runwayEstimate.weeklyNet >= 0 ? '+' : '-'}${formatAmt(Math.abs(runwayEstimate.weeklyNet))}`
+              : '—'}
+          </h4>
+          <small>{t('dashboard.finances.runwaySampleDays', { days: runwayEstimate.observedDays })}</small>
+        </article>
+        <article>
+          <p>{t('dashboard.finances.cashRunway')}</p>
+          <h4 className={runwayEstimate.dailyNet < 0 ? styles.negative : styles.positive}>
+            {!runwayEstimate.hasHistory
+              ? t('dashboard.finances.runwayNoData')
+              : runwayEstimate.dailyNet < 0
+                ? t('dashboard.finances.runwayDays', { days: runwayEstimate.runwayDays.toLocaleString() })
+                : runwayEstimate.dailyNet > 0
+                  ? t('dashboard.finances.runwayGrowing')
+                  : t('dashboard.finances.runwayStable')}
+          </h4>
+          <small>{t('dashboard.finances.runwayBasis')}</small>
         </article>
       </div>
 
@@ -540,6 +608,7 @@ function ManageFinancesModule() {
                     <Tooltip content={<ChartTooltip />} />
                     <Legend wrapperStyle={{ fontSize: 11, color: '#888' }} />
                     <Bar dataKey="expensesWrestlerPayroll" name={t('dashboard.finances.expenses.wrestlerPayroll')} stackId="e" fill={EXPENSE_COLORS.wrestlerPayroll} />
+                    <Bar dataKey="expensesMonthlyPayroll" name={t('dashboard.finances.expenses.monthlyPayroll')} stackId="e" fill={EXPENSE_COLORS.monthlyPayroll} />
                     <Bar dataKey="expensesStaffCost" name={t('dashboard.finances.expenses.staffCost')} stackId="e" fill={EXPENSE_COLORS.staffCost} />
                     <Bar dataKey="expensesEventCost" name={t('dashboard.finances.expenses.eventCost')} stackId="e" fill={EXPENSE_COLORS.eventCost} />
                     <Bar dataKey="expensesOperatingCost" name={t('dashboard.finances.expenses.operatingCost')} stackId="e" fill={EXPENSE_COLORS.operatingCost} />
@@ -695,4 +764,3 @@ function ManageFinancesModule() {
 }
 
 export default ManageFinancesModule
-

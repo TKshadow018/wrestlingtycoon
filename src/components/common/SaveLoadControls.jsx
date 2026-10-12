@@ -7,6 +7,8 @@ function SaveLoadControls({
   onLoadLocal,
   onSaveFirebase,
   onLoadFirebase,
+  onExportMods,
+  onImportMods,
   statusMessage = '',
   aiStatusMessage = '',
   aiEnabled = false,
@@ -72,6 +74,15 @@ function SaveLoadControls({
         </button>
         <button type="button" className={styles.actionButton} onClick={handleLoad}>
           {t('dashboard.saveLoad.load')}
+        </button>
+      </div>
+
+      <div className={styles.controlsRow}>
+        <button type="button" className={styles.modButton} onClick={onExportMods}>
+          {t('dashboard.saveLoad.exportMods')}
+        </button>
+        <button type="button" className={styles.modButton} onClick={onImportMods}>
+          {t('dashboard.saveLoad.importMods')}
         </button>
       </div>
 

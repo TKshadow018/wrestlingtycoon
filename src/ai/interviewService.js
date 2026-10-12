@@ -335,3 +335,46 @@ export const evaluateInterviewAnswer = async ({
     }
   }
 }
+
+const containsAnyToken = (text, tokens = []) => {
+  const lower = String(text || '').toLowerCase()
+  return tokens.some((token) => lower.includes(token))
+}
+
+export const scoreInterviewAnswer = ({ userAnswer, decision }) => {
+  const answer = String(userAnswer || '').trim()
+  if (!answer) {
+    return {
+      score: -2,
+      professionalism: -6,
+      hype: -2,
+      controversy: 4,
+      detailLevel: 0,
+      confidence: 0,
+    }
+  }
+
+  const wordCount = answer.split(/\s+/).filter(Boolean).length
+  const longFormBonus = wordCount >= 18 ? 2 : wordCount >= 10 ? 1 : 0
+  const shortPenalty = wordCount <= 4 ? -2 : 0
+  const vaguePenalty = containsAnyToken(answer, ['no comment', 'maybe', 'not sure', 'idk', 'whatever']) ? -2 : 0
+  const detailBonus = containsAnyToken(answer, ['because', 'plan', 'strategy', 'budget', 'roster', 'match', 'fans', 'title']) ? 2 : 0
+  const confidenceBonus = containsAnyToken(answer, ['will', 'definitely', 'guarantee', 'prove', 'win']) ? 1 : 0
+  const hostilityPenalty = containsAnyToken(answer, ['hate', 'trash', 'stupid', 'idiot', 'kill']) ? -2 : 0
+  const controversyBonus = containsAnyToken(answer, ['controversy', 'shock', 'chaos', 'destroy', 'blood']) ? 2 : 0
+  const decisionBonus = decision === 'accept' ? 1 : -1
+
+  const score = Math.max(
+    -6,
+    Math.min(8, longFormBonus + shortPenalty + vaguePenalty + detailBonus + confidenceBonus + decisionBonus + hostilityPenalty),
+  )
+
+  return {
+    score,
+    professionalism: (detailBonus * 3) + (longFormBonus * 2) + (decision === 'accept' ? 2 : -2) + shortPenalty + vaguePenalty + hostilityPenalty,
+    hype: (confidenceBonus * 3) + longFormBonus + (decision === 'accept' ? 1 : 0),
+    controversy: controversyBonus + (hostilityPenalty < 0 ? 2 : 0) + (decision === 'counter' ? 1 : 0),
+    detailLevel: detailBonus + longFormBonus,
+    confidence: confidenceBonus,
+  }
+}

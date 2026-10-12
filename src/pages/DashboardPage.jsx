@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FirebaseError } from 'firebase/app'
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
-import { createInterviewScenario, evaluateInterviewAnswer } from '../ai/interviewService'
+import { createInterviewScenario, evaluateInterviewAnswer, scoreInterviewAnswer } from '../ai/interviewService'
 import LanguageSwitcher from '../components/common/LanguageSwitcher'
 import AiInterviewModal from '../components/dashboard/AiInterviewModal'
+import BoardMeetingModal from '../components/dashboard/BoardMeetingModal'
 import SaveLoadControls from '../components/common/SaveLoadControls'
 import ControlPanel from '../components/dashboard/ControlPanel'
 import HudBar from '../components/dashboard/HudBar'
@@ -20,6 +21,9 @@ import EventSetupModal from '../components/dashboard/modules/EventSetupModal'
 import app, { isFirebaseConfigured } from '../config/firebase'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { useGameStore } from '../store/useGameStore'
+import { getBoardMeetingSchedule } from '../utils/boardMeetings'
+import { parseGameDate } from '../utils/gameCalendar'
+import { buildModDataPackageFromState, validateModDataPackage } from '../utils/modDataPackage'
 import styles from './DashboardPage.module.scss'
 
 const MAIN_SAVE_KEY = 'wrestling-tycoon-save-v1'
@@ -68,6 +72,9 @@ const createSaveSnapshot = (state) => ({
   market: state.market,
   events: state.events,
   history: state.history,
+  progression: state.progression,
+  onboardingChallenge: state.onboardingChallenge,
+  boardMeeting: state.boardMeeting,
   stats: state.stats,
   ui: state.ui,
 })
@@ -90,20 +97,7 @@ const writeSnapshotAndReload = (snapshot) => {
 const toStartOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
 const parseIsoDateLocal = (isoDateString) => {
-  if (!isoDateString) {
-    return null
-  }
-
-  const [yearStr, monthStr, dayStr] = isoDateString.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-  const day = Number(dayStr)
-
-  if (!year || !month || !day) {
-    return null
-  }
-
-  return new Date(year, month - 1, day)
+  return parseGameDate(isoDateString)
 }
 
 const getGameDateFromDay = (startDateIso, day) => {
@@ -183,6 +177,19 @@ const getTodayEventProjection = ({ day, startDateIso, customEvents = [], sponsor
   }
 }
 
+const computeInterviewImpactPreview = ({ metrics = {}, forcedPreShow = false }) => {
+  const score = Number(metrics.score || 0)
+  const professionalism = Number(metrics.professionalism || 0)
+  const hype = Number(metrics.hype || 0)
+  const controversy = Number(metrics.controversy || 0)
+  const forcedMultiplier = forcedPreShow ? 1.35 : 1
+
+  return {
+    fansDelta: Math.round(((score * 18) + (hype * 4) + (professionalism * 2) - (controversy * 2)) * forcedMultiplier),
+    prestigeDelta: Math.round(((score / 2) + (professionalism / 3) + (hype / 4) - (controversy / 4)) * forcedMultiplier),
+  }
+}
+
 function DashboardPage() {
   const { t } = useTranslation()
   const day = useGameStore((state) => state.calendar.day)
@@ -201,11 +208,19 @@ function DashboardPage() {
   const activeModule = useGameStore((state) => state.ui.activeModule)
   const setActiveModule = useGameStore((state) => state.setActiveModule)
   const proceedTimeline = useGameStore((state) => state.proceedTimeline)
+  const boardMeeting = useGameStore((state) => state.boardMeeting)
+  const openBoardMeeting = useGameStore((state) => state.openBoardMeeting)
+  const resolveBoardAgenda = useGameStore((state) => state.resolveBoardAgenda)
+  const acknowledgeBoardElectionResult = useGameStore((state) => state.acknowledgeBoardElectionResult)
+  const finishBoardMeeting = useGameStore((state) => state.finishBoardMeeting)
+  const gameOverReason = useGameStore((state) => state.gameStatus.gameOverReason)
+  const isGameOver = useGameStore((state) => state.gameStatus.isGameOver)
   const skipEvent = useGameStore((state) => state.skipEvent)
   const resetGame = useGameStore((state) => state.resetGame)
   const titles = useGameStore((state) => state.roster.titles)
   const ticketFees = useGameStore((state) => state.finances.ticketFees)
   const eventPreparation = useGameStore((state) => state.events.eventPreparation)
+  const careerArcUnlocks = useGameStore((state) => state.progression.unlocks)
   const setEventPreparation = useGameStore((state) => state.setEventPreparation)
   const setEventTicketFee = useGameStore((state) => state.setEventTicketFee)
   const aiStatus = useGameStore((state) => state.ai.status)
@@ -214,8 +229,11 @@ function DashboardPage() {
   const aiEnabled = useGameStore((state) => state.ai.enabled)
   const aiShowEnableModal = useGameStore((state) => state.ai.showEnableModal)
   const aiOptedInAtStart = useGameStore((state) => state.ai.optedInAtStart)
+  const onboardingChallenge = useGameStore((state) => state.onboardingChallenge)
+  const applyModDataPackage = useGameStore((state) => state.applyModDataPackage)
   const enableAi = useGameStore((state) => state.enableAi)
   const closeAiEnableModal = useGameStore((state) => state.closeAiEnableModal)
+  const applyInterviewConsequences = useGameStore((state) => state.applyInterviewConsequences)
   const [showEventBanner, setShowEventBanner] = useState(false)
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false)
   const [showRequirementsOverlay, setShowRequirementsOverlay] = useState(false)
@@ -223,6 +241,8 @@ function DashboardPage() {
   const [showCustomEventIntro, setShowCustomEventIntro] = useState(false)
   const [showMegaVideo, setShowMegaVideo] = useState(false)
   const [showEventPrep, setShowEventPrep] = useState(false)
+  const [showChallengeModal, setShowChallengeModal] = useState(false)
+  const [boardMeetingError, setBoardMeetingError] = useState('')
   const [saveLoadStatus, setSaveLoadStatus] = useState('')
   const [interviewRollByDay, setInterviewRollByDay] = useState({})
   const [interviewConsumedByDay, setInterviewConsumedByDay] = useState({})
@@ -231,10 +251,28 @@ function DashboardPage() {
   const [isInterviewSubmitting, setIsInterviewSubmitting] = useState(false)
   const [isInterviewFinished, setIsInterviewFinished] = useState(false)
   const [interviewError, setInterviewError] = useState('')
+  const [interviewMetrics, setInterviewMetrics] = useState({
+    score: 0,
+    professionalism: 0,
+    hype: 0,
+    controversy: 0,
+    answerCount: 0,
+  })
+  const [interviewImpactSummary, setInterviewImpactSummary] = useState(null)
   const fileInputRef = useRef(null)
+  const modFileInputRef = useRef(null)
 
   const todayEvent = getTodayEventProjection({ day, startDateIso, customEvents, sponsors })
   const isEventStep = Boolean(todayEvent)
+  const isBoardMeetingDay = useMemo(() => (
+    !isGameOver
+    && getBoardMeetingSchedule({
+      startDateIso,
+      customEvents,
+      throughDate: getGameDateFromDay(startDateIso, day),
+    }).some((meeting) => meeting.scheduledDay === day)
+    && (Boolean(boardMeeting.activeMeeting) || boardMeeting.lastMeetingDay !== day)
+  ), [boardMeeting.activeMeeting, boardMeeting.lastMeetingDay, customEvents, day, isGameOver, startDateIso])
   const preparationEvent = !isEventStep ? getPreparationEvent({ day, customEvents }) : null
   const isPreparationDay = Boolean(preparationEvent)
   const preShowInterviewEvent = !isEventStep ? getPreShowInterviewEvent({ day, customEvents }) : null
@@ -250,6 +288,8 @@ function DashboardPage() {
   const isInterviewEligible = aiEnabled
     && aiStatus === 'ready'
     && !isEventStep
+    && !isBoardMeetingDay
+    && !boardMeeting.activeMeeting
     && !isPreparationDay
     && !isSetupModalOpen
     && !showEventBanner
@@ -289,6 +329,9 @@ function DashboardPage() {
 
   const interviewButtonLabel = shouldOfferInterview
     ? t('dashboard.controls.attendInterview')
+    : null
+  const boardMeetingButtonLabel = isBoardMeetingDay
+    ? t('dashboard.controls.openBoardMeeting')
     : null
 
   const interviewContext = useMemo(() => {
@@ -339,6 +382,47 @@ function DashboardPage() {
     }
   }, [bookedEvent?.name, cash, day, employees, fans, lastOutcome?.segments, prestige, profile.companyName, titles, week])
 
+  const onboardingSummary = useMemo(() => {
+    if (!onboardingChallenge) {
+      return null
+    }
+
+    const rosterObjective = onboardingChallenge.objectives?.rosterBuild || {}
+    const firstShowObjective = onboardingChallenge.objectives?.firstShow || {}
+    const stabilizeObjective = onboardingChallenge.objectives?.stabilize || {}
+    const currentOperatingCashFlow = Number(stabilizeObjective.currentOperatingCashFlow || 0)
+    const targetOperatingCashFlow = Number(stabilizeObjective.targetOperatingCashFlow || 0)
+
+    const remainingDays = Math.max(0, Number(onboardingChallenge.deadlineDay || day) - day + 1)
+
+    return {
+      status: onboardingChallenge.status || 'active',
+      remainingDays,
+      reward: onboardingChallenge.reward || { cash: 0, prestige: 0 },
+      penalty: onboardingChallenge.penalty || { fans: 0, prestige: 0 },
+      objectives: [
+        {
+          key: 'rosterBuild',
+          done: Boolean(rosterObjective.completed),
+          progressText: `${Number(rosterObjective.currentWrestlers || 0)}/${Number(rosterObjective.targetWrestlers || 0)} ${t('dashboard.onboardingChallenge.objectiveRosterWrestlers')}, ${Number(rosterObjective.currentStaff || 0)}/${Number(rosterObjective.targetStaff || 0)} ${t('dashboard.onboardingChallenge.objectiveRosterStaff')}`,
+        },
+        {
+          key: 'firstShow',
+          done: Boolean(firstShowObjective.completed),
+          progressText: `${Number(firstShowObjective.currentSuccessfulEvents || 0)}/${Number(firstShowObjective.targetSuccessfulEvents || 0)}`,
+        },
+        {
+          key: 'stabilize',
+          done: Boolean(stabilizeObjective.completed),
+          progressText: `${Number(stabilizeObjective.currentFanGain || 0)}/${Number(stabilizeObjective.targetFanGain || 0)} ${t('dashboard.hud.fans')}, ${t('dashboard.onboardingChallenge.cashFlowProgress', {
+            amount: `${currentOperatingCashFlow >= 0 ? '+' : '-'}$${Math.abs(currentOperatingCashFlow).toLocaleString()}`,
+            target: `$${targetOperatingCashFlow.toLocaleString()}`,
+          })}`,
+        },
+      ],
+    }
+  }, [day, onboardingChallenge, t])
+
   const openInterview = async () => {
     setInterviewConsumedByDay((prev) => ({
       ...prev,
@@ -347,6 +431,14 @@ function DashboardPage() {
 
     setInterviewError('')
     setIsInterviewFinished(false)
+    setInterviewMetrics({
+      score: 0,
+      professionalism: 0,
+      hype: 0,
+      controversy: 0,
+      answerCount: 0,
+    })
+    setInterviewImpactSummary(null)
 
     const placeholderSession = {
       journalistName: 'Journalist',
@@ -397,6 +489,7 @@ function DashboardPage() {
     setInterviewError('')
     setIsInterviewFinished(false)
     setIsInterviewSubmitting(false)
+    setInterviewImpactSummary(null)
   }
 
   const finishInterviewAndContinueDay = () => {
@@ -435,6 +528,16 @@ function DashboardPage() {
         forceCounter: mustAskFollowUp,
       })
 
+      const answerScore = scoreInterviewAnswer({ userAnswer, decision: turn.decision })
+      const nextMetrics = {
+        score: interviewMetrics.score + answerScore.score,
+        professionalism: interviewMetrics.professionalism + answerScore.professionalism,
+        hype: interviewMetrics.hype + answerScore.hype,
+        controversy: interviewMetrics.controversy + answerScore.controversy,
+        answerCount: interviewMetrics.answerCount + 1,
+      }
+      setInterviewMetrics(nextMetrics)
+
       if (mustAskFollowUp && turn.counterQuestion) {
         setInterviewMessages((prev) => [
           ...prev,
@@ -455,9 +558,26 @@ function DashboardPage() {
         return
       }
 
+      const consequence = applyInterviewConsequences({
+        metrics: nextMetrics,
+        forcedPreShow: isForcedPreShowInterviewDay,
+      })
+      setInterviewImpactSummary(consequence)
+      const impactPreview = computeInterviewImpactPreview({ metrics: nextMetrics, forcedPreShow: isForcedPreShowInterviewDay })
+
       setInterviewMessages((prev) => [
         ...prev,
         { speaker: 'ai', text: turn.reply },
+        {
+          speaker: 'ai',
+          text: t('dashboard.ai.interviewImpactApplied', 'Media impact applied: Fans {{fans}} | Prestige {{prestige}} | Sponsor trust {{trust}}', {
+            fans: impactPreview.fansDelta >= 0 ? `+${impactPreview.fansDelta}` : `${impactPreview.fansDelta}`,
+            prestige: impactPreview.prestigeDelta >= 0 ? `+${impactPreview.prestigeDelta}` : `${impactPreview.prestigeDelta}`,
+            trust: consequence.sponsorTrustDeltaAverage >= 0
+              ? `+${consequence.sponsorTrustDeltaAverage}`
+              : `${consequence.sponsorTrustDeltaAverage}`,
+          }),
+        },
         { speaker: 'ai', text: t('dashboard.ai.interviewClosing') },
       ])
       setIsInterviewFinished(true)
@@ -479,6 +599,20 @@ function DashboardPage() {
   }
 
   const handleProceed = () => {
+    if (boardMeeting.activeMeeting) {
+      return
+    }
+
+    if (isBoardMeetingDay) {
+      const result = openBoardMeeting()
+      if (!result.ok) {
+        setBoardMeetingError(t(`dashboard.boardMeeting.errors.${result.reason}`, 'Could not open Board Meeting.'))
+        return
+      }
+      setBoardMeetingError('')
+      return
+    }
+
     if (shouldOfferInterview) {
       openInterview()
       return
@@ -520,12 +654,14 @@ function DashboardPage() {
     continueEventFlow()
   }
 
-  const handleEventPrepSave = ({ venueId, promotedWrestlerIds, ticketPrice }) => {
+  const handleEventPrepSave = ({ venueId, promotedWrestlerIds, promoStyleId, presentationId, ticketPrice }) => {
     if (preparationEvent) {
       setEventPreparation({
         eventId: preparationEvent.eventId,
         venueId: venueId || null,
         promotedWrestlerIds,
+        promoStyleId,
+        presentationId,
       })
     }
     if (preparationEvent && ticketPrice >= 0) {
@@ -596,6 +732,72 @@ function DashboardPage() {
 
   const handleLoadLocal = () => {
     fileInputRef.current?.click()
+  }
+
+  const handleExportMods = () => {
+    try {
+      const state = useGameStore.getState()
+      const modPackage = buildModDataPackageFromState(state)
+      const payload = JSON.stringify(modPackage, null, 2)
+      const blob = new Blob([payload], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      const companyName = (state.profile?.companyName || 'mod').replace(/[^a-z0-9]/gi, '_').toLowerCase()
+      anchor.href = url
+      anchor.download = `wrestling-tycoon-mod-${companyName}.json`
+      anchor.click()
+      URL.revokeObjectURL(url)
+      setSaveLoadStatus(t('dashboard.saveLoad.modExported'))
+    } catch {
+      setSaveLoadStatus(t('dashboard.saveLoad.modExportFailed'))
+    }
+  }
+
+  const handleImportMods = () => {
+    modFileInputRef.current?.click()
+  }
+
+  const handleModFileLoad = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    event.target.value = ''
+
+    const reader = new FileReader()
+    reader.onload = (readerEvent) => {
+      try {
+        const parsed = JSON.parse(readerEvent.target.result)
+        const validation = validateModDataPackage(parsed)
+
+        if (!validation.ok) {
+          setSaveLoadStatus(t('dashboard.saveLoad.modImportInvalid', {
+            reason: validation.errors[0] || 'Invalid mod package.',
+          }))
+          return
+        }
+
+        const result = applyModDataPackage(validation.data)
+        if (!result?.ok) {
+          setSaveLoadStatus(t('dashboard.saveLoad.modImportInvalid', {
+            reason: result?.errors?.[0] || 'Invalid mod package.',
+          }))
+          return
+        }
+
+        const moduleCount = result.modules?.length || 0
+        const warningCount = Math.max(validation.warnings.length, result.warnings?.length || 0)
+        setSaveLoadStatus(
+          warningCount > 0
+            ? t('dashboard.saveLoad.modImportSuccessWithWarnings', {
+                moduleCount,
+                warningCount,
+              })
+            : t('dashboard.saveLoad.modImportSuccess', { moduleCount }),
+        )
+      } catch {
+        setSaveLoadStatus(t('dashboard.saveLoad.modImportFailed'))
+      }
+    }
+    reader.readAsText(file)
   }
 
   const handleFileLoad = (event) => {
@@ -676,6 +878,13 @@ function DashboardPage() {
         style={{ display: 'none' }}
         onChange={handleFileLoad}
       />
+      <input
+        ref={modFileInputRef}
+        type="file"
+        accept=".json,application/json"
+        style={{ display: 'none' }}
+        onChange={handleModFileLoad}
+      />
       {showRequirementsOverlay && (
         <EventRequirementsOverlay
           employees={employees}
@@ -697,6 +906,11 @@ function DashboardPage() {
       {showCustomEventIntro && todayEvent?.isCustomEvent && todayEvent?.imageUrl && (
         <EventCustomIntroScreen
           event={todayEvent}
+          presentationId={
+            eventPreparation?.eventId === todayEvent.eventId
+              ? eventPreparation.presentationId
+              : 'classic'
+          }
           durationMs={2600}
           onComplete={handleCustomEventIntroComplete}
         />
@@ -715,6 +929,7 @@ function DashboardPage() {
           sponsors={sponsors}
           ticketFees={ticketFees}
           eventPreparation={eventPreparation}
+          unlocks={careerArcUnlocks}
           onSave={handleEventPrepSave}
           onCancel={handleEventPrepCancel}
         />
@@ -729,12 +944,36 @@ function DashboardPage() {
         isOpen={Boolean(interviewSession)}
         interview={interviewSession}
         messages={interviewMessages}
+        impactSummary={interviewImpactSummary}
         onSubmitAnswer={handleInterviewAnswer}
         onSkip={finishInterviewAndContinueDay}
         onFinishAndContinue={finishInterviewAndContinueDay}
         isSubmitting={isInterviewSubmitting}
         isFinished={isInterviewFinished}
         error={interviewError}
+      />
+      <BoardMeetingModal
+        meeting={boardMeeting.activeMeeting}
+        relation={boardMeeting.relation}
+        rejectionCounts={boardMeeting.rejectionCounts}
+        boardPresidentName={boardMeeting.boardPresidentName}
+        boardVicePresidentName={boardMeeting.boardVicePresidentName}
+        boardPresidentName={boardMeeting.boardPresidentName}
+        boardVicePresidentName={boardMeeting.boardVicePresidentName}
+        managerName={profile.playerName}
+        managerPhoto={
+          profile.managerImageUrl
+          || profile.playerImageUrl
+          || profile.imageUrl
+          || profile.image_url
+          || ''
+        }
+        cash={cash}
+        gameOverReason={isGameOver ? (gameOverReason || 'board-relation') : null}
+        onResolve={resolveBoardAgenda}
+        onAcknowledgeElectionResult={acknowledgeBoardElectionResult}
+        onFinish={finishBoardMeeting}
+        onReset={resetGame}
       />
       {aiShowEnableModal && aiStatus === 'ready' && !aiEnabled && (
         <section className={styles.aiModalBackdrop}>
@@ -757,14 +996,24 @@ function DashboardPage() {
           <div>
             <h1>{t('dashboard.welcome', { playerName: profile.playerName })}</h1>
             <p>{t('dashboard.company', { companyName: profile.companyName })}</p>
-            <small>{t('dashboard.nextEvent', { days: GAME_CONFIG.eventCycleDays })}</small>
           </div>
           <div className={styles.topBarActions}>
+            {onboardingSummary && (
+              <button
+                type="button"
+                className={styles.challengeButton}
+                onClick={() => setShowChallengeModal(true)}
+              >
+                {t('dashboard.onboardingChallenge.openButton')}
+              </button>
+            )}
             <SaveLoadControls
               onSaveLocal={handleSaveLocal}
               onLoadLocal={handleLoadLocal}
               onSaveFirebase={handleSaveFirebase}
               onLoadFirebase={handleLoadFirebase}
+              onExportMods={handleExportMods}
+              onImportMods={handleImportMods}
               firebaseEnabled={isFirebaseConfigured}
               statusMessage={saveLoadStatus}
               aiStatusMessage={aiStatusMessage}
@@ -774,7 +1023,102 @@ function DashboardPage() {
           </div>
         </header>
 
-        <HudBar snapshot={{ day, week, isEventDay, cash, fans, prestige, startDateIso }} />
+        <HudBar
+          snapshot={{
+            day,
+            week,
+            isEventDay,
+            boardMeetingToday: isBoardMeetingDay,
+            cash,
+            fans,
+            prestige,
+            startDateIso,
+            ownerName: profile.ownerName,
+            generalManagerName: profile.generalManagerName,
+            homeCountry: profile.homeCountry,
+            competitorPressure: lastOutcome?.competitorPressure || null,
+          }}
+        />
+
+        {showChallengeModal && onboardingSummary && (
+          <section className={styles.challengeModalBackdrop}>
+            <article
+              className={styles.challengeModal}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="challenge-modal-title"
+            >
+              <div className={styles.challengeModalHeader}>
+                <button
+                  type="button"
+                  className={styles.challengeModalClose}
+                  onClick={() => setShowChallengeModal(false)}
+                >
+                  {t('dashboard.onboardingChallenge.closeButton')}
+                </button>
+              </div>
+              <section className={styles.onboardingChallengeCard}>
+                <div className={styles.onboardingChallengeHeader}>
+                  <div>
+                    <h2 id="challenge-modal-title">{t('dashboard.onboardingChallenge.title')}</h2>
+                    <p>{t('dashboard.onboardingChallenge.subtitle')}</p>
+                  </div>
+                  <span className={styles[`onboardingChallengeStatus${onboardingSummary.status}`]}>
+                    {t(`dashboard.onboardingChallenge.status.${onboardingSummary.status}`)}
+                  </span>
+                </div>
+
+                {onboardingSummary.status === 'active' && (
+                  <p className={styles.onboardingChallengeDeadline}>
+                    {t('dashboard.onboardingChallenge.deadline', { days: onboardingSummary.remainingDays })}
+                  </p>
+                )}
+
+                <div className={styles.onboardingChallengeObjectives}>
+                  {onboardingSummary.objectives.map((objective) => (
+                    <article key={objective.key} className={styles.onboardingChallengeObjectiveRow}>
+                      <div>
+                        <h3>{t(`dashboard.onboardingChallenge.objectives.${objective.key}`)}</h3>
+                        <p>{objective.progressText}</p>
+                        {objective.key === 'stabilize' && (
+                          <small>{t('dashboard.onboardingChallenge.cashProgressNote')}</small>
+                        )}
+                      </div>
+                      <strong>
+                        {objective.done
+                          ? t('dashboard.onboardingChallenge.objectiveDone')
+                          : t('dashboard.onboardingChallenge.objectivePending')}
+                      </strong>
+                    </article>
+                  ))}
+                </div>
+
+                {onboardingSummary.status === 'active' ? (
+                  <p className={styles.onboardingChallengeFooter}>
+                    {t('dashboard.onboardingChallenge.rewardHint', {
+                      cash: Number(onboardingSummary.reward.cash || 0).toLocaleString(),
+                      prestige: onboardingSummary.reward.prestige || 0,
+                    })}
+                  </p>
+                ) : onboardingSummary.status === 'completed' ? (
+                  <p className={styles.onboardingChallengeFooterSuccess}>
+                    {t('dashboard.onboardingChallenge.successSummary', {
+                      cash: Number(onboardingSummary.reward.cash || 0).toLocaleString(),
+                      prestige: onboardingSummary.reward.prestige || 0,
+                    })}
+                  </p>
+                ) : (
+                  <p className={styles.onboardingChallengeFooterFail}>
+                    {t('dashboard.onboardingChallenge.failSummary', {
+                      fans: onboardingSummary.penalty.fans || 0,
+                      prestige: onboardingSummary.penalty.prestige || 0,
+                    })}
+                  </p>
+                )}
+              </section>
+            </article>
+          </section>
+        )}
 
         {isSetupModalOpen ? (
           <section className={styles.eventSetupStage}>
@@ -793,12 +1137,13 @@ function DashboardPage() {
         ) : (
           <section className={styles.workspace}>
             <aside className={styles.sidebar}>
+              {boardMeetingError && <p className={styles.boardMeetingError} role="alert">{boardMeetingError}</p>}
               <ControlPanel
                 isEventDay={isEventStep}
                 isPreparationDay={isPreparationDay}
                 onProceed={handleProceed}
                 onReset={resetGame}
-                proceedLabelOverride={interviewButtonLabel}
+                proceedLabelOverride={boardMeetingButtonLabel || interviewButtonLabel}
               />
               <ModuleNav activeModule={activeModule} onSelect={setActiveModule} />
             </aside>

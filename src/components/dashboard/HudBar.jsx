@@ -1,27 +1,9 @@
 import { useTranslation } from 'react-i18next'
+import { getGameDateFromDay } from '../../utils/gameCalendar'
 import styles from './HudBar.module.scss'
 
-const parseIsoDateLocal = (isoDateString) => {
-  if (!isoDateString) {
-    return null
-  }
-
-  const [yearStr, monthStr, dayStr] = isoDateString.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-  const day = Number(dayStr)
-
-  if (!year || !month || !day) {
-    return null
-  }
-
-  return new Date(year, month - 1, day)
-}
-
 const formatDate = (day, startDateIso) => {
-  const startDate = parseIsoDateLocal(startDateIso) || new Date()
-  const gameDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
-  gameDate.setDate(gameDate.getDate() + Math.max(0, Number(day || 1) - 1))
+  const gameDate = getGameDateFromDay(startDateIso, Math.max(1, Number(day) || 1))
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
@@ -36,6 +18,7 @@ const formatDate = (day, startDateIso) => {
 function HudBar({ snapshot }) {
   const { t } = useTranslation()
   const dateInfo = formatDate(snapshot.day, snapshot.startDateIso)
+  const competitorPressure = snapshot.competitorPressure || null
 
   return (
     <section className={styles.hudBar}>
@@ -46,9 +29,11 @@ function HudBar({ snapshot }) {
       <article>
         <h3>{t('dashboard.hud.schedule', 'Schedule')}</h3>
         <p>
-          {snapshot.isEventDay
-            ? t('dashboard.hud.eventDay', 'Event Day')
-            : t('dashboard.hud.nonEventDay', 'No Event Today')}
+          {snapshot.boardMeetingToday
+            ? t('dashboard.hud.boardMeeting', 'Board Meeting')
+            : snapshot.isEventDay
+              ? t('dashboard.hud.eventDay', 'Event Day')
+              : t('dashboard.hud.nonEventDay', 'No Event Today')}
         </p>
       </article>
       <article>
@@ -63,6 +48,27 @@ function HudBar({ snapshot }) {
         <h3>{t('dashboard.hud.prestige')}</h3>
         <p>{snapshot.prestige}</p>
       </article>
+      <article>
+        <h3>{t('dashboard.hud.owner', 'Owner')}</h3>
+        <p>{snapshot.ownerName || t('dashboard.managementUnknown', 'TBD')}</p>
+      </article>
+      <article>
+        <h3>{t('dashboard.hud.manager', 'General Manager')}</h3>
+        <p>{snapshot.generalManagerName || t('dashboard.managementUnknown', 'TBD')}</p>
+      </article>
+      <article>
+        <h3>{t('dashboard.hud.country', 'Home Country')}</h3>
+        <p>{t(`onboarding.countryOptions.${snapshot.homeCountry || 'UnitedStates'}`, snapshot.homeCountry || 'UnitedStates')}</p>
+      </article>
+      {competitorPressure ? (
+        <article>
+          <h3>{t('dashboard.hud.competitorPressure', 'Competitor Pressure')}</h3>
+          <p>
+            {competitorPressure.fanImpact >= 0 ? '+' : ''}
+            {Number(competitorPressure.fanImpact || 0).toLocaleString()} {t('dashboard.hud.fans', 'Fans')}
+          </p>
+        </article>
+      ) : null}
     </section>
   )
 }

@@ -1,0 +1,193 @@
+.moduleBody {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.currentArcCard,
+.historyCard {
+  background: rgba(8, 13, 20, 0.72);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 0.9rem;
+}
+
+.currentArcCard {
+  header {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.65rem;
+
+    h4,
+    p {
+      margin: 0;
+    }
+
+    h4 {
+      font-size: 1rem;
+      letter-spacing: 0.03em;
+    }
+
+    p {
+      color: var(--text-faint);
+      font-size: 0.76rem;
+    }
+  }
+}
+
+.description {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  margin: 0.45rem 0 0.7rem;
+}
+
+.progressGrid {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.progressRow {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.progressHeader {
+  align-items: center;
+  color: var(--text-main);
+  display: flex;
+  font-size: 0.82rem;
+  justify-content: space-between;
+}
+
+.progressBar {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progressFill {
+  background: linear-gradient(90deg, #f39f61, #bd5d2b);
+  height: 100%;
+  transition: width 180ms ease;
+}
+
+.rewardRow {
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+
+  span {
+    color: var(--text-faint);
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: var(--accent-copper);
+    font-size: 0.84rem;
+  }
+}
+
+.unlockRewards {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+
+  > span {
+    color: var(--text-faint);
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  ul {
+    display: grid;
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    align-items: center;
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  small {
+    color: var(--text-faint);
+    min-width: 6rem;
+  }
+
+  strong {
+    color: var(--accent-copper);
+    font-size: 0.84rem;
+  }
+}
+
+.historyCard {
+  h4 {
+    margin: 0;
+    font-size: 0.94rem;
+    letter-spacing: 0.03em;
+  }
+}
+
+.historyList {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+}
+
+.historyItem {
+  align-items: center;
+  background: rgba(8, 13, 20, 0.62);
+  border: 1px solid rgba(145, 171, 215, 0.2);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.55rem 0.65rem;
+
+  small {
+    color: var(--text-faint);
+    font-size: 0.74rem;
+  }
+}
+
+.historyName {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 0.82rem;
+}
+
+.success,
+.fail {
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 0.22rem 0.55rem;
+  text-transform: uppercase;
+}
+
+.success {
+  background: rgba(81, 179, 116, 0.15);
+  color: #8ae5a0;
+}
+
+.fail {
+  background: rgba(199, 78, 78, 0.15);
+  color: #ffb3b3;
+}
+
+.empty {
+  color: var(--text-faint);
+  margin: 0.7rem 0 0;
+}

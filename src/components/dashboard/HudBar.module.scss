@@ -1,7 +1,7 @@
 .hudBar {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 
   article {
     background: linear-gradient(140deg, rgba(22, 32, 47, 0.8), rgba(11, 18, 27, 0.9));

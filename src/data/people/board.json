@@ -1,0 +1,65 @@
+[
+  {
+    "person_name": "Jahed Mirza",
+    "age": 57,
+    "gender": "Male",
+    "representing_company": "Blue Dragon Capital",
+    "company_shareholder_percentage": 25.0,
+    "current_role": "Board Chair",
+    "image_url": "/people/board/p1.jpg"
+  },
+  {
+    "person_name": "Mohiuddin Talukdar",
+    "age": 62,
+    "gender": "Male",
+    "representing_company": "UHS Ventures",
+    "company_shareholder_percentage": 20.0,
+    "current_role": "Vice Chair",
+    "image_url": "/people/board/p2.jpg"
+  },
+  {
+    "person_name": "David Karim",
+    "age": 45,
+    "gender": "Male",
+    "representing_company": "Tiger Housing Corporation",
+    "company_shareholder_percentage": 15.0,
+    "current_role": "Audit Committee Chair",
+    "image_url": "/people/board/p3.jpg"
+  },
+  {
+    "person_name": "Ekramul Haidar",
+    "age": 86,
+    "gender": "Male",
+    "representing_company": "Haidar Pharmaceuticals",
+    "company_shareholder_percentage": 15.0,
+    "current_role": "Compensation Committee Chair",
+    "image_url": "/people/board/p4.jpg"
+  },
+  {
+    "person_name": "Jeba Rahmatullah",
+    "age": 60,
+    "gender": "Female",
+    "representing_company": "Starlight Fashion and Textiles",
+    "company_shareholder_percentage": 10.0,
+    "current_role": "Director",
+    "image_url": "/people/board/p5.jpg"
+  },
+  {
+    "person_name": "Astha Rahman",
+    "age": 25,
+    "gender": "Female",
+    "representing_company": "Neon Airlines",
+    "company_shareholder_percentage": 10.0,
+    "current_role": "Director",
+    "image_url": "/people/board/p6.jpg"
+  },
+  {
+    "person_name": "Rajib Bhuiyan",
+    "age": 32,
+    "gender": "Male",
+    "representing_company": "Zebra Technologies",
+    "company_shareholder_percentage": 5.0,
+    "current_role": "Director",
+    "image_url": "/people/board/p7.jpg"
+  }
+]

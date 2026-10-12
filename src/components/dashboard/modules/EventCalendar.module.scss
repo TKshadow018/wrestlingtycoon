@@ -163,6 +163,12 @@
     color: var(--accent-copper);
   }
 
+  &.boardMeeting {
+    background: rgba(143, 116, 222, 0.2);
+    border-left: 2px solid #a892f2;
+    color: #c8b8ff;
+  }
+
   .eventName {
     flex: 1;
     overflow: hidden;
@@ -261,6 +267,11 @@
   &.custom {
     background: rgba(243, 159, 97, 0.6);
     border: 1px solid var(--accent-copper);
+  }
+
+  &.boardMeeting {
+    background: rgba(143, 116, 222, 0.6);
+    border: 1px solid #a892f2;
   }
 }
 

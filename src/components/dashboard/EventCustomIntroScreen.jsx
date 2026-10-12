@@ -1,8 +1,19 @@
 import { useEffect, useState } from 'react'
+import {
+  DEFAULT_CAREER_ARC_UNLOCKS,
+  getCareerArcUnlockItem,
+} from '../../data/careerArcUnlocks'
 import styles from './EventCustomIntroScreen.module.scss'
 
-function EventCustomIntroScreen({ event, durationMs = 2600, onComplete }) {
+function EventCustomIntroScreen({
+  event,
+  presentationId = DEFAULT_CAREER_ARC_UNLOCKS.presentations[0],
+  durationMs = 2600,
+  onComplete,
+}) {
   const [visible, setVisible] = useState(false)
+  const presentation = getCareerArcUnlockItem('presentations', presentationId)
+    || getCareerArcUnlockItem('presentations', DEFAULT_CAREER_ARC_UNLOCKS.presentations[0])
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setVisible(true))
@@ -21,7 +32,10 @@ function EventCustomIntroScreen({ event, durationMs = 2600, onComplete }) {
   }
 
   return (
-    <div className={`${styles.overlay} ${visible ? styles.overlayVisible : ''}`}>
+    <div
+      className={`${styles.overlay} ${styles[presentation.themeClass] || ''} ${visible ? styles.overlayVisible : ''}`}
+      data-presentation={presentation.id}
+    >
       <div className={styles.posterLayer} aria-hidden="true">
         <img className={styles.poster} src={event.imageUrl} alt="" />
       </div>

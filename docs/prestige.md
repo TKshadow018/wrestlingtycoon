@@ -1,102 +1,68 @@
 # Prestige System
 
-Prestige represents your company's standing and reputation in the wrestling world. It starts at **10** and has no hard cap.
+Prestige represents the company's standing in the wrestling world. A new game starts at **10**. Prestige is clamped at zero but has no upper cap.
 
----
+Primary implementation: [`src/store/useGameStore.js`](../src/store/useGameStore.js)
 
-## What Affects Prestige
+## Prestige from an Event
 
-### Events (main driver)
+When an event is run, the game first calculates an event score:
 
-Prestige **only changes when you run an event**. Non-event days have zero prestige movement.
-
-The formula after each event:
-
-```
-prestigeDelta = round(
-    hype / 36                       — event type hype factor
-  - risk / 42                       — event type risk penalty
-  + segmentTypeBonus                — sum of bonuses from each segment type
-  + (avgWrestlerPopularity / 100) × 2   — quality of wrestlers in matches
-  + matchRatingBonus                — sum of (matchRating - 5) × 0.4 per match segment
+```text
+calculatedPrestigeDelta = round(
+    eventHype / 36
+  - eventRisk / 42
+  + segmentPrestigeBonus
+  + (averageMatchWrestlerPopularity / 100) * 2
+  + sum((matchRating - 5) * 0.4)
 )
+
+eventBaseDelta = round(calculatedPrestigeDelta / 5)
+eventPrestigeDelta = eventBaseDelta + rivalryPrestigeBoost + competitorPressurePrestigeImpact
 ```
 
-#### Segment type bonuses
-| Segment type | Prestige bonus |
-|--------------|---------------|
-| Match        | +1            |
-| Main Event   | +4            |
-| Title Match  | +3            |
-| Promo        | +1            |
-| Interview    | 0             |
+The rating term includes rated `match`, `mainEvent`, and `titleMatch` segments. The popularity average includes wrestlers in those match segments.
 
-#### Match rating impact (per match segment)
-| Match rating | Prestige contribution |
-|-------------|----------------------|
-| 10.0        | +2.0                 |
-| 8.0         | +1.2                 |
-| 7.0         | +0.8                 |
-| 5.0         | 0.0 (neutral)        |
-| 3.0         | −0.8                 |
-| 1.0         | −1.6                 |
+### Raw segment prestige bonuses
 
-Match ratings are driven by: wrestler average skill, stamina at match time, and a small random factor.
+These bonuses contribute to `calculatedPrestigeDelta` before the event score is divided by five; they are not direct prestige points:
 
-#### Wrestler popularity impact
-The average popularity (0–100) of all wrestlers who participate in match segments contributes up to **+2 prestige** per event. High-profile rosters consistently lift your prestige ceiling.
+| Segment type | Raw bonus |
+|---|---:|
+| Match | +1 |
+| Main Event | +4 |
+| Title Match | +3 |
+| Promo | +1 |
+| Interview | 0 |
 
-#### Can prestige go down from an event?
-Yes. A show with no popular wrestlers, low match ratings, and a high-risk event type can produce a **negative** prestigeDelta.
+### Match rating contribution
 
----
+The match-rating term is calculated for each rated match segment:
 
-### Skipping an Event
+| Match rating | Raw contribution |
+|---:|---:|
+| 10.0 | +2.0 |
+| 8.0 | +1.2 |
+| 7.0 | +0.8 |
+| 5.0 | 0.0 |
+| 3.0 | -0.8 |
+| 1.0 | -1.6 |
 
-If you skip an event (requirements not met and you choose to skip), prestige drops by **5–10%** of its current value (minimum −1). No income is earned.
+Ratings use wrestler skill and stamina plus a small random factor. Rivalry heat and competitor performance add separate event-level modifiers after the base score.
 
----
+## Other Prestige Changes
 
-### Hiring an Elite Wrestler
+Prestige can change outside event resolution:
 
-Signing a wrestler with skill **≥ 82** (Elite tier) immediately boosts prestige:
+- **Daily competitor simulation:** rival promotions can add or subtract prestige during timeline advancement.
+- **Interview consequences:** answer score, professionalism, hype, controversy, and whether the interview was forced affect prestige.
+- **Career arcs and onboarding:** configured completion rewards and failure penalties can affect prestige.
+- **Board decisions:** an approved competitor-response decision grants prestige.
+- **Elite wrestler hiring and firing:** a wrestler with skill `82` or higher changes prestige by `round((skill - 80) / 3)` on hire, and by the negative of that amount on firing.
+- **Skipping an event:** prestige falls by a random 5%-10% of its current value, with a minimum one-point decrease before the zero floor is applied.
 
-```
-hirePrestigeDelta = round((skill - 80) / 3)
-```
+Skipping an event prevents that event's gate, segment, and event-performance effects. Daily simulation income and expenses still occur when the timeline advances.
 
-| Wrestler skill | Prestige boost |
-|---------------|---------------|
-| 82            | +1            |
-| 85            | +2            |
-| 90            | +3            |
-| 95            | +5            |
-| 100           | +7            |
+## Summary
 
-Solid (skill 62–81) and Rookie (skill < 62) hires do **not** affect prestige.
-
----
-
-### Releasing an Elite Wrestler
-
-Firing a wrestler with skill **≥ 82** reduces prestige by the same magnitude as the hire bonus would have been:
-
-```
-firePrestigeDelta = -round((skill - 80) / 3)
-```
-
-This reflects the loss of a marquee talent from your roster.
-
----
-
-## Summary Table
-
-| Trigger                              | Prestige effect            |
-|--------------------------------------|---------------------------|
-| Non-event day                        | None                      |
-| Good event (high ratings, popular wrestlers) | Positive (+varies)  |
-| Average event                        | Small positive or neutral |
-| Poor event (low ratings, bad roster) | Negative                  |
-| Skipping an event                    | −5% to −10% of current    |
-| Hiring an Elite wrestler (skill ≥ 82)| +1 to +7                  |
-| Releasing an Elite wrestler          | −1 to −7                  |
+Event quality is the primary prestige driver, but prestige is also affected by competitors, interviews, progression rewards, board decisions, elite roster changes, and skipped events. See the finance and board-meeting documentation for related cash-flow and governance effects.

@@ -1,9 +1,82 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
 import { SPONSOR_TYPE_CONFIG, SPONSOR_TYPE_ORDER } from '../../../data/sponsorOffers'
 import styles from './ManageSponsorsModule.module.scss'
 
 const SPONSORABLE_EVENT_TYPES = ['ppv', 'megaLive', 'oneTime']
+const HIGH_TIER_SPONSOR_MIN_TIER = 6
+const HIGH_TIER_BRAND_SAFETY_MIN = 60
+const HIGH_TIER_FAMILY_SHARE_MIN = 18
+
+const getEventSponsorProfile = (eventOutcome) => {
+  if (!eventOutcome) {
+    return {
+      brandSafetyScore: 0,
+      familyShare: 0,
+    }
+  }
+
+  const segments = Array.isArray(eventOutcome?.segments) ? eventOutcome.segments : []
+  const audienceSegments = Array.isArray(eventOutcome?.audienceSegments) ? eventOutcome.audienceSegments : []
+  const totalSegments = Math.max(1, segments.length)
+  const violentSegments = segments.filter((segment) => (
+    segment?.segmentType === 'match' || segment?.segmentType === 'mainEvent' || segment?.segmentType === 'titleMatch'
+  )).length
+  const promoSegments = segments.filter((segment) => (
+    segment?.segmentType === 'promo' || segment?.segmentType === 'interview'
+  )).length
+  const familySegment = audienceSegments.find((segment) => segment?.key === 'family') || null
+  const familyShare = Number(familySegment?.sharePercent || 0)
+  const overallRating = Number(eventOutcome?.overallRating || 0)
+  const risk = Number(eventOutcome?.risk || 0)
+  const violentRatio = violentSegments / totalSegments
+  const promoRatio = promoSegments / totalSegments
+  const scandalScore = Math.max(0, risk - 22) + Math.max(0, 7 - overallRating) * 6
+
+  const brandSafetyScore = Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(64 + familyShare * 0.9 + promoRatio * 16 - violentRatio * 22 - scandalScore * 0.45),
+    ),
+  )
+
+  return {
+    familyShare,
+    brandSafetyScore,
+  }
+}
+
+const getOfferRestrictionReason = ({ offer, lastOutcome }) => {
+  if (Number(offer?.tier || 1) < HIGH_TIER_SPONSOR_MIN_TIER) {
+    return null
+  }
+
+  if (!lastOutcome) {
+    return 'needsTrackRecord'
+  }
+
+  const profile = getEventSponsorProfile(lastOutcome)
+  if (profile.brandSafetyScore < HIGH_TIER_BRAND_SAFETY_MIN) {
+    return 'brandSafety'
+  }
+
+  if (profile.familyShare < HIGH_TIER_FAMILY_SHARE_MIN) {
+    return 'familyAudience'
+  }
+
+  return null
+}
+
+const getTrustToneKey = (trust) => {
+  const value = Number(trust || 0)
+  if (value >= 80) return 'excellent'
+  if (value >= 65) return 'strong'
+  if (value >= 45) return 'neutral'
+  if (value >= 25) return 'fragile'
+  return 'critical'
+}
 
 const formatDuration = (sponsor, t) => {
   if (sponsor.eventScoped) {
@@ -26,10 +99,12 @@ function ManageSponsorsModule() {
   const offers = useGameStore((state) => state.market.sponsorOffers)
   const sponsors = useGameStore((state) => state.roster.sponsors)
   const bookedEvent = useGameStore((state) => state.events.bookedEvent)
+  const lastOutcome = useGameStore((state) => state.events.lastOutcome)
   const rerollSponsorOffers = useGameStore((state) => state.rerollSponsorOffers)
   const signSponsor = useGameStore((state) => state.signSponsor)
   const currentDay = useGameStore((state) => state.calendar.day)
   const lastRerolledDay = useGameStore((state) => state.market.sponsorOffersLastRerolledDay)
+  const [signFeedback, setSignFeedback] = useState('')
   const rerollCooldownDays = lastRerolledDay === null ? 0 : Math.max(0, 7 - (currentDay - lastRerolledDay))
   const canReroll = rerollCooldownDays === 0
 
@@ -77,6 +152,8 @@ function ManageSponsorsModule() {
                     <h5>{sponsor.name}</h5>
                     <p>{t('dashboard.sponsors.dailyPayout', { amount: sponsor.dailyPayout.toLocaleString() })}</p>
                     <p>{t('dashboard.sponsors.eventBoost', { percent: Math.round(sponsor.eventMultiplier * 100) })}</p>
+                    <p>{t('dashboard.sponsors.trust', { value: Number(sponsor.trust ?? sponsor.reputation ?? 55) })}</p>
+                    <p>{t('dashboard.sponsors.relationship', { value: t(`dashboard.sponsors.relationshipLevels.${getTrustToneKey(sponsor.trust ?? sponsor.reputation ?? 55)}`) })}</p>
                     <p>{t('dashboard.sponsors.contractLength', { value: formatDuration(sponsor, t) })}</p>
                   </article>
                 ))}
@@ -94,6 +171,7 @@ function ManageSponsorsModule() {
                     <p>{t('dashboard.sponsors.signingBonus', { amount: offer.signingBonus.toLocaleString() })}</p>
                     <p>{t('dashboard.sponsors.dailyPayout', { amount: offer.dailyPayout.toLocaleString() })}</p>
                     <p>{t('dashboard.sponsors.eventBoost', { percent: Math.round(offer.eventMultiplier * 100) })}</p>
+                    <p>{t('dashboard.sponsors.baseTrust', { value: Number(offer.trust ?? offer.reputation ?? 55) })}</p>
                     <p>
                       {t('dashboard.sponsors.contractLength', {
                         value: config.eventScoped
@@ -103,14 +181,30 @@ function ManageSponsorsModule() {
                     </p>
                     <button
                       type="button"
-                      disabled={isTypeFull || eventNeedsBooking || eventTypeNotEligible}
-                      onClick={() => signSponsor(offer.offerId)}
+                      disabled={isTypeFull || eventNeedsBooking || eventTypeNotEligible || Boolean(getOfferRestrictionReason({ offer, lastOutcome }))}
+                      onClick={() => {
+                        const result = signSponsor(offer.offerId)
+                        if (result?.ok) {
+                          setSignFeedback('')
+                          return
+                        }
+                        setSignFeedback(result?.reason || 'signFailed')
+                      }}
                     >
                       {t('dashboard.sponsors.sign')}
                     </button>
                     {isTypeFull ? <p className={styles.hint}>{t('dashboard.sponsors.slotFull')}</p> : null}
                     {eventNeedsBooking ? <p className={styles.hint}>{t('dashboard.sponsors.eventBookingRequired')}</p> : null}
                     {eventTypeNotEligible ? <p className={styles.hint}>{t('dashboard.sponsors.eventTypeNotEligible')}</p> : null}
+                    {getOfferRestrictionReason({ offer, lastOutcome }) === 'needsTrackRecord'
+                      ? <p className={styles.hint}>{t('dashboard.sponsors.highTierNeedsTrackRecord')}</p>
+                      : null}
+                    {getOfferRestrictionReason({ offer, lastOutcome }) === 'brandSafety'
+                      ? <p className={styles.hint}>{t('dashboard.sponsors.highTierNeedsBrandSafety')}</p>
+                      : null}
+                    {getOfferRestrictionReason({ offer, lastOutcome }) === 'familyAudience'
+                      ? <p className={styles.hint}>{t('dashboard.sponsors.highTierNeedsFamilyAudience')}</p>
+                      : null}
                   </article>
                 ))}
               </div>
@@ -120,6 +214,7 @@ function ManageSponsorsModule() {
           </section>
         )
       })}
+      {signFeedback ? <p className={styles.hint}>{t(`dashboard.sponsors.signErrors.${signFeedback}`)}</p> : null}
     </section>
   )
 }
