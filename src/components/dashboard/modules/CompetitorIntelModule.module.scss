@@ -110,3 +110,70 @@
 .negative {
   color: #f07d7d;
 }
+
+.competitorRoster {
+  display: grid;
+  gap: 0.7rem;
+
+  > h3 {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+}
+
+.competitorProfiles {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.competitorProfile {
+  background: rgba(8, 13, 20, 0.75);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.8rem;
+
+  p,
+  small {
+    color: var(--text-faint);
+    font-size: 0.78rem;
+    margin: 0;
+  }
+
+  ul {
+    display: grid;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+}
+
+.profileHeading {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.7rem;
+  justify-content: space-between;
+
+  h4 {
+    color: var(--text-main);
+    font-size: 0.88rem;
+    margin: 0;
+  }
+
+  span {
+    color: var(--accent-copper);
+    font-size: 0.75rem;
+  }
+}

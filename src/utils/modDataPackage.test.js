@@ -9,9 +9,10 @@ describe('mod data packages', () => {
           {
             name: '  Tag Team Championship ',
             division: 'doubles',
+            isWomenOnly: true,
+            isActive: true,
             holderEmployeeIds: ['team-a', 2, 'team-b', 'team-c'],
             prestige: 1200,
-            isActive: true,
           },
           { titleId: 'empty-title', name: ' ' },
         ],
@@ -35,6 +36,38 @@ describe('mod data packages', () => {
           hype: 110,
           risk: -5,
         }],
+        wrestlerArchetypes: [{
+          archetypeId: 'technical',
+          name: 'Technical Specialist',
+          alignment: 'face',
+          style: 'technical',
+        }],
+        modWrestlers: [{
+          personId: 'mod-ace',
+          name: 'Ace',
+          ring_name: 'The Technician',
+          gender: 'male',
+          popularity: 88,
+          archetypeId: 'technical',
+          salary_demand: { monthly_wage: 25000, per_match_salary: 4000, additional_bonus: 5000 },
+          wrestling_ability: {
+            strength: 75,
+            technics: 90,
+            high_fly_ability: 60,
+            leg_stamina: 80,
+            body_stamina: 82,
+            head_stamina: 85,
+          },
+        }],
+        modVenues: [{
+          id: 'mod-venue',
+          name: 'Sky Dome',
+          location: 'North City',
+          capacity: 18000,
+          rentFee: 32000,
+          facilities: 4,
+          isIndoor: true,
+        }],
       },
     })
 
@@ -46,6 +79,8 @@ describe('mod data packages', () => {
           titleId: 'mod-title-1',
           name: 'Tag Team Championship',
           division: 'doubles',
+          isWomenOnly: true,
+          isActive: true,
           holderEmployeeId: 'team-a',
           holderEmployeeIds: ['team-a', 'team-b'],
           prestige: 1000,
@@ -68,17 +103,39 @@ describe('mod data packages', () => {
           hype: 100,
           risk: 0,
         }],
+        wrestlerArchetypes: expect.arrayContaining([
+          expect.objectContaining({ archetypeId: 'technical', name: 'Technical Specialist' }),
+        ]),
+        rosterData: [{
+          personId: 'mod-ace',
+          name: 'Ace',
+          role: 'wrestler',
+          archetypeId: 'technical',
+          popularity: 88,
+          salary_demand: expect.objectContaining({ monthly_wage: 25000 }),
+        }],
+        venues: [{
+          id: 'mod-venue',
+          name: 'Sky Dome',
+          capacity: 18000,
+          rentFee: 32000,
+          facilities: 4,
+        }],
       },
     })
     expect(result.createdAt).toEqual(expect.any(Number))
   })
 
   it('handles an empty or missing state without inventing module entries', () => {
-    expect(buildModDataPackageFromState(null).modules).toEqual({
+    expect(buildModDataPackageFromState(null).modules).toMatchObject({
       titles: [],
       sponsorOffers: [],
       eventTemplates: [],
+      rosterData: [],
+      venues: [],
     })
+    expect(buildModDataPackageFromState(null).modules.wrestlerArchetypes)
+      .toEqual(expect.arrayContaining([expect.objectContaining({ archetypeId: 'technician' })]))
   })
 
   it('rejects non-object payloads and missing module objects', () => {
@@ -100,6 +157,9 @@ describe('mod data packages', () => {
         titles: {},
         sponsorOffers: [],
         eventTemplates: [{ name: '' }],
+        wrestlerArchetypes: [{ name: '' }],
+        rosterData: [{ name: '' }],
+        venues: [{ name: '' }],
       },
     })
 
@@ -108,9 +168,14 @@ describe('mod data packages', () => {
       'titles must be an array.',
       'sponsorOffers has no valid entries.',
       'eventTemplates has no valid entries.',
-      'No valid modules found. Include at least one of: titles, sponsorOffers, eventTemplates.',
+      'No valid modules found. Include at least one of: titles, sponsorOffers, eventTemplates, wrestlerArchetypes, rosterData, venues.',
     ]))
-    expect(result.warnings).toContain('eventTemplates: skipped 1 invalid entries.')
+    expect(result.warnings).toEqual(expect.arrayContaining([
+      'wrestlerArchetypes: skipped 1 invalid entries.',
+      'rosterData: skipped 1 invalid entries.',
+      'venues: skipped 1 invalid entries.',
+      'eventTemplates: skipped 1 invalid entries.',
+    ]))
   })
 
   it('normalizes valid module entries, warns about skipped and duplicate entries, and omits invalid names', () => {
@@ -131,6 +196,35 @@ describe('mod data packages', () => {
           { eventId: 'event-2', name: 'Duplicate Show', templateKey: 'shared-key' },
           { name: '' },
         ],
+        wrestlerArchetypes: [
+          { archetypeId: 'technical', name: 'Technician', alignment: 'face', style: 'technical' },
+          { archetypeId: 'technical', name: 'Duplicate', alignment: 'heel', style: 'powerhouse' },
+          { name: '' },
+        ],
+        rosterData: [
+          {
+            personId: 'mod-ace',
+            name: 'Ace',
+            archetypeId: 'technical',
+            popularity: 150,
+            salary_demand: { monthly_wage: 24000, per_match_salary: 5000, additional_bonus: 8000 },
+            wrestling_ability: {
+              strength: 90,
+              technics: 80,
+              high_fly_ability: 70,
+              leg_stamina: 85,
+              body_stamina: 90,
+              head_stamina: 75,
+            },
+          },
+          { personId: 'mod-manager', name: 'Not a wrestler', role: 'manager' },
+          { personId: 'mod-ace', name: 'Duplicate Ace', role: 'wrestler' },
+        ],
+        venues: [
+          { id: 'venue-extra', name: 'Extra Arena', capacity: 20000, location: 'Metro', rentFee: 10000, facilities: 5 },
+          { id: 'venue-extra', name: 'Duplicate Venue', capacity: 9000, location: 'Elsewhere' },
+          { name: '' },
+        ],
       },
     })
 
@@ -145,6 +239,15 @@ describe('mod data packages', () => {
     })
     expect(result.data.modules.sponsorOffers[0].eventMultiplier).toBe(3)
     expect(result.data.modules.eventTemplates[0].risk).toBe(20)
+    expect(result.data.modules.wrestlerArchetypes).toHaveLength(1)
+    expect(result.data.modules.rosterData).toHaveLength(1)
+    expect(result.data.modules.rosterData[0]).toMatchObject({
+      role: 'wrestler',
+      archetypeId: 'technical',
+      popularity: 100,
+    })
+    expect(result.data.modules.venues).toHaveLength(1)
+    expect(result.data.modules.venues[0]).toMatchObject({ capacity: 20000, facilities: 5 })
     expect(result.warnings).toEqual(expect.arrayContaining([
       'titles: skipped 1 invalid entries.',
       'titles: removed 1 duplicate entries by titleId.',
@@ -152,6 +255,12 @@ describe('mod data packages', () => {
       'sponsorOffers: removed 1 duplicate entries by offerId.',
       'eventTemplates: skipped 1 invalid entries.',
       'eventTemplates: removed 1 duplicate entries by templateKey.',
+      'wrestlerArchetypes: skipped 1 invalid entries.',
+      'wrestlerArchetypes: removed 1 duplicate entries by archetypeId.',
+      'rosterData: skipped 1 invalid entries.',
+      'rosterData: removed 1 duplicate entries by personId.',
+      'venues: skipped 1 invalid entries.',
+      'venues: removed 1 duplicate entries by id.',
     ]))
   })
 })

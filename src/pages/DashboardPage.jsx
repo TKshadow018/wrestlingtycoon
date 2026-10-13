@@ -5,7 +5,9 @@ import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
 import { createInterviewScenario, evaluateInterviewAnswer, scoreInterviewAnswer } from '../ai/interviewService'
 import LanguageSwitcher from '../components/common/LanguageSwitcher'
 import AiInterviewModal from '../components/dashboard/AiInterviewModal'
+import InterviewFocusModal from '../components/dashboard/InterviewFocusModal'
 import BoardMeetingModal from '../components/dashboard/BoardMeetingModal'
+import OnboardingTutorialGuide from '../components/dashboard/OnboardingTutorialGuide'
 import SaveLoadControls from '../components/common/SaveLoadControls'
 import ControlPanel from '../components/dashboard/ControlPanel'
 import HudBar from '../components/dashboard/HudBar'
@@ -22,6 +24,7 @@ import app, { isFirebaseConfigured } from '../config/firebase'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { useGameStore } from '../store/useGameStore'
 import { getBoardMeetingSchedule } from '../utils/boardMeetings'
+import { getOnboardingTutorialStage } from '../utils/onboardingTutorial'
 import { parseGameDate } from '../utils/gameCalendar'
 import { buildModDataPackageFromState, validateModDataPackage } from '../utils/modDataPackage'
 import styles from './DashboardPage.module.scss'
@@ -219,6 +222,7 @@ function DashboardPage() {
   const resetGame = useGameStore((state) => state.resetGame)
   const titles = useGameStore((state) => state.roster.titles)
   const ticketFees = useGameStore((state) => state.finances.ticketFees)
+  const modVenues = useGameStore((state) => state.market.modVenues || [])
   const eventPreparation = useGameStore((state) => state.events.eventPreparation)
   const careerArcUnlocks = useGameStore((state) => state.progression.unlocks)
   const setEventPreparation = useGameStore((state) => state.setEventPreparation)
@@ -247,6 +251,7 @@ function DashboardPage() {
   const [interviewRollByDay, setInterviewRollByDay] = useState({})
   const [interviewConsumedByDay, setInterviewConsumedByDay] = useState({})
   const [interviewSession, setInterviewSession] = useState(null)
+  const [showInterviewFocus, setShowInterviewFocus] = useState(false)
   const [interviewMessages, setInterviewMessages] = useState([])
   const [isInterviewSubmitting, setIsInterviewSubmitting] = useState(false)
   const [isInterviewFinished, setIsInterviewFinished] = useState(false)
@@ -325,6 +330,7 @@ function DashboardPage() {
   const shouldOfferInterview = isInterviewEligible
     && interviewRollByDay?.[day] === true
     && interviewConsumedByDay?.[day] !== true
+    && !showInterviewFocus
     && !interviewSession
 
   const interviewButtonLabel = shouldOfferInterview
@@ -398,18 +404,27 @@ function DashboardPage() {
     return {
       status: onboardingChallenge.status || 'active',
       remainingDays,
+      tutorial: {
+        ...getOnboardingTutorialStage(onboardingChallenge),
+        successfulEvents: Number(firstShow.currentSuccessfulEvents || 0),
+        targetSuccessfulEvents: Number(firstShow.targetSuccessfulEvents || 0),
+        rosterProgress: `${Number(rosterObjective.currentWrestlers || 0)}/${Number(rosterObjective.targetWrestlers || 0)} wrestlers · ${Number(rosterObjective.currentStaff || 0)}/${Number(rosterObjective.targetStaff || 0)} staff · ${Number(rosterObjective.currentReferees || 0)}/${Number(rosterObjective.targetReferees || 0)} referees · ${Number(rosterObjective.currentAnnouncers || 0)}/${Number(rosterObjective.targetAnnouncers || 0)} announcers`,
+      },
       reward: onboardingChallenge.reward || { cash: 0, prestige: 0 },
       penalty: onboardingChallenge.penalty || { fans: 0, prestige: 0 },
       objectives: [
         {
           key: 'rosterBuild',
           done: Boolean(rosterObjective.completed),
-          progressText: `${Number(rosterObjective.currentWrestlers || 0)}/${Number(rosterObjective.targetWrestlers || 0)} ${t('dashboard.onboardingChallenge.objectiveRosterWrestlers')}, ${Number(rosterObjective.currentStaff || 0)}/${Number(rosterObjective.targetStaff || 0)} ${t('dashboard.onboardingChallenge.objectiveRosterStaff')}`,
+          progressText: `${Number(rosterObjective.currentWrestlers || 0)}/${Number(rosterObjective.targetWrestlers || 0)} ${t('dashboard.onboardingChallenge.objectiveRosterWrestlers')}, ${Number(rosterObjective.currentStaff || 0)}/${Number(rosterObjective.targetStaff || 0)} ${t('dashboard.onboardingChallenge.objectiveRosterStaff')}, ${Number(rosterObjective.currentReferees || 0)}/${Number(rosterObjective.targetReferees || 0)} ${t('dashboard.onboardingChallenge.objectiveRosterReferees')}, ${Number(rosterObjective.currentAnnouncers || 0)}/${Number(rosterObjective.targetAnnouncers || 0)} ${t('dashboard.onboardingChallenge.objectiveRosterAnnouncers')}`,
         },
         {
           key: 'firstShow',
           done: Boolean(firstShowObjective.completed),
-          progressText: `${Number(firstShowObjective.currentSuccessfulEvents || 0)}/${Number(firstShowObjective.targetSuccessfulEvents || 0)}`,
+          progressText: t('dashboard.onboardingChallenge.weeklyShowsProgress', {
+            current: Number(firstShowObjective.currentSuccessfulEvents || 0),
+            target: Number(firstShowObjective.targetSuccessfulEvents || 0),
+          }),
         },
         {
           key: 'stabilize',
@@ -423,7 +438,7 @@ function DashboardPage() {
     }
   }, [day, onboardingChallenge, t])
 
-  const openInterview = async () => {
+  const openInterview = async (storyFocus = {}) => {
     setInterviewConsumedByDay((prev) => ({
       ...prev,
       [day]: true,
@@ -457,7 +472,11 @@ function DashboardPage() {
     setIsInterviewSubmitting(true)
 
     try {
-      const scenario = await createInterviewScenario(interviewContext)
+      const scenario = await createInterviewScenario({
+        ...interviewContext,
+        featuredWrestlerName: storyFocus.featuredWrestlerName || '',
+        rivalWrestlerName: storyFocus.rivalWrestlerName || '',
+      })
       const firstQuestion = scenario.questions?.[0]
 
       if (!firstQuestion) {
@@ -466,6 +485,7 @@ function DashboardPage() {
 
       setInterviewSession({
         ...scenario,
+        storyFocus,
         questionIndex: 0,
         followUpCount: 0,
         targetFollowUps: 3 + Math.floor(Math.random() * 3),
@@ -561,6 +581,8 @@ function DashboardPage() {
       const consequence = applyInterviewConsequences({
         metrics: nextMetrics,
         forcedPreShow: isForcedPreShowInterviewDay,
+        featuredWrestlerId: interviewSession.storyFocus?.featuredWrestlerId || null,
+        rivalWrestlerId: interviewSession.storyFocus?.rivalWrestlerId || null,
       })
       setInterviewImpactSummary(consequence)
       const impactPreview = computeInterviewImpactPreview({ metrics: nextMetrics, forcedPreShow: isForcedPreShowInterviewDay })
@@ -570,12 +592,14 @@ function DashboardPage() {
         { speaker: 'ai', text: turn.reply },
         {
           speaker: 'ai',
-          text: t('dashboard.ai.interviewImpactApplied', 'Media impact applied: Fans {{fans}} | Prestige {{prestige}} | Sponsor trust {{trust}}', {
+          text: t('dashboard.ai.interviewImpactApplied', 'Media impact applied: Fans {{fans}} | Prestige {{prestige}} | Sponsor trust {{trust}} | Alignment {{alignment}} | Rivalry heat {{rivalry}}', {
             fans: impactPreview.fansDelta >= 0 ? `+${impactPreview.fansDelta}` : `${impactPreview.fansDelta}`,
             prestige: impactPreview.prestigeDelta >= 0 ? `+${impactPreview.prestigeDelta}` : `${impactPreview.prestigeDelta}`,
             trust: consequence.sponsorTrustDeltaAverage >= 0
               ? `+${consequence.sponsorTrustDeltaAverage}`
               : `${consequence.sponsorTrustDeltaAverage}`,
+            alignment: `${consequence.alignmentTargetName ? `${consequence.alignmentTargetName} ` : ''}${consequence.alignmentDelta >= 0 ? '+' : ''}${consequence.alignmentDelta}`,
+            rivalry: `${consequence.rivalryNames.join(' vs ') || t('dashboard.ai.noInterviewRival')} ${consequence.rivalryHeatDelta >= 0 ? '+' : ''}${consequence.rivalryHeatDelta}`,
           }),
         },
         { speaker: 'ai', text: t('dashboard.ai.interviewClosing') },
@@ -614,7 +638,7 @@ function DashboardPage() {
     }
 
     if (shouldOfferInterview) {
-      openInterview()
+      setShowInterviewFocus(true)
       return
     }
 
@@ -930,6 +954,7 @@ function DashboardPage() {
           ticketFees={ticketFees}
           eventPreparation={eventPreparation}
           unlocks={careerArcUnlocks}
+          modVenues={modVenues}
           onSave={handleEventPrepSave}
           onCancel={handleEventPrepCancel}
         />
@@ -952,6 +977,17 @@ function DashboardPage() {
         isFinished={isInterviewFinished}
         error={interviewError}
       />
+      {showInterviewFocus && (
+        <InterviewFocusModal
+          isOpen
+          wrestlers={employees.filter((employee) => employee.role === 'wrestler')}
+          onStart={(storyFocus) => {
+            setShowInterviewFocus(false)
+            void openInterview(storyFocus)
+          }}
+          onCancel={() => setShowInterviewFocus(false)}
+        />
+      )}
       <BoardMeetingModal
         meeting={boardMeeting.activeMeeting}
         relation={boardMeeting.relation}
@@ -1039,6 +1075,12 @@ function DashboardPage() {
             competitorPressure: lastOutcome?.competitorPressure || null,
           }}
         />
+        {onboardingSummary && (
+          <OnboardingTutorialGuide
+            tutorial={onboardingSummary.tutorial}
+            onOpenModule={setActiveModule}
+          />
+        )}
 
         {showChallengeModal && onboardingSummary && (
           <section className={styles.challengeModalBackdrop}>

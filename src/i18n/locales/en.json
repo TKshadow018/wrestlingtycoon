@@ -85,6 +85,15 @@
       "enableButton": "Enable AI",
       "laterButton": "Later",
       "interviewTitle": "Media Interview",
+      "interviewFocusTitle": "Choose the Interview Focus",
+      "interviewFocusDescription": "Your answers can shift the featured wrestler's alignment and change heat with their selected rival.",
+      "interviewFocusFeatured": "Featured Wrestler",
+      "interviewFocusRival": "Rival",
+      "interviewFocusCompany": "Company-wide interview (no featured wrestler)",
+      "interviewFocusNoRival": "No rival",
+      "noInterviewRival": "No rivalry selected",
+      "startInterview": "Start Interview",
+      "cancelInterview": "Cancel",
       "interviewHeadline": "{{journalist}} from {{newspaper}} is live with your promotion.",
       "you": "You",
       "answerPlaceholder": "Give your answer...",
@@ -96,8 +105,8 @@
       "interviewInitializing": "Connecting to journalist...",
       "interviewInitError": "Could not start interview right now. Try proceeding again.",
       "interviewTurnError": "Interview response failed. Try again.",
-      "interviewImpactApplied": "Media impact applied: Fans {{fans}} | Prestige {{prestige}} | Sponsor trust {{trust}}",
-      "interviewImpactSummary": "Interview impact: Fans {{fans}} | Prestige {{prestige}} | Avg sponsor trust {{trust}}"
+      "interviewImpactApplied": "Media impact: Fans {{fans}} | Prestige {{prestige}} | Sponsor trust {{trust}} | {{alignment}} alignment | {{rivalry}} rivalry heat",
+      "interviewImpactSummary": "Interview impact: Fans {{fans}} | Prestige {{prestige}} | Avg sponsor trust {{trust}} | {{alignment}} alignment | {{rivalry}} rivalry heat"
     },
     "controls": {
       "proceedDay": "Proceed to Next Day",
@@ -124,7 +133,7 @@
       "boardMeeting": "Board Meeting"
     },
     "onboardingChallenge": {
-      "title": "3-Show Rescue Challenge",
+      "title": "21-Day Rescue Tutorial",
       "openButton": "Challenges",
       "closeButton": "Close",
       "subtitle": "Stabilize your promotion before momentum collapses.",
@@ -135,6 +144,8 @@
       "objectivePending": "Pending",
       "objectiveRosterWrestlers": "wrestlers",
       "objectiveRosterStaff": "staff",
+      "objectiveRosterReferees": "referees",
+      "objectiveRosterAnnouncers": "announcers",
       "rewardHint": "Complete all objectives for +${{cash}} cash and +{{prestige}} prestige.",
       "successSummary": "Challenge complete. Reward granted: +${{cash}} cash and +{{prestige}} prestige.",
       "failSummary": "Challenge failed. Penalty applied: {{fans}} fans and {{prestige}} prestige.",
@@ -144,9 +155,45 @@
         "failed": "Failed"
       },
       "objectives": {
-        "rosterBuild": "Build a basic roster",
-        "firstShow": "Deliver one successful show",
+        "rosterBuild": "Build an event-ready roster",
+        "firstShow": "Deliver three successful weekly shows",
         "stabilize": "Keep operating cash flow at break-even or better"
+      },
+      "tutorial": {
+        "kicker": "Guided Rescue Tutorial",
+        "step": "Step {{current}} of {{total}}",
+        "showsComplete": "Successful weekly shows: {{current}} / {{total}}",
+        "openHiring": "Open Hire Employees",
+        "openEvents": "Open Event Planning",
+        "openFinances": "Open Finances",
+        "buildRoster": {
+          "title": "Build an event-ready roster",
+          "body": "Hire 12 wrestlers, at least one staff member, a referee, and an announcer. Use the employee role filters and check contract costs before signing."
+        },
+        "openingShow": {
+          "title": "Book and run your opening show",
+          "body": "Open Event Planning, confirm the weekly show, build a balanced card with matches and a promo, then run it when the roster requirements are met."
+        },
+        "secondShow": {
+          "title": "Build on the first crowd reaction",
+          "body": "Plan a second weekly card. Try a different stipulation or main-event pairing and compare attendance and ratings after the show."
+        },
+        "finalShow": {
+          "title": "Deliver the final rescue show",
+          "body": "Run a third successful weekly show. Review its event results, attendance segments, and postmortem for clues about what to improve."
+        },
+        "stabilizePromotion": {
+          "title": "Stabilize the promotion",
+          "body": "Review operating income, payroll, and recurring costs. Finish with at least 350 additional fans and non-negative operating cash flow."
+        },
+        "completed": {
+          "title": "Rescue tutorial complete",
+          "body": "Your promotion has completed the three-show rescue and stabilization plan. Keep using event results and finances to guide your next goals."
+        },
+        "failed": {
+          "title": "Rescue tutorial ended",
+          "body": "The 21-day rescue window has closed. Review your roster and operating cash flow, then use the next campaign to recover."
+        }
       }
     },
     "boardMeeting": {
@@ -805,6 +852,42 @@
       "historyEmpty": "No finished arcs yet.",
       "completed": "Completed",
       "failed": "Failed",
+      "tutorial": {
+        "kicker": "Guided Rescue Tutorial",
+        "step": "Step {{current}} of {{total}}",
+        "showsComplete": "Successful weekly shows: {{current}} / {{total}}",
+        "openHiring": "Open Hire Employees",
+        "openEvents": "Open Event Planning",
+        "openFinances": "Open Finances",
+        "buildRoster": {
+          "title": "Build an event-ready roster",
+          "body": "Hire 12 wrestlers, at least one staff member, a referee, and an announcer. Check contract costs before signing."
+        },
+        "openingShow": {
+          "title": "Book and run your opening show",
+          "body": "Open Event Planning, build a balanced match card, then run the show once your roster meets the event requirements."
+        },
+        "secondShow": {
+          "title": "Build on the first crowd reaction",
+          "body": "Plan a second weekly card. Try a different stipulation or main-event pairing and compare attendance and ratings."
+        },
+        "finalShow": {
+          "title": "Deliver the final rescue show",
+          "body": "Run a third successful weekly show. Review its event results, audience segments, and postmortem."
+        },
+        "stabilizePromotion": {
+          "title": "Stabilize the promotion",
+          "body": "Review operating income, payroll, and recurring costs. Finish with at least 350 additional fans and non-negative operating cash flow."
+        },
+        "completed": {
+          "title": "Rescue tutorial complete",
+          "body": "Your promotion completed the three-show rescue and stabilization plan. Use event results and finances to set your next goals."
+        },
+        "failed": {
+          "title": "Rescue tutorial ended",
+          "body": "The 21-day rescue window has closed. Review your roster and operating cash flow as you plan the next campaign."
+        }
+      },
       "templates": {
         "audienceSurge": {
           "title": "Audience Surge",
@@ -875,6 +958,16 @@
     },
     "competitorIntel": {
       "empty": "No competitor pressure data yet. Run an event to generate intelligence.",
+      "noHeadlines": "Rivals have not made a newsworthy move yet.",
+      "rivalProfiles": "Rival Promotion Profiles",
+      "strategies": {
+        "talentAcquisition": "Talent Acquisition",
+        "counterProgramming": "Counter-Programming",
+        "audienceExpansion": "Audience Expansion"
+      },
+      "nextStrategyShift": "Strategy review on game day {{day}}",
+      "copiedGimmick": "Copied {{gimmick}} from {{wrestler}}",
+      "noCopiedGimmicks": "No copied gimmicks recorded.",
       "averageFanImpact": "Average Fan Swing",
       "averagePrestigeImpact": "Average Prestige Swing",
       "winningNights": "Winning Nights",
@@ -905,6 +998,14 @@
       "promoCampaign": "Campaign: {{name}}",
       "backstageChemistry": "Backstage chemistry {{value}}",
       "factionStoriesTitle": "Faction Storylines",
+      "recommendations": {
+        "title": "Actionable Recommendations",
+        "repeatedMatchType": {
+          "title": "{{format}} dominated the recent card",
+          "message": "{{share}}% of this card used {{format}}, and it appeared in {{recentShows}} of the last three events.",
+          "action": "Mix in a different stipulation to keep the card feeling fresh."
+        }
+      },
       "factionStoryFactionPromo": "{{source}} called out {{target}}: rivalry heat +{{heat}}, fans +{{fans}}.",
       "factionStoryInterference": "{{source}} interfered in {{target}}'s moment: rivalry heat +{{heat}}, fans +{{fans}}.",
       "factionStoryBetrayal": "{{member}} betrayed {{source}} for {{target}}: rivalry heat +{{heat}}, fans +{{fans}}.",

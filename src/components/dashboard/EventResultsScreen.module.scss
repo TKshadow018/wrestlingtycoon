@@ -383,6 +383,53 @@
   }
 }
 
+.recommendationCard {
+  background: rgba(243, 159, 97, 0.055);
+  border: 1px solid rgba(243, 159, 97, 0.32);
+  border-radius: 10px;
+  padding: 0.8rem 0.9rem;
+
+  h3 {
+    color: var(--accent-copper);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin: 0 0 0.55rem;
+    text-transform: uppercase;
+  }
+
+  ul {
+    display: grid;
+    gap: 0.7rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  strong {
+    color: var(--text-main);
+    font-size: 0.86rem;
+  }
+
+  p,
+  small {
+    color: var(--text-faint);
+    font-size: 0.78rem;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  small {
+    color: #f3b27f;
+  }
+}
+
 .rivalryCard {
   margin-top: 0.75rem;
 }

@@ -1,4 +1,9 @@
 import peopleData from './people'
+import {
+  DEFAULT_WRESTLER_ARCHETYPES,
+  inferWrestlerArchetypeId,
+  normalizeWrestlerArchetypes,
+} from './wrestlerArchetypes'
 
 const TIERS = ['Rookie', 'Solid', 'Elite']
 
@@ -120,7 +125,7 @@ const createContractTerms = (person) => {
   }
 }
 
-const toCandidate = (person, index) => {
+const toCandidate = (person, index, candidateId = `candidate-${person.id}-${index}`) => {
   const skill = calculateSkill(person)
   const tier = getTierBySkill(skill)
   const contract = createContractTerms(person)
@@ -128,7 +133,10 @@ const toCandidate = (person, index) => {
   return {
     ...person,
     image_url: person.image_url || null,
-    candidateId: `candidate-${person.id}-${index}`,
+    candidateId,
+    archetypeId: person.role === 'wrestler'
+      ? person.archetypeId || inferWrestlerArchetypeId(person)
+      : null,
     skill,
     tier,
     salary: contract.negotiatedMonthlySalary,
@@ -187,4 +195,35 @@ export const createEmployeeCandidates = ({ hiredEmployees = [], previousCandidat
 
       return left.name.localeCompare(right.name)
     })
+}
+
+export const createModWrestlerCandidates = ({
+  rosterData = [],
+  previousCandidates = [],
+  archetypes = DEFAULT_WRESTLER_ARCHETYPES,
+} = {}) => {
+  const validArchetypeIds = new Set(
+    normalizeWrestlerArchetypes(archetypes).map((archetype) => archetype.archetypeId),
+  )
+  const previousCandidatesByPersonId = new Map(
+    previousCandidates.map((candidate) => [candidate.id, candidate]),
+  )
+
+  return (Array.isArray(rosterData) ? rosterData : [])
+    .filter((person) => person?.role === 'wrestler' && person?.id)
+    .map((person, index) => {
+      const archetypeId = validArchetypeIds.has(person.archetypeId)
+        ? person.archetypeId
+        : inferWrestlerArchetypeId(person)
+      const freshCandidate = toCandidate(
+        { ...person, archetypeId },
+        index,
+        `mod-candidate-${person.id}`,
+      )
+      return mergePersistedCandidateState(
+        freshCandidate,
+        previousCandidatesByPersonId.get(person.id),
+      )
+    })
+    .sort((left, right) => left.name.localeCompare(right.name))
 }

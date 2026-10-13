@@ -67,12 +67,14 @@ function AiInterviewModal({
 
         {isFinished && impactSummary ? (
           <p className={styles.impactSummary}>
-            {t('dashboard.ai.interviewImpactSummary', 'Interview impact: Fans {{fans}} | Prestige {{prestige}} | Avg sponsor trust {{trust}}', {
+            {t('dashboard.ai.interviewImpactSummary', 'Interview impact: Fans {{fans}} | Prestige {{prestige}} | Avg sponsor trust {{trust}} | Alignment {{alignment}} | Rivalry heat {{rivalry}}', {
               fans: impactSummary.fansDelta >= 0 ? `+${impactSummary.fansDelta}` : `${impactSummary.fansDelta}`,
               prestige: impactSummary.prestigeDelta >= 0 ? `+${impactSummary.prestigeDelta}` : `${impactSummary.prestigeDelta}`,
               trust: impactSummary.sponsorTrustDeltaAverage >= 0
                 ? `+${impactSummary.sponsorTrustDeltaAverage}`
                 : `${impactSummary.sponsorTrustDeltaAverage}`,
+              alignment: `${impactSummary.alignmentTargetName ? `${impactSummary.alignmentTargetName} ` : ''}${impactSummary.alignmentDelta >= 0 ? '+' : ''}${impactSummary.alignmentDelta}`,
+              rivalry: `${impactSummary.rivalryNames?.join(' vs ') || t('dashboard.ai.noInterviewRival')} ${impactSummary.rivalryHeatDelta >= 0 ? '+' : ''}${impactSummary.rivalryHeatDelta}`,
             })}
           </p>
         ) : null}

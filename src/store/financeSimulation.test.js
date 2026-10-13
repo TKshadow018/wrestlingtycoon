@@ -115,7 +115,7 @@ describe('promotion finance simulator', () => {
     }
 
     const challenge = useGameStore.getState().onboardingChallenge
-    expect(challenge.objectives.rosterBuild.completed).toBe(true)
+    expect(challenge.objectives.rosterBuild.completed).toBe(false)
     expect(challenge.objectives.stabilize.currentOperatingCashFlow).toBe(0)
   })
 

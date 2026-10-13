@@ -8,6 +8,25 @@ vi.stubGlobal('localStorage', {
   clear: () => testStorage.clear(),
 })
 
+it('starts a three-show guided rescue challenge with roster and finance stages', () => {
+  const challenge = useGameStore.getState().onboardingChallenge
+
+  expect(challenge).toMatchObject({
+    tutorialVersion: 2,
+    tutorialStageId: 'buildRoster',
+    deadlineDay: 21,
+    objectives: {
+      rosterBuild: {
+        targetWrestlers: 12,
+        targetStaff: 1,
+        targetReferees: 1,
+        targetAnnouncers: 1,
+      },
+      firstShow: { targetSuccessfulEvents: 3 },
+    },
+  })
+})
+
 const { useGameStore } = await import('./useGameStore')
 
 const startGame = () => useGameStore.getState().startGame({
@@ -123,6 +142,51 @@ describe('game store action coverage', () => {
     expect(nextProgression.currentArc.reward.unlockables).not.toEqual(earnedUnlocks)
   })
 
+  it('counts only successful weekly TV events toward the three-show tutorial', () => {
+    useGameStore.setState((state) => ({
+      onboardingChallenge: {
+        ...state.onboardingChallenge,
+        objectives: {
+          ...state.onboardingChallenge.objectives,
+          rosterBuild: { ...state.onboardingChallenge.objectives.rosterBuild, completed: true },
+          firstShow: {
+            ...state.onboardingChallenge.objectives.firstShow,
+            currentSuccessfulEvents: 0,
+            targetSuccessfulEvents: 3,
+          },
+        },
+      },
+      events: {
+        ...state.events,
+        customEvents: [{
+          eventId: 'tutorial-ppv',
+          type: 'ppv',
+          name: 'Tutorial PPV',
+          scheduledDay: 5,
+          scheduledWeek: 1,
+          specificDate: '2026-06-05',
+          maxMatches: 7,
+          isSystem: false,
+        }],
+      },
+    }))
+
+    for (let day = 1; day < 5; day += 1) {
+      useGameStore.getState().proceedTimeline()
+    }
+    expect(useGameStore.getState().calendar.day).toBe(5)
+    useGameStore.getState().proceedTimeline({ totalSegments: 1, segments: [] })
+    expect(useGameStore.getState().onboardingChallenge.objectives.firstShow.currentSuccessfulEvents).toBe(0)
+
+    while (useGameStore.getState().calendar.day < 12) {
+      const isFriday = [12].includes(useGameStore.getState().calendar.day)
+      useGameStore.getState().proceedTimeline(isFriday ? { totalSegments: 1, segments: [] } : null)
+    }
+    expect(useGameStore.getState().calendar.day).toBe(12)
+    useGameStore.getState().proceedTimeline({ totalSegments: 1, segments: [] })
+    expect(useGameStore.getState().onboardingChallenge.objectives.firstShow.currentSuccessfulEvents).toBe(1)
+  })
+
   it('validates game startup and keeps AI download, consent, and interview state consistent', () => {
     expect(useGameStore.getState().startGame({ playerName: ' ', companyName: 'Promotion' }))
       .toEqual({ ok: false })
@@ -167,13 +231,47 @@ describe('game store action coverage', () => {
       },
     }))
     const oldFans = useGameStore.getState().stats.fans
+    const featuredWrestler = hireCandidate('wrestler')
+    const rivalWrestler = hireCandidate('wrestler')
+    useGameStore.setState((state) => ({
+      roster: {
+        ...state.roster,
+        employees: state.roster.employees.map((employee) => (
+          employee.employeeId === featuredWrestler.employeeId
+            ? { ...employee, heelFaceMeter: 50 }
+            : employee
+        )),
+      },
+      events: {
+        ...state.events,
+        rivalries: [{
+          pairKey: [featuredWrestler.employeeId, rivalWrestler.employeeId].sort().join('::'),
+          wrestlerIds: [featuredWrestler.employeeId, rivalWrestler.employeeId],
+          wrestlerNames: [featuredWrestler.name, rivalWrestler.name],
+          heat: 20,
+          lastEventDay: 1,
+          lastSegmentType: 'match',
+          lastRating: 7,
+        }],
+      },
+    }))
     const impact = useGameStore.getState().applyInterviewConsequences({
       metrics: { score: 6, professionalism: 4, hype: 5, controversy: 2, answerCount: 3 },
       forcedPreShow: true,
+      featuredWrestlerId: featuredWrestler.employeeId,
+      rivalWrestlerId: rivalWrestler.employeeId,
     })
     expect(impact.fansDelta).toBeGreaterThan(0)
     expect(useGameStore.getState().stats.fans).toBe(oldFans + impact.fansDelta)
     expect(useGameStore.getState().ai.lastInterviewImpact.answerCount).toBe(3)
+    expect(impact.alignmentDelta).toBe(-1)
+    expect(impact.rivalryHeatDelta).toBe(1)
+    expect(impact.rivalryNames).toEqual([featuredWrestler.name, rivalWrestler.name])
+    expect(useGameStore.getState().roster.employees.find(
+      (employee) => employee.employeeId === featuredWrestler.employeeId,
+    ).heelFaceMeter).toBe(49)
+    expect(useGameStore.getState().events.rivalries[0].heat).toBe(21)
+    expect(useGameStore.getState().ai.lastInterviewImpact.alignmentTargetName).toBe(featuredWrestler.name)
     expect(useGameStore.getState().finances.ledger.at(-1).category).toBe('dailyClose')
   })
 
@@ -182,15 +280,76 @@ describe('game store action coverage', () => {
 
     const imported = useGameStore.getState().applyModDataPackage({
       modules: {
-        titles: [{ titleId: 'mod-title', name: 'Imported Championship', division: 'singles' }],
+        titles: [{
+          titleId: 'mod-title',
+          name: 'Imported Championship',
+          division: 'singles',
+          isWomenOnly: true,
+          isActive: false,
+          prestige: 375,
+        }],
         sponsorOffers: [{ offerId: 'mod-offer', name: 'Imported Sponsor', sponsorType: 'media' }],
         eventTemplates: [{ eventId: 'mod-event', name: 'Imported Show' }],
+        wrestlerArchetypes: [{
+          archetypeId: 'technical',
+          name: 'Technical Specialist',
+          alignment: 'face',
+          style: 'technical',
+        }],
+        rosterData: [{
+          personId: 'mod-ace',
+          name: 'Mod Ace',
+          archetypeId: 'technical',
+          popularity: 85,
+          salary_demand: { monthly_wage: 20000, per_match_salary: 3000, additional_bonus: 4000 },
+          wrestling_ability: {
+            strength: 80,
+            technics: 90,
+            high_fly_ability: 65,
+            leg_stamina: 75,
+            body_stamina: 85,
+            head_stamina: 80,
+          },
+        }],
+        venues: [{
+          id: 'mod-venue',
+          name: 'North Arena',
+          location: 'North City',
+          capacity: 19000,
+          rentFee: 24000,
+          facilities: 4,
+          isIndoor: true,
+        }],
       },
     })
     expect(imported).toMatchObject({ ok: true })
-    expect(useGameStore.getState().roster.titles.some((title) => title.titleId === 'mod-title')).toBe(true)
+    expect(useGameStore.getState().roster.titles.find((title) => title.titleId === 'mod-title'))
+      .toMatchObject({
+        isWomenOnly: true,
+        isActive: false,
+        prestige: 375,
+      })
     expect(useGameStore.getState().market.sponsorOffers[0].offerId).toBe('mod-offer')
     expect(useGameStore.getState().market.eventTemplates[0].eventId).toBe('mod-event')
+    expect(useGameStore.getState().market.wrestlerArchetypes.some(
+      (archetype) => archetype.archetypeId === 'technical',
+    )).toBe(true)
+    expect(useGameStore.getState().market.modVenues[0]).toMatchObject({
+      id: 'mod-venue',
+      name: 'North Arena',
+    })
+    const modCandidate = useGameStore.getState().market.employeeCandidates.find(
+      (candidate) => candidate.personId === 'mod-ace',
+    )
+    expect(modCandidate).toMatchObject({
+      candidateId: 'mod-candidate-mod-ace',
+      archetypeId: 'technical',
+    })
+    expect(useGameStore.getState().hireEmployee(modCandidate.candidateId, { skipNegotiation: true }).ok)
+      .toBe(true)
+    expect(useGameStore.getState().roster.employees.at(-1).archetypeId).toBe('technical')
+    expect(useGameStore.getState().market.employeeCandidates.some((candidate) => candidate.personId === 'mod-ace'))
+      .toBe(false)
 
     const oldCandidates = useGameStore.getState().market.employeeCandidates
     const oldTemplates = useGameStore.getState().market.eventTemplates
@@ -475,6 +634,33 @@ describe('game store action coverage', () => {
     useGameStore.getState().fireEmployee('missing')
   })
 
+  it('persists competitor strategy shifts as visible daily news', () => {
+    const companies = useGameStore.getState().events.competitorCompanies
+    expect(companies).toHaveLength(3)
+    useGameStore.setState((state) => ({
+      events: {
+        ...state.events,
+        competitorCompanies: state.events.competitorCompanies.map((company, index) => (
+          index === 0
+            ? { ...company, strategyId: 'talentAcquisition', nextStrategyDay: 2 }
+            : company
+        )),
+      },
+    }))
+
+    useGameStore.getState().proceedTimeline()
+    const state = useGameStore.getState()
+    expect(state.events.competitorCompanies[0].strategyId).toBe('counterProgramming')
+    expect(state.events.competitorHeadlines).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        type: 'strategyShift',
+        rivalId: companies[0].id,
+        strategyId: 'counterProgramming',
+        day: 2,
+      }),
+    ]))
+  })
+
   it('activates titles, validates team membership, and updates or removes teams', () => {
     const first = hireCandidate('wrestler')
     const second = hireCandidate('wrestler')
@@ -616,6 +802,22 @@ describe('game store action coverage', () => {
       },
       events: {
         ...state.events,
+        eventLog: [
+          {
+            type: 'success',
+            segments: Array.from({ length: 3 }, () => ({
+              segmentType: 'match',
+              matchStipulation: 'singles',
+            })),
+          },
+          {
+            type: 'success',
+            segments: Array.from({ length: 3 }, () => ({
+              segmentType: 'mainEvent',
+              matchStipulation: 'singles',
+            })),
+          },
+        ],
         customEvents: [{
           eventId: 'test-ppv',
           type: 'ppv',
@@ -768,6 +970,13 @@ describe('game store action coverage', () => {
     expect(state.roster.employees.find((employee) => employee.employeeId === first.employeeId).happiness)
       .toBeLessThan(50)
     expect(state.events.lastOutcome.postmortem.moneyFactors.length).toBeGreaterThan(0)
+    expect(state.events.lastOutcome.postmortem.recommendations).toEqual([
+      expect.objectContaining({
+        id: 'repeatedMatchType',
+        format: 'singles',
+        repeatedEvents: 2,
+      }),
+    ])
     expect(state.roster.employees.find((employee) => employee.employeeId === second.employeeId)
       .matchStats.totalWins).toBeGreaterThan(0)
     expect(state.roster.employees.find((employee) => employee.employeeId === first.employeeId)

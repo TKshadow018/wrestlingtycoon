@@ -49,6 +49,7 @@ function EventPreparationScreen({
   ticketFees,
   eventPreparation,
   unlocks,
+  modVenues = [],
   onSave,
   onCancel,
 }) {
@@ -57,7 +58,13 @@ function EventPreparationScreen({
   const unlockedVenues = getUnlockedCareerArcItems('venues', unlocks)
   const unlockedPromoStyles = getUnlockedCareerArcItems('promoStyles', unlocks)
   const unlockedPresentations = getUnlockedCareerArcItems('presentations', unlocks)
-  const initialVenueId = unlockedVenues.some((venue) => venue.id === eventPreparation?.venueId)
+  const availableVenues = [
+    ...unlockedVenues,
+    ...(Array.isArray(modVenues) ? modVenues : []),
+  ].filter((venue, index, venues) => (
+    venues.findIndex((candidate) => candidate.id === venue.id) === index
+  ))
+  const initialVenueId = availableVenues.some((venue) => venue.id === eventPreparation?.venueId)
     ? eventPreparation.venueId
     : ''
   const initialPromoStyleId = unlockedPromoStyles.some((style) => style.id === eventPreparation?.promoStyleId)
@@ -94,14 +101,14 @@ function EventPreparationScreen({
   )
   const top5Ids = new Set(sortedWrestlers.slice(0, 5).map((e) => e.employeeId))
 
-  const filteredVenues = unlockedVenues.filter(
+  const filteredVenues = availableVenues.filter(
     (v) =>
       !venueSearch ||
       v.name.toLowerCase().includes(venueSearch.toLowerCase()) ||
       v.location.toLowerCase().includes(venueSearch.toLowerCase()),
   )
 
-  const selectedVenue = unlockedVenues.find((v) => v.id === selectedVenueId)
+  const selectedVenue = availableVenues.find((v) => v.id === selectedVenueId)
   const selectedPromoStyle = unlockedPromoStyles.find((style) => style.id === selectedPromoStyleId)
 
   const toggleWrestler = (id) => {

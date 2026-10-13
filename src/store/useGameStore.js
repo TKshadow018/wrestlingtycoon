@@ -9,11 +9,20 @@ import {
   getNextCareerArcUnlocks,
   normalizeCareerArcUnlocks,
 } from '../data/careerArcUnlocks'
-import { createEmployeeCandidates } from '../data/employeeMarket'
+import {
+  createEmployeeCandidates,
+  createModWrestlerCandidates,
+} from '../data/employeeMarket'
+import {
+  DEFAULT_WRESTLER_ARCHETYPES,
+  inferWrestlerArchetypeId,
+  normalizeWrestlerArchetypes,
+} from '../data/wrestlerArchetypes'
 import { createEventTemplates } from '../data/eventTemplates'
 import { createSponsorOffers, SPONSOR_TYPE_CONFIG } from '../data/sponsorOffers'
 import { clampHeelFaceMeter, DEFAULT_HEEL_FACE_METER_VALUE, computeHeelFaceShift, applyHeelFaceNeutralDecay } from '../utils/heelFaceMeter'
 import { validateModDataPackage } from '../utils/modDataPackage'
+import { getOnboardingTutorialStage } from '../utils/onboardingTutorial'
 import { buildBoardMeetingAgendaPool } from '../utils/boardMeetingAgendas'
 import {
   applyBoardRelationChange,
@@ -30,6 +39,15 @@ import {
 } from '../utils/boardMeetingSystem'
 import { getBoardMeetingSchedule } from '../utils/boardMeetings'
 import { getBoardEventAttendance } from '../utils/boardEventAttendance'
+import {
+  advanceCompetitorStrategies,
+  applyCompetitorGimmickCopy,
+  createInitialCompetitorCompanies,
+  getCompetitorStrategyModifiers,
+  normalizeCompetitorCompanies,
+} from '../utils/competitorWorld'
+import { computeInterviewStoryEffects } from '../utils/interviewStoryEffects'
+import { buildEventPostmortemRecommendations } from '../utils/eventPostmortemRecommendations'
 import {
   FACTION_STORY_BEATS,
   normalizeBackstageChemistry,
@@ -243,6 +261,9 @@ const normalizePersistedEmployees = (employees = [], day = 1) => {
     return {
       ...employee,
       employeeId,
+      archetypeId: employee?.role === 'wrestler'
+        ? employee.archetypeId || inferWrestlerArchetypeId(employee)
+        : null,
       popularity: clampPopularity(employee?.popularity ?? 0),
       happiness: shouldTrackHappiness(employee?.role)
         ? clampHappiness(employee?.happiness ?? DEFAULT_HAPPINESS)
@@ -299,12 +320,30 @@ const pruneExpiredHiringLocks = (hiringLocks = {}, currentDay = 1) => {
   }, {})
 }
 
-const syncEmployeeCandidates = ({ employees = [], currentCandidates = [], currentDay = 1, hiringLocks = {} }) => {
+const syncEmployeeCandidates = ({
+  employees = [],
+  currentCandidates = [],
+  currentDay = 1,
+  hiringLocks = {},
+  modWrestlers = [],
+  wrestlerArchetypes = DEFAULT_WRESTLER_ARCHETYPES,
+}) => {
   const unlockedLocks = pruneExpiredHiringLocks(hiringLocks, currentDay)
-  const candidates = createEmployeeCandidates({
+  const builtInCandidates = createEmployeeCandidates({
     hiredEmployees: employees,
     previousCandidates: currentCandidates,
   })
+  const builtInPersonIds = new Set(builtInCandidates.map((candidate) => candidate.id))
+  const modCandidates = createModWrestlerCandidates({
+    rosterData: modWrestlers,
+    previousCandidates: currentCandidates,
+    archetypes: wrestlerArchetypes,
+  }).filter((candidate) => (
+    !builtInPersonIds.has(candidate.id)
+    && !(employees || []).some((employee) => employee.personId === candidate.id)
+  ))
+  const candidates = [...builtInCandidates, ...modCandidates]
+    .sort((left, right) => left.role.localeCompare(right.role) || left.name.localeCompare(right.name))
 
   return candidates.filter((candidate) => {
     const personId = getCandidatePersonId(candidate)
@@ -328,6 +367,9 @@ const toEmployeeRecord = (candidate, currentDay) => {
   dob: candidate.dob,
   gender: candidate.gender,
   role: candidate.role,
+  archetypeId: candidate.role === 'wrestler'
+    ? candidate.archetypeId || inferWrestlerArchetypeId(candidate)
+    : null,
   imageUrl: candidate.image_url,
   popularity: candidate.popularity,
   happiness: shouldTrackHappiness(candidate.role) ? DEFAULT_HAPPINESS : null,
@@ -506,6 +548,9 @@ const buildInitialState = () => {
       }),
       hiringLocks: {},
       eventTemplates: createEventTemplates(),
+      wrestlerArchetypes: normalizeWrestlerArchetypes(DEFAULT_WRESTLER_ARCHETYPES),
+      modWrestlers: [],
+      modVenues: [],
       sponsorOffers: createSponsorOffers(10, {
         requiredTier: getSponsorOfferTierByStaffSkill(initialRoster.employees),
       }),
@@ -524,6 +569,7 @@ const buildInitialState = () => {
       lastOutcome: null,
       eventLog: [],
       rivalries: [],
+      competitorCompanies: createInitialCompetitorCompanies(),
       factionRivalries: [],
       competitorHeadlines: [],
       eventPreparation: null,
@@ -691,15 +737,19 @@ const getBoardMeetingAgendaPool = (state, financialReport, isJanuary) => {
   })
 }
 
-const COMPETITOR_COMPANIES = [
-  { id: 'comp-1', name: 'Titan Ring Federation', aggression: 1.1 },
-  { id: 'comp-2', name: 'Prime Grapple Alliance', aggression: 0.95 },
-  { id: 'comp-3', name: 'Global Slam Network', aggression: 1.05 },
-]
+const COMPETITOR_COMPANIES = createInitialCompetitorCompanies()
 
-const runCompetitorPressure = ({ overallRating, rivalryHeatScore, eventType, day }) => {
+const runCompetitorPressure = ({
+  overallRating,
+  rivalryHeatScore,
+  eventType,
+  day,
+  competitorCompanies = COMPETITOR_COMPANIES,
+}) => {
   const competitionConfig = GAME_CONFIG.competition
-  const rival = COMPETITOR_COMPANIES[Math.floor(Math.random() * COMPETITOR_COMPANIES.length)]
+  const companies = normalizeCompetitorCompanies(competitorCompanies)
+  const rival = companies[Math.floor(Math.random() * companies.length)]
+  const strategy = getCompetitorStrategyModifiers(rival.strategyId, rival.copiedGimmicks?.length)
   const rating = Number.isFinite(Number(overallRating)) ? Number(overallRating) : 6
   const volatility = eventType === 'megaLive' || eventType === 'ppv'
     ? competitionConfig.pressureEventVolatilityMajor
@@ -711,7 +761,11 @@ const runCompetitorPressure = ({ overallRating, rivalryHeatScore, eventType, day
   const performanceEdge = (rating - competitionConfig.pressureBaseRating) * competitionConfig.pressureSwingScale
   const randomDrift = competitionConfig.pressureRandomMin
     + (Math.random() * (competitionConfig.pressureRandomMax - competitionConfig.pressureRandomMin))
-  const swing = Math.round((performanceEdge + randomDrift) * volatility * rivalryEdge * rival.aggression)
+  const copycatEdge = 1 + (strategy.gimmickCopyPressure / 100)
+  const swing = Math.round(
+    (performanceEdge + randomDrift) * volatility * rivalryEdge * rival.aggression
+    * strategy.counterProgramMultiplier * copycatEdge,
+  )
 
   const fanImpact = Math.round(swing)
   const prestigeImpact = Math.max(
@@ -725,7 +779,9 @@ const runCompetitorPressure = ({ overallRating, rivalryHeatScore, eventType, day
 
   return {
     day,
+    rivalId: rival.id,
     rivalName: rival.name,
+    strategyId: rival.strategyId,
     fanImpact,
     prestigeImpact,
     headline,
@@ -738,23 +794,31 @@ const runCompetitorWorldSimulation = ({
   lastOutcome,
   employees = [],
   marketCandidates = [],
+  competitorCompanies = COMPETITOR_COMPANIES,
+  wrestlerArchetypes = DEFAULT_WRESTLER_ARCHETYPES,
 }) => {
-  const rival = COMPETITOR_COMPANIES[Math.floor(Math.random() * COMPETITOR_COMPANIES.length)]
+  const companies = normalizeCompetitorCompanies(competitorCompanies)
+  const rival = companies[Math.floor(Math.random() * companies.length)]
+  const strategy = getCompetitorStrategyModifiers(rival.strategyId, rival.copiedGimmicks?.length)
   let fanImpact = 0
   let prestigeImpact = 0
   let poachedEmployeeId = null
   let signedCandidateId = null
   const newsItems = []
+  let nextCompetitorCompanies = companies
 
   const wrestlerCandidates = (marketCandidates || []).filter((candidate) => candidate?.role === 'wrestler')
-  if (wrestlerCandidates.length > 0 && Math.random() < 0.35) {
+  if (wrestlerCandidates.length > 0 && Math.random() < strategy.candidateSigningChance) {
     const signedCandidate = wrestlerCandidates[Math.floor(Math.random() * wrestlerCandidates.length)]
     signedCandidateId = signedCandidate.candidateId
     const prospectImpact = Math.max(6, Math.round((Number(signedCandidate.popularity || 35) / 100) * 24))
     fanImpact -= prospectImpact
     newsItems.push({
       day,
+      rivalId: rival.id,
       rivalName: rival.name,
+      strategyId: rival.strategyId,
+      type: 'talentSigning',
       fanImpact: -prospectImpact,
       prestigeImpact: 0,
       headline: `${rival.name} signed prospect ${signedCandidate.name} ahead of your talent team.`,
@@ -765,18 +829,70 @@ const runCompetitorWorldSimulation = ({
     const rating = Number(lastOutcome.overallRating || 6)
     const baseCounterSwing = rating >= 8.3 ? -8 : rating >= 7.2 ? -18 : -32
     const randomness = Math.round((Math.random() * 14) - 7)
-    const counterSwing = Math.round((baseCounterSwing + randomness) * rival.aggression)
+    const counterSwing = Math.round(
+      (baseCounterSwing + randomness) * rival.aggression * strategy.counterProgramMultiplier,
+    )
     fanImpact += counterSwing
     prestigeImpact += Math.round(counterSwing / 60)
     newsItems.push({
       day,
+      rivalId: rival.id,
       rivalName: rival.name,
+      strategyId: rival.strategyId,
       fanImpact: counterSwing,
       prestigeImpact: Math.round(counterSwing / 60),
       headline: counterSwing >= 0
         ? `${rival.name} failed to dent your night despite heavy counter-programming.`
         : `${rival.name} counter-programmed with a strong card and stole momentum.`,
     })
+    if (strategy.gimmickCopyPressure > 0) {
+      fanImpact -= strategy.gimmickCopyPressure
+      newsItems.push({
+        day,
+        rivalId: rival.id,
+        rivalName: rival.name,
+        strategyId: rival.strategyId,
+        type: 'gimmickCopy',
+        fanImpact: -strategy.gimmickCopyPressure,
+        prestigeImpact: 0,
+        headline: `${rival.name} used copied gimmicks to boost its competing event.`,
+      })
+    }
+  }
+
+  if (shouldRunEvent && strategy.audiencePressure > 0) {
+    const pressure = Math.round(strategy.audiencePressure * rival.aggression)
+    fanImpact -= pressure
+    newsItems.push({
+      day,
+      rivalId: rival.id,
+      rivalName: rival.name,
+      strategyId: rival.strategyId,
+      type: 'audienceExpansion',
+      fanImpact: -pressure,
+      prestigeImpact: 0,
+      headline: `${rival.name} expanded its audience reach ahead of your event.`,
+    })
+  }
+
+  const copyableArchetypeTargets = (employees || []).filter(
+    (employee) => employee?.role === 'wrestler' && employee?.archetypeId,
+  )
+  if (shouldRunEvent && copyableArchetypeTargets.length > 0 && Math.random() < 0.18) {
+    const target = copyableArchetypeTargets[Math.floor(Math.random() * copyableArchetypeTargets.length)]
+    const archetype = (wrestlerArchetypes || [])
+      .find((entry) => entry.archetypeId === target.archetypeId)
+      || { archetypeId: target.archetypeId, name: target.archetypeName || target.archetypeId }
+    const copyResult = applyCompetitorGimmickCopy(nextCompetitorCompanies, {
+      competitorId: rival.id,
+      archetype,
+      wrestler: target,
+      day,
+    })
+    nextCompetitorCompanies = copyResult.companies
+    if (copyResult.newsItem) {
+      newsItems.push(copyResult.newsItem)
+    }
   }
 
   const vulnerableWrestlers = (employees || []).filter(
@@ -790,7 +906,9 @@ const runCompetitorWorldSimulation = ({
     prestigeImpact -= 1
     newsItems.push({
       day,
+      rivalId: rival.id,
       rivalName: rival.name,
+      strategyId: rival.strategyId,
       fanImpact: -poachImpact,
       prestigeImpact: -1,
       headline: `${rival.name} poached unhappy star ${target.name} from your roster.`,
@@ -802,6 +920,7 @@ const runCompetitorWorldSimulation = ({
     prestigeImpact: Math.max(-3, Math.min(2, Math.round(prestigeImpact))),
     poachedEmployeeId,
     signedCandidateId,
+    competitorCompanies: nextCompetitorCompanies,
     newsItems,
   }
 }
@@ -882,19 +1001,21 @@ const ensureProgressionShape = (progression, { legacyVenueId = null } = {}) => {
   }
 }
 
-const normalizeEventPreparation = (eventPreparation, unlocks) => {
+const normalizeEventPreparation = (eventPreparation, unlocks, modVenues = []) => {
   if (!eventPreparation || typeof eventPreparation !== 'object') {
     return null
   }
 
   const normalizedUnlocks = normalizeCareerArcUnlocks(unlocks)
+  const modVenueIds = new Set((modVenues || []).map((venue) => venue.id))
   const isUnlocked = (category, id) => (
     typeof id === 'string' && normalizedUnlocks[category].includes(id)
   )
+  const isVenueAvailable = (id) => isUnlocked('venues', id) || modVenueIds.has(id)
 
   return {
     eventId: typeof eventPreparation.eventId === 'string' ? eventPreparation.eventId : null,
-    venueId: isUnlocked('venues', eventPreparation.venueId) ? eventPreparation.venueId : null,
+    venueId: isVenueAvailable(eventPreparation.venueId) ? eventPreparation.venueId : null,
     promotedWrestlerIds: Array.isArray(eventPreparation.promotedWrestlerIds)
       ? eventPreparation.promotedWrestlerIds.filter((id) => typeof id === 'string')
       : [],
@@ -937,22 +1058,28 @@ const buildOnboardingChallenge = ({ startDay, startFans, startCash }) => {
   return {
     challengeId: `onboarding-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
     financeObjectiveVersion: 2,
+    tutorialVersion: 2,
     status: 'active',
     active: true,
     startDay,
     deadlineDay: startDay + ONBOARDING_CHALLENGE_DURATION_DAYS - 1,
+    tutorialStageId: 'buildRoster',
     baselineFans: Number(startFans || 0),
     baselineCash: Number(startCash || 0),
     objectives: {
       rosterBuild: {
-        targetWrestlers: 2,
+        targetWrestlers: 12,
         targetStaff: 1,
+        targetReferees: 1,
+        targetAnnouncers: 1,
         currentWrestlers: 0,
         currentStaff: 0,
+        currentReferees: 0,
+        currentAnnouncers: 0,
         completed: false,
       },
       firstShow: {
-        targetSuccessfulEvents: 1,
+        targetSuccessfulEvents: 3,
         currentSuccessfulEvents: 0,
         completed: false,
       },
@@ -992,6 +1119,8 @@ const progressOnboardingChallenge = ({
   const stabilize = challenge.objectives?.stabilize || {}
   const wrestlerCount = (employees || []).filter((employee) => employee?.role === 'wrestler').length
   const staffCount = (employees || []).filter((employee) => employee?.role === 'staff').length
+  const refereeCount = (employees || []).filter((employee) => employee?.role === 'referee').length
+  const announcerCount = (employees || []).filter((employee) => employee?.role === 'announcer').length
   const fanGain = Math.round(Number(fans || 0) - Number(challenge.baselineFans || 0))
   const operatingCashFlow = Math.round(
     Number(stabilize.currentOperatingCashFlow || 0) + Number(operatingCashFlowDelta || 0),
@@ -1000,14 +1129,19 @@ const progressOnboardingChallenge = ({
 
   const nextChallenge = {
     ...challenge,
+    tutorialVersion: 2,
     objectives: {
       ...challenge.objectives,
       rosterBuild: {
         ...rosterBuild,
         currentWrestlers: wrestlerCount,
         currentStaff: staffCount,
+        currentReferees: refereeCount,
+        currentAnnouncers: announcerCount,
         completed: wrestlerCount >= Number(rosterBuild.targetWrestlers || 0)
-          && staffCount >= Number(rosterBuild.targetStaff || 0),
+          && staffCount >= Number(rosterBuild.targetStaff || 0)
+          && refereeCount >= Number(rosterBuild.targetReferees || 0)
+          && announcerCount >= Number(rosterBuild.targetAnnouncers || 0),
       },
       firstShow: {
         ...firstShow,
@@ -1026,29 +1160,28 @@ const progressOnboardingChallenge = ({
 
   const allObjectivesCompleted = Object.values(nextChallenge.objectives || {}).every((objective) => objective?.completed)
   if (allObjectivesCompleted) {
-    return {
-      challenge: {
-        ...nextChallenge,
+    const completedChallenge = {
+      ...nextChallenge,
         status: 'completed',
         active: false,
         completedDay: day,
-      },
-      resolution: 'completed',
     }
+    completedChallenge.tutorialStageId = getOnboardingTutorialStage(completedChallenge)?.id
+    return { challenge: completedChallenge, resolution: 'completed' }
   }
 
   if (day > Number(challenge.deadlineDay || day)) {
-    return {
-      challenge: {
-        ...nextChallenge,
+    const failedChallenge = {
+      ...nextChallenge,
         status: 'failed',
         active: false,
         failedDay: day,
-      },
-      resolution: 'failed',
     }
+    failedChallenge.tutorialStageId = getOnboardingTutorialStage(failedChallenge)?.id
+    return { challenge: failedChallenge, resolution: 'failed' }
   }
 
+  nextChallenge.tutorialStageId = getOnboardingTutorialStage(nextChallenge)?.id
   return { challenge: nextChallenge, resolution: null }
 }
 
@@ -1065,6 +1198,8 @@ const ensureOnboardingChallengeShape = (challenge, timeline = [], currentDay = 1
   } = persistedStabilize
   const financeObjectiveVersion = Number(challenge.financeObjectiveVersion)
   const isLegacyFinanceObjective = !Number.isFinite(financeObjectiveVersion) || financeObjectiveVersion < 2
+  const tutorialVersion = Number(challenge.tutorialVersion) || 1
+  const needsGuidedTutorialMigration = tutorialVersion < 2
   const defaults = buildOnboardingChallenge({
     startDay: Number(challenge.startDay || 1),
     startFans: Number(challenge.baselineFans || GAME_CONFIG.startingFans),
@@ -1083,20 +1218,30 @@ const ensureOnboardingChallengeShape = (challenge, timeline = [], currentDay = 1
     persistedStabilize.targetOperatingCashFlow ?? legacyTargetCashGain,
   )
 
-  return {
+  const normalized = {
     ...defaults,
     ...challenge,
     financeObjectiveVersion: 2,
+    tutorialVersion: 2,
     objectives: {
       ...defaults.objectives,
       ...(challenge.objectives || {}),
       rosterBuild: {
         ...defaults.objectives.rosterBuild,
         ...(challenge.objectives?.rosterBuild || {}),
+        ...(needsGuidedTutorialMigration ? {
+          targetWrestlers: defaults.objectives.rosterBuild.targetWrestlers,
+          targetStaff: defaults.objectives.rosterBuild.targetStaff,
+          targetReferees: defaults.objectives.rosterBuild.targetReferees,
+          targetAnnouncers: defaults.objectives.rosterBuild.targetAnnouncers,
+        } : {}),
       },
       firstShow: {
         ...defaults.objectives.firstShow,
         ...(challenge.objectives?.firstShow || {}),
+        ...(needsGuidedTutorialMigration
+          ? { targetSuccessfulEvents: defaults.objectives.firstShow.targetSuccessfulEvents }
+          : {}),
       },
       stabilize: {
         ...defaults.objectives.stabilize,
@@ -1122,6 +1267,18 @@ const ensureOnboardingChallengeShape = (challenge, timeline = [], currentDay = 1
       ...(challenge.penalty || {}),
     },
   }
+  const rosterBuild = normalized.objectives.rosterBuild
+  const firstShow = normalized.objectives.firstShow
+  if (normalized.status === 'active') {
+    rosterBuild.completed = Number(rosterBuild.currentWrestlers || 0) >= Number(rosterBuild.targetWrestlers || 0)
+      && Number(rosterBuild.currentStaff || 0) >= Number(rosterBuild.targetStaff || 0)
+      && Number(rosterBuild.currentReferees || 0) >= Number(rosterBuild.targetReferees || 0)
+      && Number(rosterBuild.currentAnnouncers || 0) >= Number(rosterBuild.targetAnnouncers || 0)
+    firstShow.completed = Number(firstShow.currentSuccessfulEvents || 0)
+      >= Number(firstShow.targetSuccessfulEvents || 1)
+  }
+  normalized.tutorialStageId = getOnboardingTutorialStage(normalized)?.id || 'buildRoster'
+  return normalized
 }
 
 const getWeekFromDay = (day) => Math.floor((day - 1) / 7) + 1
@@ -1483,6 +1640,7 @@ const normalizeRivalries = (rivalries = []) => {
         lastEventDay: Number.isInteger(Number(rivalry?.lastEventDay)) ? Number(rivalry.lastEventDay) : null,
         lastSegmentType: typeof rivalry?.lastSegmentType === 'string' ? rivalry.lastSegmentType : null,
         lastRating: Number.isFinite(Number(rivalry?.lastRating)) ? Number(rivalry.lastRating) : null,
+        lastAction: typeof rivalry?.lastAction === 'string' ? rivalry.lastAction : null,
       }
     })
     .filter((rivalry) => rivalry && rivalry.heat > 0)
@@ -1658,6 +1816,8 @@ const buildEventPostmortem = ({
   prestigeDelta,
   incomeBreakdown,
   expenseBreakdown,
+  segments = [],
+  recentEvents = [],
   net,
 }) => {
   const fanFactors = [
@@ -1769,6 +1929,7 @@ const buildEventPostmortem = ({
     fanFactors,
     prestigeFactors,
     moneyFactors,
+    recommendations: buildEventPostmortemRecommendations({ segments, recentEvents }),
   }
 }
 
@@ -3723,6 +3884,27 @@ export const useGameStore = create(
 
         set((state) => {
           const modules = validation.data?.modules || {}
+          const nextWrestlerArchetypes = normalizeWrestlerArchetypes([
+            ...(state.market.wrestlerArchetypes || DEFAULT_WRESTLER_ARCHETYPES),
+            ...(modules.wrestlerArchetypes || []),
+          ])
+          const mergedModWrestlers = Array.isArray(modules.rosterData)
+            ? new Map([
+                ...(state.market.modWrestlers || []).map((wrestler) => [wrestler.personId, wrestler]),
+                ...modules.rosterData.map((wrestler) => [wrestler.personId, {
+                  ...wrestler,
+                  role: 'wrestler',
+                  id: wrestler.personId,
+                }]),
+              ]).values()
+            : (state.market.modWrestlers || [])
+          const nextModWrestlers = [...mergedModWrestlers]
+          const nextModVenues = Array.isArray(modules.venues)
+            ? [...new Map([
+                ...(state.market.modVenues || []).map((venue) => [venue.id, venue]),
+                ...modules.venues.map((venue) => [venue.id, venue]),
+              ]).values()]
+            : (state.market.modVenues || [])
           const nextTitles = Array.isArray(modules.titles)
             ? modules.titles.map((title) => normalizeTitleRecord(title))
             : state.roster.titles
@@ -3741,6 +3923,14 @@ export const useGameStore = create(
                 templateKey: String(template?.templateKey || `${template?.eventId || 'event'}-${Date.now()}-${index}`),
               }))
             : state.market.eventTemplates
+          const employeeCandidates = syncEmployeeCandidates({
+            employees: state.roster.employees,
+            currentCandidates: state.market.employeeCandidates,
+            currentDay: state.calendar.day,
+            hiringLocks: state.market.hiringLocks,
+            modWrestlers: nextModWrestlers,
+            wrestlerArchetypes: nextWrestlerArchetypes,
+          })
 
           return {
             roster: {
@@ -3749,6 +3939,10 @@ export const useGameStore = create(
             },
             market: {
               ...state.market,
+              employeeCandidates,
+              wrestlerArchetypes: nextWrestlerArchetypes,
+              modWrestlers: nextModWrestlers,
+              modVenues: nextModVenues,
               sponsorOffers: nextSponsorOffers,
               eventTemplates: nextEventTemplates,
             },
@@ -3858,11 +4052,19 @@ export const useGameStore = create(
         }))
       },
 
-      applyInterviewConsequences: ({ metrics = {}, forcedPreShow = false } = {}) => {
+      applyInterviewConsequences: ({
+        metrics = {},
+        forcedPreShow = false,
+        featuredWrestlerId = null,
+        rivalWrestlerId = null,
+      } = {}) => {
         let result = {
           fansDelta: 0,
           prestigeDelta: 0,
           sponsorTrustDeltaAverage: 0,
+          alignmentDelta: 0,
+          rivalryHeatDelta: 0,
+          rivalryNames: [],
           score: 0,
         }
 
@@ -3874,9 +4076,73 @@ export const useGameStore = create(
           const controversy = Number(metrics.controversy || 0)
           const answerCount = Math.max(1, Number(metrics.answerCount || 1))
           const forcedMultiplier = forcedPreShow ? 1.35 : 1
+          const storyEffects = computeInterviewStoryEffects({ metrics, answerCount })
 
           const fansDelta = Math.round(((score * 18) + (hype * 4) + (professionalism * 2) - (controversy * 2)) * forcedMultiplier)
           const prestigeDelta = Math.round(((score / 2) + (professionalism / 3) + (hype / 4) - (controversy / 4)) * forcedMultiplier)
+          const focusedWrestler = state.roster.employees.find(
+            (employee) => employee.employeeId === featuredWrestlerId && employee.role === 'wrestler',
+          )
+          const focusedRival = state.roster.employees.find(
+            (employee) => employee.employeeId === rivalWrestlerId
+              && employee.role === 'wrestler'
+              && employee.employeeId !== focusedWrestler?.employeeId,
+          )
+          const previousAlignment = focusedWrestler
+            ? clampHeelFaceMeter(focusedWrestler.heelFaceMeter ?? DEFAULT_HEEL_FACE_METER_VALUE)
+            : null
+          const nextAlignment = focusedWrestler
+            ? clampHeelFaceMeter(previousAlignment + storyEffects.alignmentDelta)
+            : null
+          const alignmentDelta = focusedWrestler ? nextAlignment - previousAlignment : 0
+          let nextEmployees = state.roster.employees
+          if (focusedWrestler && alignmentDelta !== 0) {
+            nextEmployees = state.roster.employees.map((employee) => (
+              employee.employeeId === focusedWrestler.employeeId
+                ? { ...employee, heelFaceMeter: nextAlignment }
+                : employee
+            ))
+          }
+
+          let nextRivalries = state.events.rivalries
+          let rivalryHeatDelta = 0
+          const rivalryNames = []
+          if (focusedWrestler && focusedRival) {
+            const pairKey = buildRivalryPairKey(focusedWrestler.employeeId, focusedRival.employeeId)
+            const normalizedRivalries = normalizeRivalries(state.events.rivalries)
+            const existingRivalry = normalizedRivalries.find((rivalry) => rivalry.pairKey === pairKey)
+            const previousHeat = existingRivalry?.heat || 0
+            const nextHeat = Math.max(
+              0,
+              Math.min(RIVALRY_MAX_HEAT, previousHeat + storyEffects.rivalryHeatDelta),
+            )
+            rivalryHeatDelta = nextHeat - previousHeat
+
+            if (nextHeat > 0 && rivalryHeatDelta !== 0) {
+              const sortedEmployees = [focusedWrestler, focusedRival]
+                .sort((left, right) => left.employeeId.localeCompare(right.employeeId))
+              const nextRivalry = {
+                pairKey,
+                wrestlerIds: sortedEmployees.map((employee) => employee.employeeId),
+                wrestlerNames: sortedEmployees.map((employee) => employee.name),
+                heat: nextHeat,
+                lastEventDay: state.calendar.day,
+                lastSegmentType: 'interview',
+                lastRating: null,
+                lastAction: 'mediaInterview',
+              }
+              nextRivalries = [
+                ...normalizedRivalries.filter((rivalry) => rivalry.pairKey !== pairKey),
+                nextRivalry,
+              ].sort((left, right) => right.heat - left.heat).slice(0, 120)
+            } else if (nextHeat === 0 && existingRivalry) {
+              nextRivalries = normalizedRivalries.filter((rivalry) => rivalry.pairKey !== pairKey)
+            } else {
+              nextRivalries = normalizedRivalries
+            }
+
+            rivalryNames.push(focusedWrestler.name, focusedRival.name)
+          }
 
           const sponsorTrustChanges = []
           const nextSponsors = normalizedSponsors.map((sponsor) => {
@@ -3901,6 +4167,10 @@ export const useGameStore = create(
             fansDelta,
             prestigeDelta,
             sponsorTrustDeltaAverage: avgTrustDelta,
+            alignmentDelta,
+            alignmentTargetName: focusedWrestler?.name || '',
+            rivalryHeatDelta,
+            rivalryNames,
             score,
           }
 
@@ -3912,7 +4182,12 @@ export const useGameStore = create(
             },
             roster: {
               ...state.roster,
+              employees: nextEmployees,
               sponsors: nextSponsors,
+            },
+            events: {
+              ...state.events,
+              rivalries: nextRivalries,
             },
             ai: {
               ...state.ai,
@@ -3923,6 +4198,10 @@ export const useGameStore = create(
                 fansDelta,
                 prestigeDelta,
                 sponsorTrustDeltaAverage: avgTrustDelta,
+                alignmentDelta,
+                alignmentTargetName: focusedWrestler?.name || '',
+                rivalryHeatDelta,
+                rivalryNames,
               },
             },
             finances: {
@@ -3933,7 +4212,7 @@ export const useGameStore = create(
                 type: fansDelta + prestigeDelta >= 0 ? 'income' : 'expense',
                 category: 'dailyClose',
                 amount: Math.abs(fansDelta * 5 + prestigeDelta * 40),
-                note: `Media interview impact | score ${score >= 0 ? `+${score}` : score}, fans ${fansDelta >= 0 ? `+${fansDelta}` : fansDelta}, prestige ${prestigeDelta >= 0 ? `+${prestigeDelta}` : prestigeDelta}, avg sponsor trust ${avgTrustDelta >= 0 ? `+${avgTrustDelta}` : avgTrustDelta}`,
+                note: `Media interview impact | score ${score >= 0 ? `+${score}` : score}, fans ${fansDelta >= 0 ? `+${fansDelta}` : fansDelta}, prestige ${prestigeDelta >= 0 ? `+${prestigeDelta}` : prestigeDelta}, alignment ${alignmentDelta >= 0 ? `+${alignmentDelta}` : alignmentDelta}, rivalry heat ${rivalryHeatDelta >= 0 ? `+${rivalryHeatDelta}` : rivalryHeatDelta}, avg sponsor trust ${avgTrustDelta >= 0 ? `+${avgTrustDelta}` : avgTrustDelta}`,
               }),
             },
           }
@@ -3951,6 +4230,8 @@ export const useGameStore = create(
               currentCandidates: state.market.employeeCandidates,
               currentDay: state.calendar.day,
               hiringLocks: state.market.hiringLocks,
+              modWrestlers: state.market.modWrestlers,
+              wrestlerArchetypes: state.market.wrestlerArchetypes,
             }),
             hiringLocks: pruneExpiredHiringLocks(state.market.hiringLocks, state.calendar.day),
           },
@@ -4417,6 +4698,8 @@ export const useGameStore = create(
                 currentCandidates: state.market.employeeCandidates.filter((item) => item.candidateId !== candidateId),
                 currentDay: state.calendar.day,
                 hiringLocks: state.market.hiringLocks,
+                modWrestlers: state.market.modWrestlers,
+                wrestlerArchetypes: state.market.wrestlerArchetypes,
               }),
               hiringLocks: pruneExpiredHiringLocks(state.market.hiringLocks, state.calendar.day),
             },
@@ -4555,6 +4838,8 @@ export const useGameStore = create(
                 currentCandidates: state.market.employeeCandidates,
                 currentDay: state.calendar.day,
                 hiringLocks: state.market.hiringLocks,
+                modWrestlers: state.market.modWrestlers,
+                wrestlerArchetypes: state.market.wrestlerArchetypes,
               }),
               hiringLocks: pruneExpiredHiringLocks(state.market.hiringLocks, state.calendar.day),
             },
@@ -4825,7 +5110,11 @@ export const useGameStore = create(
         set((state) => ({
           events: {
             ...state.events,
-            eventPreparation: normalizeEventPreparation(data, state.progression?.unlocks),
+            eventPreparation: normalizeEventPreparation(
+              data,
+              state.progression?.unlocks,
+              state.market?.modVenues,
+            ),
           },
         }))
       },
@@ -5097,6 +5386,10 @@ export const useGameStore = create(
           }
 
           const nextCalendar = calculateNextCalendar(state.calendar.day, state.calendar.startDateIso)
+          const competitorStrategyAdvance = advanceCompetitorStrategies(
+            state.events.competitorCompanies || COMPETITOR_COMPANIES,
+            nextCalendar.day,
+          )
           const nextActiveEmployees = filterActiveEmployees(state.roster.employees, nextCalendar.day)
           const normalizedSponsors = normalizeSponsors(state.roster.sponsors)
           const dueCustomEvent = getDueCustomEventForDay(state.calendar.day, state.events.customEvents)
@@ -5170,7 +5463,11 @@ export const useGameStore = create(
           const prepEventId = dueCustomEvent?.eventId || 'regular-weekly-event'
           const prep = state.events.eventPreparation
           const matchedPreparation = shouldRunEvent && prep?.eventId === prepEventId
-            ? normalizeEventPreparation(prep, state.progression?.unlocks)
+            ? normalizeEventPreparation(
+                prep,
+                state.progression?.unlocks,
+                state.market?.modVenues,
+              )
             : null
           const promoStyle = getCareerArcUnlockItem(
             'promoStyles',
@@ -5497,6 +5794,7 @@ export const useGameStore = create(
               rivalryHeatScore,
               eventType,
               day: state.calendar.day,
+              competitorCompanies: competitorStrategyAdvance.companies,
             })
             competitorHeadline = competitorPressure
             competitorFanImpactForPostmortem = competitorPressure.fanImpact
@@ -5509,6 +5807,16 @@ export const useGameStore = create(
               type: 'success',
               eventId: productionWithSponsor.eventId,
               venueId: matchedPreparation?.venueId || null,
+              venueName: matchedPreparation
+                ? (state.market.modVenues || []).find((venue) => venue.id === matchedPreparation.venueId)?.name
+                  || getCareerArcUnlockItem('venues', matchedPreparation.venueId)?.name
+                  || null
+                : null,
+              venueLocation: matchedPreparation
+                ? (state.market.modVenues || []).find((venue) => venue.id === matchedPreparation.venueId)?.location
+                  || getCareerArcUnlockItem('venues', matchedPreparation.venueId)?.location
+                  || null
+                : null,
               promoStyleId: matchedPreparation?.promoStyleId || DEFAULT_CAREER_ARC_UNLOCKS.promoStyles[0],
               presentationId: matchedPreparation?.presentationId || DEFAULT_CAREER_ARC_UNLOCKS.presentations[0],
               scheduledDay: productionWithSponsor.scheduledDay,
@@ -5541,6 +5849,7 @@ export const useGameStore = create(
                   targetFactionId: seg.targetFactionId || null,
                   betrayerId: seg.betrayerId || null,
                   matchType: seg.matchType || null,
+                  matchStipulation: seg.matchStipulation || null,
                   participantIds: Array.isArray(seg.participantIds) ? seg.participantIds : [],
                   winnerEmployeeId: isTagTeamSeg ? null : (seg.winnerEmployeeId || null),
                   winnerTeamIds: isTagTeamSeg ? segWinnerTeamIds : [],
@@ -5626,6 +5935,8 @@ export const useGameStore = create(
             lastOutcome,
             employees: nextActiveEmployeesWithDecay,
             marketCandidates: state.market.employeeCandidates,
+            competitorCompanies: competitorStrategyAdvance.companies,
+            wrestlerArchetypes: state.market.wrestlerArchetypes,
           })
           competitorWorldNewsForOutcome = competitorWorldResult.newsItems
           competitorPoachedEmployeeId = competitorWorldResult.poachedEmployeeId
@@ -5793,7 +6104,11 @@ export const useGameStore = create(
             day: nextCalendar.day,
             employees: nextActiveEmployeesFinal,
             fans: nextFans,
-            successfulEventIncrement: shouldRunEvent && lastOutcome?.type === 'success' ? 1 : 0,
+            successfulEventIncrement: shouldRunEvent
+              && lastOutcome?.type === 'success'
+              && productionWithSponsor?.type === 'regularWeekly'
+              ? 1
+              : 0,
             operatingCashFlowDelta: delta,
           })
           const nextOnboardingChallenge = onboardingProgress.challenge
@@ -5968,6 +6283,8 @@ export const useGameStore = create(
                   operatingCost,
                   otherCost,
                 },
+                segments: lastOutcome.segments,
+                recentEvents: state.events.eventLog,
                 net: netOutcome,
               }),
               rivalryHighlights: rivalryHighlightsForPostmortem,
@@ -6112,6 +6429,10 @@ export const useGameStore = create(
           }
 
           const competitorFeedEntries = [
+            ...competitorStrategyAdvance.newsItems.map((entry, index) => ({
+              ...entry,
+              id: `competitor-strategy-${state.calendar.day}-${index}-${Date.now()}`,
+            })),
             ...(lastOutcome?.competitorPressure
               ? [{ ...lastOutcome.competitorPressure, id: `competitor-pressure-${state.calendar.day}-${Date.now()}` }]
               : []),
@@ -6130,6 +6451,8 @@ export const useGameStore = create(
             currentCandidates: state.market.employeeCandidates,
             currentDay: nextCalendar.day,
             hiringLocks: happinessOutcome.hiringLocks,
+            modWrestlers: state.market.modWrestlers,
+            wrestlerArchetypes: state.market.wrestlerArchetypes,
           })
           const nextEmployeeCandidates = competitorSignedCandidateId
             ? syncedCandidates.filter((candidate) => candidate.candidateId !== competitorSignedCandidateId)
@@ -6156,6 +6479,7 @@ export const useGameStore = create(
                   ].slice(-100)
                 : state.events.eventLog,
               competitorHeadlines: nextCompetitorHeadlines,
+              competitorCompanies: competitorWorldResult.competitorCompanies,
               eventPreparation: (shouldRunEvent && prep?.eventId === prepEventId) ? null : state.events.eventPreparation,
             },
             history: {
@@ -6327,6 +6651,15 @@ export const useGameStore = create(
           typedPersistedState?.roster?.factions,
           normalizedPersistedEmployees,
         )
+        const normalizedWrestlerArchetypes = normalizeWrestlerArchetypes(
+          typedPersistedState?.market?.wrestlerArchetypes || DEFAULT_WRESTLER_ARCHETYPES,
+        )
+        const normalizedModWrestlers = (Array.isArray(typedPersistedState?.market?.modWrestlers)
+          ? typedPersistedState.market.modWrestlers
+          : []).filter((wrestler) => wrestler?.role === 'wrestler' && wrestler?.personId)
+        const normalizedModVenues = Array.isArray(typedPersistedState?.market?.modVenues)
+          ? typedPersistedState.market.modVenues
+          : []
         const mergedFinances = {
           ...currentState.finances,
           ...typedPersistedState?.finances,
@@ -6405,6 +6738,7 @@ export const useGameStore = create(
             eventPreparation: normalizeEventPreparation(
               typedPersistedState?.events?.eventPreparation,
               restoredProgression.unlocks,
+              normalizedModVenues,
             ),
             rivalries: normalizeRivalries(typedPersistedState?.events?.rivalries || currentState.events.rivalries),
             factionRivalries: normalizeFactionRivalries(
@@ -6414,6 +6748,10 @@ export const useGameStore = create(
             competitorHeadlines: Array.isArray(typedPersistedState?.events?.competitorHeadlines)
               ? typedPersistedState.events.competitorHeadlines.slice(-60)
               : currentState.events.competitorHeadlines,
+            competitorCompanies: normalizeCompetitorCompanies(
+              typedPersistedState?.events?.competitorCompanies
+                || currentState.events.competitorCompanies,
+            ),
           },
           ai: {
             ...currentState.ai,
@@ -6429,11 +6767,16 @@ export const useGameStore = create(
           market: {
             ...currentState.market,
             ...typedPersistedState?.market,
+            wrestlerArchetypes: normalizedWrestlerArchetypes,
+            modWrestlers: normalizedModWrestlers,
+            modVenues: normalizedModVenues,
             employeeCandidates: syncEmployeeCandidates({
               employees: normalizedPersistedEmployees,
               currentCandidates: typedPersistedState?.market?.employeeCandidates || [],
               currentDay: restoredDay,
               hiringLocks: normalizedHiringLocks,
+              modWrestlers: normalizedModWrestlers,
+              wrestlerArchetypes: normalizedWrestlerArchetypes,
             }),
             hiringLocks: normalizedHiringLocks,
           },

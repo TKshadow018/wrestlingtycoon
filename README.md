@@ -34,20 +34,27 @@ Wrestling Tycoon is a comprehensive sports management simulation game where you 
 - **Event Creation**: Design custom wrestling events with various match types and segments
 - **Financial System**: Track income, expenses, and cash flow throughout your company's growth
 - **Prestige System**: Build your company's reputation through successful events and elite roster management
-- **AI Integration**: Local AI-powered media interviews with gameplay consequences
+- **AI Integration**: Local AI-powered interviews that affect promotion reputation, wrestler alignment, and selected rivalries
 - **Ranking System**: Dynamic wrestler ranking based on match performance and popularity
 - **Happiness & Morale**: Manage employee satisfaction and team morale
 - **Career Arcs**: Pursue eight-week objectives and unlock venues, promotional campaigns, promo formats, and event presentations
 - **Faction Stories & Backstage Chemistry**: Build wrestler/manager factions, stage rivalry promos, interference and betrayals, and shape backstage relationships
 - **Competitor Intelligence**: Track rival promotions, talent poaching, counter-programming, and industry news
 - **Board Governance**: Resolve monthly agendas, weighted votes, mandates, and annual elections
-- **Mod Data Packages**: Import and export validated title, sponsor-offer, and event-template data
+- **Actionable Event Postmortems**: Event results flag match formats repeated across recent cards and suggest booking variety
+- **Mod Data Packages**: Import and export validated titles, sponsors, event templates, wrestler archetypes and free agents, and custom venues
 - **Multi-language Support**: Game available in multiple languages via i18n
 - **Save/Load System**: Persistent game saves with cloud integration via Firebase
 
 ---
 
 ## 🚧 Phase Updates
+
+### Phase 13 (2026-10-13)
+
+- **Guided Rescue Tutorial**: The existing 21-day challenge now walks players through role-complete staffing, three successful weekly shows, and operating-cash stabilization with dashboard step actions.
+- **Expanded Mod Packages**: Add validated wrestler archetypes and free-agent roster entries, import custom venues, and preserve supported title division, eligibility, active, and prestige properties.
+- **Persistent Competitor Profiles**: Rival promotions evolve long-term strategy, copy wrestler archetypes, and publish strategy changes and gimmick-copy news to Competitor Intel.
 
 ### Phase 12 (2026-10-12)
 
@@ -56,11 +63,13 @@ Wrestling Tycoon is a comprehensive sports management simulation game where you 
 - **Dashboard Integration**: Added the Board module, meeting room, member portraits, meeting history, mandate status, and next-meeting date.
 - **Career Arc Unlocks**: Completed arcs now award new venues, featured-match campaigns, promo formats, and event-intro presentations.
 - **Faction Rivalries and Backstage Chemistry**: Wrestlers and managers can form factions; promo callouts, interference, and betrayals build rivalry heat and crowd response. Shared segment bookings change chemistry, which influences match ratings and tracked-role happiness.
+- **Interview Story Effects**: Choose an interview's featured wrestler and optional rival; controversy, professionalism, and hype shift the wrestler's alignment and rivalry heat.
+- **Match Variety Recommendations**: Postmortems recommend a different stipulation when one format dominates at least 60% of a 3+ match card and appeared in two of the last three successful events.
 
 ### Phase 11 (2026-08-03)
 
 - **Mod Data Pipeline (In-Game)**: Added JSON mod package export/import directly in the dashboard Save/Load controls.
-- **Supported Modules**: Mod packages can now safely override Titles, Sponsor Offers, and Event Templates without editing source files manually.
+- **Supported Modules**: Mod packages can safely override titles, sponsor offers, and event templates, and can add wrestler archetypes, free-agent roster entries, and custom venues without editing source files manually.
 - **Validation + Diagnostics**: Import now validates module shapes, removes duplicate IDs, skips malformed entries, and reports invalid package reasons.
 - **Conflict-Safe Normalization**: Imported values are clamped/sanitized (tiers, trust, costs, multipliers, ratings) to prevent runtime breakage.
 - **Creator Workflow Upgrade**: Players can export their live tuned data into a reusable mod package, edit externally, and re-import for rapid balancing.
@@ -137,7 +146,7 @@ Wrestling Tycoon is a comprehensive sports management simulation game where you 
 
 - **Rivalry Heat Engine**: Rivalries now accumulate heat through match interactions and decay over time.
 - **Rivalry Outcome Influence**: High-heat rivalries can increase event fan growth and prestige momentum.
-- **Event Postmortem**: Results now include a “Why This Happened” breakdown for fan, prestige, and money drivers.
+- **Event Postmortem**: Results include a “Why This Happened” breakdown for fan, prestige, and money drivers, plus advice when recent cards repeat the same match format.
 
 ---
 

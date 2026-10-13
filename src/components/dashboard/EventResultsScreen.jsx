@@ -289,6 +289,7 @@ function EventResultsScreen({ outcome, onContinue }) {
 
   const eventTypeLabel = EVENT_TYPE_LABELS[eventType] || 'Event'
   const venue = venueCatalog.find((entry) => entry.id === venueId)
+    || (outcome.venueName ? { name: outcome.venueName, location: outcome.venueLocation } : null)
   const promoStyle = promoStyleId ? getCareerArcUnlockItem('promoStyles', promoStyleId) : null
   const net = (income || 0) - (expenses || 0)
   const matchSegs = segments.filter((s) => MATCH_SEGMENT_TYPES.has(s.segmentType))
@@ -453,6 +454,33 @@ function EventResultsScreen({ outcome, onContinue }) {
                         </div>
                       </li>
                     ))}
+                  </ul>
+                </article>
+              )}
+
+              {(postmortem?.recommendations || []).length > 0 && (
+                <article className={styles.recommendationCard}>
+                  <h3>{t('dashboard.eventResults.recommendations.title', 'Actionable Recommendations')}</h3>
+                  <ul>
+                    {postmortem.recommendations.map((recommendation) => {
+                      const formatLabel = t(
+                        `dashboard.events.setup.matchTypes.${recommendation.format}`,
+                        recommendation.format,
+                      )
+                      return (
+                        <li key={recommendation.id}>
+                          <strong>{t(recommendation.titleKey, { format: formatLabel })}</strong>
+                          <p>
+                            {t(recommendation.messageKey, {
+                              format: formatLabel,
+                              share: recommendation.currentSharePercent,
+                              recentShows: recommendation.repeatedEvents,
+                            })}
+                          </p>
+                          <small>{t(recommendation.actionKey)}</small>
+                        </li>
+                      )
+                    })}
                   </ul>
                 </article>
               )}

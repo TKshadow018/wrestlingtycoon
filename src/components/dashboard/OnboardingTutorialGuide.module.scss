@@ -1,0 +1,85 @@
+.guide {
+  align-items: center;
+  background: linear-gradient(105deg, rgba(40, 25, 18, 0.92), rgba(11, 20, 29, 0.96));
+  border: 1px solid rgba(243, 159, 97, 0.42);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding: 0.9rem 1rem;
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    color: var(--text-main);
+    font-size: 1rem;
+  }
+
+  p:not(.eyebrow) {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    line-height: 1.45;
+    margin-top: 0.3rem;
+  }
+
+  small {
+    color: #f3bd91;
+    display: block;
+    font-size: 0.76rem;
+    margin-top: 0.35rem;
+  }
+}
+
+.stepBadge {
+  align-items: center;
+  background: rgba(243, 159, 97, 0.16);
+  border: 1px solid rgba(243, 159, 97, 0.5);
+  border-radius: 999px;
+  color: #ffc894;
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 0.82rem;
+  font-weight: 700;
+  height: 2.6rem;
+  justify-content: center;
+  width: 2.6rem;
+}
+
+.copy {
+  flex: 1 1 18rem;
+}
+
+.eyebrow {
+  color: var(--accent-copper);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.2rem !important;
+  text-transform: uppercase;
+}
+
+.action {
+  background: var(--accent-copper);
+  border: 1px solid var(--accent-copper);
+  border-radius: 8px;
+  color: #17100a;
+  cursor: pointer;
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.65rem 0.85rem;
+}
+
+.guidecompleted {
+  border-color: rgba(135, 211, 124, 0.5);
+}
+
+.guidefailed {
+  border-color: rgba(240, 125, 125, 0.5);
+}

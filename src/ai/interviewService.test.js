@@ -57,12 +57,30 @@ describe('interview scenarios and answers', () => {
       prestige: 67,
       day: 5,
       week: 1,
+      featuredWrestlerName: 'Rising Star',
+      rivalWrestlerName: 'The Champion',
     })
 
-    expect(scenario.situation).toBe('')
-    expect(scenario.questions[0]).toBe('You recently signed Rookie. What was your strategy behind hiring him?')
+    expect(scenario.situation).toContain('Rising Star')
+    expect(scenario.situation).toContain('The Champion')
+    expect(scenario.questions[0]).toContain('Rising Star')
+    expect(scenario.questions[0]).toContain('The Champion')
     expect(scenario.journalistName).toBeTruthy()
     expect(scenario.newspaperName).toBeTruthy()
+
+    const standardScenario = await createInterviewScenario({
+      newestEmployees: ['Rookie'],
+      companyName: 'North Star Wrestling',
+      upcomingEvent: 'Summer Clash',
+      cash: 12345,
+      fans: 4321,
+      prestige: 67,
+      day: 5,
+      week: 1,
+    })
+    expect(standardScenario.situation).toBe('')
+    expect(standardScenario.questions[0])
+      .toBe('You recently signed Rookie. What was your strategy behind hiring him?')
   })
 
   it('accepts valid JSON and supports text-part completion responses', async () => {

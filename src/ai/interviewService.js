@@ -230,12 +230,22 @@ const completeText = async (messages, options = {}) => {
 export const createInterviewScenario = async (context) => {
   const journalistName = pickRandom(JOURNALISTS)
   const newspaperName = pickRandom(NEWSPAPERS)
-  const firstQuestion = buildDynamicQuestions(context)[0]
+  const featuredWrestlerName = String(context?.featuredWrestlerName || '').trim()
+  const rivalWrestlerName = String(context?.rivalWrestlerName || '').trim()
+  const firstQuestion = featuredWrestlerName
+    ? rivalWrestlerName
+      ? `How will ${featuredWrestlerName} respond to the challenge from ${rivalWrestlerName}?`
+      : `What direction are you planning for ${featuredWrestlerName}?`
+    : buildDynamicQuestions(context)[0]
 
   return {
     journalistName,
     newspaperName,
-    situation: '',
+    situation: featuredWrestlerName
+      ? rivalWrestlerName
+        ? `This interview is focused on ${featuredWrestlerName} and the rivalry with ${rivalWrestlerName}.`
+        : `This interview is focused on ${featuredWrestlerName}.`
+      : '',
     questions: [firstQuestion || 'What is your top priority for your promotion right now?'],
   }
 }

@@ -13,16 +13,17 @@ This document separates systems already present in the game from ideas that are 
 - **Morale and contract demands:** low-happiness wrestlers and staff can request salary changes; wrestlers can also request title shots. Unresolved demands can cause walkouts.
 - **Sponsor reputation:** interviews and event outcomes adjust sponsor trust; higher-tier offers have track-record, brand-safety, and family-audience gates.
 - **Competitor simulation:** rival promotions can counter-program, sign market talent, poach vulnerable employees, and publish industry headlines.
+- **Persistent competitor strategies:** rival profiles rotate between talent acquisition, counter-programming, and audience expansion; news records strategy changes and rivals can copy wrestler archetypes.
 - **Interview consequences:** answer quality affects fans, prestige, and sponsor trust.
-- **Event postmortem:** event results show fan, prestige, and financial drivers.
-- **Onboarding challenge:** a 21-day rescue challenge tracks roster, event, and stabilization objectives, with completion rewards and failure penalties.
-- **Mod data packages:** dashboard import/export supports validated title, sponsor-offer, and event-template data.
+- **Interview story consequences:** players select a featured wrestler and optional rival before the interview. Per-answer controversy shifts the featured wrestler toward Heel while professionalism and hype shift them toward Face; rivalry heat responds to controversy/hype versus professionalism, with bounded changes.
+- **Event postmortem:** event results show fan, prestige, and financial drivers. When at least three current matches use one format for 60% or more of the card, and that format also appeared in at least two of the last three successful events, the report recommends a different stipulation.
+- **Guided onboarding tutorial:** the 21-day rescue challenge guides players through event-ready staffing, three weekly shows, and operating-cash stabilization, with step-specific dashboard actions.
+- **Mod data packages:** dashboard import/export supports validated title properties, sponsors, event templates, wrestler archetypes, modded free-agent roster entries, and custom venues.
 - **Board governance:** monthly meetings include finance review, agenda decisions, weighted votes, mandates, annual elections, and manager-dismissal outcomes.
+- **Persistent competitor strategies:** rival promotions rotate through talent acquisition, counter-programming, and audience expansion; competitors can copy a wrestler archetype once and publish strategy/gimmick news.
 
 ## Remaining Follow-Up Ideas
 
-- Expand interview consequences to influence alignment and rivalry heat, if desired.
-- Add more actionable postmortem recommendations such as crowd fatigue or repeated match-type feedback.
-- Turn the 21-day onboarding challenge into a staged, show-by-show tutorial.
-- Extend mod packages to cover wrestler archetypes, roster data, venues, and title rules.
-- Let competitor promotions copy gimmicks or pursue additional long-term strategies.
+- Add interactive acknowledgements/checkpoints to the guided tutorial.
+- Apply venue rent and facility ratings to event audience and expense formulas.
+- Allow players to respond to rival strategy shifts through targeted counter-actions.

@@ -26,11 +26,19 @@ describe('career arc event-preparation unlocks', () => {
       ticketFees: { ppv: 45 },
       eventPreparation: null,
       unlocks: unlockedContent,
+      modVenues: [{
+        id: 'mod-venue',
+        name: 'Modded Arena',
+        location: 'North City',
+        capacity: 12000,
+        facilities: 4,
+      }],
       onSave: () => {},
       onCancel: () => {},
     }))
 
     expect(html).toContain('Surma Elite Stadium')
+    expect(html).toContain('Modded Arena')
     expect(html).not.toContain('Chattogram Champions Arena')
     expect(html).toContain('value="hometownBuzz"')
     expect(html).not.toContain('value="nationalSpotlight"')
@@ -78,6 +86,20 @@ describe('career arc event-preparation unlocks', () => {
             fanImpact: 15,
           },
         ],
+        postmortem: {
+          recommendations: [{
+            id: 'repeatedMatchType',
+            format: 'singles',
+            currentSharePercent: 75,
+            recentShows: 2,
+            titleKey: 'dashboard.eventResults.recommendations.repeatedMatchType.title',
+            messageKey: 'dashboard.eventResults.recommendations.repeatedMatchType.message',
+            actionKey: 'dashboard.eventResults.recommendations.repeatedMatchType.action',
+          }],
+          fanFactors: [],
+          prestigeFactors: [],
+          moneyFactors: [],
+        },
       },
       onContinue: () => {},
     }))
@@ -85,5 +107,8 @@ describe('career arc event-preparation unlocks', () => {
     expect(html).toContain('Faction Storylines')
     expect(html).toContain('The Aces called out Blaze Club')
     expect(html).toContain('Coach betrayed The Aces for Blaze Club')
+    expect(html).toContain('Actionable Recommendations')
+    expect(html).toContain('75%')
+    expect(html).toContain('Mix in a different stipulation')
   })
 })

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
+import { DEFAULT_WRESTLER_ARCHETYPES } from '../../../data/wrestlerArchetypes'
 import styles from './HireEmployeesModule.module.scss'
 
 const formatMoney = (value) => value.toLocaleString()
@@ -67,10 +68,14 @@ const createOfferForm = (candidate) => ({
   },
 })
 
-const renderRoleDetails = (candidate, t) => {
+const renderRoleDetails = (candidate, t, archetypes) => {
   if (candidate.role === 'wrestler') {
+    const archetype = archetypes.find((entry) => entry.archetypeId === candidate.archetypeId)
     return (
       <>
+        {archetype && (
+          <p>{t('dashboard.hiring.archetype', { archetype: archetype.name })}</p>
+        )}
         <p>{t('dashboard.hiring.popularity', { amount: candidate.popularity })}</p>
         <p>
           {t('dashboard.hiring.wrestlerAbility', {
@@ -149,6 +154,9 @@ function HireEmployeesModule() {
   })
   const [offerFeedback, setOfferFeedback] = useState(null)
   const candidates = useGameStore((state) => state.market.employeeCandidates)
+  const wrestlerArchetypes = useGameStore(
+    (state) => state.market.wrestlerArchetypes || DEFAULT_WRESTLER_ARCHETYPES,
+  )
   const cash = useGameStore((state) => state.finances.cash)
   const gameDay = useGameStore((state) => state.calendar.day)
   const startDateIso = useGameStore((state) => state.calendar.startDateIso)
@@ -362,7 +370,7 @@ function HireEmployeesModule() {
               {contract?.offerAccepted ? <p>{t('dashboard.hiring.offerAccepted')}</p> : null}
               {!contract?.offerAccepted && contract?.negotiationAttempted ? <p>{t('dashboard.hiring.offerPending')}</p> : null}
 
-              {renderRoleDetails(candidate, t)}
+              {renderRoleDetails(candidate, t, wrestlerArchetypes)}
 
               <div className={styles.actionRow}>
                 <button

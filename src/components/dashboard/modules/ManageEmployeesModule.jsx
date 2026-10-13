@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
 import { calculateRanking, calculateTeamRanking } from '../../../utils/wrestlerRank'
+import { DEFAULT_WRESTLER_ARCHETYPES } from '../../../data/wrestlerArchetypes'
 import { clampHeelFaceMeter, getHeelFaceStageLabel } from '../../../utils/heelFaceMeter'
 import styles from './ManageEmployeesModule.module.scss'
 
@@ -846,6 +847,9 @@ function ManageEmployeesModule() {
   const employees = useGameStore((state) => state.roster.employees)
   const titles = useGameStore((state) => state.roster.titles)
   const teams = useGameStore((state) => state.roster.teams)
+  const wrestlerArchetypes = useGameStore(
+    (state) => state.market.wrestlerArchetypes || DEFAULT_WRESTLER_ARCHETYPES,
+  )
   const factions = useGameStore((state) => state.roster.factions || [])
   const backstageChemistry = useGameStore((state) => state.roster.backstageChemistry || {})
   const factionRivalries = useGameStore((state) => state.events.factionRivalries || [])
@@ -1155,6 +1159,15 @@ function ManageEmployeesModule() {
 
           <p>{t('dashboard.employees.role', { role: employee.role })}</p>
           <p>{t('dashboard.employees.skill', { skill: employee.skill })}</p>
+          {employee.role === 'wrestler' && employee.archetypeId && (
+            <p>
+              {t('dashboard.hiring.archetype', {
+                archetype: wrestlerArchetypes.find(
+                  (archetype) => archetype.archetypeId === employee.archetypeId,
+                )?.name || employee.archetypeId,
+              })}
+            </p>
+          )}
           {['wrestler', 'staff'].includes(employee.role) && (
             <p className={getHappiness(employee) < 10 ? styles.happinessLow : styles.happinessValue}>
               {t('dashboard.employees.happiness', { amount: getHappiness(employee) })}
