@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getOnboardingTutorialStage } from './onboardingTutorial'
+import { getOnboardingTutorialShowProgress, getOnboardingTutorialStage } from './onboardingTutorial'
 
 const challenge = ({
   status = 'active',
@@ -16,6 +16,20 @@ const challenge = ({
 })
 
 describe('guided onboarding tutorial stages', () => {
+  it('returns first-show progress from the onboarding objective', () => {
+    expect(getOnboardingTutorialShowProgress(challenge({ successfulEvents: 1 }))).toEqual({
+      successfulEvents: 1,
+      targetSuccessfulEvents: 3,
+    })
+  })
+
+  it('defaults first-show progress when the objective is missing', () => {
+    expect(getOnboardingTutorialShowProgress({ objectives: {} })).toEqual({
+      successfulEvents: 0,
+      targetSuccessfulEvents: 0,
+    })
+  })
+
   it('guides the player to complete event staffing before the opening show', () => {
     expect(getOnboardingTutorialStage(challenge())).toMatchObject({
       id: 'buildRoster',

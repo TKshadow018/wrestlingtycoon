@@ -36,6 +36,15 @@ export const ONBOARDING_TUTORIAL_STAGES = [
   },
 ]
 
+export const getOnboardingTutorialShowProgress = (challenge) => {
+  const firstShow = challenge?.objectives?.firstShow || {}
+
+  return {
+    successfulEvents: Number(firstShow.currentSuccessfulEvents) || 0,
+    targetSuccessfulEvents: Number(firstShow.targetSuccessfulEvents) || 0,
+  }
+}
+
 export const getOnboardingTutorialStage = (challenge) => {
   if (!challenge) {
     return null

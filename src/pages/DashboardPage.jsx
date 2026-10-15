@@ -24,7 +24,7 @@ import app, { isFirebaseConfigured } from '../config/firebase'
 import { GAME_CONFIG } from '../config/gameConfig'
 import { useGameStore } from '../store/useGameStore'
 import { getBoardMeetingSchedule } from '../utils/boardMeetings'
-import { getOnboardingTutorialStage } from '../utils/onboardingTutorial'
+import { getOnboardingTutorialShowProgress, getOnboardingTutorialStage } from '../utils/onboardingTutorial'
 import { parseGameDate } from '../utils/gameCalendar'
 import { buildModDataPackageFromState, validateModDataPackage } from '../utils/modDataPackage'
 import styles from './DashboardPage.module.scss'
@@ -394,7 +394,7 @@ function DashboardPage() {
     }
 
     const rosterObjective = onboardingChallenge.objectives?.rosterBuild || {}
-    const firstShowObjective = onboardingChallenge.objectives?.firstShow || {}
+    const firstShowProgress = getOnboardingTutorialShowProgress(onboardingChallenge)
     const stabilizeObjective = onboardingChallenge.objectives?.stabilize || {}
     const currentOperatingCashFlow = Number(stabilizeObjective.currentOperatingCashFlow || 0)
     const targetOperatingCashFlow = Number(stabilizeObjective.targetOperatingCashFlow || 0)
@@ -406,8 +406,8 @@ function DashboardPage() {
       remainingDays,
       tutorial: {
         ...getOnboardingTutorialStage(onboardingChallenge),
-        successfulEvents: Number(firstShow.currentSuccessfulEvents || 0),
-        targetSuccessfulEvents: Number(firstShow.targetSuccessfulEvents || 0),
+        successfulEvents: firstShowProgress.successfulEvents,
+        targetSuccessfulEvents: firstShowProgress.targetSuccessfulEvents,
         rosterProgress: `${Number(rosterObjective.currentWrestlers || 0)}/${Number(rosterObjective.targetWrestlers || 0)} wrestlers · ${Number(rosterObjective.currentStaff || 0)}/${Number(rosterObjective.targetStaff || 0)} staff · ${Number(rosterObjective.currentReferees || 0)}/${Number(rosterObjective.targetReferees || 0)} referees · ${Number(rosterObjective.currentAnnouncers || 0)}/${Number(rosterObjective.targetAnnouncers || 0)} announcers`,
       },
       reward: onboardingChallenge.reward || { cash: 0, prestige: 0 },
@@ -420,10 +420,10 @@ function DashboardPage() {
         },
         {
           key: 'firstShow',
-          done: Boolean(firstShowObjective.completed),
+          done: Boolean(onboardingChallenge.objectives?.firstShow?.completed),
           progressText: t('dashboard.onboardingChallenge.weeklyShowsProgress', {
-            current: Number(firstShowObjective.currentSuccessfulEvents || 0),
-            target: Number(firstShowObjective.targetSuccessfulEvents || 0),
+            current: firstShowProgress.successfulEvents,
+            target: firstShowProgress.targetSuccessfulEvents,
           }),
         },
         {
