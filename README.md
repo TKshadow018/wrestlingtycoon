@@ -565,6 +565,7 @@ For detailed system specifications, see the docs folder:
 - **[Ranking System](docs/RANKING_POINTS.md)**: Wrestler ranking points, match impact calculations, and team rankings
 - **[Heel/Face System](docs/HEEL_FACE_SYSTEM.md)**: Alignment shifts, labels, and event-run decay
 - **[Board Meeting System](docs/BOARD_MEETING_PLAN.md)**: Monthly finance review, agendas, votes, mandates, and dismissal rules
+- **[AI Media Interviews](docs/AI_INTERVIEWS.md)**: Local model setup, eligibility, answer evaluation, story effects, retry, and finish behavior
 
 ---
 

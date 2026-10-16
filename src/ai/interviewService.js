@@ -5,7 +5,15 @@ import {
   recoverAiModelFromRuntimeError,
   startAiModelDownload,
 } from './webllmManager'
-import { JOURNALISTS, NEWSPAPERS, QUESTION_TEMPLATES } from './interviewData'
+import {
+  CHAMPION_QUESTION_TEMPLATES,
+  FINANCE_QUESTION_TEMPLATES,
+  HIRE_QUESTION_TEMPLATES,
+  JOURNALISTS,
+  MATCH_QUESTION_TEMPLATES,
+  NEWSPAPERS,
+  UPCOMING_EVENT_QUESTION_TEMPLATES,
+} from './interviewData'
 import {
   BRIDGE_SYSTEM_PROMPT_LINES,
   COUNTER_QUESTION_SYSTEM_PROMPT_LINES,
@@ -13,7 +21,6 @@ import {
   BRIDGE_USER_INSTRUCTION,
   FALLBACK_BRIDGE_REPLY,
   FALLBACK_ACCEPT_REPLY,
-  FALLBACK_ERROR_REPLY,
 } from './interviewPrompts'
 
 const pickRandom = (items) => items[Math.floor(Math.random() * items.length)]
@@ -40,7 +47,7 @@ const parseJson = (value) => {
 
 const looksLikeQuestion = (value) => /\?\s*$/.test(String(value || '').trim())
 
-const generateFollowUpBridgeReply = async ({ journalistName, newspaperName, userAnswer, counterQuestion, transcript }) => {
+const generateFollowUpBridgeReply = async ({ journalistName, newspaperName, userAnswer, counterQuestion, transcript, t }) => {
   const bridgeMessages = [
     {
       role: 'system',
@@ -69,7 +76,7 @@ const generateFollowUpBridgeReply = async ({ journalistName, newspaperName, user
     // Fall through to deterministic fallback.
   }
 
-  return FALLBACK_BRIDGE_REPLY
+  return t?.('dashboard.ai.bridgeFallback', FALLBACK_BRIDGE_REPLY) || FALLBACK_BRIDGE_REPLY
 }
 
 const generateForcedCounterQuestion = async ({ journalistName, newspaperName, currentQuestion, userAnswer, transcript }) => {
@@ -115,8 +122,6 @@ const formatCurrency = (value) => {
 
   return `$${Math.round(numeric).toLocaleString('en-US')}`
 }
-
-const shuffle = (items) => [...items].sort(() => Math.random() - 0.5)
 
 const buildFactsFromContext = (context = {}) => {
   const newestEmployees = Array.isArray(context.newestEmployees) ? context.newestEmployees.filter(Boolean) : []
@@ -165,19 +170,31 @@ const hydrateTemplate = (template, facts) => {
   })
 }
 
-const buildDynamicQuestions = (context = {}) => {
+const selectInterviewQuestion = (context = {}, t = (_key, fallback) => fallback) => {
   const facts = buildFactsFromContext(context)
-  const mandatoryQuestion = `You recently signed ${facts.latestHire}. What was your strategy behind hiring him?`
+  const topics = []
+  if (Array.isArray(context.recentMatches) && context.recentMatches.length > 0) topics.push(['match', MATCH_QUESTION_TEMPLATES])
+  if (context.upcomingEvent && context.upcomingEvent !== 'No announced event') topics.push(['event', UPCOMING_EVENT_QUESTION_TEMPLATES])
+  if ((context.champions || []).some((champion) => champion?.holders?.length)) topics.push(['champion', CHAMPION_QUESTION_TEMPLATES])
+  if (Array.isArray(context.newestEmployees) && context.newestEmployees.length > 0) topics.push(['hire', HIRE_QUESTION_TEMPLATES])
+  if (Number.isFinite(Number(context.cash))) topics.push(['finance', FINANCE_QUESTION_TEMPLATES])
 
-  const hydrated = QUESTION_TEMPLATES.map((template) => hydrateTemplate(template, facts).trim())
-  const cleaned = hydrated.filter(Boolean)
-  const unique = [...new Set(cleaned)]
-  const withoutMandatory = unique.filter((question) => question !== mandatoryQuestion)
+  if (topics.length === 0) {
+    return {
+      topic: 'general',
+      question: t('dashboard.ai.genericQuestion', {}, 'What is your top priority for your promotion right now?'),
+    }
+  }
 
-  const totalQuestions = 3 + Math.floor(Math.random() * 3)
-  const sampled = shuffle(withoutMandatory).slice(0, Math.max(0, totalQuestions - 1))
+  const [topic, templates] = topics[Math.floor(Math.random() * topics.length)]
+  const template = templates[Math.floor(Math.random() * templates.length)]
+  const localizedQuestionValue = t(`dashboard.ai.interviewQuestions.${topic}`, facts, '')
+  const localizedQuestion = typeof localizedQuestionValue === 'string' ? localizedQuestionValue : ''
+  const question = localizedQuestion
+    ? hydrateTemplate(localizedQuestion, facts)
+    : hydrateTemplate(template, facts)
 
-  return [mandatoryQuestion, ...sampled].slice(0, totalQuestions)
+  return { topic, question }
 }
 
 const getEngine = async () => {
@@ -227,26 +244,35 @@ const completeText = async (messages, options = {}) => {
   return ''
 }
 
-export const createInterviewScenario = async (context) => {
+export const createInterviewScenario = async (context, { t } = {}) => {
+  const translate = (key, options, fallback) => t
+    ? t(key, { ...options, defaultValue: fallback })
+    : fallback
   const journalistName = pickRandom(JOURNALISTS)
   const newspaperName = pickRandom(NEWSPAPERS)
   const featuredWrestlerName = String(context?.featuredWrestlerName || '').trim()
   const rivalWrestlerName = String(context?.rivalWrestlerName || '').trim()
   const firstQuestion = featuredWrestlerName
     ? rivalWrestlerName
-      ? `How will ${featuredWrestlerName} respond to the challenge from ${rivalWrestlerName}?`
-      : `What direction are you planning for ${featuredWrestlerName}?`
-    : buildDynamicQuestions(context)[0]
+      ? translate('dashboard.ai.storyRivalQuestion', { featured: featuredWrestlerName, rival: rivalWrestlerName }, `How will ${featuredWrestlerName} respond to the challenge from ${rivalWrestlerName}?`)
+      : translate('dashboard.ai.storyQuestion', { featured: featuredWrestlerName }, `What direction are you planning for ${featuredWrestlerName}?`)
+    : null
+  const selectedQuestion = featuredWrestlerName
+    ? { topic: 'story', question: firstQuestion }
+    : selectInterviewQuestion(context, (key, facts, fallback) => (
+        t ? t(key, { ...facts, defaultValue: fallback }) : fallback
+      ))
 
   return {
     journalistName,
     newspaperName,
     situation: featuredWrestlerName
       ? rivalWrestlerName
-        ? `This interview is focused on ${featuredWrestlerName} and the rivalry with ${rivalWrestlerName}.`
-        : `This interview is focused on ${featuredWrestlerName}.`
+        ? translate('dashboard.ai.storyRivalSituation', { featured: featuredWrestlerName, rival: rivalWrestlerName }, `This interview is focused on ${featuredWrestlerName} and the rivalry with ${rivalWrestlerName}.`)
+        : translate('dashboard.ai.storySituation', { featured: featuredWrestlerName }, `This interview is focused on ${featuredWrestlerName}.`)
       : '',
-    questions: [firstQuestion || 'What is your top priority for your promotion right now?'],
+    topic: selectedQuestion.topic,
+    questions: [selectedQuestion.question || t('dashboard.ai.genericQuestion', 'What is your top priority for your promotion right now?')],
   }
 }
 
@@ -258,6 +284,7 @@ export const evaluateInterviewAnswer = async ({
   transcript,
   allowCounter,
   forceCounter,
+  t,
 }) => {
   const messages = [
     {
@@ -282,19 +309,13 @@ export const evaluateInterviewAnswer = async ({
   try {
     const text = await completeText(messages, { temperature: 0.65, maxTokens: 240 })
     const parsed = parseJson(text)
-    let decision = parsed?.decision === 'counter' && allowCounter ? 'counter' : 'accept'
+    let decision = forceCounter && allowCounter ? 'counter' : 'accept'
     let reply = typeof parsed?.reply === 'string' && parsed.reply.trim()
       ? parsed.reply.trim()
-      : FALLBACK_ACCEPT_REPLY
+      : (t?.('dashboard.ai.acceptFallback', FALLBACK_ACCEPT_REPLY) || FALLBACK_ACCEPT_REPLY)
     let counterQuestion = typeof parsed?.counterQuestion === 'string' ? parsed.counterQuestion.trim() : ''
 
-    if (forceCounter && allowCounter) {
-      decision = 'counter'
-    }
-
-    // Normalize imperfect model output: sometimes it places follow-up in reply while marking accept.
-    if (allowCounter && decision === 'accept' && !counterQuestion && looksLikeQuestion(reply)) {
-      decision = 'counter'
+    if (decision === 'counter' && !counterQuestion && looksLikeQuestion(reply)) {
       counterQuestion = reply
       reply = await generateFollowUpBridgeReply({
         journalistName,
@@ -302,18 +323,12 @@ export const evaluateInterviewAnswer = async ({
         userAnswer,
         counterQuestion,
         transcript,
+        t,
       })
     }
 
-    if (allowCounter && decision === 'counter' && !counterQuestion && looksLikeQuestion(reply)) {
-      counterQuestion = reply
-      reply = await generateFollowUpBridgeReply({
-        journalistName,
-        newspaperName,
-        userAnswer,
-        counterQuestion,
-        transcript,
-      })
+    if (decision === 'accept' && looksLikeQuestion(reply)) {
+      reply = t?.('dashboard.ai.acceptFallback', FALLBACK_ACCEPT_REPLY) || FALLBACK_ACCEPT_REPLY
     }
 
     if (decision === 'counter' && !counterQuestion) {
@@ -328,30 +343,36 @@ export const evaluateInterviewAnswer = async ({
       if (forcedCounterQuestion) {
         counterQuestion = forcedCounterQuestion
       } else {
-        decision = 'accept'
+        throw new Error('Unable to generate the required follow-up question')
       }
     }
 
     return {
       decision,
       reply,
-      counterQuestion,
+      counterQuestion: decision === 'counter' ? counterQuestion : '',
     }
-  } catch {
-    return {
-      decision: 'accept',
-      reply: FALLBACK_ERROR_REPLY,
-      counterQuestion: '',
-    }
+  } catch (error) {
+    throw new Error(`Interview evaluation failed: ${error?.message || 'unknown error'}`, { cause: error })
   }
 }
 
-const containsAnyToken = (text, tokens = []) => {
-  const lower = String(text || '').toLowerCase()
-  return tokens.some((token) => lower.includes(token))
-}
+const STOP_WORDS = new Set(['a', 'an', 'and', 'are', 'as', 'at', 'be', 'but', 'by', 'do', 'for', 'from', 'how', 'i', 'in', 'is', 'it', 'of', 'on', 'or', 'our', 'the', 'this', 'to', 'we', 'what', 'will', 'with', 'you', 'your'])
+const getTokens = (text) => String(text || '').toLowerCase().match(/[a-z0-9']+/g) || []
 
-export const scoreInterviewAnswer = ({ userAnswer, decision }) => {
+const getGroundedTokens = (text) => new Set(getTokens(text)
+  .filter((token) => token.length > 2 && !STOP_WORDS.has(token)))
+
+const hasUnnegatedSignal = (tokens, signals) => tokens.some((token, index) => (
+  signals.includes(token)
+  && (() => {
+    const preceding = tokens.slice(Math.max(0, index - 7), index)
+    const lastNegation = Math.max(...['not', 'never', "don't", 'cannot', "can't"].map((negation) => preceding.lastIndexOf(negation)))
+    return lastNegation < 0 || preceding.slice(lastNegation + 1).includes('but')
+  })()
+))
+
+export const scoreInterviewAnswer = ({ userAnswer, currentQuestion = '' }) => {
   const answer = String(userAnswer || '').trim()
   if (!answer) {
     return {
@@ -361,30 +382,94 @@ export const scoreInterviewAnswer = ({ userAnswer, decision }) => {
       controversy: 4,
       detailLevel: 0,
       confidence: 0,
+      relevance: 0,
+      clarity: 0,
+      needsFollowUp: true,
     }
   }
 
-  const wordCount = answer.split(/\s+/).filter(Boolean).length
-  const longFormBonus = wordCount >= 18 ? 2 : wordCount >= 10 ? 1 : 0
-  const shortPenalty = wordCount <= 4 ? -2 : 0
-  const vaguePenalty = containsAnyToken(answer, ['no comment', 'maybe', 'not sure', 'idk', 'whatever']) ? -2 : 0
-  const detailBonus = containsAnyToken(answer, ['because', 'plan', 'strategy', 'budget', 'roster', 'match', 'fans', 'title']) ? 2 : 0
-  const confidenceBonus = containsAnyToken(answer, ['will', 'definitely', 'guarantee', 'prove', 'win']) ? 1 : 0
-  const hostilityPenalty = containsAnyToken(answer, ['hate', 'trash', 'stupid', 'idiot', 'kill']) ? -2 : 0
-  const controversyBonus = containsAnyToken(answer, ['controversy', 'shock', 'chaos', 'destroy', 'blood']) ? 2 : 0
-  const decisionBonus = decision === 'accept' ? 1 : -1
-
-  const score = Math.max(
-    -6,
-    Math.min(8, longFormBonus + shortPenalty + vaguePenalty + detailBonus + confidenceBonus + decisionBonus + hostilityPenalty),
-  )
+  const tokens = getTokens(answer)
+  const answerTerms = getGroundedTokens(answer)
+  const questionTerms = getGroundedTokens(currentQuestion)
+  const overlap = [...answerTerms].filter((token) => questionTerms.has(token)).length
+  const relevance = questionTerms.size === 0 ? 1 : Math.min(3, overlap)
+  const wordCount = tokens.length
+  const vague = hasUnnegatedSignal(tokens, ['maybe', 'whatever', 'idk'])
+    || /\bno comment\b|\bnot sure\b/i.test(answer)
+  const hostile = hasUnnegatedSignal(tokens, ['hate', 'trash', 'stupid', 'idiot', 'kill'])
+  const controversy = hasUnnegatedSignal(tokens, ['controversy', 'shock', 'chaos', 'destroy', 'blood']) ? 2 : 0
+  const clarity = Math.min(2, Math.floor(answerTerms.size / 3))
+  const confidence = hasUnnegatedSignal(tokens, ['definitely', 'guarantee', 'prove', 'win']) ? 1 : 0
+  const relevant = relevance > 0
+  const detailLevel = Math.min(3, relevance + clarity)
+  const needsFollowUp = vague || !relevant || wordCount < 5 || (questionTerms.size > 0 && overlap === 0)
+  const professionalism = (relevant ? 2 : -2) + clarity - (hostile ? 4 : 0) - (vague ? 2 : 0)
+  const hype = confidence + (relevant ? 1 : 0)
+  const score = Math.max(-6, Math.min(8, professionalism + hype + relevance - (relevant ? 0 : 2) - controversy - (vague ? 2 : 0)))
 
   return {
     score,
-    professionalism: (detailBonus * 3) + (longFormBonus * 2) + (decision === 'accept' ? 2 : -2) + shortPenalty + vaguePenalty + hostilityPenalty,
-    hype: (confidenceBonus * 3) + longFormBonus + (decision === 'accept' ? 1 : 0),
-    controversy: controversyBonus + (hostilityPenalty < 0 ? 2 : 0) + (decision === 'counter' ? 1 : 0),
-    detailLevel: detailBonus + longFormBonus,
-    confidence: confidenceBonus,
+    professionalism,
+    hype,
+    controversy: controversy + (hostile ? 2 : 0),
+    detailLevel,
+    confidence,
+    relevance,
+    clarity,
+    needsFollowUp,
+  }
+}
+
+export const buildInterviewTurnResult = async ({
+  interview,
+  currentQuestion,
+  userAnswer,
+  transcript = [],
+  metrics = {},
+  t,
+}) => {
+  const answerScore = scoreInterviewAnswer({ userAnswer, currentQuestion })
+  const followUpCount = Number(interview?.followUpCount) || 0
+  const maxFollowUps = Math.max(0, Number(interview?.maxFollowUps ?? 3) || 0)
+  const shouldAskFollowUp = answerScore.needsFollowUp && followUpCount < maxFollowUps
+  const playerMessages = [...transcript, { speaker: 'user', text: userAnswer }]
+  const turn = await evaluateInterviewAnswer({
+    journalistName: interview?.journalistName,
+    newspaperName: interview?.newspaperName,
+    currentQuestion,
+    userAnswer,
+    transcript: playerMessages,
+    allowCounter: shouldAskFollowUp,
+    forceCounter: shouldAskFollowUp,
+    t,
+  })
+
+  if (shouldAskFollowUp && !turn.counterQuestion) {
+    throw new Error('Required follow-up question was unavailable')
+  }
+
+  const nextMetrics = {
+    score: (Number(metrics.score) || 0) + answerScore.score,
+    professionalism: (Number(metrics.professionalism) || 0) + answerScore.professionalism,
+    hype: (Number(metrics.hype) || 0) + answerScore.hype,
+    controversy: (Number(metrics.controversy) || 0) + answerScore.controversy,
+    relevance: (Number(metrics.relevance) || 0) + answerScore.relevance,
+    clarity: (Number(metrics.clarity) || 0) + answerScore.clarity,
+    answerCount: (Number(metrics.answerCount) || 0) + 1,
+  }
+  const committedMessages = shouldAskFollowUp
+    ? [
+        ...playerMessages,
+        { speaker: 'ai', text: turn.reply },
+        { speaker: 'ai', text: turn.counterQuestion },
+      ]
+    : [...playerMessages, { speaker: 'ai', text: turn.reply }]
+
+  return {
+    answerScore,
+    turn,
+    nextMetrics,
+    committedMessages,
+    shouldAskFollowUp,
   }
 }

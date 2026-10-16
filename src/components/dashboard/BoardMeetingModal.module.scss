@@ -142,6 +142,16 @@
   text-transform: uppercase;
 }
 
+.meetingPoster {
+  background: rgba(3, 8, 14, 0.8);
+  border: 1px solid rgba(203, 165, 101, 0.35);
+  border-radius: 12px;
+  display: block;
+  max-height: 220px;
+  object-fit: contain;
+  width: 100%;
+}
+
 .relationBadge {
   background: rgba(9, 15, 22, 0.82);
   border: 1px solid var(--line-soft);

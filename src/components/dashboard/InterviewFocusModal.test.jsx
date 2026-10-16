@@ -12,6 +12,7 @@ describe('InterviewFocusModal', () => {
         { employeeId: 'ace', name: 'Ace', popularity: 90 },
         { employeeId: 'blaze', name: 'Blaze', popularity: 80 },
       ],
+      rivalries: [{ wrestlerIds: ['ace', 'blaze'], heat: 42 }],
       onStart: () => {},
       onCancel: () => {},
     }))
@@ -24,5 +25,22 @@ describe('InterviewFocusModal', () => {
     expect(html).toContain('value="blaze"')
     expect(html).toContain('Ace')
     expect(html).toContain('Blaze')
+    expect(html).toContain('Active rivalry')
+    expect(html).toContain('aria-modal="true"')
+  })
+
+  it('explains that selecting a non-rival opponent can start a rivalry', () => {
+    const html = renderToStaticMarkup(createElement(InterviewFocusModal, {
+      isOpen: true,
+      wrestlers: [
+        { employeeId: 'ace', name: 'Ace', popularity: 90 },
+        { employeeId: 'blaze', name: 'Blaze', popularity: 80 },
+      ],
+      rivalries: [],
+      onStart: () => {},
+      onCancel: () => {},
+    }))
+
+    expect(html).toContain('New story rivalry')
   })
 })

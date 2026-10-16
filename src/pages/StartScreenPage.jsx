@@ -30,6 +30,7 @@ function StartScreenPage() {
   const aiProgress = useGameStore((state) => state.ai.progress)
   const aiProgressText = useGameStore((state) => state.ai.progressText)
   const aiError = useGameStore((state) => state.ai.error)
+  const aiModelId = useGameStore((state) => state.ai.modelId)
 
   const [playerName, setPlayerName] = useState('Tusar')
   const [companyName, setCompanyName] = useState('Dhisum Dhisum Wrestling')
@@ -86,7 +87,7 @@ function StartScreenPage() {
         {isBlockingForAi ? (
           <div className={styles.aiLoadingScreen}>
             <h2>{t('onboarding.aiLoadingTitle')}</h2>
-            <p>{t('onboarding.aiLoadingSubtitle')}</p>
+            <p>{t('onboarding.aiLoadingSubtitle', { model: aiModelId })}</p>
             <div className={styles.aiProgressPanel}>
               <p>
                 {t('onboarding.aiLoadingPercent', {

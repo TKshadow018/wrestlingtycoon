@@ -31,7 +31,7 @@ function MegaEventVideoScreen({ event, onComplete }) {
 
   if (!event) return null
 
-  const videoSrc = '/Events/Chud%20ling%20pong.mp4'
+  const videoSrc = '/Events/Wrestling/Chud%20ling%20pong.mp4'
 
   return (
     <div className={`${styles.overlay} ${visible ? styles.overlayVisible : ''}`}>

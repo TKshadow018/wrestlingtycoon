@@ -5,6 +5,7 @@ import {
   getBoardDismissalChance,
   getRepeatedRejectionPenalty,
 } from '../../utils/boardMeetingSystem'
+import { getBoardMeetingImageUrl } from '../../utils/boardMeetingVisuals'
 import styles from './BoardMeetingModal.module.scss'
 
 const formatCash = (amount) => `$${Math.round(Number(amount) || 0).toLocaleString()}`
@@ -152,6 +153,12 @@ function BoardMeetingModal({
             <small>{t('dashboard.boardMeeting.dismissalRisk', { percent: Math.round(dismissalRisk * 100) })}</small>
           </div>
         </header>
+
+        <img
+          className={styles.meetingPoster}
+          src={getBoardMeetingImageUrl(meeting.isJanuary)}
+          alt={meeting.isJanuary ? 'Annual Board Meeting election' : 'Board Meeting'}
+        />
 
         <section className={`${styles.financeReport} ${financeIsNegative ? styles.financeNegative : ''}`}>
           <div>

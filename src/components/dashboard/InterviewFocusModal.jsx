@@ -7,7 +7,7 @@ const sortWrestlers = (wrestlers) => [...(wrestlers || [])].sort((left, right) =
   || left.name.localeCompare(right.name)
 ))
 
-function InterviewFocusModal({ isOpen, wrestlers = [], onStart, onCancel }) {
+function InterviewFocusModal({ isOpen, wrestlers = [], rivalries = [], onStart, onCancel }) {
   const { t } = useTranslation()
   const sortedWrestlers = sortWrestlers(wrestlers)
   const [featuredWrestlerId, setFeaturedWrestlerId] = useState(
@@ -30,6 +30,14 @@ function InterviewFocusModal({ isOpen, wrestlers = [], onStart, onCancel }) {
   const selectedRival = rivalCandidates.find(
     (wrestler) => wrestler.employeeId === rivalWrestlerId,
   )
+  const selectedRivalry = selectedFeatured && selectedRival
+    ? rivalries.find((rivalry) => (
+        Array.isArray(rivalry.wrestlerIds)
+        && rivalry.wrestlerIds.length === 2
+        && rivalry.wrestlerIds.includes(selectedFeatured.employeeId)
+        && rivalry.wrestlerIds.includes(selectedRival.employeeId)
+      ))
+    : null
 
   const handleFeaturedChange = (event) => {
     const nextFeaturedId = event.target.value
@@ -51,16 +59,40 @@ function InterviewFocusModal({ isOpen, wrestlers = [], onStart, onCancel }) {
     })
   }
 
+  const handleDialogKeyDown = (event) => {
+    if (event.key !== 'Tab') return
+    const selector = 'button:not(:disabled), select:not(:disabled), input:not(:disabled), textarea:not(:disabled)'
+    const controls = [...event.currentTarget.querySelectorAll('*')]
+      .filter((element) => element.matches(selector))
+    if (controls.length === 0) return
+    const first = controls[0]
+    const last = controls[controls.length - 1]
+    if (event.shiftKey && event.target === first) {
+      event.preventDefault()
+      last.focus()
+    } else if (!event.shiftKey && event.target === last) {
+      event.preventDefault()
+      first.focus()
+    }
+  }
+
   return (
     <section className={styles.backdrop}>
-      <form className={styles.modal} onSubmit={handleStart} role="dialog" aria-modal="true">
+      <form
+        className={styles.modal}
+        onSubmit={handleStart}
+        onKeyDown={handleDialogKeyDown}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="interview-focus-title"
+      >
         <p className={styles.eyebrow}>{t('dashboard.ai.interviewTitle')}</p>
-        <h2>{t('dashboard.ai.interviewFocusTitle')}</h2>
+        <h2 id="interview-focus-title">{t('dashboard.ai.interviewFocusTitle')}</h2>
         <p className={styles.description}>{t('dashboard.ai.interviewFocusDescription')}</p>
 
         <label className={styles.field}>
           <span>{t('dashboard.ai.interviewFocusFeatured')}</span>
-          <select value={featuredWrestlerId} onChange={handleFeaturedChange}>
+          <select autoFocus value={featuredWrestlerId} onChange={handleFeaturedChange}>
             <option value="">{t('dashboard.ai.interviewFocusCompany')}</option>
             {sortedWrestlers.map((wrestler) => (
               <option key={wrestler.employeeId} value={wrestler.employeeId}>
@@ -69,6 +101,13 @@ function InterviewFocusModal({ isOpen, wrestlers = [], onStart, onCancel }) {
             ))}
           </select>
         </label>
+        {selectedRival ? (
+          <p className={styles.description} aria-live="polite">
+            {selectedRivalry
+              ? t('dashboard.ai.interviewActiveRivalry', { heat: selectedRivalry.heat })
+              : t('dashboard.ai.interviewNewRivalry')}
+          </p>
+        ) : null}
 
         <label className={styles.field}>
           <span>{t('dashboard.ai.interviewFocusRival')}</span>

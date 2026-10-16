@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getBoardMeetingSchedule } from '../../../utils/boardMeetings'
 import { getGameDateFromDay, parseGameDate } from '../../../utils/gameCalendar'
+import { getBoardMeetingImageUrl } from '../../../utils/boardMeetingVisuals'
 import styles from './EventCalendar.module.scss'
 
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -126,10 +127,12 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
       }
 
       const eventDay = meetingDate.getDate()
+      const isJanuary = meetingDate.getMonth() === 0
       eventMap[eventDay] = eventMap[eventDay] || []
       eventMap[eventDay].push({
         ...meeting,
         name: t('dashboard.events.boardMeeting'),
+        imageUrl: getBoardMeetingImageUrl(isJanuary),
       })
     })
 
@@ -247,7 +250,9 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
                           className={`${styles.eventBadge} ${styles.fullDayEvent} ${displayEventClass}`}
                           title={displayEvent.name}
                         >
-                          {isCustomDisplayEvent && displayEventImageUrl ? (
+                          {displayEvent?.isNonWrestling && displayEventImageUrl ? (
+                            <img className={styles.eventPosterImage} src={displayEventImageUrl} alt={displayEvent.name} />
+                          ) : isCustomDisplayEvent && displayEventImageUrl ? (
                             <button
                               type="button"
                               className={styles.eventPosterButton}

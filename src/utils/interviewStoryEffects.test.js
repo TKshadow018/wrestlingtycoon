@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { computeInterviewStoryEffects } from './interviewStoryEffects'
+import { computeInterviewImpactPreview, computeInterviewStoryEffects } from './interviewStoryEffects'
 
 describe('interview story effects', () => {
+  it('calculates bounded audience impact consistently, including the pre-show bonus', () => {
+    const metrics = { score: 6, professionalism: 4, hype: 5, controversy: 2 }
+    const regular = computeInterviewImpactPreview({ metrics })
+    const preShow = computeInterviewImpactPreview({ metrics, forcedPreShow: true })
+
+    expect(regular).toEqual({ fansDelta: 132, prestigeDelta: 5 })
+    expect(preShow).toEqual({ fansDelta: 178, prestigeDelta: 7 })
+  })
+
   it('turns a focused provocative interview toward Heel and intensifies its rivalry', () => {
     expect(computeInterviewStoryEffects({
       metrics: { professionalism: 0, hype: 0, controversy: 12, answerCount: 3 },

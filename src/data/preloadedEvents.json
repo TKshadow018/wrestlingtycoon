@@ -5,7 +5,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "14 January",
-    "image_url": "/Events/Nobo lorai.png"
+    "image_url": "/Events/Wrestling/Nobo lorai.png"
   },
   {
     "id": "ban-ppv-02",
@@ -13,7 +13,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "16 February",
-    "image_url": "/Events/Rokto rong moncho.png"
+    "image_url": "/Events/Wrestling/Rokto rong moncho.png"
   },
   {
     "id": "ban-ppv-03",
@@ -21,7 +21,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "15 March",
-    "image_url": "/Events/Khela hobe.png"
+    "image_url": "/Events/Wrestling/Khela hobe.png"
   },
   {
     "id": "ban-ppv-04",
@@ -29,7 +29,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "13 April",
-    "image_url": "/Events/Moha judhho.png"
+    "image_url": "/Events/Wrestling/Moha judhho.png"
   },
   {
     "id": "ban-ppv-05",
@@ -37,7 +37,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "18 May",
-    "image_url": "/Events/Put Koira Dimu.png"
+    "image_url": "/Events/Wrestling/Put Koira Dimu.png"
   },
   {
     "id": "ban-ppv-06",
@@ -45,7 +45,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "16 June",
-    "image_url": "/Events/Dhor pakor.png"
+    "image_url": "/Events/Wrestling/Dhor pakor.png"
   },
   {
     "id": "ban-ppv-07",
@@ -53,7 +53,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "14 July",
-    "image_url": "/Events/Agun Jhor.png"
+    "image_url": "/Events/Wrestling/Agun Jhor.png"
   },
   {
     "id": "ban-ppv-08",
@@ -61,7 +61,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "18 August",
-    "image_url": "/Events/Juddho Mela.png"
+    "image_url": "/Events/Wrestling/Juddho Mela.png"
   },
   {
     "id": "ban-ppv-09",
@@ -69,7 +69,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "15 September",
-    "image_url": "/Events/Kopa Samsu.png"
+    "image_url": "/Events/Wrestling/Kopa Samsu.png"
   },
   {
     "id": "ban-ppv-10",
@@ -77,7 +77,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "13 October",
-    "image_url": "/Events/Jhorer Raat.png"
+    "image_url": "/Events/Wrestling/Jhorer Raat.png"
   },
   {
     "id": "ban-ppv-11",
@@ -85,7 +85,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "17 November",
-    "image_url": "/Events/Shesh Dour.png"
+    "image_url": "/Events/Wrestling/Shesh Dour.png"
   },
   {
     "id": "ban-ppv-12",
@@ -93,7 +93,7 @@
     "event_type": "ppv",
     "event_reputation": 86,
     "event_date": "14 December",
-    "image_url": "/Events/Bishal Dhamaka.png"
+    "image_url": "/Events/Wrestling/Bishal Dhamaka.png"
   },
   {
     "id": "ban-mega-01",
@@ -101,6 +101,6 @@
     "event_type": "megaLive",
     "event_reputation": 96,
     "event_date": "26 December",
-    "image_url": "/Events/Chud ling pong.png"
+    "image_url": "/Events/Wrestling/Chud ling pong.png"
   }
 ]

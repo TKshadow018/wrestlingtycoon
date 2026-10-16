@@ -46,7 +46,7 @@ import {
   getCompetitorStrategyModifiers,
   normalizeCompetitorCompanies,
 } from '../utils/competitorWorld'
-import { computeInterviewStoryEffects } from '../utils/interviewStoryEffects'
+import { computeInterviewImpactPreview, computeInterviewStoryEffects } from '../utils/interviewStoryEffects'
 import { buildEventPostmortemRecommendations } from '../utils/eventPostmortemRecommendations'
 import {
   FACTION_STORY_BEATS,
@@ -598,7 +598,7 @@ const buildInitialState = () => {
     ai: {
       optedInAtStart: false,
       enabled: false,
-      modelId: 'Qwen2.5-3B-Instruct-q4f16_1-MLC',
+      modelId: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
       status: 'idle',
       progress: 0,
       progressText: '',
@@ -3978,7 +3978,7 @@ export const useGameStore = create(
         set((state) => ({
           ai: {
             ...state.ai,
-            modelId: modelId || state.ai.modelId || 'Qwen2.5-3B-Instruct-q4f16_1-MLC',
+            modelId: modelId || state.ai.modelId || 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
             status: 'downloading',
             progress: state.ai.status === 'ready' ? 100 : Math.max(0, Number(state.ai.progress) || 0),
             progressText: '',
@@ -4075,11 +4075,8 @@ export const useGameStore = create(
           const hype = Number(metrics.hype || 0)
           const controversy = Number(metrics.controversy || 0)
           const answerCount = Math.max(1, Number(metrics.answerCount || 1))
-          const forcedMultiplier = forcedPreShow ? 1.35 : 1
           const storyEffects = computeInterviewStoryEffects({ metrics, answerCount })
-
-          const fansDelta = Math.round(((score * 18) + (hype * 4) + (professionalism * 2) - (controversy * 2)) * forcedMultiplier)
-          const prestigeDelta = Math.round(((score / 2) + (professionalism / 3) + (hype / 4) - (controversy / 4)) * forcedMultiplier)
+          const { fansDelta, prestigeDelta } = computeInterviewImpactPreview({ metrics, forcedPreShow })
           const focusedWrestler = state.roster.employees.find(
             (employee) => employee.employeeId === featuredWrestlerId && employee.role === 'wrestler',
           )

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FirebaseError } from 'firebase/app'
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
-import { createInterviewScenario, evaluateInterviewAnswer, scoreInterviewAnswer } from '../ai/interviewService'
+import { buildInterviewTurnResult, createInterviewScenario } from '../ai/interviewService'
 import LanguageSwitcher from '../components/common/LanguageSwitcher'
 import AiInterviewModal from '../components/dashboard/AiInterviewModal'
 import InterviewFocusModal from '../components/dashboard/InterviewFocusModal'
@@ -27,6 +27,8 @@ import { getBoardMeetingSchedule } from '../utils/boardMeetings'
 import { getOnboardingTutorialShowProgress, getOnboardingTutorialStage } from '../utils/onboardingTutorial'
 import { parseGameDate } from '../utils/gameCalendar'
 import { buildModDataPackageFromState, validateModDataPackage } from '../utils/modDataPackage'
+import { computeInterviewImpactPreview } from '../utils/interviewStoryEffects'
+import { applyInterviewConsequencesOnce, getInterviewFollowUpLimit, isAiInterviewEligible } from '../utils/interviewFlow'
 import styles from './DashboardPage.module.scss'
 
 const MAIN_SAVE_KEY = 'wrestling-tycoon-save-v1'
@@ -180,19 +182,6 @@ const getTodayEventProjection = ({ day, startDateIso, customEvents = [], sponsor
   }
 }
 
-const computeInterviewImpactPreview = ({ metrics = {}, forcedPreShow = false }) => {
-  const score = Number(metrics.score || 0)
-  const professionalism = Number(metrics.professionalism || 0)
-  const hype = Number(metrics.hype || 0)
-  const controversy = Number(metrics.controversy || 0)
-  const forcedMultiplier = forcedPreShow ? 1.35 : 1
-
-  return {
-    fansDelta: Math.round(((score * 18) + (hype * 4) + (professionalism * 2) - (controversy * 2)) * forcedMultiplier),
-    prestigeDelta: Math.round(((score / 2) + (professionalism / 3) + (hype / 4) - (controversy / 4)) * forcedMultiplier),
-  }
-}
-
 function DashboardPage() {
   const { t } = useTranslation()
   const day = useGameStore((state) => state.calendar.day)
@@ -206,6 +195,7 @@ function DashboardPage() {
   const lastOutcome = useGameStore((state) => state.events.lastOutcome)
   const customEvents = useGameStore((state) => state.events.customEvents)
   const employees = useGameStore((state) => state.roster.employees)
+  const rivalries = useGameStore((state) => state.events.rivalries)
   const sponsors = useGameStore((state) => state.roster.sponsors)
   const startDateIso = useGameStore((state) => state.calendar.startDateIso)
   const activeModule = useGameStore((state) => state.ui.activeModule)
@@ -266,6 +256,8 @@ function DashboardPage() {
   const [interviewImpactSummary, setInterviewImpactSummary] = useState(null)
   const fileInputRef = useRef(null)
   const modFileInputRef = useRef(null)
+  const interviewTurnInFlightRef = useRef(false)
+  const interviewEffectsAppliedRef = useRef(false)
 
   const todayEvent = getTodayEventProjection({ day, startDateIso, customEvents, sponsors })
   const isEventStep = Boolean(todayEvent)
@@ -290,17 +282,19 @@ function DashboardPage() {
       })
     : ''
 
-  const isInterviewEligible = aiEnabled
-    && aiStatus === 'ready'
-    && !isEventStep
-    && !isBoardMeetingDay
-    && !boardMeeting.activeMeeting
-    && !isPreparationDay
-    && !isSetupModalOpen
-    && !showEventBanner
-    && !showCustomEventIntro
-    && !showMegaVideo
-    && !showEventPrep
+  const isInterviewEligible = isAiInterviewEligible({
+    enabled: aiEnabled,
+    status: aiStatus,
+    isEventStep,
+    isBoardMeetingDay,
+    hasActiveBoardMeeting: Boolean(boardMeeting.activeMeeting),
+    isPreparationDay,
+    isSetupModalOpen,
+    showEventBanner,
+    showCustomEventIntro,
+    showMegaVideo,
+    showEventPrep,
+  })
 
   useEffect(() => {
     if (!isInterviewEligible) {
@@ -342,6 +336,7 @@ function DashboardPage() {
 
   const interviewContext = useMemo(() => {
     const newestEmployees = [...employees]
+      .filter((employee) => employee.role === 'wrestler')
       .sort((a, b) => (Number(b.contractStartDay) || 0) - (Number(a.contractStartDay) || 0))
       .slice(0, 3)
       .map((employee) => employee.name)
@@ -386,7 +381,7 @@ function DashboardPage() {
       recentMatches,
       champions: activeTitles,
     }
-  }, [bookedEvent?.name, cash, day, employees, fans, lastOutcome?.segments, prestige, profile.companyName, titles, week])
+  }, [bookedEvent?.name, cash, day, employees, fans, lastOutcome, prestige, profile.companyName, titles, week])
 
   const onboardingSummary = useMemo(() => {
     if (!onboardingChallenge) {
@@ -454,15 +449,18 @@ function DashboardPage() {
       answerCount: 0,
     })
     setInterviewImpactSummary(null)
+    interviewEffectsAppliedRef.current = false
+    interviewTurnInFlightRef.current = false
 
     const placeholderSession = {
       journalistName: 'Journalist',
       newspaperName: 'Loading...',
       situation: t('dashboard.ai.interviewInitializing'),
+      topic: 'initializing',
       questions: [],
       questionIndex: 0,
       followUpCount: 0,
-      targetFollowUps: 3,
+      maxFollowUps: getInterviewFollowUpLimit(isForcedPreShowInterviewDay),
     }
 
     setInterviewSession(placeholderSession)
@@ -476,7 +474,7 @@ function DashboardPage() {
         ...interviewContext,
         featuredWrestlerName: storyFocus.featuredWrestlerName || '',
         rivalWrestlerName: storyFocus.rivalWrestlerName || '',
-      })
+      }, { t })
       const firstQuestion = scenario.questions?.[0]
 
       if (!firstQuestion) {
@@ -488,7 +486,7 @@ function DashboardPage() {
         storyFocus,
         questionIndex: 0,
         followUpCount: 0,
-        targetFollowUps: 3 + Math.floor(Math.random() * 3),
+        maxFollowUps: getInterviewFollowUpLimit(isForcedPreShowInterviewDay),
       })
 
       setInterviewMessages([
@@ -496,6 +494,7 @@ function DashboardPage() {
       ])
     } catch {
       setInterviewError(t('dashboard.ai.interviewInitError'))
+      setInterviewConsumedByDay((previous) => ({ ...previous, [day]: false }))
       setInterviewSession(null)
       setInterviewMessages([])
     } finally {
@@ -517,16 +516,55 @@ function DashboardPage() {
     proceedTimeline()
   }
 
+  const applyCurrentInterviewConsequences = (metrics = interviewMetrics) => {
+    const application = applyInterviewConsequencesOnce({
+      alreadyApplied: interviewEffectsAppliedRef.current,
+      apply: () => applyInterviewConsequences({
+        metrics,
+        forcedPreShow: isForcedPreShowInterviewDay,
+        featuredWrestlerId: interviewSession?.storyFocus?.featuredWrestlerId || null,
+        rivalWrestlerId: interviewSession?.storyFocus?.rivalWrestlerId || null,
+      }),
+    })
+    interviewEffectsAppliedRef.current = application.applied || interviewEffectsAppliedRef.current
+    if (!application.applied) return interviewImpactSummary
+    const result = { ...application.result, rubric: metrics }
+    setInterviewImpactSummary(result)
+    return result
+  }
+
+  const formatInterviewImpactMessage = (metrics, consequence) => {
+    const impactPreview = computeInterviewImpactPreview({ metrics, forcedPreShow: isForcedPreShowInterviewDay })
+    return t('dashboard.ai.interviewImpactApplied', {
+      fans: impactPreview.fansDelta >= 0 ? `+${impactPreview.fansDelta}` : `${impactPreview.fansDelta}`,
+      prestige: impactPreview.prestigeDelta >= 0 ? `+${impactPreview.prestigeDelta}` : `${impactPreview.prestigeDelta}`,
+      trust: consequence.sponsorTrustDeltaAverage >= 0 ? `+${consequence.sponsorTrustDeltaAverage}` : `${consequence.sponsorTrustDeltaAverage}`,
+      alignment: `${consequence.alignmentTargetName ? `${consequence.alignmentTargetName} ` : ''}${consequence.alignmentDelta >= 0 ? '+' : ''}${consequence.alignmentDelta}`,
+      rivalry: `${consequence.rivalryNames.join(' vs ') || t('dashboard.ai.noInterviewRival')} ${consequence.rivalryHeatDelta >= 0 ? '+' : ''}${consequence.rivalryHeatDelta}`,
+    })
+  }
+
+  const finishInterviewEarly = () => {
+    if (!interviewSession || isInterviewFinished || isInterviewSubmitting) return
+    const consequence = interviewMetrics.answerCount > 0 ? applyCurrentInterviewConsequences() : null
+    setInterviewMessages((previous) => [
+      ...previous,
+      ...(consequence ? [
+        { speaker: 'ai', text: formatInterviewImpactMessage(interviewMetrics, consequence) },
+      ] : []),
+      { speaker: 'ai', text: t('dashboard.ai.interviewClosing') },
+    ])
+    setIsInterviewFinished(true)
+  }
+
   const handleInterviewAnswer = async (userAnswer) => {
-    if (!interviewSession || isInterviewFinished) {
-      return
+    if (!interviewSession || isInterviewFinished || interviewTurnInFlightRef.current) {
+      return false
     }
 
+    interviewTurnInFlightRef.current = true
     setInterviewError('')
     setIsInterviewSubmitting(true)
-
-    const nextMessagesAfterUser = [...interviewMessages, { speaker: 'user', text: userAnswer }]
-    setInterviewMessages(nextMessagesAfterUser)
 
     const baseQuestion = interviewSession.questions?.[interviewSession.questionIndex] || ''
     const currentQuestion = [...interviewMessages]
@@ -534,80 +572,43 @@ function DashboardPage() {
       .find((entry) => entry.speaker === 'ai')?.text || baseQuestion
 
     try {
-      const followUpCount = interviewSession.followUpCount || 0
-      const targetFollowUps = interviewSession.targetFollowUps || 3
-      const mustAskFollowUp = followUpCount < targetFollowUps
-
-      const turn = await evaluateInterviewAnswer({
-        journalistName: interviewSession.journalistName,
-        newspaperName: interviewSession.newspaperName,
+      const turnResult = await buildInterviewTurnResult({
+        interview: interviewSession,
         currentQuestion,
         userAnswer,
-        transcript: nextMessagesAfterUser,
-        allowCounter: mustAskFollowUp,
-        forceCounter: mustAskFollowUp,
+        transcript: interviewMessages,
+        metrics: interviewMetrics,
+        t,
       })
+      const { nextMetrics, committedMessages, shouldAskFollowUp } = turnResult
 
-      const answerScore = scoreInterviewAnswer({ userAnswer, decision: turn.decision })
-      const nextMetrics = {
-        score: interviewMetrics.score + answerScore.score,
-        professionalism: interviewMetrics.professionalism + answerScore.professionalism,
-        hype: interviewMetrics.hype + answerScore.hype,
-        controversy: interviewMetrics.controversy + answerScore.controversy,
-        answerCount: interviewMetrics.answerCount + 1,
-      }
-      setInterviewMetrics(nextMetrics)
-
-      if (mustAskFollowUp && turn.counterQuestion) {
-        setInterviewMessages((prev) => [
-          ...prev,
-          { speaker: 'ai', text: turn.reply },
-          { speaker: 'ai', text: turn.counterQuestion },
-        ])
+      if (shouldAskFollowUp) {
+        setInterviewMetrics(nextMetrics)
+        setInterviewMessages(committedMessages)
 
         setInterviewSession((prev) => ({
           ...prev,
           followUpCount: (prev.followUpCount || 0) + 1,
         }))
 
-        return
+        return true
       }
 
-      if (mustAskFollowUp && !turn.counterQuestion) {
-        setInterviewError(t('dashboard.ai.interviewTurnError'))
-        return
-      }
+      setInterviewMetrics(nextMetrics)
+      const consequence = applyCurrentInterviewConsequences(nextMetrics)
 
-      const consequence = applyInterviewConsequences({
-        metrics: nextMetrics,
-        forcedPreShow: isForcedPreShowInterviewDay,
-        featuredWrestlerId: interviewSession.storyFocus?.featuredWrestlerId || null,
-        rivalWrestlerId: interviewSession.storyFocus?.rivalWrestlerId || null,
-      })
-      setInterviewImpactSummary(consequence)
-      const impactPreview = computeInterviewImpactPreview({ metrics: nextMetrics, forcedPreShow: isForcedPreShowInterviewDay })
-
-      setInterviewMessages((prev) => [
-        ...prev,
-        { speaker: 'ai', text: turn.reply },
-        {
-          speaker: 'ai',
-          text: t('dashboard.ai.interviewImpactApplied', 'Media impact applied: Fans {{fans}} | Prestige {{prestige}} | Sponsor trust {{trust}} | Alignment {{alignment}} | Rivalry heat {{rivalry}}', {
-            fans: impactPreview.fansDelta >= 0 ? `+${impactPreview.fansDelta}` : `${impactPreview.fansDelta}`,
-            prestige: impactPreview.prestigeDelta >= 0 ? `+${impactPreview.prestigeDelta}` : `${impactPreview.prestigeDelta}`,
-            trust: consequence.sponsorTrustDeltaAverage >= 0
-              ? `+${consequence.sponsorTrustDeltaAverage}`
-              : `${consequence.sponsorTrustDeltaAverage}`,
-            alignment: `${consequence.alignmentTargetName ? `${consequence.alignmentTargetName} ` : ''}${consequence.alignmentDelta >= 0 ? '+' : ''}${consequence.alignmentDelta}`,
-            rivalry: `${consequence.rivalryNames.join(' vs ') || t('dashboard.ai.noInterviewRival')} ${consequence.rivalryHeatDelta >= 0 ? '+' : ''}${consequence.rivalryHeatDelta}`,
-          }),
-        },
+      setInterviewMessages([
+        ...committedMessages,
+        { speaker: 'ai', text: formatInterviewImpactMessage(nextMetrics, consequence) },
         { speaker: 'ai', text: t('dashboard.ai.interviewClosing') },
       ])
       setIsInterviewFinished(true)
+      return true
     } catch {
       setInterviewError(t('dashboard.ai.interviewTurnError'))
+      return false
     } finally {
+      interviewTurnInFlightRef.current = false
       setIsInterviewSubmitting(false)
     }
   }
@@ -749,7 +750,7 @@ function DashboardPage() {
       URL.revokeObjectURL(url)
 
       setSaveLoadStatus(t('dashboard.saveLoad.savedLocal'))
-    } catch (error) {
+    } catch {
       setSaveLoadStatus(t('dashboard.saveLoad.errorSaveLocal'))
     }
   }
@@ -972,6 +973,7 @@ function DashboardPage() {
         impactSummary={interviewImpactSummary}
         onSubmitAnswer={handleInterviewAnswer}
         onSkip={finishInterviewAndContinueDay}
+        onFinishEarly={finishInterviewEarly}
         onFinishAndContinue={finishInterviewAndContinueDay}
         isSubmitting={isInterviewSubmitting}
         isFinished={isInterviewFinished}
@@ -981,6 +983,7 @@ function DashboardPage() {
         <InterviewFocusModal
           isOpen
           wrestlers={employees.filter((employee) => employee.role === 'wrestler')}
+          rivalries={rivalries}
           onStart={(storyFocus) => {
             setShowInterviewFocus(false)
             void openInterview(storyFocus)

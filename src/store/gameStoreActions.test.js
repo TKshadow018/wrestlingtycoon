@@ -102,6 +102,23 @@ afterAll(() => {
 })
 
 describe('game store action coverage', () => {
+  it('creates a rivalry from a selected new pairing only when interview heat rises', () => {
+    const featuredWrestler = hireCandidate('wrestler')
+    const rivalWrestler = hireCandidate('wrestler')
+    const pairKey = [featuredWrestler.employeeId, rivalWrestler.employeeId].sort().join('::')
+
+    expect(useGameStore.getState().events.rivalries.some((rivalry) => rivalry.pairKey === pairKey)).toBe(false)
+    const impact = useGameStore.getState().applyInterviewConsequences({
+      metrics: { score: 8, professionalism: 0, hype: 0, controversy: 8, answerCount: 1 },
+      featuredWrestlerId: featuredWrestler.employeeId,
+      rivalWrestlerId: rivalWrestler.employeeId,
+    })
+
+    expect(impact.rivalryHeatDelta).toBeGreaterThan(0)
+    expect(useGameStore.getState().events.rivalries.find((rivalry) => rivalry.pairKey === pairKey)?.heat)
+      .toBe(impact.rivalryHeatDelta)
+  })
+
   it('starts with basic unlocks and grants a new unlock bundle when a career arc completes', () => {
     const progression = useGameStore.getState().progression
     expect(progression.unlocks).toMatchObject({
@@ -197,7 +214,7 @@ describe('game store action coverage', () => {
     useGameStore.getState().setAiOptedInAtStart(true)
     useGameStore.getState().setAiDownloadStarted()
     expect(useGameStore.getState().ai.status).toBe('downloading')
-    expect(useGameStore.getState().ai.modelId).toBeTruthy()
+    expect(useGameStore.getState().ai.modelId).toBe('Qwen2.5-1.5B-Instruct-q4f16_1-MLC')
 
     useGameStore.getState().setAiDownloadProgress({ progress: 140, text: 'Almost done' })
     expect(useGameStore.getState().ai).toMatchObject({

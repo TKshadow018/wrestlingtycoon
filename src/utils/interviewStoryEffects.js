@@ -5,6 +5,19 @@ const asMetric = (metrics, key) => {
   return Number.isFinite(value) ? value : 0
 }
 
+export const computeInterviewImpactPreview = ({ metrics = {}, forcedPreShow = false } = {}) => {
+  const score = asMetric(metrics, 'score')
+  const professionalism = asMetric(metrics, 'professionalism')
+  const hype = asMetric(metrics, 'hype')
+  const controversy = asMetric(metrics, 'controversy')
+  const multiplier = forcedPreShow ? 1.35 : 1
+
+  return {
+    fansDelta: Math.round(((score * 18) + (hype * 4) + (professionalism * 2) - (controversy * 2)) * multiplier),
+    prestigeDelta: Math.round(((score / 2) + (professionalism / 3) + (hype / 4) - (controversy / 4)) * multiplier),
+  }
+}
+
 export const computeInterviewStoryEffects = ({ metrics = {}, answerCount } = {}) => {
   const requestedCount = Number(answerCount ?? metrics.answerCount)
   const count = Number.isFinite(requestedCount) && requestedCount > 0

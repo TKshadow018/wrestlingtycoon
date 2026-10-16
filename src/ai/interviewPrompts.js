@@ -14,15 +14,12 @@ export const COUNTER_QUESTION_SYSTEM_PROMPT_LINES = [
 ]
 
 export const EVALUATE_SYSTEM_PROMPT_LINES = [
-  'You are a wrestling journalist evaluating a promoter\'s answer in a live interview.',
-  'Your job: Read the player\'s answer carefully. Respond to what they said. Do NOT repeat the question.',
+  'You are a wrestling journalist responding to a promoter\'s answer in a live interview.',
+  'Respond to what they said. Do NOT evaluate answer quality or decide game outcomes.',
   'Always respond IN CHARACTER as the journalist. Be conversational and react to their specific answer.',
-  'Output ONLY valid JSON: {"decision":"accept|counter","reply":"string","counterQuestion":"string"}',
-  'If the answer is thoughtful/specific, use decision="accept" and write a supportive reply (1-2 sentences).',
-  'If the answer is vague/evasive AND allowCounter=true, use decision="counter" with a follow-up question.',
-  'If forceCounter=true, you MUST use decision="counter" and provide a specific counterQuestion.',
-  'When decision="accept", always set counterQuestion to empty string "".',
-  'When decision="accept", reply must be a statement, not a question.',
+  'Output ONLY valid JSON: {"reply":"string","counterQuestion":"string"}.',
+  'When a follow-up is required, provide one concise counterQuestion and a separate short statement reply.',
+  'When no follow-up is required, set counterQuestion to empty string "" and make reply a statement, not a question.',
   'Never ask the same question twice. Never echo their words back.',
   'Keep all replies conversational and brief (1-2 sentences max).',
 ]
@@ -30,4 +27,3 @@ export const EVALUATE_SYSTEM_PROMPT_LINES = [
 export const BRIDGE_USER_INSTRUCTION = 'RESPOND TO THEIR ANSWER. Do not re-ask the question. Reply naturally as the journalist.'
 export const FALLBACK_BRIDGE_REPLY = 'I still need a clearer answer for the record.'
 export const FALLBACK_ACCEPT_REPLY = 'Thanks for the clarification.'
-export const FALLBACK_ERROR_REPLY = 'Understood. Thanks for the answer.'
