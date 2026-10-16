@@ -363,6 +363,34 @@ const getTokens = (text) => String(text || '').toLowerCase().match(/[a-z0-9']+/g
 const getGroundedTokens = (text) => new Set(getTokens(text)
   .filter((token) => token.length > 2 && !STOP_WORDS.has(token)))
 
+const hasContradictoryClaims = (answer) => {
+  const correction = /\b(?:actually|correction|i mean|to clarify)\b[:,]?/gi
+  const correctionMatches = [...String(answer || '').matchAll(correction)]
+  const effectiveAnswer = correctionMatches.length
+    ? String(answer).slice(correctionMatches[correctionMatches.length - 1].index + correctionMatches[correctionMatches.length - 1][0].length)
+    : String(answer || '')
+  const clauses = effectiveAnswer
+    .split(/[.!?;]|\b(?:but|however|while)\b/i)
+    .map((clause) => getTokens(clause))
+    .filter((tokens) => tokens.length > 0)
+
+  for (let leftIndex = 0; leftIndex < clauses.length; leftIndex += 1) {
+    const leftTerms = getGroundedTokens(clauses[leftIndex].join(' '))
+    const leftNegated = clauses[leftIndex].some((token) => ['not', 'never', "can't", "won't"].includes(token))
+
+    for (let rightIndex = leftIndex + 1; rightIndex < clauses.length; rightIndex += 1) {
+      const rightNegated = clauses[rightIndex].some((token) => ['not', 'never', "can't", "won't"].includes(token))
+      if (leftNegated === rightNegated) continue
+
+      const rightTerms = getGroundedTokens(clauses[rightIndex].join(' '))
+      const sharedTerms = [...leftTerms].filter((term) => rightTerms.has(term))
+      if (sharedTerms.length >= 2) return true
+    }
+  }
+
+  return false
+}
+
 const hasUnnegatedSignal = (tokens, signals) => tokens.some((token, index) => (
   signals.includes(token)
   && (() => {
@@ -384,6 +412,7 @@ export const scoreInterviewAnswer = ({ userAnswer, currentQuestion = '' }) => {
       confidence: 0,
       relevance: 0,
       clarity: 0,
+      contradictory: false,
       needsFollowUp: true,
     }
   }
@@ -401,8 +430,9 @@ export const scoreInterviewAnswer = ({ userAnswer, currentQuestion = '' }) => {
   const clarity = Math.min(2, Math.floor(answerTerms.size / 3))
   const confidence = hasUnnegatedSignal(tokens, ['definitely', 'guarantee', 'prove', 'win']) ? 1 : 0
   const relevant = relevance > 0
+  const contradictory = hasContradictoryClaims(answer)
   const detailLevel = Math.min(3, relevance + clarity)
-  const needsFollowUp = vague || !relevant || wordCount < 5 || (questionTerms.size > 0 && overlap === 0)
+  const needsFollowUp = vague || contradictory || !relevant || wordCount < 5 || (questionTerms.size > 0 && overlap === 0)
   const professionalism = (relevant ? 2 : -2) + clarity - (hostile ? 4 : 0) - (vague ? 2 : 0)
   const hype = confidence + (relevant ? 1 : 0)
   const score = Math.max(-6, Math.min(8, professionalism + hype + relevance - (relevant ? 0 : 2) - controversy - (vague ? 2 : 0)))
@@ -416,6 +446,7 @@ export const scoreInterviewAnswer = ({ userAnswer, currentQuestion = '' }) => {
     confidence,
     relevance,
     clarity,
+    contradictory,
     needsFollowUp,
   }
 }

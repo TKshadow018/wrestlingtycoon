@@ -37,6 +37,7 @@
     "aiLoadingTitle": "Preparing AI Assistant",
     "aiLoadingSubtitle": "Preparing {{model}} locally. If it is unavailable, compatible fallback models will be tried automatically.",
     "aiLoadingPercent": "Download Progress: {{progress}}%",
+    "aiRetryButton": "Retry AI setup",
     "aiBackgroundButton": "Stop Waiting, Download In Background"
   },
   "dashboard": {

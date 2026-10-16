@@ -75,6 +75,10 @@ function StartScreenPage() {
     navigate('/dashboard')
   }
 
+  const handleRetryAiSetup = () => {
+    startAiModelDownload().catch(() => {})
+  }
+
   return (
     <main className={styles.screen}>
       <div className={styles.backgroundGlow} aria-hidden="true" />
@@ -95,8 +99,13 @@ function StartScreenPage() {
                 })}
               </p>
               {aiProgressText ? <small>{aiProgressText}</small> : null}
-              {aiError ? <small className={styles.aiError}>{aiError}</small> : null}
+              {aiError ? <small className={styles.aiError} role="alert">{aiError}</small> : null}
             </div>
+            {aiError ? (
+              <button type="button" className={styles.backgroundButton} onClick={handleRetryAiSetup}>
+                {t('onboarding.aiRetryButton')}
+              </button>
+            ) : null}
             <button type="button" className={styles.backgroundButton} onClick={handleContinueInBackground}>
               {t('onboarding.aiBackgroundButton')}
             </button>

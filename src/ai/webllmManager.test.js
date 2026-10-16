@@ -105,6 +105,21 @@ describe('WebLLM model manager', () => {
     expect(mocks.setAiDownloadError).toHaveBeenCalledWith(expect.stringContaining('Llama-3.2-1B-Instruct-q4f16_1-MLC'))
   })
 
+  it('can retry model setup after every candidate fails', async () => {
+    const engine = { chat: {} }
+    mocks.CreateMLCEngine
+      .mockRejectedValueOnce(new Error('first failed'))
+      .mockRejectedValueOnce(new Error('second failed'))
+      .mockRejectedValueOnce(new Error('third failed'))
+      .mockResolvedValueOnce(engine)
+
+    await expect(manager.startAiModelDownload()).rejects.toThrow('third failed')
+    await expect(manager.startAiModelDownload()).resolves.toBe(engine)
+
+    expect(mocks.CreateMLCEngine).toHaveBeenCalledTimes(4)
+    expect(mocks.setAiDownloadReady).toHaveBeenCalledTimes(1)
+  })
+
   it('rotates to the next model when recovering and rethrows non-recoverable errors', async () => {
     const engine = { chat: {} }
     mocks.CreateMLCEngine.mockResolvedValue(engine)

@@ -17,6 +17,7 @@ import {
   scoreInterviewAnswer,
 } from './interviewService'
 import i18n from '../i18n'
+import { applyInterviewConsequencesOnce } from '../utils/interviewFlow'
 
 const completionWith = (content) => ({
   choices: [{ message: { content } }],
@@ -286,6 +287,11 @@ describe('interview scenarios and answers', () => {
     expect(retry.nextMetrics.answerCount).toBe(1)
     expect(retry.committedMessages.filter((entry) => entry.speaker === 'user')).toHaveLength(1)
     expect(retry.committedMessages).toHaveLength(3)
+
+    const applyEffects = vi.fn()
+    applyInterviewConsequencesOnce({ alreadyApplied: false, apply: applyEffects })
+    applyInterviewConsequencesOnce({ alreadyApplied: true, apply: applyEffects })
+    expect(applyEffects).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -300,6 +306,7 @@ describe('scoreInterviewAnswer', () => {
       confidence: 0,
       relevance: 0,
       clarity: 0,
+      contradictory: false,
       needsFollowUp: true,
     })
   })
@@ -359,5 +366,47 @@ describe('scoreInterviewAnswer', () => {
     })
     expect(longAnswer.score).toBeLessThanOrEqual(8)
     expect(longAnswer.needsFollowUp).toBe(true)
+  })
+
+  it('probes explicitly conflicting claims but not consistent claims', () => {
+    const question = 'What is your plan for the roster?'
+    const contradictory = scoreInterviewAnswer({
+      currentQuestion: question,
+      userAnswer: 'We will cut the roster. We will not cut the roster.',
+    })
+    const consistent = scoreInterviewAnswer({
+      currentQuestion: question,
+      userAnswer: 'We will not cut the roster. We will support the roster.',
+    })
+
+    expect(contradictory.needsFollowUp).toBe(true)
+    expect(contradictory.contradictory).toBe(true)
+    expect(consistent.needsFollowUp).toBe(false)
+    expect(consistent.contradictory).toBe(false)
+
+    const corrected = scoreInterviewAnswer({
+      currentQuestion: question,
+      userAnswer: 'We will cut the roster. Correction: we will not cut the roster.',
+    })
+    expect(corrected.contradictory).toBe(false)
+  })
+
+  it('accepts an answer after the pre-show follow-up limit is reached', async () => {
+    const interview = {
+      journalistName: 'Reporter',
+      newspaperName: 'Daily Grapple',
+      followUpCount: 1,
+      maxFollowUps: 1,
+    }
+    makeEngine(['{"reply":"Thanks for clarifying.","counterQuestion":""}'])
+
+    const result = await buildInterviewTurnResult({
+      interview,
+      currentQuestion: 'What is your plan for the roster?',
+      userAnswer: 'No comment.',
+    })
+
+    expect(result.shouldAskFollowUp).toBe(false)
+    expect(result.turn.counterQuestion).toBe('')
   })
 })

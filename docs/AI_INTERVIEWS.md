@@ -12,7 +12,7 @@ The opening question is selected from currently available game context: recent m
 
 ## Model setup and fallback
 
-The interview uses browser-local WebLLM inference. The configured candidate order is Qwen2.5 1.5B, Gemma 3 1B, and Llama 3.2 1B. The manager tries the next candidate if setup fails and may rotate candidates after recoverable GPU/runtime failures. The active model is shown during onboarding setup. Inference failures do not count as completed answers: the transcript, rubric totals, and game state remain unchanged, and the player can retry or finish with previously accepted answers.
+The interview uses browser-local WebLLM inference. The configured candidate order is Qwen2.5 1.5B, Gemma 3 1B, and Llama 3.2 1B. The manager tries the next candidate if setup fails and may rotate candidates after recoverable GPU/runtime failures. The active model is shown during onboarding setup, with a retry action if all model candidates fail. Inference failures do not count as completed answers: the transcript, rubric totals, and game state remain unchanged, and the player can retry or finish with previously accepted answers.
 
 No interview answers are sent to a game backend for evaluation. Players still need a compatible browser/device and enough local memory for a supported model; model downloads can be large.
 
@@ -20,7 +20,7 @@ No interview answers are sent to a game backend for evaluation. Players still ne
 
 Each answer is scored deterministically against the current question. The rubric considers overlap between meaningful question/answer terms, answer clarity, professionalism, hype/confidence, and clearly expressed controversy or hostility. Negated signals are excluded where the text rules can identify them. Answers are not rewarded just for being long, and the model's `accept`/`counter` decision never changes the score or follow-up policy.
 
-A vague, hostile, very short, or question-irrelevant answer can prompt a journalist follow-up when the interview still has probes available. The normal maximum is three probes; a forced pre-show interview uses at most one. A failed required follow-up is retryable and does not commit that answer. Since this rubric is lexical and deterministic rather than a semantic language model, indirect paraphrases may not always be recognized as relevant.
+A vague, hostile, very short, question-irrelevant, or explicitly self-contradictory answer can prompt a journalist follow-up when the interview still has probes available. Contradiction detection is conservative and lexical: it compares opposing claims that share at least two meaningful terms, and treats explicit correction phrases as clarification. The normal maximum is three probes; a forced pre-show interview uses at most one. A failed required follow-up is retryable and does not commit that answer. Since this rubric is lexical and deterministic rather than a semantic language model, indirect paraphrases may not always be recognized as relevant.
 
 ## Finishing, skipping, and effects
 
