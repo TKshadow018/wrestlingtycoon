@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import '../../i18n'
 import BoardMeetingModal from './BoardMeetingModal'
 import EventCalendar from './modules/EventCalendar'
+import BoardMeetingIntroScreen from './BoardMeetingIntroScreen'
 
 const boardImages = {
   standard: '/Events/Board/board-meeting.jpeg',
@@ -62,5 +63,26 @@ describe('board meeting event visuals', () => {
 
   it('shows the election image in the January event-day meeting modal', () => {
     expect(renderMeeting(true)).toContain(`src="${boardImages.election}"`)
+  })
+
+  it('renders the board meeting artwork in an animated event-day intro', () => {
+    const html = renderToStaticMarkup(createElement(BoardMeetingIntroScreen, {
+      isJanuary: false,
+      onComplete: () => {},
+    }))
+
+    expect(html).toContain(`src="${boardImages.standard}"`)
+    expect(html).toContain('board-meeting-intro')
+    expect(html).toContain('Monthly Board Meeting')
+  })
+
+  it('renders the special election artwork in the January event-day intro', () => {
+    const html = renderToStaticMarkup(createElement(BoardMeetingIntroScreen, {
+      isJanuary: true,
+      onComplete: () => {},
+    }))
+
+    expect(html).toContain(`src="${boardImages.election}"`)
+    expect(html).toContain('Annual Board Meeting &amp; Election')
   })
 })

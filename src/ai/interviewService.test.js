@@ -16,6 +16,7 @@ import {
   evaluateInterviewAnswer,
   scoreInterviewAnswer,
 } from './interviewService'
+import { JOURNALISTS, NEWSPAPERS } from './interviewData'
 import i18n from '../i18n'
 import { applyInterviewConsequencesOnce } from '../utils/interviewFlow'
 
@@ -48,6 +49,24 @@ afterEach(() => {
 })
 
 describe('interview scenarios and answers', () => {
+  it('uses Bangladeshi sports journalists and newspapers', () => {
+    expect(JOURNALISTS).toEqual([
+      'Shabab Chowdhury',
+      'Samsul Arefin Khan',
+      'Nazrul Hosen Ayon',
+    ])
+    expect(NEWSPAPERS).toEqual([
+      'Prothom Alo',
+      'The Daily Star',
+      'Dhaka Tribune',
+      'Kaler Kantho',
+      'Ittefaq',
+      'Samakal',
+      'Jugantor',
+      'Bangladesh Pratidin',
+    ])
+  })
+
   it('creates a deterministic scenario with a personalized mandatory question', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0)
 

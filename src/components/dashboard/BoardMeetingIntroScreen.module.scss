@@ -1,0 +1,131 @@
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes posterZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+@keyframes panelReveal {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scanlineScroll {
+  from { background-position: 0 0; }
+  to { background-position: 0 100%; }
+}
+
+.overlay {
+  align-items: center;
+  background: #050a12;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  opacity: 0;
+  overflow: hidden;
+  position: fixed;
+  z-index: 320;
+}
+
+.overlayVisible {
+  animation: overlayFadeIn 0.35s ease forwards;
+}
+
+.posterLayer {
+  align-items: center;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: absolute;
+}
+
+.poster {
+  animation: posterZoom 2.6s ease-out forwards;
+  display: block;
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.vignette {
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.06) 15%, rgba(2, 7, 13, 0.64) 100%);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.scanlines {
+  animation: scanlineScroll 10s linear infinite;
+  background: repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0, 0, 0, 0.08) 3px 4px);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.content {
+  animation: panelReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  background: linear-gradient(160deg, rgba(7, 11, 18, 0.88), rgba(8, 15, 23, 0.74));
+  border: 1px solid rgba(246, 205, 111, 0.58);
+  border-radius: 12px;
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.55), 0 0 34px rgba(246, 205, 111, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  left: 3.5vw;
+  max-width: min(680px, 44vw);
+  padding: 1.2rem 1.35rem;
+  position: absolute;
+  top: 3.5vh;
+}
+
+.label {
+  color: #f6cd6f;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.title {
+  color: #fff8e8;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  letter-spacing: 0.06em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.subline {
+  color: #ded2b9;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .content {
+    left: 1rem;
+    max-width: none;
+    right: 1rem;
+    top: 1rem;
+  }
+
+  .title {
+    font-size: clamp(1.7rem, 7vw, 2.8rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlayVisible,
+  .poster,
+  .content,
+  .scanlines {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+}

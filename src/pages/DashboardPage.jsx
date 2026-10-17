@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FirebaseError } from 'firebase/app'
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
@@ -7,6 +7,7 @@ import LanguageSwitcher from '../components/common/LanguageSwitcher'
 import AiInterviewModal from '../components/dashboard/AiInterviewModal'
 import InterviewFocusModal from '../components/dashboard/InterviewFocusModal'
 import BoardMeetingModal from '../components/dashboard/BoardMeetingModal'
+import BoardMeetingIntroScreen from '../components/dashboard/BoardMeetingIntroScreen'
 import OnboardingTutorialGuide from '../components/dashboard/OnboardingTutorialGuide'
 import SaveLoadControls from '../components/common/SaveLoadControls'
 import ControlPanel from '../components/dashboard/ControlPanel'
@@ -237,6 +238,7 @@ function DashboardPage() {
   const [showEventPrep, setShowEventPrep] = useState(false)
   const [showChallengeModal, setShowChallengeModal] = useState(false)
   const [boardMeetingError, setBoardMeetingError] = useState('')
+  const [showBoardMeetingIntro, setShowBoardMeetingIntro] = useState(false)
   const [saveLoadStatus, setSaveLoadStatus] = useState('')
   const [interviewRollByDay, setInterviewRollByDay] = useState({})
   const [interviewConsumedByDay, setInterviewConsumedByDay] = useState({})
@@ -624,17 +626,13 @@ function DashboardPage() {
   }
 
   const handleProceed = () => {
-    if (boardMeeting.activeMeeting) {
+    if (boardMeeting.activeMeeting || showBoardMeetingIntro) {
       return
     }
 
     if (isBoardMeetingDay) {
-      const result = openBoardMeeting()
-      if (!result.ok) {
-        setBoardMeetingError(t(`dashboard.boardMeeting.errors.${result.reason}`, 'Could not open Board Meeting.'))
-        return
-      }
       setBoardMeetingError('')
+      setShowBoardMeetingIntro(true)
       return
     }
 
@@ -660,6 +658,14 @@ function DashboardPage() {
 
     proceedTimeline()
   }
+
+  const handleBoardMeetingIntroComplete = useCallback(() => {
+    setShowBoardMeetingIntro(false)
+    const result = openBoardMeeting()
+    if (!result.ok) {
+      setBoardMeetingError(t(`dashboard.boardMeeting.errors.${result.reason}`, 'Could not open Board Meeting.'))
+    }
+  }, [openBoardMeeting, t])
 
   const handleRequirementsGoBack = () => {
     setShowRequirementsOverlay(false)
@@ -964,6 +970,13 @@ function DashboardPage() {
         <EventResultsScreen
           outcome={pendingEventResult}
           onContinue={handleDismissEventResult}
+        />
+      )}
+      {showBoardMeetingIntro && (
+        <BoardMeetingIntroScreen
+          isJanuary={getGameDateFromDay(startDateIso, day).getMonth() === 0}
+          durationMs={2600}
+          onComplete={handleBoardMeetingIntroComplete}
         />
       )}
       <AiInterviewModal
