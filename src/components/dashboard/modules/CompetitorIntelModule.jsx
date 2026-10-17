@@ -3,6 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
 import styles from './CompetitorIntelModule.module.scss'
 
+const COMPETITOR_LOGOS = {
+  'comp-1': '/Company/Rivals/titan.jpeg',
+  'comp-2': '/Company/Rivals/prime.jpeg',
+  'comp-3': '/Company/Rivals/global.jpeg',
+}
+
 const formatSignedNumber = (value) => {
   const numeric = Number(value || 0)
   if (!Number.isFinite(numeric)) {
@@ -88,6 +94,14 @@ function CompetitorIntelModule() {
         <div className={styles.competitorProfiles}>
           {competitors.map((competitor) => (
             <article key={competitor.id} className={styles.competitorProfile}>
+              {COMPETITOR_LOGOS[competitor.id] ? (
+                <img
+                  className={styles.competitorLogo}
+                  src={COMPETITOR_LOGOS[competitor.id]}
+                  alt={`${competitor.name} logo`}
+                  loading="lazy"
+                />
+              ) : null}
               <div className={styles.profileHeading}>
                 <h4>{competitor.name}</h4>
                 <span>{t(`dashboard.competitorIntel.strategies.${competitor.strategyId}`, competitor.strategyId)}</span>

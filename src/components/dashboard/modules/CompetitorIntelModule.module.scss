@@ -159,6 +159,18 @@
   }
 }
 
+.competitorLogo {
+  background: rgba(4, 8, 14, 0.8);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  box-sizing: border-box;
+  display: block;
+  height: 15rem;
+  object-fit: contain;
+  padding: 0.35rem;
+  width: 100%;
+}
+
 .profileHeading {
   align-items: baseline;
   display: flex;

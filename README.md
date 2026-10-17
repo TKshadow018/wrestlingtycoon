@@ -455,6 +455,12 @@ WrestlingTycoon/
 │       ├── heelFaceMeter.js    # Alignment calculation
 │       └── wrestlerRank.js    # Ranking calculations
 ├── docs/                       # Game documentation
+│   ├── AI_GAME_GUIDE.md         # AI-oriented game overview and reading map
+│   ├── GAME_LOOP_AND_STATE.md   # Calendar, day advancement, and persisted state
+│   ├── EVENTS_AND_MATCHES.md    # Scheduling, card setup, execution, and outcomes
+│   ├── ROSTER_AND_STORYLINES.md # Employees, titles, teams, factions, and rivalries
+│   ├── PROGRESSION_AND_WORLD.md # Onboarding, arcs, unlocks, and competitors
+│   ├── SPONSORS_AND_MOD_PACKAGES.md # Sponsor contracts and mod data
 │   ├── BOARD_MEETING_PLAN.md   # Board meeting flow and governance rules
 │   ├── FINANCE_MONEY_SYSTEM.md # Financial system details
 │   ├── HAPPINESS.md            # Happiness system details
@@ -528,9 +534,8 @@ WrestlingTycoon/
 
 4. **Run the Event**
    - Follow timeline to event date
-   - Match outcomes determined automatically based on wrestler skill
-   - Event generates income based on attendance
-   - Prestige updates based on event performance
+   - Complete the event card, then simulate matches or choose their outcomes in Play mode
+   - Running the event applies its attendance, revenue, fan, prestige, and roster effects
 
 ### Day-to-Day Management
 
@@ -546,7 +551,7 @@ WrestlingTycoon/
 ### Advanced Strategies
 
 - **Sponsorship Deals**: Secure sponsors for recurring daily income
-- **Elite Roster Building**: Hire high-skill wrestlers (80+) for prestige boosts
+- **Elite Roster Building**: Hire high-skill wrestlers (82+) for prestige boosts
 - **Event Optimization**: Create high-hype events with popular wrestlers for prestige gains
 - **Title Management**: Title wins improve wrestler happiness and contribute to event results
 - **Staff Balance**: Include managers, referees, and announcers in event planning while managing their contract costs
@@ -559,6 +564,12 @@ WrestlingTycoon/
 
 For detailed system specifications, see the docs folder:
 
+- **[AI Game Guide](docs/AI_GAME_GUIDE.md)**: AI-friendly orientation, source-of-truth rules, core vocabulary, state map, and documentation index
+- **[Game Loop and State](docs/GAME_LOOP_AND_STATE.md)**: Starting a promotion, calendar model, timeline processing, and persistence
+- **[Events and Matches](docs/EVENTS_AND_MATCHES.md)**: Event scheduling, segment setup, match execution, results, and simulator boundaries
+- **[Roster and Storylines](docs/ROSTER_AND_STORYLINES.md)**: Hiring, worker attributes, titles, teams, factions, chemistry, and wrestler rivalries
+- **[Progression and Competitor World](docs/PROGRESSION_AND_WORLD.md)**: Guided onboarding, career arcs, unlocks, competitor actions, and related systems
+- **[Sponsors and Mod Packages](docs/SPONSORS_AND_MOD_PACKAGES.md)**: Sponsor slots, brand fit, trust, churn, package schema, and import behavior
 - **[Financial System](docs/FINANCE_MONEY_SYSTEM.md)**: Complete income/expense calculations, daily timeline updates, sponsor flows, and ledger tracking
 - **[Happiness System](docs/HAPPINESS.md)**: Employee satisfaction mechanics, bonus calculations, and termination rules
 - **[Prestige System](docs/prestige.md)**: Company reputation formula, event impact, elite wrestler bonuses, and skipping penalties

@@ -48,4 +48,12 @@ describe('CompetitorIntelModule', () => {
     expect(html).toContain('Talent Acquisition')
     expect(html).toContain('Rivals have not made a newsworthy move yet.')
   })
+
+  it('renders the matching logo for each rival profile', () => {
+    const html = renderToStaticMarkup(createElement(CompetitorIntelModule))
+
+    expect(html).toContain('src="/Company/Rivals/titan.jpeg"')
+    expect(html).toContain('src="/Company/Rivals/prime.jpeg"')
+    expect(html).toContain('src="/Company/Rivals/global.jpeg"')
+  })
 })
