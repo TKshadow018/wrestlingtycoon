@@ -566,6 +566,7 @@ For detailed system specifications, see the docs folder:
 
 - **[AI Game Guide](docs/AI_GAME_GUIDE.md)**: AI-friendly orientation, source-of-truth rules, core vocabulary, state map, and documentation index
 - **[Game Loop and State](docs/GAME_LOOP_AND_STATE.md)**: Starting a promotion, calendar model, timeline processing, and persistence
+- **[Home Country](docs/HOME_COUNTRY.md)**: Management-country selection, profile persistence, and its current gameplay impact
 - **[Events and Matches](docs/EVENTS_AND_MATCHES.md)**: Event scheduling, segment setup, match execution, results, and simulator boundaries
 - **[Roster and Storylines](docs/ROSTER_AND_STORYLINES.md)**: Hiring, worker attributes, titles, teams, factions, chemistry, and wrestler rivalries
 - **[Progression and Competitor World](docs/PROGRESSION_AND_WORLD.md)**: Guided onboarding, career arcs, unlocks, competitor actions, and related systems
