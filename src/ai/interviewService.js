@@ -1,10 +1,10 @@
 import {
-  getAiModelEngine,
+  getAiCompletionClient,
   getAiModelId,
   isRecoverableAiError,
-  recoverAiModelFromRuntimeError,
-  startAiModelDownload,
-} from './webllmManager'
+  recoverAiClientFromRuntimeError,
+  initializeAiAssistant,
+} from './openRouterManager'
 import {
   JOURNALISTS,
   NEWSPAPERS,
@@ -187,12 +187,12 @@ const selectInterviewQuestion = (context = {}, t) => {
 }
 
 const getEngine = async () => {
-  const existingEngine = getAiModelEngine()
-  if (existingEngine) {
-    return existingEngine
+  const existingClient = getAiCompletionClient()
+  if (existingClient) {
+    return existingClient
   }
 
-  return startAiModelDownload()
+  return initializeAiAssistant()
 }
 
 const completeText = async (messages, options = {}) => {
@@ -214,7 +214,7 @@ const completeText = async (messages, options = {}) => {
       throw error
     }
 
-    await recoverAiModelFromRuntimeError(error)
+    await recoverAiClientFromRuntimeError(error)
     completion = await requestCompletion()
   }
 

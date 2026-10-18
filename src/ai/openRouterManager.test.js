@@ -81,7 +81,7 @@ describe('OpenRouter AI manager', () => {
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
-          Authorization: '******',
+          Authorization: expect.stringContaining('Bearer '),
           'Content-Type': 'application/json',
         }),
         body: JSON.stringify({

@@ -35,7 +35,7 @@ describe('AI interview flow rules', () => {
     ]) {
       expect(isAiInterviewEligible({ ...eligibleState, [blockingFlag]: true }), blockingFlag).toBe(false)
     }
-    expect(isAiInterviewEligible({ ...eligibleState, status: 'downloading' })).toBe(false)
+    expect(isAiInterviewEligible({ ...eligibleState, status: 'initializing' })).toBe(false)
     expect(isAiInterviewEligible({ ...eligibleState, enabled: false })).toBe(false)
   })
 

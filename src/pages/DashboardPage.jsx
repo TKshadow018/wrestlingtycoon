@@ -219,7 +219,6 @@ function DashboardPage() {
   const setEventTicketFee = useGameStore((state) => state.setEventTicketFee)
   const getTicketPricingRecommendation = useGameStore((state) => state.getTicketPricingRecommendation)
   const aiStatus = useGameStore((state) => state.ai.status)
-  const aiProgress = useGameStore((state) => state.ai.progress)
   const aiProgressText = useGameStore((state) => state.ai.progressText)
   const aiEnabled = useGameStore((state) => state.ai.enabled)
   const aiShowEnableModal = useGameStore((state) => state.ai.showEnableModal)
@@ -289,11 +288,10 @@ function DashboardPage() {
   }, [day, getTicketPricingRecommendation, preparationEventDay, preparationEventId, preparationEventType])
   const preShowInterviewEvent = !isEventStep ? getPreShowInterviewEvent({ day, customEvents }) : null
   const isForcedPreShowInterviewDay = Boolean(preShowInterviewEvent)
-  const shouldShowAiProgress = aiOptedInAtStart && aiStatus === 'downloading'
+  const shouldShowAiProgress = aiOptedInAtStart && aiStatus === 'initializing'
   const aiStatusMessage = shouldShowAiProgress
-    ? t('dashboard.ai.downloading', {
-        progress: Math.max(0, Math.min(100, Number(aiProgress) || 0)),
-        detail: aiProgressText || t('dashboard.ai.defaultDownloadText'),
+    ? t('dashboard.ai.connecting', {
+        detail: aiProgressText || t('dashboard.ai.defaultConnectionText'),
       })
     : ''
 

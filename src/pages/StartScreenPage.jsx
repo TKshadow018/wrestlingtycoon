@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { startAiModelDownload } from '../ai/webllmManager'
+import { initializeAiAssistant } from '../ai/openRouterManager'
 import LanguageSwitcher from '../components/common/LanguageSwitcher'
 import StartGameForm from '../components/onboarding/StartGameForm'
 import { GAME_CONFIG } from '../config/gameConfig'
@@ -53,7 +53,7 @@ function StartScreenPage() {
     }
 
     setIsBlockingForAi(true)
-    startAiModelDownload().catch(() => {})
+    initializeAiAssistant().catch(() => {})
   }
 
   const handleContinueInBackground = () => {
@@ -62,7 +62,7 @@ function StartScreenPage() {
   }
 
   const handleRetryAiSetup = () => {
-    startAiModelDownload().catch(() => {})
+    initializeAiAssistant().catch(() => {})
   }
 
   return (
@@ -85,7 +85,11 @@ function StartScreenPage() {
                 })}
               </p>
               {aiProgressText ? <small>{aiProgressText}</small> : null}
-              {aiError ? <small className={styles.aiError} role="alert">{aiError}</small> : null}
+              {aiError ? (
+                <small className={styles.aiError} role="alert">
+                  {t(aiError, { defaultValue: t('onboarding.aiSetupError') })}
+                </small>
+              ) : null}
             </div>
             {aiError ? (
               <button type="button" className={styles.backgroundButton} onClick={handleRetryAiSetup}>

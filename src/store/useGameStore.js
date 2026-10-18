@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { GAME_CONFIG, GAME_DAYS_PER_MONTH, MANAGEMENT_MODULES } from '../config/gameConfig'
+import { getOpenRouterModel } from '../config/ai'
 import { BOARD_CHAIR, BOARD_MEMBERS, BOARD_VICE_CHAIR } from '../data/board'
 import {
   applyCareerArcUnlocks,
@@ -606,7 +607,7 @@ const buildInitialState = () => {
     ai: {
       optedInAtStart: false,
       enabled: false,
-      modelId: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
+      modelId: getOpenRouterModel(),
       status: 'idle',
       progress: 0,
       progressText: '',
@@ -3970,12 +3971,12 @@ export const useGameStore = create(
         }))
       },
 
-      setAiDownloadStarted: ({ modelId } = {}) => {
+      setAiInitializationStarted: ({ modelId } = {}) => {
         set((state) => ({
           ai: {
             ...state.ai,
-            modelId: modelId || state.ai.modelId || 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
-            status: 'downloading',
+            modelId: modelId || state.ai.modelId || getOpenRouterModel(),
+            status: 'initializing',
             progress: state.ai.status === 'ready' ? 100 : Math.max(0, Number(state.ai.progress) || 0),
             progressText: '',
             error: '',
@@ -3983,7 +3984,7 @@ export const useGameStore = create(
         }))
       },
 
-      setAiDownloadProgress: ({ progress, text } = {}) => {
+      setAiInitializationProgress: ({ progress, text } = {}) => {
         set((state) => {
           if (state.ai.status === 'ready') {
             return state
@@ -3997,7 +3998,7 @@ export const useGameStore = create(
           return {
             ai: {
               ...state.ai,
-              status: 'downloading',
+              status: 'initializing',
               progress: normalizedProgress,
               progressText: typeof text === 'string' ? text : state.ai.progressText,
               error: '',
@@ -4006,25 +4007,25 @@ export const useGameStore = create(
         })
       },
 
-      setAiDownloadReady: () => {
+      setAiReady: () => {
         set((state) => ({
           ai: {
             ...state.ai,
             status: 'ready',
             progress: 100,
-            progressText: 'Model ready',
+            progressText: 'AI ready',
             error: '',
             showEnableModal: !state.ai.enabled,
           },
         }))
       },
 
-      setAiDownloadError: (errorMessage) => {
+      setAiError: (errorMessage) => {
         set((state) => ({
           ai: {
             ...state.ai,
             status: 'error',
-            error: String(errorMessage || 'Model download failed'),
+            error: String(errorMessage || 'onboarding.aiSetupError'),
           },
         }))
       },

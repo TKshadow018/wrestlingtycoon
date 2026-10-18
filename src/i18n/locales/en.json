@@ -22,10 +22,12 @@
     "aiStartYes": "Start with AI enabled setup",
     "aiStartNo": "Start without AI",
     "aiLoadingTitle": "Preparing AI Assistant",
-    "aiLoadingSubtitle": "Preparing {{model}} locally. If it is unavailable, compatible fallback models will be tried automatically.",
-    "aiLoadingPercent": "Download Progress: {{progress}}%",
-    "aiRetryButton": "Retry AI setup",
-    "aiBackgroundButton": "Stop Waiting, Download In Background"
+    "aiLoadingSubtitle": "Connecting to {{model}} through OpenRouter.",
+    "aiLoadingPercent": "AI connection progress: {{progress}}%",
+    "aiRetryButton": "Retry AI connection",
+    "aiBackgroundButton": "Continue While AI Connects",
+    "aiSetupError": "Could not connect to the AI service. Check the configuration and try again.",
+    "aiMissingApiKey": "OpenRouter API key is missing. Add VITE_OPENROUTER_API_KEY and try again."
   },
   "dashboard": {
     "welcome": "Welcome back, {{playerName}}",
@@ -150,11 +152,11 @@
       "errorLoadFirebase": "Failed to load game from Firebase."
     },
     "ai": {
-      "defaultDownloadText": "Preparing local AI model files...",
-      "downloading": "AI Model Download: {{progress}}% ({{detail}})",
+      "defaultConnectionText": "Connecting to OpenRouter...",
+      "connecting": "Connecting to OpenRouter AI ({{detail}})",
       "enabledInline": "AI Enabled",
-      "readyTitle": "AI Model Is Ready",
-      "readyBody": "The model finished downloading. Enable AI assistant now?",
+      "readyTitle": "AI Assistant Is Ready",
+      "readyBody": "The OpenRouter connection is ready. Enable AI assistant now?",
       "enableButton": "Enable AI",
       "laterButton": "Later",
       "interviewTitle": "Media Interview",
