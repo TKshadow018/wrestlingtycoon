@@ -39,7 +39,7 @@ function ManageTitlesModule() {
           .filter(Boolean)
         const holderLabel = holders.length > 0
           ? holders.map((holder) => holder.name).join(' & ')
-          : t('dashboard.titles.vacant', 'Vacant')
+          : t('dashboard.titles.vacant')
         const isDoublesTitle = title.division === 'doubles'
 
         return (
@@ -65,7 +65,7 @@ function ManageTitlesModule() {
                         }}
                       />
                     ) : (
-                      <div className={styles.noHolder}>{t('dashboard.titles.noHolder', 'No current holder')}</div>
+                      <div className={styles.noHolder}>{t('dashboard.titles.noHolder')}</div>
                     )}
                     <img src={title.image} alt={title.name} className={styles.titleImageOnHolder} loading="lazy" />
                   </div>
@@ -88,7 +88,7 @@ function ManageTitlesModule() {
                   }}
                 />
               ) : (
-                <div className={styles.noHolder}>{t('dashboard.titles.noHolder', 'No current holder')}</div>
+                <div className={styles.noHolder}>{t('dashboard.titles.noHolder')}</div>
               )}
               <img src={title.image} alt={title.name} className={styles.titleImage} loading="lazy" />
             </div>
@@ -101,7 +101,7 @@ function ManageTitlesModule() {
                 className={styles.historyButton}
                 onClick={() => setHistoryTitleId(title.titleId)}
               >
-                {t('dashboard.titles.historyButton', 'Holder History')}
+                {t('dashboard.titles.historyButton')}
               </button>
               <button
                 type="button"
@@ -116,7 +116,7 @@ function ManageTitlesModule() {
               <h4>{title.name}</h4>
               <p>{t('dashboard.titles.division', { division: title.division })}</p>
               <p>
-                {t('dashboard.titles.currentHolder', 'Current Holder: {{name}}', {
+                {t('dashboard.titles.currentHolder', {
                   name: holderLabel,
                 })}
               </p>
@@ -133,13 +133,13 @@ function ManageTitlesModule() {
             className={styles.historyPanel}
             role="dialog"
             aria-modal="true"
-            aria-label={t('dashboard.titles.historyTitle', 'Previous Holders')}
+            aria-label={t('dashboard.titles.historyTitle')}
             onClick={(event) => event.stopPropagation()}
           >
             <div className={styles.historyHeader}>
-              <h4>{t('dashboard.titles.historyTitle', 'Previous Holders')}</h4>
+              <h4>{t('dashboard.titles.historyTitle')}</h4>
               <button type="button" onClick={() => setHistoryTitleId(null)}>
-                {t('dashboard.titles.closeHistory', 'Close')}
+                {t('dashboard.titles.closeHistory')}
               </button>
             </div>
 
@@ -181,7 +181,7 @@ function ManageTitlesModule() {
                         ))}
                       </div>
                       <p>
-                        {t('dashboard.titles.daysHeld', 'Days held: {{days}}', {
+                        {t('dashboard.titles.daysHeld', {
                           days: Number(entry.daysHeld) || 0,
                         })}
                       </p>
@@ -190,7 +190,7 @@ function ManageTitlesModule() {
                 })}
               </div>
             ) : (
-              <p className={styles.historyEmpty}>{t('dashboard.titles.noHistory', 'No previous holders yet.')}</p>
+              <p className={styles.historyEmpty}>{t('dashboard.titles.noHistory')}</p>
             )}
           </aside>
         </div>

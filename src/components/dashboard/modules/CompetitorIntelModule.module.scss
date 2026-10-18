@@ -159,6 +159,72 @@
   }
 }
 
+.championSection,
+.rivalEvent,
+.rivalRosterDetails {
+  border-top: 1px solid var(--line-soft);
+  display: grid;
+  gap: 0.45rem;
+  padding-top: 0.55rem;
+
+  h5,
+  p {
+    margin: 0;
+  }
+
+  h5 {
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+.championList,
+.matchList,
+.rivalRosterList {
+  display: grid;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: grid;
+    gap: 0.16rem;
+  }
+
+  strong {
+    color: var(--text-main);
+    font-size: 0.8rem;
+  }
+
+  span {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  small {
+    color: var(--text-faint);
+    font-size: 0.72rem;
+  }
+}
+
+.rivalEvent > p,
+.championChange {
+  color: var(--text-faint);
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.rivalRosterDetails summary {
+  color: var(--accent-copper);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  list-style-position: inside;
+}
+
 .competitorLogo {
   background: rgba(4, 8, 14, 0.8);
   border: 1px solid var(--line-soft);

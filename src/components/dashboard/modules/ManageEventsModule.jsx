@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
 import { getGameDayDifference, parseGameDate } from '../../../utils/gameCalendar'
 import EventCreateModal from './EventCreateModal'
@@ -46,6 +47,7 @@ const getScheduledWeekFromSpecificDate = (specificDate, currentGameDay, startDat
 }
 
 function ManageEventsModule() {
+  const { t } = useTranslation()
   const day = useGameStore((state) => state.calendar.day)
   const week = useGameStore((state) => state.calendar.week)
   const startDateIso = useGameStore((state) => state.calendar.startDateIso)
@@ -112,13 +114,16 @@ function ManageEventsModule() {
   }
 
   const recentEvents = [...(eventLog || [])].reverse().slice(0, 5)
+  const lastOutcomeEventName = lastOutcome?.eventId === 'regular-weekly-event'
+    ? t('dashboard.eventTypes.regularWeekly')
+    : lastOutcome?.eventName || t('dashboard.eventTypes.unknown')
 
   return (
     <section className={styles.moduleBody}>
       <div className={styles.headerSection}>
-        <h3>Events Calendar</h3>
+        <h3>{t('dashboard.events.calendarTitle')}</h3>
         <button className={styles.createButton} onClick={handleOpenModal}>
-          + Create Event
+          {t('dashboard.events.createEventButton')}
         </button>
       </div>
 
@@ -132,32 +137,36 @@ function ManageEventsModule() {
 
       {lastOutcome ? (
         <article className={styles.outcomeCard}>
-          <p>Latest Event Outcome</p>
-          <h4>{lastOutcome.type === 'success' ? `${lastOutcome.eventName} delivered a strong show` : 'No event outcome available'}</h4>
+          <p>{t('dashboard.events.lastOutcome')}</p>
+          <h4>
+            {lastOutcome.type === 'success'
+              ? t('dashboard.events.outcomeSuccess', { eventName: lastOutcomeEventName })
+              : t('dashboard.events.outcomeUnavailable')}
+          </h4>
 
           {lastOutcome.audience != null && (
             <div className={styles.outcomeRow}>
-              <span>Audience</span>
-              <span>{lastOutcome.audience.toLocaleString()} attendees</span>
+              <span>{t('dashboard.events.audience')}</span>
+              <span>{t('dashboard.events.audienceAttendance', { count: lastOutcome.audience.toLocaleString() })}</span>
             </div>
           )}
 
           {lastOutcome.overallRating != null && (
             <div className={styles.outcomeRow}>
-              <span>Overall Rating</span>
+              <span>{t('dashboard.events.overallRating')}</span>
               <span>★ {lastOutcome.overallRating} / 10</span>
             </div>
           )}
 
           <div className={styles.outcomeRow}>
-            <span>Fans</span>
+            <span>{t('dashboard.eventResults.fans')}</span>
             <span className={lastOutcome.fanDelta >= 0 ? styles.positive : styles.negative}>
               {lastOutcome.fanDelta >= 0 ? '+' : ''}{lastOutcome.fanDelta}
             </span>
           </div>
 
           <div className={styles.outcomeRow}>
-            <span>Prestige</span>
+            <span>{t('dashboard.eventResults.prestige')}</span>
             <span className={lastOutcome.prestigeDelta >= 0 ? styles.positive : styles.negative}>
               {lastOutcome.prestigeDelta >= 0 ? '+' : ''}{lastOutcome.prestigeDelta}
             </span>
@@ -165,31 +174,31 @@ function ManageEventsModule() {
 
           {lastOutcome.incomeBreakdown && (
             <div className={styles.breakdownSection}>
-              <p className={styles.breakdownTitle}>Day Earnings Breakdown</p>
+              <p className={styles.breakdownTitle}>{t('dashboard.events.dayEarningsBreakdown')}</p>
               <div className={styles.outcomeRow}>
-                <span>Event Gate</span>
+                <span>{t('dashboard.events.eventGate')}</span>
                 <span className={styles.positive}>+$ {(lastOutcome.incomeBreakdown.eventGate || 0).toLocaleString()}</span>
               </div>
               <div className={styles.outcomeRow}>
-                <span>Merchandise</span>
+                <span>{t('dashboard.events.merchandise')}</span>
                 <span className={styles.positive}>+$ {(lastOutcome.incomeBreakdown.merchandise || 0).toLocaleString()}</span>
               </div>
               <div className={styles.outcomeRow}>
-                <span>Sponsor</span>
+                <span>{t('dashboard.events.sponsorRevenue')}</span>
                 <span className={styles.positive}>+$ {(lastOutcome.incomeBreakdown.sponsor || 0).toLocaleString()}</span>
               </div>
               <div className={styles.outcomeRow}>
-                <span>Web Subscriptions</span>
+                <span>{t('dashboard.events.webSubscriptions')}</span>
                 <span className={styles.positive}>+$ {(lastOutcome.incomeBreakdown.webSubscription || 0).toLocaleString()}</span>
               </div>
               {(lastOutcome.incomeBreakdown.thirdParty || 0) > 0 && (
                 <div className={styles.outcomeRow}>
-                  <span>3rd Party</span>
+                  <span>{t('dashboard.events.thirdParty')}</span>
                   <span className={styles.positive}>+$ {lastOutcome.incomeBreakdown.thirdParty.toLocaleString()}</span>
                 </div>
               )}
               <div className={`${styles.outcomeRow} ${styles.outcomeTotal}`}>
-                <span>Total Income</span>
+                <span>{t('dashboard.events.totalIncome')}</span>
                 <span className={styles.positive}>$ {(lastOutcome.totalDayIncome || 0).toLocaleString()}</span>
               </div>
             </div>
@@ -197,29 +206,29 @@ function ManageEventsModule() {
 
           {lastOutcome.expenseBreakdown && (
             <div className={styles.breakdownSection}>
-              <p className={styles.breakdownTitle}>Day Cost Breakdown</p>
+              <p className={styles.breakdownTitle}>{t('dashboard.events.dayCostBreakdown')}</p>
               <div className={styles.outcomeRow}>
-                <span>Event Cost</span>
+                <span>{t('dashboard.events.eventCost')}</span>
                 <span className={styles.negative}>-$ {(lastOutcome.expenseBreakdown.eventCost || 0).toLocaleString()}</span>
               </div>
               <div className={styles.outcomeRow}>
-                <span>Wrestler Payroll</span>
+                <span>{t('dashboard.events.wrestlerPayroll')}</span>
                 <span className={styles.negative}>-$ {(lastOutcome.expenseBreakdown.wrestlerPayroll || 0).toLocaleString()}</span>
               </div>
               <div className={styles.outcomeRow}>
-                <span>Staff Cost</span>
+                <span>{t('dashboard.events.staffCost')}</span>
                 <span className={styles.negative}>-$ {(lastOutcome.expenseBreakdown.staffCost || 0).toLocaleString()}</span>
               </div>
               <div className={styles.outcomeRow}>
-                <span>Operating Cost</span>
+                <span>{t('dashboard.events.operatingCost')}</span>
                 <span className={styles.negative}>-$ {(lastOutcome.expenseBreakdown.operatingCost || 0).toLocaleString()}</span>
               </div>
               <div className={styles.outcomeRow}>
-                <span>Other Cost</span>
+                <span>{t('dashboard.events.otherCost')}</span>
                 <span className={styles.negative}>-$ {(lastOutcome.expenseBreakdown.otherCost || 0).toLocaleString()}</span>
               </div>
               <div className={`${styles.outcomeRow} ${styles.outcomeTotal}`}>
-                <span>Total Expenses</span>
+                <span>{t('dashboard.events.totalExpenses')}</span>
                 <span className={styles.negative}>$ {(lastOutcome.totalDayExpenses || 0).toLocaleString()}</span>
               </div>
             </div>
@@ -227,10 +236,16 @@ function ManageEventsModule() {
 
           {lastOutcome.setup && (
             <div className={styles.breakdownSection}>
-              <p className={styles.breakdownTitle}>Participation ({lastOutcome.setup.uniqueParticipants} unique)</p>
+              <p className={styles.breakdownTitle}>
+                {t('dashboard.events.participation', { count: lastOutcome.setup.uniqueParticipants })}
+              </p>
               {lastOutcome.setup.segments.map((seg, i) => (
                 <div key={i} className={styles.outcomeRow}>
-                  <span className={styles.segType}>{seg.segmentType}</span>
+                  <span className={styles.segType}>
+                    {t(`dashboard.segments.${seg.segmentType}`, {
+                      defaultValue: t('dashboard.segments.unknown'),
+                    })}
+                  </span>
                   <span>{seg.participants.join(', ') || '—'}</span>
                 </div>
               ))}
@@ -241,7 +256,9 @@ function ManageEventsModule() {
 
       {recentEvents.length > 0 ? (
         <section className={styles.recentHistorySection}>
-          <h4 className={styles.recentHistoryTitle}>Recent 5 Event Histories</h4>
+          <h4 className={styles.recentHistoryTitle}>
+            {t('dashboard.events.recentHistoryTitle', { count: recentEvents.length })}
+          </h4>
           <div className={styles.recentHistoryList}>
             {recentEvents.map((event) => (
               <article key={event.id} className={styles.recentEventCard}>
@@ -254,7 +271,11 @@ function ManageEventsModule() {
                   <div className={styles.recentSegmentList}>
                     {event.segments.map((segment, index) => (
                       <div key={`${event.id}-segment-${index}`} className={styles.recentSegmentCard}>
-                        <p className={styles.recentSegmentType}>{segment.segmentType}</p>
+                        <p className={styles.recentSegmentType}>
+                          {t(`dashboard.segments.${segment.segmentType}`, {
+                            defaultValue: t('dashboard.segments.unknown'),
+                          })}
+                        </p>
                         {Array.isArray(segment.participantDetails) && segment.participantDetails.length > 0 ? (
                           <div className={styles.recentParticipantsGrid}>
                             {segment.participantDetails.map((participant) => (
@@ -278,13 +299,13 @@ function ManageEventsModule() {
                             ))}
                           </div>
                         ) : (
-                          <p className={styles.recentNoParticipants}>No participants recorded.</p>
+                          <p className={styles.recentNoParticipants}>{t('dashboard.events.noParticipantsRecorded')}</p>
                         )}
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className={styles.recentNoParticipants}>No segments recorded.</p>
+                  <p className={styles.recentNoParticipants}>{t('dashboard.events.noSegmentsRecorded')}</p>
                 )}
               </article>
             ))}

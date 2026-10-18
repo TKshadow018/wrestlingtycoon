@@ -5,8 +5,8 @@ import { getGameDateFromDay, parseGameDate } from '../../../utils/gameCalendar'
 import { getBoardMeetingImageUrl } from '../../../utils/boardMeetingVisuals'
 import styles from './EventCalendar.module.scss'
 
-const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const monthKeys = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
+const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
 // Build calendar grid for given month/year
 const buildCalendarGrid = (month, year) => {
@@ -82,7 +82,7 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
         eventMap[d] = eventMap[d] || []
         eventMap[d].push({
           id: `regular-weekly-event-${viewYear}-${viewMonth}-${d}`,
-          name: regularWeeklyEvent.name,
+          name: t('dashboard.eventTypes.regularWeekly'),
           type: regularWeeklyEvent.type,
           isSystem: true,
           maxMatches: regularWeeklyEvent.maxMatches,
@@ -197,24 +197,24 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
   return (
     <div className={styles.calendarContainer}>
       <div className={styles.calendarHeader}>
-        <button className={styles.navButton} onClick={handlePrevMonth} aria-label="Previous month">
-          ← Previous
+        <button className={styles.navButton} onClick={handlePrevMonth} aria-label={t('dashboard.accessibility.previousMonth')}>
+          ← {t('dashboard.calendar.previous')}
         </button>
         <div className={styles.monthYearDisplay}>
           <h3>
-            {monthNames[viewMonth - 1]} {viewYear}
+            {t(`dashboard.calendar.months.${monthKeys[viewMonth - 1]}`)} {viewYear}
           </h3>
           <p className={styles.currentDay}>{formatGameDateFromDay(startDateIso, gameDay)}</p>
         </div>
-        <button className={styles.navButton} onClick={handleNextMonth} aria-label="Next month">
-          Next →
+        <button className={styles.navButton} onClick={handleNextMonth} aria-label={t('dashboard.accessibility.nextMonth')}>
+          {t('dashboard.calendar.next')} →
         </button>
       </div>
 
       <div className={styles.weekDayLabels}>
-        {dayNames.map((dayName) => (
-          <div key={dayName} className={styles.dayLabel}>
-            {dayName}
+        {dayKeys.map((dayKey) => (
+          <div key={dayKey} className={styles.dayLabel}>
+            {t(`dashboard.calendar.weekdaysShort.${dayKey}`)}
           </div>
         ))}
       </div>
@@ -260,7 +260,7 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
                                 clickEvent.stopPropagation()
                                 onDaySelect?.({ mode: 'edit', event: displayEvent })
                               }}
-                              title={`Edit ${displayEvent.name}`}
+                              title={t('dashboard.accessibility.editEvent', { name: displayEvent.name })}
                             >
                               <img className={styles.eventPosterImage} src={displayEventImageUrl} alt={displayEvent.name} />
                             </button>
@@ -272,7 +272,7 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
                                 clickEvent.stopPropagation()
                                 onDaySelect?.({ mode: 'edit', event: displayEvent })
                               }}
-                              title={`Edit ${displayEvent.name}`}
+                              title={t('dashboard.accessibility.editEvent', { name: displayEvent.name })}
                             >
                               <span className={styles.eventName}>{displayEvent.name}</span>
                               {displayEvent.isRecurring && <span className={styles.recurring}>↻</span>}
@@ -297,7 +297,7 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
       <div className={styles.eventLegend}>
         <div className={styles.legendItem}>
           <div className={`${styles.legendColor} ${styles.regularWeekly}`}></div>
-          <span>Regular Weekly Event (Fridays)</span>
+          <span>{t('dashboard.eventTypes.regularWeeklyLegend')}</span>
         </div>
         <div className={styles.legendItem}>
           <div className={`${styles.legendColor} ${styles.custom}`}></div>

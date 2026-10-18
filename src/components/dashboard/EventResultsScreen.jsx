@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import venueCatalog from '../../data/venue.json'
 import { getCareerArcUnlockItem } from '../../data/careerArcUnlocks'
+import { localizeCompetitorHeadline } from '../../utils/competitorNews'
 import styles from './EventResultsScreen.module.scss'
 
 const FEMALE_FALLBACK = '/people/girl.png'
@@ -9,23 +10,23 @@ const MALE_FALLBACK = '/people/boy.png'
 
 const getFallbackImage = (gender) => (gender === 'female' ? FEMALE_FALLBACK : MALE_FALLBACK)
 
-const SEGMENT_TYPE_LABELS = {
-  match: 'Match',
-  mainEvent: 'Main Event',
-  titleMatch: 'Title Match',
-  interview: 'Interview',
-  promo: 'Promo Segment',
+const SEGMENT_TYPE_KEYS = {
+  match: 'dashboard.segments.match',
+  mainEvent: 'dashboard.segments.mainEvent',
+  titleMatch: 'dashboard.segments.titleMatch',
+  interview: 'dashboard.segments.interview',
+  promo: 'dashboard.segments.promo',
 }
 
 const MATCH_SEGMENT_TYPES = new Set(['match', 'mainEvent', 'titleMatch'])
 
-const EVENT_TYPE_LABELS = {
-  ppv: 'Pay-Per-View',
-  megaLive: 'Mega Live Event',
-  oneTime: 'Special Event',
-  regularWeekly: 'Weekly Show',
-  houseShow: 'House Show',
-  digitalOnly: 'Digital Only',
+const EVENT_TYPE_KEYS = {
+  ppv: 'dashboard.eventTypes.ppv',
+  megaLive: 'dashboard.eventTypes.megaLive',
+  oneTime: 'dashboard.eventTypes.oneTime',
+  regularWeekly: 'dashboard.eventTypes.regularWeekly',
+  houseShow: 'dashboard.eventTypes.houseShow',
+  digitalOnly: 'dashboard.eventTypes.digitalOnly',
 }
 
 function getRatingColor(rating) {
@@ -38,15 +39,21 @@ function getRatingColor(rating) {
   return '#b04040'
 }
 
-function getRatingLabel(rating) {
+function getRatingLabel(rating, t) {
   if (!Number.isFinite(Number(rating))) return '—'
   const r = Number(rating)
-  if (r >= 9) return 'Classic'
-  if (r >= 8) return 'Excellent'
-  if (r >= 7) return 'Good'
-  if (r >= 5.5) return 'Average'
-  if (r >= 4) return 'Below Average'
-  return 'Poor'
+  const labelKey = r >= 9
+    ? 'classic'
+    : r >= 8
+      ? 'excellent'
+      : r >= 7
+        ? 'good'
+        : r >= 5.5
+          ? 'average'
+          : r >= 4
+            ? 'belowAverage'
+            : 'poor'
+  return t(`dashboard.eventResults.ratingLabels.${labelKey}`)
 }
 
 function RatingStars({ rating }) {
@@ -73,7 +80,7 @@ function formatSignedValue(value, isMoney = false) {
   return numeric > 0 ? `+${abs}` : `-${abs}`
 }
 
-function PostmortemFactor({ factor, isMoney = false }) {
+function PostmortemFactor({ factor, isMoney = false, t }) {
   const impactClass = factor?.impact === 'positive'
     ? styles.factorPositive
     : factor?.impact === 'negative'
@@ -82,7 +89,12 @@ function PostmortemFactor({ factor, isMoney = false }) {
 
   return (
     <li className={styles.factorItem}>
-      <span className={styles.factorLabel}>{factor.label}</span>
+      <span className={styles.factorLabel}>
+        {t(factor?.labelKey || 'dashboard.eventResults.postmortemFactors.unknown', {
+          ...factor?.labelValues,
+          rating: factor?.labelValues?.rating ?? t('dashboard.eventResults.notAvailable'),
+        })}
+      </span>
       <span className={`${styles.factorValue} ${impactClass}`}>
         {formatSignedValue(factor.value, isMoney)}
       </span>
@@ -90,14 +102,20 @@ function PostmortemFactor({ factor, isMoney = false }) {
   )
 }
 
-function getSatisfactionLabel(value) {
+function getSatisfactionLabel(value, t) {
   const numeric = Number(value)
-  if (!Number.isFinite(numeric)) return 'Unknown'
-  if (numeric >= 80) return 'Very Hot'
-  if (numeric >= 65) return 'Hot'
-  if (numeric >= 50) return 'Mixed+'
-  if (numeric >= 35) return 'Mixed'
-  return 'Cold'
+  const labelKey = !Number.isFinite(numeric)
+    ? 'unknown'
+    : numeric >= 80
+      ? 'veryHot'
+      : numeric >= 65
+        ? 'hot'
+        : numeric >= 50
+          ? 'mixedPositive'
+          : numeric >= 35
+            ? 'mixed'
+            : 'cold'
+  return t(`dashboard.eventResults.satisfactionLabels.${labelKey}`)
 }
 
 function formatPromoAdjustment({ segment, t }) {
@@ -111,31 +129,17 @@ function formatPromoAdjustment({ segment, t }) {
 
   if (segment.promoRatingAdjustmentType === 'bonus') {
     if (segment?.promoRatingCapHit && (!hasDelta || delta <= 0)) {
-      return t(
-        'dashboard.eventResults.promoBonusCapped',
-        'Promoted match bonus applied (rating cap reached).',
-      )
+      return t('dashboard.eventResults.promoBonusCapped')
     }
 
-    return t(
-      'dashboard.eventResults.promoBonusApplied',
-      '+{{delta}} promoted match bonus',
-      { delta: absDelta },
-    )
+    return t('dashboard.eventResults.promoBonusApplied', { delta: absDelta })
   }
 
   if (segment?.promoRatingCapHit && (!hasDelta || delta >= 0)) {
-    return t(
-      'dashboard.eventResults.promoPenaltyCapped',
-      'Promoted-match penalty applied (rating floor reached).',
-    )
+    return t('dashboard.eventResults.promoPenaltyCapped')
   }
 
-  return t(
-    'dashboard.eventResults.promoPenaltyApplied',
-    '-{{delta}} promoted-match penalty',
-    { delta: absDelta },
-  )
+  return t('dashboard.eventResults.promoPenaltyApplied', { delta: absDelta })
 }
 
 function WrestlerChip({ person, isWinner }) {
@@ -171,8 +175,10 @@ function SegmentCard({ segment, index, visible, t }) {
     ? Math.round(wrestlers.reduce((s, w) => s + (Number(w.popularity) || 0), 0) / wrestlers.length)
     : null
   const segmentLabel = segment.segmentType === 'promo' && segment.promoSegmentId
-    ? t(`dashboard.events.setup.promoSegments.${segment.promoSegmentId}`, SEGMENT_TYPE_LABELS.promo)
-    : SEGMENT_TYPE_LABELS[segment.segmentType] || segment.segmentType
+    ? t(`dashboard.events.setup.promoSegments.${segment.promoSegmentId}`, {
+        defaultValue: t('dashboard.segments.promo'),
+      })
+    : t(SEGMENT_TYPE_KEYS[segment.segmentType] || 'dashboard.segments.unknown')
   const promoAdjustmentText = isMatch ? formatPromoAdjustment({ segment, t }) : null
   const promoAdjustmentType = segment?.promoRatingAdjustmentType
 
@@ -185,18 +191,18 @@ function SegmentCard({ segment, index, visible, t }) {
         <span className={styles.segIndex}>#{index + 1}</span>
         <span className={styles.segType}>{segmentLabel}</span>
         {isMatch && segment.matchType === 'tagTeam' && (
-          <span className={styles.segSubtype}>Tag Team</span>
+          <span className={styles.segSubtype}>{t('dashboard.eventResults.tagTeam')}</span>
         )}
         {isMatch && Number(segment.chemistryRatingAdjustment) !== 0 && (
           <span className={styles.segSubtype}>
-            {t('dashboard.eventResults.backstageChemistry', 'Backstage chemistry {{value}}', {
+            {t('dashboard.eventResults.backstageChemistry', {
               value: formatSignedValue(segment.chemistryRatingAdjustment),
             })}
           </span>
         )}
         {isMatch && segment.winnerName && (
           <span className={styles.winnerLabel}>
-            Winner: <strong>{segment.winnerName}</strong>
+            {t('dashboard.eventResults.winner')} <strong>{segment.winnerName}</strong>
           </span>
         )}
       </div>
@@ -218,10 +224,10 @@ function SegmentCard({ segment, index, visible, t }) {
           <div className={styles.segStats}>
             {Number.isFinite(Number(segment.matchRating)) && (
               <div className={styles.statBlock}>
-                <span className={styles.statLabel}>Match Rating</span>
+                <span className={styles.statLabel}>{t('dashboard.eventResults.matchRating')}</span>
                 <span className={styles.statValue} style={{ color: getRatingColor(segment.matchRating) }}>
                   {Number(segment.matchRating).toFixed(1)}
-                  <span className={styles.ratingDesc}> — {getRatingLabel(segment.matchRating)}</span>
+                  <span className={styles.ratingDesc}> — {getRatingLabel(segment.matchRating, t)}</span>
                 </span>
                 <RatingStars rating={segment.matchRating} />
                 {promoAdjustmentText && (
@@ -239,7 +245,7 @@ function SegmentCard({ segment, index, visible, t }) {
             )}
             {avgPop !== null && (
               <div className={styles.statBlock}>
-                <span className={styles.statLabel}>Avg. Popularity</span>
+                <span className={styles.statLabel}>{t('dashboard.eventResults.averagePopularity')}</span>
                 <span className={styles.statValue}>{avgPop}</span>
               </div>
             )}
@@ -287,7 +293,10 @@ function EventResultsScreen({ outcome, onContinue }) {
     competitorPressure,
   } = outcome
 
-  const eventTypeLabel = EVENT_TYPE_LABELS[eventType] || 'Event'
+  const eventTypeLabel = t(EVENT_TYPE_KEYS[eventType] || 'dashboard.eventTypes.unknown')
+  const displayEventName = outcome.eventId === 'regular-weekly-event'
+    ? eventTypeLabel
+    : eventName || t('dashboard.eventResults.defaultName')
   const venue = venueCatalog.find((entry) => entry.id === venueId)
     || (outcome.venueName ? { name: outcome.venueName, location: outcome.venueLocation } : null)
   const promoStyle = promoStyleId ? getCareerArcUnlockItem('promoStyles', promoStyleId) : null
@@ -314,19 +323,19 @@ function EventResultsScreen({ outcome, onContinue }) {
         </div>
 
         <h1 className={`${styles.eventName} ${visible ? styles.animate2 : ''}`}>
-          {eventName || t('dashboard.eventResults.defaultName', 'Event Results')}
+          {displayEventName}
         </h1>
         {(venue || (promoStyle && promoStyle.id !== 'spotlight')) && (
           <p className={styles.eventMeta}>
             {venue
-              ? t('dashboard.eventResults.eventVenue', 'Venue: {{venue}} · {{location}}', {
+              ? t('dashboard.eventResults.eventVenue', {
                   venue: venue.name,
                   location: venue.location,
                 })
               : ''}
             {venue && promoStyle?.id !== 'spotlight' ? ' · ' : ''}
             {promoStyle && promoStyle.id !== 'spotlight'
-              ? t('dashboard.eventResults.promoCampaign', 'Campaign: {{name}}', {
+              ? t('dashboard.eventResults.promoCampaign', {
                   name: t(promoStyle.labelKey),
                 })
               : ''}
@@ -339,38 +348,38 @@ function EventResultsScreen({ outcome, onContinue }) {
         <div className={`${styles.summaryRow} ${visible ? styles.animate3 : ''}`}>
           {overallRating !== null && overallRating !== undefined && (
             <div className={styles.summaryBlock}>
-              <span className={styles.summaryLabel}>{t('dashboard.eventResults.overallRating', 'Event Rating')}</span>
+              <span className={styles.summaryLabel}>{t('dashboard.eventResults.overallRating')}</span>
               <span className={styles.summaryBig} style={{ color: getRatingColor(overallRating) }}>
                 {overallRating.toFixed(1)}
               </span>
-              <span className={styles.summaryDesc}>{getRatingLabel(overallRating)}</span>
+              <span className={styles.summaryDesc}>{getRatingLabel(overallRating, t)}</span>
               <RatingStars rating={overallRating} />
             </div>
           )}
           {hype !== undefined && (
             <div className={styles.summaryBlock}>
-              <span className={styles.summaryLabel}>{t('dashboard.eventResults.hype', 'Event Hype')}</span>
+              <span className={styles.summaryLabel}>{t('dashboard.eventResults.hype')}</span>
               <span className={styles.summaryBig}>{hype}</span>
             </div>
           )}
           <div className={styles.summaryBlock}>
-            <span className={styles.summaryLabel}>{t('dashboard.eventResults.matches', 'Matches')}</span>
+            <span className={styles.summaryLabel}>{t('dashboard.eventResults.matches')}</span>
             <span className={styles.summaryBig}>{matchSegs.length}</span>
           </div>
           <div className={`${styles.summaryBlock} ${prestigeDelta > 0 ? styles.positive : prestigeDelta < 0 ? styles.negative : ''}`}>
-            <span className={styles.summaryLabel}>{t('dashboard.eventResults.prestige', 'Prestige')}</span>
+            <span className={styles.summaryLabel}>{t('dashboard.eventResults.prestige')}</span>
             <span className={styles.summaryBig}>
               {prestigeDelta > 0 ? `+${prestigeDelta}` : prestigeDelta < 0 ? `${prestigeDelta}` : '±0'}
             </span>
           </div>
           <div className={`${styles.summaryBlock} ${fanDelta > 0 ? styles.positive : fanDelta < 0 ? styles.negative : ''}`}>
-            <span className={styles.summaryLabel}>{t('dashboard.eventResults.fans', 'Fans')}</span>
+            <span className={styles.summaryLabel}>{t('dashboard.eventResults.fans')}</span>
             <span className={styles.summaryBig}>
               {fanDelta > 0 ? `+${fanDelta.toLocaleString()}` : fanDelta?.toLocaleString()}
             </span>
           </div>
           <div className={`${styles.summaryBlock} ${net > 0 ? styles.positive : net < 0 ? styles.negative : ''}`}>
-            <span className={styles.summaryLabel}>{t('dashboard.eventResults.revenue', 'Event Revenue')}</span>
+            <span className={styles.summaryLabel}>{t('dashboard.eventResults.revenue')}</span>
             <span className={styles.summaryBig}>
               {net > 0 ? `+$${net.toLocaleString()}` : `-$${Math.abs(net).toLocaleString()}`}
             </span>
@@ -386,7 +395,7 @@ function EventResultsScreen({ outcome, onContinue }) {
             />
             <div className={styles.boardAttendanceCopy}>
               <p className={styles.boardAttendanceLabel}>
-                {t('dashboard.eventResults.boardMemberPresent', 'Board Member in Attendance')}
+                {t('dashboard.eventResults.boardMemberPresent')}
               </p>
               <h2>{boardAttendance.personName}</h2>
               <p>{boardAttendance.role}</p>
@@ -404,52 +413,58 @@ function EventResultsScreen({ outcome, onContinue }) {
 
         {(postmortem || rivalryHighlights.length > 0 || factionStories.length > 0 || competitorPressure) && (
           <section className={`${styles.postmortemSection} ${visible ? styles.animate4 : ''}`}>
-            <p className={styles.sectionLabel}>{t('dashboard.eventResults.postmortemTitle', 'Why This Happened')}</p>
+            <p className={styles.sectionLabel}>{t('dashboard.eventResults.postmortemTitle')}</p>
 
             <div className={styles.postmortemGrid}>
               <article className={styles.postmortemCard}>
-                <h3>{t('dashboard.eventResults.postmortemFans', 'Fan Drivers')}</h3>
+                <h3>{t('dashboard.eventResults.postmortemFans')}</h3>
                 <ul>
                   {(postmortem?.fanFactors || []).map((factor) => (
-                    <PostmortemFactor key={`fan-${factor.key}`} factor={factor} />
+                    <PostmortemFactor key={`fan-${factor.key}`} factor={factor} t={t} />
                   ))}
                 </ul>
               </article>
 
               <article className={styles.postmortemCard}>
-                <h3>{t('dashboard.eventResults.postmortemPrestige', 'Prestige Drivers')}</h3>
+                <h3>{t('dashboard.eventResults.postmortemPrestige')}</h3>
                 <ul>
                   {(postmortem?.prestigeFactors || []).map((factor) => (
-                    <PostmortemFactor key={`prestige-${factor.key}`} factor={factor} />
+                    <PostmortemFactor key={`prestige-${factor.key}`} factor={factor} t={t} />
                   ))}
                 </ul>
               </article>
 
               <article className={styles.postmortemCard}>
-                <h3>{t('dashboard.eventResults.postmortemMoney', 'Money Drivers')}</h3>
+                <h3>{t('dashboard.eventResults.postmortemMoney')}</h3>
                 <ul>
                   {(postmortem?.moneyFactors || []).map((factor) => (
-                    <PostmortemFactor key={`money-${factor.key}`} factor={factor} isMoney />
+                    <PostmortemFactor key={`money-${factor.key}`} factor={factor} isMoney t={t} />
                   ))}
                 </ul>
               </article>
 
               {audienceSegments.length > 0 && (
                 <article className={styles.postmortemCard}>
-                  <h3>{t('dashboard.eventResults.audienceSegments', 'Audience Segments')}</h3>
+                  <h3>{t('dashboard.eventResults.audienceSegments')}</h3>
                   <ul>
                     {audienceSegments.map((segment) => (
                       <li key={segment.key} className={styles.audienceSegmentItem}>
                         <div className={styles.audienceSegmentMain}>
-                          <span className={styles.audienceSegmentLabel}>{segment.label}</span>
+                          <span className={styles.audienceSegmentLabel}>
+                            {t(segment.labelKey || `dashboard.eventResults.audienceSegmentLabels.${segment.key}`, {
+                              defaultValue: t('dashboard.eventResults.postmortemFactors.unknown'),
+                            })}
+                          </span>
                           <span className={styles.audienceSegmentAttendance}>
                             {Number(segment.attendance || 0).toLocaleString()} ({Number(segment.sharePercent || 0)}%)
                           </span>
                         </div>
                         <div className={styles.audienceSegmentMeta}>
-                          <span>{t('dashboard.eventResults.audienceSatisfaction', 'Satisfaction')}: {getSatisfactionLabel(segment.satisfaction)} ({segment.satisfaction})</span>
+                          <span>
+                            {t('dashboard.eventResults.audienceSatisfaction')}: {getSatisfactionLabel(segment.satisfaction, t)} ({segment.satisfaction})
+                          </span>
                           <span className={Number(segment.fanImpact || 0) >= 0 ? styles.factorPositive : styles.factorNegative}>
-                            {t('dashboard.eventResults.audienceFanImpact', 'Fan impact')}: {Number(segment.fanImpact || 0) >= 0 ? '+' : ''}{Number(segment.fanImpact || 0)}
+                            {t('dashboard.eventResults.audienceFanImpact')}: {Number(segment.fanImpact || 0) >= 0 ? '+' : ''}{Number(segment.fanImpact || 0)}
                           </span>
                         </div>
                       </li>
@@ -460,12 +475,12 @@ function EventResultsScreen({ outcome, onContinue }) {
 
               {(postmortem?.recommendations || []).length > 0 && (
                 <article className={styles.recommendationCard}>
-                  <h3>{t('dashboard.eventResults.recommendations.title', 'Actionable Recommendations')}</h3>
+                  <h3>{t('dashboard.eventResults.recommendations.title')}</h3>
                   <ul>
                     {postmortem.recommendations.map((recommendation) => {
                       const formatLabel = t(
                         `dashboard.events.setup.matchTypes.${recommendation.format}`,
-                        recommendation.format,
+                        { defaultValue: t('dashboard.segments.unknown') },
                       )
                       return (
                         <li key={recommendation.id}>
@@ -488,15 +503,15 @@ function EventResultsScreen({ outcome, onContinue }) {
 
             {rivalryHighlights.length > 0 && (
               <article className={styles.rivalryCard}>
-                <h3>{t('dashboard.eventResults.rivalryTitle', 'Rivalry Heat')}</h3>
+                <h3>{t('dashboard.eventResults.rivalryTitle')}</h3>
                 <ul className={styles.rivalryList}>
                   {rivalryHighlights.map((item) => (
                     <li key={item.pairKey} className={styles.rivalryItem}>
-                      <span className={styles.rivalryNames}>{item.names || t('dashboard.eventResults.rivalryUnknown', 'Unknown Rivalry')}</span>
+                      <span className={styles.rivalryNames}>{item.names || t('dashboard.eventResults.rivalryUnknown')}</span>
                       <span className={styles.rivalryHeat}>
-                        {t('dashboard.eventResults.rivalryGain', 'Heat +{{gain}}', { gain: item.gain })}
+                        {t('dashboard.eventResults.rivalryGain', { gain: item.gain })}
                         {' · '}
-                        {t('dashboard.eventResults.rivalryTotal', 'Total {{heat}}', { heat: item.heat })}
+                        {t('dashboard.eventResults.rivalryTotal', { heat: item.heat })}
                       </span>
                     </li>
                   ))}
@@ -531,16 +546,18 @@ function EventResultsScreen({ outcome, onContinue }) {
 
             {competitorPressure && (
               <article className={styles.rivalryCard}>
-                <h3>{t('dashboard.eventResults.competitorTitle', 'Competitor Pressure')}</h3>
+                <h3>{t('dashboard.eventResults.competitorTitle')}</h3>
                 <ul className={styles.rivalryList}>
                   <li className={styles.rivalryItem}>
-                    <span className={styles.rivalryNames}>{competitorPressure.headline}</span>
+                    <span className={styles.rivalryNames}>
+                      {localizeCompetitorHeadline(competitorPressure, t)}
+                    </span>
                     <span className={styles.rivalryHeat}>
-                      {t('dashboard.eventResults.competitorFans', 'Fans {{value}}', {
+                      {t('dashboard.eventResults.competitorFans', {
                         value: formatSignedValue(competitorPressure.fanImpact),
                       })}
                       {' · '}
-                      {t('dashboard.eventResults.competitorPrestige', 'Prestige {{value}}', {
+                      {t('dashboard.eventResults.competitorPrestige', {
                         value: formatSignedValue(competitorPressure.prestigeImpact),
                       })}
                     </span>
@@ -555,16 +572,16 @@ function EventResultsScreen({ outcome, onContinue }) {
         <div className={`${styles.segmentsSection} ${visible ? styles.animate4 : ''}`}>
           <div className={styles.segmentsSectionHeader}>
             <p className={styles.sectionLabel}>
-              {t('dashboard.eventResults.segmentsLabel', 'Segments')} ({segments.length})
+              {t('dashboard.eventResults.segmentsLabel')} ({segments.length})
             </p>
             {bestMatch && (
               <div className={styles.bestMatchBadge} style={{ borderColor: getRatingColor(bestMatch.seg.matchRating) }}>
                 <span className={styles.bestMatchCrown}>★</span>
                 <div className={styles.bestMatchInfo}>
-                  <span className={styles.bestMatchLabel}>Match of the Night</span>
+                  <span className={styles.bestMatchLabel}>{t('dashboard.eventResults.matchOfTheNight')}</span>
                   <span className={styles.bestMatchRating} style={{ color: getRatingColor(bestMatch.seg.matchRating) }}>
                     {Number(bestMatch.seg.matchRating).toFixed(1)}
-                    <em className={styles.bestMatchDesc}> — {getRatingLabel(bestMatch.seg.matchRating)}</em>
+                    <em className={styles.bestMatchDesc}> — {getRatingLabel(bestMatch.seg.matchRating, t)}</em>
                   </span>
                   <span className={styles.bestMatchName}>
                     {(bestMatch.seg.participantDetails || [])
@@ -586,7 +603,7 @@ function EventResultsScreen({ outcome, onContinue }) {
         {/* CTA */}
         <div className={`${styles.ctaRow} ${visible ? styles.animate5 : ''}`}>
           <button type="button" className={styles.continueBtn} onClick={onContinue}>
-            {t('dashboard.eventResults.continue', 'Continue')}
+            {t('dashboard.eventResults.continue')}
           </button>
         </div>
       </div>

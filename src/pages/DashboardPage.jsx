@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { FirebaseError } from 'firebase/app'
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
 import { buildInterviewTurnResult, createInterviewScenario } from '../ai/interviewService'
+import GameExitConfirmation from '../components/common/GameExitConfirmation'
 import LanguageSwitcher from '../components/common/LanguageSwitcher'
 import AiInterviewModal from '../components/dashboard/AiInterviewModal'
 import InterviewFocusModal from '../components/dashboard/InterviewFocusModal'
@@ -161,7 +162,7 @@ const getTodayEventProjection = ({ day, startDateIso, customEvents = [], sponsor
         ? {
             eventId: 'regular-weekly-event',
             type: 'regularWeekly',
-            name: 'Weekly TV Show',
+          name: '',
             maxMatches: 5,
             imageUrl: '',
             isCustomEvent: false,
@@ -378,7 +379,7 @@ function DashboardPage() {
       cash,
       fans,
       prestige,
-      upcomingEvent: bookedEvent?.name || 'No announced event',
+      upcomingEvent: bookedEvent?.name || '',
       newestEmployees,
       recentMatches,
       champions: activeTitles,
@@ -663,7 +664,9 @@ function DashboardPage() {
     setShowBoardMeetingIntro(false)
     const result = openBoardMeeting()
     if (!result.ok) {
-      setBoardMeetingError(t(`dashboard.boardMeeting.errors.${result.reason}`, 'Could not open Board Meeting.'))
+      setBoardMeetingError(t(`dashboard.boardMeeting.errors.${result.reason}`, {
+        defaultValue: t('dashboard.boardMeeting.errors.unknown'),
+      }))
     }
   }, [openBoardMeeting, t])
 
@@ -902,6 +905,7 @@ function DashboardPage() {
 
   return (
     <main className={styles.dashboard}>
+      <GameExitConfirmation />
       <input
         ref={fileInputRef}
         type="file"
@@ -1010,8 +1014,6 @@ function DashboardPage() {
         rejectionCounts={boardMeeting.rejectionCounts}
         boardPresidentName={boardMeeting.boardPresidentName}
         boardVicePresidentName={boardMeeting.boardVicePresidentName}
-        boardPresidentName={boardMeeting.boardPresidentName}
-        boardVicePresidentName={boardMeeting.boardVicePresidentName}
         managerName={profile.playerName}
         managerPhoto={
           profile.managerImageUrl
@@ -1087,7 +1089,6 @@ function DashboardPage() {
             startDateIso,
             ownerName: profile.ownerName,
             generalManagerName: profile.generalManagerName,
-            homeCountry: profile.homeCountry,
             competitorPressure: lastOutcome?.competitorPressure || null,
           }}
         />
@@ -1183,8 +1184,10 @@ function DashboardPage() {
             <EventSetupModal
               isOpen={isSetupModalOpen}
               eventConfig={{
-                eventName: todayEvent?.name || bookedEvent?.name || t('dashboard.events.bookedLabel', 'Booked Event'),
-                eventType: todayEvent?.type || bookedEvent?.type || 'regularWeekly',
+                eventName: todayEvent?.name
+                  || (bookedEvent?.eventId === 'regular-weekly-event' ? '' : bookedEvent?.name)
+                  || t(`dashboard.eventTypes.${todayEvent?.type || bookedEvent?.type || 'unknown'}`),
+                eventType: t(`dashboard.eventTypes.${todayEvent?.type || bookedEvent?.type || 'regularWeekly'}`),
                 totalSegments: todayEvent?.maxMatches || bookedEvent?.maxMatches || 1,
               }}
               employees={employees}

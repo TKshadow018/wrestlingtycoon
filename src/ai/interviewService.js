@@ -6,24 +6,19 @@ import {
   startAiModelDownload,
 } from './webllmManager'
 import {
-  CHAMPION_QUESTION_TEMPLATES,
-  FINANCE_QUESTION_TEMPLATES,
-  HIRE_QUESTION_TEMPLATES,
   JOURNALISTS,
-  MATCH_QUESTION_TEMPLATES,
   NEWSPAPERS,
-  UPCOMING_EVENT_QUESTION_TEMPLATES,
 } from './interviewData'
+import i18n from '../i18n'
 import {
   BRIDGE_SYSTEM_PROMPT_LINES,
   COUNTER_QUESTION_SYSTEM_PROMPT_LINES,
   EVALUATE_SYSTEM_PROMPT_LINES,
   BRIDGE_USER_INSTRUCTION,
-  FALLBACK_BRIDGE_REPLY,
-  FALLBACK_ACCEPT_REPLY,
 } from './interviewPrompts'
 
 const pickRandom = (items) => items[Math.floor(Math.random() * items.length)]
+const getTranslator = (t) => (typeof t === 'function' ? t : (key, options) => i18n.t(key, options))
 
 const stripCodeFence = (value) => {
   const text = String(value || '').trim()
@@ -76,7 +71,7 @@ const generateFollowUpBridgeReply = async ({ journalistName, newspaperName, user
     // Fall through to deterministic fallback.
   }
 
-  return t?.('dashboard.ai.bridgeFallback', FALLBACK_BRIDGE_REPLY) || FALLBACK_BRIDGE_REPLY
+  return getTranslator(t)('dashboard.ai.bridgeFallback')
 }
 
 const generateForcedCounterQuestion = async ({ journalistName, newspaperName, currentQuestion, userAnswer, transcript }) => {
@@ -123,33 +118,36 @@ const formatCurrency = (value) => {
   return `$${Math.round(numeric).toLocaleString('en-US')}`
 }
 
-const buildFactsFromContext = (context = {}) => {
+const buildFactsFromContext = (context = {}, t) => {
+  const translate = getTranslator(t)
   const newestEmployees = Array.isArray(context.newestEmployees) ? context.newestEmployees.filter(Boolean) : []
-  const latestHire = newestEmployees[0] || 'your latest recruit'
+  const latestHire = newestEmployees[0] || translate('dashboard.ai.interviewFacts.latestHire')
 
   const recentMatches = Array.isArray(context.recentMatches) ? context.recentMatches : []
   const latestMatch = recentMatches[0] || {}
   const latestMatchParticipants = Array.isArray(latestMatch.participants) && latestMatch.participants.length > 0
-    ? latestMatch.participants.join(' vs ')
-    : 'your recent top performers'
-  const latestMatchWinner = latestMatch.winner || 'no clear winner'
+    ? latestMatch.participants.join(` ${translate('dashboard.ai.interviewFacts.versus')} `)
+    : translate('dashboard.ai.interviewFacts.recentTopPerformers')
+  const latestMatchWinner = latestMatch.winner || translate('dashboard.ai.interviewFacts.noClearWinner')
   const latestMatchRating = Number.isFinite(Number(latestMatch.rating))
     ? Number(latestMatch.rating).toFixed(1)
-    : 'N/A'
+    : translate('dashboard.ai.interviewFacts.notAvailable')
 
   const champions = Array.isArray(context.champions) ? context.champions : []
-  const firstChampionRow = champions[0] || {}
-  const currentTitle = firstChampionRow.title || 'your top championship'
-  const currentChampion = Array.isArray(firstChampionRow.holders) && firstChampionRow.holders.length > 0
-    ? firstChampionRow.holders.join(' & ')
-    : 'your current champion'
+  const currentChampionRow = champions.find((champion) => (
+    Array.isArray(champion?.holders) && champion.holders.length > 0
+  )) || {}
+  const currentTitle = currentChampionRow.title || translate('dashboard.ai.interviewFacts.topChampionship')
+  const currentChampion = Array.isArray(currentChampionRow.holders) && currentChampionRow.holders.length > 0
+    ? currentChampionRow.holders.join(` ${translate('dashboard.ai.interviewFacts.holdersSeparator')} `)
+    : translate('dashboard.ai.interviewFacts.currentChampion')
 
   return {
     latestHire,
     secondLatestHire: newestEmployees[1] || latestHire,
     thirdLatestHire: newestEmployees[2] || latestHire,
-    companyName: context.companyName || 'your promotion',
-    upcomingEvent: context.upcomingEvent || 'your next event',
+    companyName: context.companyName || translate('dashboard.ai.interviewFacts.promotion'),
+    upcomingEvent: context.upcomingEvent || translate('dashboard.ai.interviewFacts.nextEvent'),
     cash: formatCurrency(context.cash),
     fans: Number(context.fans || 0).toLocaleString('en-US'),
     prestige: Number(context.prestige || 0).toLocaleString('en-US'),
@@ -163,38 +161,29 @@ const buildFactsFromContext = (context = {}) => {
   }
 }
 
-const hydrateTemplate = (template, facts) => {
-  return template.replace(/#\{([a-zA-Z0-9_]+)\}/g, (_, key) => {
-    const value = facts[key]
-    return value == null ? '' : String(value)
-  })
-}
-
-const selectInterviewQuestion = (context = {}, t = (_key, fallback) => fallback) => {
-  const facts = buildFactsFromContext(context)
+const selectInterviewQuestion = (context = {}, t) => {
+  const translate = getTranslator(t)
+  const facts = buildFactsFromContext(context, translate)
   const topics = []
-  if (Array.isArray(context.recentMatches) && context.recentMatches.length > 0) topics.push(['match', MATCH_QUESTION_TEMPLATES])
-  if (context.upcomingEvent && context.upcomingEvent !== 'No announced event') topics.push(['event', UPCOMING_EVENT_QUESTION_TEMPLATES])
-  if ((context.champions || []).some((champion) => champion?.holders?.length)) topics.push(['champion', CHAMPION_QUESTION_TEMPLATES])
-  if (Array.isArray(context.newestEmployees) && context.newestEmployees.length > 0) topics.push(['hire', HIRE_QUESTION_TEMPLATES])
-  if (Number.isFinite(Number(context.cash))) topics.push(['finance', FINANCE_QUESTION_TEMPLATES])
+  if (Array.isArray(context.recentMatches) && context.recentMatches.length > 0) topics.push('match')
+  if (context.upcomingEvent) topics.push('event')
+  if ((context.champions || []).some((champion) => champion?.holders?.length)) topics.push('champion')
+  if (Array.isArray(context.newestEmployees) && context.newestEmployees.length > 0) topics.push('hire')
+  if (Number.isFinite(Number(context.cash))) topics.push('finance')
 
   if (topics.length === 0) {
     return {
       topic: 'general',
-      question: t('dashboard.ai.genericQuestion', {}, 'What is your top priority for your promotion right now?'),
+      question: translate('dashboard.ai.genericQuestion'),
     }
   }
 
-  const [topic, templates] = topics[Math.floor(Math.random() * topics.length)]
-  const template = templates[Math.floor(Math.random() * templates.length)]
-  const localizedQuestionValue = t(`dashboard.ai.interviewQuestions.${topic}`, facts, '')
-  const localizedQuestion = typeof localizedQuestionValue === 'string' ? localizedQuestionValue : ''
-  const question = localizedQuestion
-    ? hydrateTemplate(localizedQuestion, facts)
-    : hydrateTemplate(template, facts)
-
-  return { topic, question }
+  const topic = topics[Math.floor(Math.random() * topics.length)]
+  const questionIndex = Math.floor(Math.random() * 30)
+  return {
+    topic,
+    question: translate(`dashboard.ai.interviewQuestions.${topic}.${questionIndex}`, facts),
+  }
 }
 
 const getEngine = async () => {
@@ -245,34 +234,30 @@ const completeText = async (messages, options = {}) => {
 }
 
 export const createInterviewScenario = async (context, { t } = {}) => {
-  const translate = (key, options, fallback) => t
-    ? t(key, { ...options, defaultValue: fallback })
-    : fallback
+  const translate = getTranslator(t)
   const journalistName = pickRandom(JOURNALISTS)
   const newspaperName = pickRandom(NEWSPAPERS)
   const featuredWrestlerName = String(context?.featuredWrestlerName || '').trim()
   const rivalWrestlerName = String(context?.rivalWrestlerName || '').trim()
   const firstQuestion = featuredWrestlerName
     ? rivalWrestlerName
-      ? translate('dashboard.ai.storyRivalQuestion', { featured: featuredWrestlerName, rival: rivalWrestlerName }, `How will ${featuredWrestlerName} respond to the challenge from ${rivalWrestlerName}?`)
-      : translate('dashboard.ai.storyQuestion', { featured: featuredWrestlerName }, `What direction are you planning for ${featuredWrestlerName}?`)
+      ? translate('dashboard.ai.storyRivalQuestion', { featured: featuredWrestlerName, rival: rivalWrestlerName })
+      : translate('dashboard.ai.storyQuestion', { featured: featuredWrestlerName })
     : null
   const selectedQuestion = featuredWrestlerName
     ? { topic: 'story', question: firstQuestion }
-    : selectInterviewQuestion(context, (key, facts, fallback) => (
-        t ? t(key, { ...facts, defaultValue: fallback }) : fallback
-      ))
+    : selectInterviewQuestion(context, translate)
 
   return {
     journalistName,
     newspaperName,
     situation: featuredWrestlerName
       ? rivalWrestlerName
-        ? translate('dashboard.ai.storyRivalSituation', { featured: featuredWrestlerName, rival: rivalWrestlerName }, `This interview is focused on ${featuredWrestlerName} and the rivalry with ${rivalWrestlerName}.`)
-        : translate('dashboard.ai.storySituation', { featured: featuredWrestlerName }, `This interview is focused on ${featuredWrestlerName}.`)
+        ? translate('dashboard.ai.storyRivalSituation', { featured: featuredWrestlerName, rival: rivalWrestlerName })
+        : translate('dashboard.ai.storySituation', { featured: featuredWrestlerName })
       : '',
     topic: selectedQuestion.topic,
-    questions: [selectedQuestion.question || t('dashboard.ai.genericQuestion', 'What is your top priority for your promotion right now?')],
+    questions: [selectedQuestion.question || translate('dashboard.ai.genericQuestion')],
   }
 }
 
@@ -286,6 +271,7 @@ export const evaluateInterviewAnswer = async ({
   forceCounter,
   t,
 }) => {
+  const translate = getTranslator(t)
   const messages = [
     {
       role: 'system',
@@ -312,7 +298,7 @@ export const evaluateInterviewAnswer = async ({
     let decision = forceCounter && allowCounter ? 'counter' : 'accept'
     let reply = typeof parsed?.reply === 'string' && parsed.reply.trim()
       ? parsed.reply.trim()
-      : (t?.('dashboard.ai.acceptFallback', FALLBACK_ACCEPT_REPLY) || FALLBACK_ACCEPT_REPLY)
+      : translate('dashboard.ai.acceptFallback')
     let counterQuestion = typeof parsed?.counterQuestion === 'string' ? parsed.counterQuestion.trim() : ''
 
     if (decision === 'counter' && !counterQuestion && looksLikeQuestion(reply)) {
@@ -328,7 +314,7 @@ export const evaluateInterviewAnswer = async ({
     }
 
     if (decision === 'accept' && looksLikeQuestion(reply)) {
-      reply = t?.('dashboard.ai.acceptFallback', FALLBACK_ACCEPT_REPLY) || FALLBACK_ACCEPT_REPLY
+      reply = translate('dashboard.ai.acceptFallback')
     }
 
     if (decision === 'counter' && !counterQuestion) {

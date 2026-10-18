@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   DEFAULT_CAREER_ARC_UNLOCKS,
   getCareerArcUnlockItem,
@@ -11,6 +12,7 @@ function EventCustomIntroScreen({
   durationMs = 2600,
   onComplete,
 }) {
+  const { t } = useTranslation()
   const [visible, setVisible] = useState(false)
   const presentation = getCareerArcUnlockItem('presentations', presentationId)
     || getCareerArcUnlockItem('presentations', DEFAULT_CAREER_ARC_UNLOCKS.presentations[0])
@@ -42,9 +44,9 @@ function EventCustomIntroScreen({
       <div className={styles.vignette} aria-hidden="true" />
       <div className={styles.scanlines} aria-hidden="true" />
       <div className={styles.content}>
-        <p className={styles.label}>Tonight's Special Event</p>
+        <p className={styles.label}>{t('dashboard.customEventIntro.title')}</p>
         <h2 className={styles.name}>{event.name}</h2>
-        <p className={styles.subline}>Get ready for a major custom event night.</p>
+        <p className={styles.subline}>{t('dashboard.customEventIntro.subtitle')}</p>
       </div>
     </div>
   )

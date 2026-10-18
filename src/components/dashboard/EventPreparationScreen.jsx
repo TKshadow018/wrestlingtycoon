@@ -153,7 +153,7 @@ function EventPreparationScreen({
         {/* ── Header ── */}
         <div className={styles.headerBlock}>
           <span className={styles.typeBadge}>
-            {t(`dashboard.eventPreparation.eventTypes.${eventType}`, event?.name || '')}
+            {t(`dashboard.eventPreparation.eventTypes.${eventType}`)}
           </span>
           <h1 className={styles.pageTitle}>{t('dashboard.eventPreparation.title')}</h1>
           <p className={styles.eventName}>{event?.name}</p>
@@ -178,7 +178,7 @@ function EventPreparationScreen({
                 <div className={styles.selectedVenueBar}>
                   <span className={styles.selectedVenueName}>{selectedVenue.name}</span>
                   <span className={styles.selectedVenueMeta}>
-                    {selectedVenue.location} · {selectedVenue.capacity.toLocaleString()} seats
+                    {selectedVenue.location} · {t('dashboard.eventPreparation.venueSeats', { count: selectedVenue.capacity.toLocaleString() })}
                     · {'★'.repeat(selectedVenue.facilities)}
                   </span>
                   <button
@@ -194,7 +194,7 @@ function EventPreparationScreen({
               <input
                 type="text"
                 className={styles.venueSearch}
-                placeholder="Search venues…"
+                placeholder={t('dashboard.eventPreparation.venueSearchPlaceholder')}
                 value={venueSearch}
                 onChange={(e) => setVenueSearch(e.target.value)}
               />
@@ -356,7 +356,9 @@ function EventPreparationScreen({
                           ) : (
                             <div className={styles.promoSlotEmpty}>
                               <span className={styles.promoSlotEmptyIcon}>+</span>
-                              <span className={styles.promoSlotEmptyLabel}>Pick wrestler {slot + 1}</span>
+                              <span className={styles.promoSlotEmptyLabel}>
+                                {t('dashboard.eventPreparation.promoPickWrestler', { index: slot + 1 })}
+                              </span>
                             </div>
                           )}
                         </div>

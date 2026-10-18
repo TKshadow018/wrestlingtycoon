@@ -11,11 +11,11 @@ import styles from './EventSetupModal.module.scss'
 
 // ─── Segment type definitions ─────────────────────────────────────────────────
 const SEGMENT_TYPES = [
-  { value: 'match',      label: 'Match',       hasReferee: true,  announcerMode: 'none' },
-  { value: 'mainEvent',  label: 'Main Event',  hasReferee: true,  announcerMode: 'required' },
-  { value: 'titleMatch', label: 'Title Match', hasReferee: true,  announcerMode: 'optional' },
-  { value: 'interview',  label: 'Interview',   hasReferee: false, announcerMode: 'required' },
-  { value: 'promo',      label: 'Promo',       hasReferee: false, announcerMode: 'optional' },
+  { value: 'match',      labelKey: 'dashboard.events.setup.segmentTypes.match',       hasReferee: true,  announcerMode: 'none' },
+  { value: 'mainEvent',  labelKey: 'dashboard.events.setup.segmentTypes.mainEvent',  hasReferee: true,  announcerMode: 'required' },
+  { value: 'titleMatch', labelKey: 'dashboard.events.setup.segmentTypes.titleMatch', hasReferee: true,  announcerMode: 'optional' },
+  { value: 'interview',  labelKey: 'dashboard.events.setup.segmentTypes.interview',   hasReferee: false, announcerMode: 'required' },
+  { value: 'promo',      labelKey: 'dashboard.events.setup.segmentTypes.promo',      hasReferee: false, announcerMode: 'optional' },
 ]
 
 const getSegmentConfig = (segmentType) =>
@@ -84,20 +84,20 @@ const buildCrowdFeedback = ({ matchRating, winnerName, wrestlers, t }) => {
 
   const feedback = []
   if (matchRating >= 8.5) {
-    feedback.push(t('dashboard.events.setup.execution.feedbackHot', 'The crowd was electric from bell to bell.'))
+    feedback.push(t('dashboard.events.setup.execution.feedbackHot'))
   } else if (matchRating >= 7) {
-    feedback.push(t('dashboard.events.setup.execution.feedbackSolid', 'Fans stayed invested and reacted to the key moments.'))
+    feedback.push(t('dashboard.events.setup.execution.feedbackSolid'))
   } else {
-    feedback.push(t('dashboard.events.setup.execution.feedbackCold', 'The audience reaction was mixed in this segment.'))
+    feedback.push(t('dashboard.events.setup.execution.feedbackCold'))
   }
 
   if (winnerName) {
-    feedback.push(t('dashboard.events.setup.execution.feedbackWinner', '{{name}} got one of the loudest reactions of the night.', { name: winnerName }))
+    feedback.push(t('dashboard.events.setup.execution.feedbackWinner', { name: winnerName }))
   }
 
   const highPopularity = (wrestlers || []).find((wrestler) => Number(wrestler?.popularity ?? 0) >= 75)
   if (highPopularity) {
-    feedback.push(t('dashboard.events.setup.execution.feedbackStarPower', '{{name}}\'s star power pulled the crowd in.', { name: highPopularity.name }))
+    feedback.push(t('dashboard.events.setup.execution.feedbackStarPower', { name: highPopularity.name }))
   }
 
   return feedback.slice(0, 3)
@@ -282,14 +282,14 @@ function PersonCard({ employee, onRemove, onDragStart, isCashIn, currentRank }) 
           </span>
         )}
         {employee.role !== 'wrestler' && (
-          <span className={styles.personRole}>{employee.role}</span>
+          <span className={styles.personRole}>{t(`dashboard.employees.roleOptions.${employee.role}`)}</span>
         )}
       </div>
       {isCashIn && (
-        <span className={styles.mitbBadge}>💰 Cash In</span>
+          <span className={styles.mitbBadge}>{t('dashboard.events.setup.cashInBadge')}</span>
       )}
       {onRemove && (
-        <button type="button" className={styles.removeBtn} onClick={onRemove} aria-label="Remove">
+        <button type="button" className={styles.removeBtn} onClick={onRemove} aria-label={t('dashboard.accessibility.remove')}>
           ×
         </button>
       )}
@@ -299,6 +299,7 @@ function PersonCard({ employee, onRemove, onDragStart, isCashIn, currentRank }) 
 
 // ─── AvailablePool ────────────────────────────────────────────────────────────
 function AvailablePool({ label, employees, blockedIds, cashInEmployeeId, wrestlerRankById }) {
+  const { t } = useTranslation()
   const available = sortEmployeesByRank(
     employees.filter((employee) => {
       const id = getEmployeeId(employee)
@@ -321,7 +322,7 @@ function AvailablePool({ label, employees, blockedIds, cashInEmployeeId, wrestle
       <span className={styles.zoneLabel}>{label}</span>
       <div className={styles.pool}>
         {available.length === 0 ? (
-          <p className={styles.emptyHint}>None available</p>
+          <p className={styles.emptyHint}>{t('dashboard.events.setup.noneAvailable')}</p>
         ) : (
           available.map((emp) => {
             const employeeId = getEmployeeId(emp)
@@ -343,6 +344,7 @@ function AvailablePool({ label, employees, blockedIds, cashInEmployeeId, wrestle
 
 // ─── DropZone ─────────────────────────────────────────────────────────────────
 function DropZone({ label, subLabel, employees, onDrop, onRemove, maxSlots, hint, cashInEmployeeId, wrestlerRankById }) {
+  const { t } = useTranslation()
   const [isDragOver, setIsDragOver] = useState(false)
   const isFull = maxSlots != null && employees.length >= maxSlots
   const sortedEmployees = sortEmployeesByRank(employees, wrestlerRankById)
@@ -367,7 +369,7 @@ function DropZone({ label, subLabel, employees, onDrop, onRemove, maxSlots, hint
     <div className={styles.dropZoneWrapper}>
       <span className={styles.zoneLabel}>
         {label}
-        {maxSlots === 1 && <span className={styles.slotBadge}> · 1 slot</span>}
+        {maxSlots === 1 && <span className={styles.slotBadge}>{t('dashboard.events.setup.slotCount', { count: maxSlots })}</span>}
       </span>
       {subLabel ? <p className={styles.zoneSubLabel}>{subLabel}</p> : null}
       <div
@@ -381,7 +383,7 @@ function DropZone({ label, subLabel, employees, onDrop, onRemove, maxSlots, hint
         onDrop={handleDrop}
       >
         {sortedEmployees.length === 0 ? (
-          <p className={styles.dropHint}>{hint ?? 'Drag here'}</p>
+          <p className={styles.dropHint}>{hint ?? t('dashboard.events.setup.dragHint')}</p>
         ) : (
           sortedEmployees.map((emp) => {
             const employeeId = getEmployeeId(emp)
@@ -986,22 +988,22 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
 
       if (requiresMultipleParticipants && currentSegment.matchType === 'tagTeam') {
         if ((currentSegment.team1Ids || []).length < 1 || (currentSegment.team2Ids || []).length < 1) {
-          return t('dashboard.events.setup.validation.tagTeamNeedTeamMembers', 'Tag team matches require participants in both Team 1 and Team 2.')
+          return t('dashboard.events.setup.validation.tagTeamNeedTeamMembers')
         }
       } else if (requiresMultipleParticipants && currentWrestlerIds.length < 2) {
-        return t('dashboard.events.setup.validation.needTwoWrestlers', 'Match segments require at least two participants.')
+        return t('dashboard.events.setup.validation.needTwoWrestlers')
       }
 
       if (!requiresMultipleParticipants && currentWrestlerIds.length < 1) {
-        return t('dashboard.events.setup.validation.needOneParticipant', 'This segment requires at least one participant.')
+        return t('dashboard.events.setup.validation.needOneParticipant')
       }
 
       if (currentConfig.hasReferee && !currentSegment.refereeId) {
-        return t('dashboard.events.setup.validation.refereeRequired', 'A referee is required for this segment.')
+        return t('dashboard.events.setup.validation.refereeRequired')
       }
 
       if (requiresAnnouncer(currentSegment.segmentType) && !currentSegment.announcerId) {
-        return t('dashboard.events.setup.validation.announcerRequired', 'An announcer is required for this segment.')
+        return t('dashboard.events.setup.validation.announcerRequired')
       }
     }
 
@@ -1066,7 +1068,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
       return wrestlerNames.join(' VS ')
     }
 
-    return t('dashboard.events.setup.execution.transitionFallback', 'Segment Participants')
+    return t('dashboard.events.setup.execution.transitionFallback')
   }, [executionSegment, executionWrestlers, formatTagSideLabel, t])
 
   const getExecutionChoiceNarrative = () => {
@@ -1075,26 +1077,26 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
     }
 
     const winnerLabel = executionSegment.matchType === 'tagTeam'
-      ? (executionChoice.winnerTeam === 'team2' ? t('dashboard.events.setup.execution.team2', 'Team 2') : t('dashboard.events.setup.execution.team1', 'Team 1'))
-      : (executionWrestlers.find((employee) => employee.employeeId === executionChoice.winnerEmployeeId)?.name || executionWrestlers[0]?.name || 'The competitor')
+      ? (executionChoice.winnerTeam === 'team2' ? t('dashboard.events.setup.execution.team2') : t('dashboard.events.setup.execution.team1'))
+      : (executionWrestlers.find((employee) => employee.employeeId === executionChoice.winnerEmployeeId)?.name || executionWrestlers[0]?.name || t('dashboard.events.setup.execution.unknownCompetitor'))
 
     const finishLabel = executionChoice.finishType === 'submission'
-      ? t('dashboard.events.setup.execution.finishes.submission', 'submission')
+      ? t('dashboard.events.setup.execution.finishes.submission')
       : executionChoice.finishType === 'countout'
-        ? t('dashboard.events.setup.execution.finishes.countout', 'count-out')
+        ? t('dashboard.events.setup.execution.finishes.countout')
         : executionChoice.finishType === 'dq'
-          ? t('dashboard.events.setup.execution.finishes.dq', 'disqualification')
-          : t('dashboard.events.setup.execution.finishes.pin', 'pinfall')
+          ? t('dashboard.events.setup.execution.finishes.dq')
+          : t('dashboard.events.setup.execution.finishes.pin')
 
     const riskLabel = executionChoice.riskLevel === 'risky'
-      ? t('dashboard.events.setup.execution.risks.risky', 'risky')
+      ? t('dashboard.events.setup.execution.risks.risky')
       : executionChoice.riskLevel === 'chaotic'
-        ? t('dashboard.events.setup.execution.risks.chaotic', 'chaotic')
-        : t('dashboard.events.setup.execution.risks.balanced', 'balanced')
+        ? t('dashboard.events.setup.execution.risks.chaotic')
+        : t('dashboard.events.setup.execution.risks.balanced')
 
     return [
-      t('dashboard.events.setup.execution.playNarrativeLine1', '{{winner}} is pushing the pace with a {{finish}} finish.', { winner: winnerLabel, finish: finishLabel }),
-      t('dashboard.events.setup.execution.playNarrativeLine2', 'The crowd is reacting to the {{risk}} tempo and the danger level is rising.', { risk: riskLabel }),
+      t('dashboard.events.setup.execution.playNarrativeLine1', { winner: winnerLabel, finish: finishLabel }),
+      t('dashboard.events.setup.execution.playNarrativeLine2', { risk: riskLabel }),
     ]
   }
 
@@ -1104,10 +1106,10 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
     const beatBoost = Math.min(16, beatIndex * 4 + sequenceLength * 3)
     const momentum = Math.min(100, base + finishBoost + beatBoost)
     const label = momentum >= 80
-      ? t('dashboard.events.setup.execution.momentumHot', 'Crowd is on fire')
+      ? t('dashboard.events.setup.execution.momentumHot')
       : momentum >= 60
-        ? t('dashboard.events.setup.execution.momentumBuilding', 'Momentum is building')
-        : t('dashboard.events.setup.execution.momentumSteady', 'The pace is steady')
+        ? t('dashboard.events.setup.execution.momentumBuilding')
+        : t('dashboard.events.setup.execution.momentumSteady')
     const color = momentum >= 80 ? '#ff8a00' : momentum >= 60 ? '#ffd166' : '#4ecdc4'
 
     return { momentum, label, color }
@@ -1119,48 +1121,48 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
     }
 
     const winnerLabel = executionSegment.matchType === 'tagTeam'
-      ? (executionChoice.winnerTeam === 'team2' ? t('dashboard.events.setup.execution.team2', 'Team 2') : t('dashboard.events.setup.execution.team1', 'Team 1'))
-      : (executionWrestlers.find((employee) => employee.employeeId === executionChoice.winnerEmployeeId)?.name || executionWrestlers[0]?.name || 'The competitor')
+      ? (executionChoice.winnerTeam === 'team2' ? t('dashboard.events.setup.execution.team2') : t('dashboard.events.setup.execution.team1'))
+      : (executionWrestlers.find((employee) => employee.employeeId === executionChoice.winnerEmployeeId)?.name || executionWrestlers[0]?.name || t('dashboard.events.setup.execution.unknownCompetitor'))
 
     const finishLabel = executionChoice.finishType === 'submission'
-      ? t('dashboard.events.setup.execution.finishes.submission', 'submission')
+      ? t('dashboard.events.setup.execution.finishes.submission')
       : executionChoice.finishType === 'countout'
-        ? t('dashboard.events.setup.execution.finishes.countout', 'count-out')
+        ? t('dashboard.events.setup.execution.finishes.countout')
         : executionChoice.finishType === 'dq'
-          ? t('dashboard.events.setup.execution.finishes.dq', 'disqualification')
-          : t('dashboard.events.setup.execution.finishes.pin', 'pinfall')
+          ? t('dashboard.events.setup.execution.finishes.dq')
+          : t('dashboard.events.setup.execution.finishes.pin')
 
     const riskLabel = executionChoice.riskLevel === 'risky'
-      ? t('dashboard.events.setup.execution.risks.risky', 'risky')
+      ? t('dashboard.events.setup.execution.risks.risky')
       : executionChoice.riskLevel === 'chaotic'
-        ? t('dashboard.events.setup.execution.risks.chaotic', 'chaotic')
-        : t('dashboard.events.setup.execution.risks.balanced', 'balanced')
+        ? t('dashboard.events.setup.execution.risks.chaotic')
+        : t('dashboard.events.setup.execution.risks.balanced')
 
     const sequenceLength = 4
     const baseBeats = Array.from({ length: sequenceLength }, (_, index) => {
       const momentumState = getMomentumState(executionChoice, sequenceLength, index)
       const isFinalBeat = index === sequenceLength - 1
       const title = index === 0
-        ? t('dashboard.events.setup.execution.playBeatOpening', 'The bell rings')
+        ? t('dashboard.events.setup.execution.playBeatOpening')
         : index === 1
-          ? t('dashboard.events.setup.execution.playBeatMomentum', 'Momentum swing')
+          ? t('dashboard.events.setup.execution.playBeatMomentum')
           : index === 2
-            ? t('dashboard.events.setup.execution.playBeatNearFall', 'Near fall')
-            : t('dashboard.events.setup.execution.playBeatFinish', 'Finish line')
+            ? t('dashboard.events.setup.execution.playBeatNearFall')
+            : t('dashboard.events.setup.execution.playBeatFinish')
       const detail = index === 0
-        ? t('dashboard.events.setup.execution.playBeatOpeningDetail', '{{winner}} starts fast and the crowd is already reacting.', { winner: winnerLabel })
+        ? t('dashboard.events.setup.execution.playBeatOpeningDetail', { winner: winnerLabel })
         : index === 1
           ? (executionChoice.riskLevel === 'chaotic'
-            ? t('dashboard.events.setup.execution.playBeatMomentumChaotic', 'The pace turns wild and every exchange feels dangerous.')
+            ? t('dashboard.events.setup.execution.playBeatMomentumChaotic')
             : executionChoice.riskLevel === 'risky'
-              ? t('dashboard.events.setup.execution.playBeatMomentumRisky', 'The pressure rises as the pace gets more aggressive.')
-              : t('dashboard.events.setup.execution.playBeatMomentumBalanced', 'The rhythm stays controlled, but the tension is building.'))
+              ? t('dashboard.events.setup.execution.playBeatMomentumRisky')
+              : t('dashboard.events.setup.execution.playBeatMomentumBalanced'))
           : index === 2
-            ? t('dashboard.events.setup.execution.playBeatNearFallDetail', 'A dramatic {{finish}} attempt nearly changes the whole segment.', { finish: finishLabel })
-            : t('dashboard.events.setup.execution.playBeatFinishDetail', '{{winner}} survives the {{risk}} tempo and forces the final moment.', { winner: winnerLabel, risk: riskLabel })
+            ? t('dashboard.events.setup.execution.playBeatNearFallDetail', { finish: finishLabel })
+            : t('dashboard.events.setup.execution.playBeatFinishDetail', { winner: winnerLabel, risk: riskLabel })
       const crowdLine = isFinalBeat
-        ? t('dashboard.events.setup.execution.crowdFinal', 'The arena erupts as the final stretch begins.')
-        : t('dashboard.events.setup.execution.crowdBeat', 'The crowd chants louder as the pace rises.')
+        ? t('dashboard.events.setup.execution.crowdFinal')
+        : t('dashboard.events.setup.execution.crowdBeat')
 
       return {
         title,
@@ -1252,9 +1254,9 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
       const delta = Math.random() < 0.5 ? -popularitySwing : popularitySwing
       const resultText = wrestler
         ? (delta >= 0
-            ? t('dashboard.events.setup.execution.interviewPopularityUp', '{{name}} gained {{delta}} popularity from this interview.', { name: wrestler.name, delta })
-            : t('dashboard.events.setup.execution.interviewPopularityDown', '{{name}} lost {{delta}} popularity from this interview.', { name: wrestler.name, delta: Math.abs(delta) }))
-        : t('dashboard.events.setup.execution.resultNoWinner', 'Segment complete.')
+            ? t('dashboard.events.setup.execution.interviewPopularityUp', { name: wrestler.name, delta })
+            : t('dashboard.events.setup.execution.interviewPopularityDown', { name: wrestler.name, delta: Math.abs(delta) }))
+        : t('dashboard.events.setup.execution.resultNoWinner')
 
       setExecutionResults((current) => ({
         ...current,
@@ -1300,8 +1302,8 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
         return acc
       }, {})
       const resultText = winnerTeamNames
-        ? t('dashboard.events.setup.execution.resultTagWinner', '{{names}} win the match!', { names: winnerTeamNames })
-        : t('dashboard.events.setup.execution.resultNoWinner', 'Segment complete.')
+        ? t('dashboard.events.setup.execution.resultTagWinner', { names: winnerTeamNames })
+        : t('dashboard.events.setup.execution.resultNoWinner')
 
       const momentumState = Array.isArray(options.playSequence) && options.playSequence.length > 0
         ? options.playSequence[options.playSequence.length - 1]
@@ -1363,8 +1365,8 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
       }, {})
       : {}
     const resultText = winnerCandidate
-      ? t('dashboard.events.setup.execution.resultWinner', '{{name}} stood tall in this segment.', { name: winnerCandidate.name })
-      : t('dashboard.events.setup.execution.resultNoWinner', 'Segment complete.')
+      ? t('dashboard.events.setup.execution.resultWinner', { name: winnerCandidate.name })
+      : t('dashboard.events.setup.execution.resultNoWinner')
 
     const momentumState = Array.isArray(options.playSequence) && options.playSequence.length > 0
       ? options.playSequence[options.playSequence.length - 1]
@@ -1424,17 +1426,17 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
       {showExecutionTransition && phase === 'execution' && executionSegment ? (
         <div className={styles.executionTransitionOverlay}>
           <div className={styles.executionTransitionCard}>
-            <p className={styles.executionTransitionLabel}>{t('dashboard.events.setup.execution.transitionTitle', 'Upcoming Segment')}</p>
+            <p className={styles.executionTransitionLabel}>{t('dashboard.events.setup.execution.transitionTitle')}</p>
             <h5>{executionTransitionLabel}</h5>
             <p className={styles.executionTransitionSubtext}>
-              {t(
-                'dashboard.events.setup.execution.transitionType',
-                'Type: {{type}}',
-                { type: t(`dashboard.events.setup.segmentTypes.${executionSegment.segmentType}`, executionSegment.segmentType) },
-              )}
+              {t('dashboard.events.setup.execution.transitionType', {
+                type: t(`dashboard.events.setup.segmentTypes.${executionSegment.segmentType}`, {
+                  defaultValue: t('dashboard.segments.unknown'),
+                }),
+              })}
             </p>
             <button type="button" className={styles.primaryBtn} onClick={confirmExecutionTransition}>
-              {t('dashboard.events.setup.execution.startSegment', 'Start Segment')}
+              {t('dashboard.events.setup.execution.startSegment')}
             </button>
           </div>
         </div>
@@ -1447,7 +1449,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
             <h3 className={styles.eventTitle}>{eventConfig?.eventName}</h3>
             <span className={styles.eventTypeBadge}>{eventConfig?.eventType}</span>
           </div>
-          <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close">
+          <button type="button" className={styles.closeBtn} onClick={onClose} aria-label={t('dashboard.accessibility.close')}>
             ×
           </button>
         </div>
@@ -1459,12 +1461,12 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
             className={styles.navArrow}
             onClick={() => setActiveIndex((i) => Math.max(0, i - 1))}
             disabled={activeIndex === 0}
-            aria-label="Previous segment"
+            aria-label={t('dashboard.accessibility.previousSegment')}
           >
             ‹
           </button>
           <div className={styles.segTitle}>
-            <span>{t('dashboard.events.setup.segmentLabel', 'Segment {{index}}', { index: activeIndex + 1 })}</span>
+            <span>{t('dashboard.events.setup.segmentLabel', { index: activeIndex + 1 })}</span>
             <span className={styles.segCount}>{activeIndex + 1} / {totalSegments}</span>
           </div>
           <button
@@ -1472,7 +1474,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
             className={styles.navArrow}
             onClick={() => setActiveIndex((i) => Math.min(totalSegments - 1, i + 1))}
             disabled={activeIndex === totalSegments - 1}
-            aria-label="Next segment"
+            aria-label={t('dashboard.accessibility.nextSegment')}
           >
             ›
           </button>
@@ -1486,7 +1488,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
               type="button"
               className={`${styles.dot} ${i === activeIndex ? styles.dotActive : ''}`}
               onClick={() => setActiveIndex(i)}
-              aria-label={`Segment ${i + 1}`}
+              aria-label={t('dashboard.accessibility.segment', { index: i + 1 })}
             />
           ))}
         </div>
@@ -1504,28 +1506,28 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                   className={`${styles.typeChip} ${segment.segmentType === opt.value ? styles.typeChipActive : ''}`}
                   onClick={() => handleTypeChange(opt.value)}
                 >
-                  {t(`dashboard.events.setup.segmentTypes.${opt.value}`, opt.label)}
+                  {t(opt.labelKey)}
                 </button>
               ))}
             </div>
 
             {isMatchSegment && (
               <div className={styles.matchTypeRow}>
-                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.participantFormat', 'Participant Format')}</span>
+                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.participantFormat')}</span>
                 <div className={styles.matchTypeChips}>
                   <button
                     type="button"
                     className={`${styles.typeChip} ${(segment.matchType || 'singles') === 'singles' ? styles.typeChipActive : ''}`}
                     onClick={() => handleMatchTypeChange('singles')}
                   >
-                    {t('dashboard.events.setup.matchTypes.singles', 'Singles')}
+                    {t('dashboard.events.setup.matchTypes.singles')}
                   </button>
                   <button
                     type="button"
                     className={`${styles.typeChip} ${segment.matchType === 'tagTeam' ? styles.typeChipActive : ''}`}
                     onClick={() => handleMatchTypeChange('tagTeam')}
                   >
-                    {t('dashboard.events.setup.matchTypes.tagTeam', 'Tag Team')}
+                    {t('dashboard.events.setup.matchTypes.tagTeam')}
                   </button>
                 </div>
               </div>
@@ -1533,7 +1535,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
 
             {isMatchSegment && (
               <div className={styles.matchTypeRow}>
-                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.matchTypeSelection', 'Match Type Selection')}</span>
+                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.matchTypeSelection')}</span>
                 <select
                   className={styles.matchTypeSelect}
                   value={activeMatchStipulation.id}
@@ -1645,7 +1647,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
 
             {segment.segmentType === 'titleMatch' && (
               <div className={styles.titleSelectorRow}>
-                <span className={styles.titleSelectorLabel}>{t('dashboard.events.setup.titleBelt', 'Title Belt')}</span>
+                <span className={styles.titleSelectorLabel}>{t('dashboard.events.setup.titleBelt')}</span>
                 <div className={styles.titleBeltGrid}>
                   {availableTitlesForSegment.map((title) => (
                     <button
@@ -1662,7 +1664,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
 
                 {availableTitlesForSegment.length === 0 ? (
                   <p className={styles.warning}>
-                    {t('dashboard.events.setup.validation.noTitlesForMatchType', 'No active titles available for this match type.')}
+                    {t('dashboard.events.setup.validation.noTitlesForMatchType')}
                   </p>
                 ) : null}
 
@@ -1698,23 +1700,23 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
               {/* Wrestlers / Participants */}
               <div className={styles.poolFilterRow}>
                 <label className={styles.poolFilterField}>
-                  <span>{t('dashboard.events.setup.poolGenderFilter', 'Gender')}</span>
+                  <span>{t('dashboard.events.setup.poolGenderFilter')}</span>
                   <select
                     value={participantGenderFilter}
                     onChange={(event) => setParticipantGenderFilter(event.target.value)}
                   >
-                    <option value="all">{t('dashboard.events.setup.genderOptions.all', 'All')}</option>
-                    <option value="male">{t('dashboard.events.setup.genderOptions.male', 'Male')}</option>
-                    <option value="female">{t('dashboard.events.setup.genderOptions.female', 'Female')}</option>
+                    <option value="all">{t('dashboard.events.setup.genderOptions.all')}</option>
+                    <option value="male">{t('dashboard.events.setup.genderOptions.male')}</option>
+                    <option value="female">{t('dashboard.events.setup.genderOptions.female')}</option>
                   </select>
                 </label>
                 <label className={styles.poolFilterField}>
-                  <span>{t('dashboard.events.setup.poolSearch', 'Search')}</span>
+                  <span>{t('dashboard.events.setup.poolSearch')}</span>
                   <input
                     type="text"
                     value={participantSearch}
                     onChange={(event) => setParticipantSearch(event.target.value)}
-                    placeholder={t('dashboard.events.setup.poolSearchPlaceholder', 'Search wrestler')}
+                    placeholder={t('dashboard.events.setup.poolSearchPlaceholder')}
                   />
                 </label>
               </div>
@@ -1723,30 +1725,30 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                 <div className={styles.assignRowTriple}>
                   <AvailablePool
                     label={isNonMatch
-                      ? t('dashboard.events.setup.poolParticipants', 'Wrestlers & Managers')
-                      : t('dashboard.events.setup.poolWrestlers', 'Wrestlers')}
+                      ? t('dashboard.events.setup.poolParticipants')
+                      : t('dashboard.events.setup.poolWrestlers')}
                     employees={participantPool}
                     blockedIds={blockedInSegment}
                     cashInEmployeeId={segment.cashInByEmployeeId}
                     wrestlerRankById={wrestlerRankById}
                   />
                   <DropZone
-                    label={t('dashboard.events.setup.zoneTeam1Participants', 'Team 1 Participants')}
+                    label={t('dashboard.events.setup.zoneTeam1Participants')}
                     subLabel={assignedTeam1Label}
                     employees={assignedTeam1}
                     onDrop={(id) => handleDropWrestler(id, 'team1')}
                     onRemove={(id) => handleRemoveWrestler(id, 'team1')}
-                    hint={t('dashboard.events.setup.dragHintTeam1Participants', 'Drag team 1 wrestlers here')}
+                    hint={t('dashboard.events.setup.dragHintTeam1Participants')}
                     cashInEmployeeId={segment.cashInByEmployeeId}
                     wrestlerRankById={wrestlerRankById}
                   />
                   <DropZone
-                    label={t('dashboard.events.setup.zoneTeam2Participants', 'Team 2 Participants')}
+                    label={t('dashboard.events.setup.zoneTeam2Participants')}
                     subLabel={assignedTeam2Label}
                     employees={assignedTeam2}
                     onDrop={(id) => handleDropWrestler(id, 'team2')}
                     onRemove={(id) => handleRemoveWrestler(id, 'team2')}
-                    hint={t('dashboard.events.setup.dragHintTeam2Participants', 'Drag team 2 wrestlers here')}
+                    hint={t('dashboard.events.setup.dragHintTeam2Participants')}
                     cashInEmployeeId={segment.cashInByEmployeeId}
                     wrestlerRankById={wrestlerRankById}
                   />
@@ -1755,19 +1757,19 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
               <div className={styles.assignRow}>
                 <AvailablePool
                   label={isNonMatch
-                    ? t('dashboard.events.setup.poolParticipants', 'Wrestlers & Managers')
-                    : t('dashboard.events.setup.poolWrestlers', 'Wrestlers')}
+                    ? t('dashboard.events.setup.poolParticipants')
+                    : t('dashboard.events.setup.poolWrestlers')}
                   employees={participantPool}
                   blockedIds={blockedInSegment}
                   cashInEmployeeId={segment.cashInByEmployeeId}
                   wrestlerRankById={wrestlerRankById}
                 />
                 <DropZone
-                  label={t('dashboard.events.setup.zoneParticipants', 'Participants')}
+                  label={t('dashboard.events.setup.zoneParticipants')}
                   employees={assignedWrestlers}
                   onDrop={handleDropWrestler}
                   onRemove={handleRemoveWrestler}
-                  hint={t('dashboard.events.setup.dragHintParticipants', 'Drag wrestlers here')}
+                  hint={t('dashboard.events.setup.dragHintParticipants')}
                   cashInEmployeeId={segment.cashInByEmployeeId}
                   wrestlerRankById={wrestlerRankById}
                 />
@@ -1778,18 +1780,18 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
               {segCfg.hasReferee && (
                 <div className={styles.assignRow}>
                   <AvailablePool
-                    label={t('dashboard.events.setup.poolReferees', 'Referees')}
+                    label={t('dashboard.events.setup.poolReferees')}
                     employees={refereePool}
                     blockedIds={blockedInSegment}
                     wrestlerRankById={wrestlerRankById}
                   />
                   <DropZone
-                    label={t('dashboard.events.setup.zoneReferee', 'Referee')}
+                    label={t('dashboard.events.setup.zoneReferee')}
                     employees={assignedReferee}
                     onDrop={handleDropReferee}
                     onRemove={handleRemoveReferee}
                     maxSlots={1}
-                    hint={t('dashboard.events.setup.dragHintReferee', 'Drag referee here')}
+                    hint={t('dashboard.events.setup.dragHintReferee')}
                     wrestlerRankById={wrestlerRankById}
                   />
                 </div>
@@ -1803,9 +1805,6 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                       segment.segmentType === 'promo' || segment.segmentType === 'titleMatch'
                         ? 'dashboard.events.setup.poolInterviewersOptional'
                         : 'dashboard.events.setup.poolAnnouncers',
-                      segment.segmentType === 'promo' || segment.segmentType === 'titleMatch'
-                        ? 'Interviewers (Optional)'
-                        : 'Announcers',
                     )}
                     employees={announcerPool}
                     blockedIds={blockedInSegment}
@@ -1816,9 +1815,6 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                       segment.segmentType === 'promo' || segment.segmentType === 'titleMatch'
                         ? 'dashboard.events.setup.zoneInterviewerOptional'
                         : 'dashboard.events.setup.zoneAnnouncer',
-                      segment.segmentType === 'promo' || segment.segmentType === 'titleMatch'
-                        ? 'Interviewer (Optional)'
-                        : 'Announcer',
                     )}
                     employees={assignedAnnouncer}
                     onDrop={handleDropAnnouncer}
@@ -1828,9 +1824,6 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                       segment.segmentType === 'promo' || segment.segmentType === 'titleMatch'
                         ? 'dashboard.events.setup.dragHintInterviewerOptional'
                         : 'dashboard.events.setup.dragHintAnnouncer',
-                      segment.segmentType === 'promo' || segment.segmentType === 'titleMatch'
-                        ? 'Drag interviewer here (optional)'
-                        : 'Drag announcer here',
                     )}
                     wrestlerRankById={wrestlerRankById}
                   />
@@ -1841,13 +1834,13 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
 
             <div className={styles.participantInsightsSection}>
               <div className={styles.participantInsightsHeader}>
-                <h4>{t('dashboard.events.setup.participantInsightsTitle', 'Participant Match Insights')}</h4>
-                <p>{t('dashboard.events.setup.participantInsightsHint', 'Select a participant and click to view their last 5 matches.')}</p>
+                <h4>{t('dashboard.events.setup.participantInsightsTitle')}</h4>
+                <p>{t('dashboard.events.setup.participantInsightsHint')}</p>
               </div>
 
               {selectedSegmentParticipants.length === 0 ? (
                 <p className={styles.participantInsightsEmpty}>
-                  {t('dashboard.events.setup.participantInsightsEmpty', 'Assign participants to this segment to view history insights.')}
+                  {t('dashboard.events.setup.participantInsightsEmpty')}
                 </p>
               ) : (
                 <div className={styles.participantInsightsGrid}>
@@ -1863,14 +1856,14 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                           onClick={() => setSelectedParticipantHistoryId(employee.employeeId)}
                         >
                           <span>{employee.name}</span>
-                          {isPairMatched ? <em>{t('dashboard.events.setup.pairHistoryTag', 'Past pair match')}</em> : null}
+                          {isPairMatched ? <em>{t('dashboard.events.setup.pairHistoryTag')}</em> : null}
                         </button>
                       )
                     })}
 
                     {pairHistoryMatches.length > 0 ? (
                       <div className={styles.pairHistorySummary}>
-                        <p>{t('dashboard.events.setup.pairHistorySummaryTitle', 'Previous pairings in your history:')}</p>
+                        <p>{t('dashboard.events.setup.pairHistorySummaryTitle')}</p>
                         <div className={styles.pairHistoryTags}>
                           {pairHistoryMatches.map((pair) => (
                             <span key={pair.pairKey} className={styles.pairHistoryTag}>
@@ -1885,13 +1878,13 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                   <div className={styles.participantHistoryPanel}>
                     <h5>
                       {selectedHistoryParticipant
-                        ? t('dashboard.events.setup.participantLastFive', '{{name}} - Last 5 Matches', { name: selectedHistoryParticipant.name })
-                        : t('dashboard.events.setup.participantLastFiveEmpty', 'Last 5 Matches')}
+                        ? t('dashboard.events.setup.participantLastFive', { name: selectedHistoryParticipant.name })
+                        : t('dashboard.events.setup.participantLastFiveEmpty')}
                     </h5>
 
                     {selectedParticipantLastFiveMatches.length === 0 ? (
                       <p className={styles.participantHistoryEmpty}>
-                        {t('dashboard.events.setup.participantNoHistory', 'No match history yet for this participant.')}
+                        {t('dashboard.events.setup.participantNoHistory')}
                       </p>
                     ) : (
                       <div className={styles.participantHistoryList}>
@@ -1906,21 +1899,29 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                           return (
                             <article key={`${entry.eventName || 'event'}-${entry.day || index}-${index}`} className={styles.participantHistoryRow}>
                               <div>
-                                <strong>{entry.eventName || t('dashboard.employees.unknownEvent', 'Unknown Event')}</strong>
+                                <strong>
+                                  {entry.eventId === 'regular-weekly-event'
+                                    ? t('dashboard.eventTypes.regularWeekly')
+                                    : entry.eventName || t('dashboard.employees.unknownEvent')}
+                                </strong>
                                 <p>{formatGameDateFromDay(startDateIso, entry.day)}</p>
                               </div>
                               <div>
-                                <span>{t(`dashboard.events.setup.segmentTypes.${entry.segmentType}`, entry.segmentType)}</span>
+                                <span>
+                                  {t(`dashboard.events.setup.segmentTypes.${entry.segmentType}`, {
+                                    defaultValue: t('dashboard.segments.unknown'),
+                                  })}
+                                </span>
                                 <small>
-                                  {t('dashboard.events.setup.participantResult', 'Result: {{result}}', {
+                                  {t('dashboard.events.setup.participantResult', {
                                     result: t(`dashboard.employees.results.${entry.result || 'nodecision'}`),
                                   })}
                                 </small>
                                 <small>
-                                  {t('dashboard.events.setup.participantOpponents', 'Opponents: {{names}}', {
+                                  {t('dashboard.events.setup.participantOpponents', {
                                     names: opponentNames.length > 0
                                       ? opponentNames.join(', ')
-                                      : t('dashboard.events.setup.participantOpponentsUnknown', 'Unknown'),
+                                      : t('dashboard.events.setup.participantOpponentsUnknown'),
                                   })}
                                 </small>
                                 {opponentDetails.length > 0 ? (
@@ -1967,7 +1968,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                 className={styles.historyToggle}
                 onClick={() => setHistoryOpen((v) => !v)}
               >
-                {t('dashboard.events.setup.history.title', 'Previous Events ({{count}})', { count: eventLog.length })}
+                {t('dashboard.events.setup.history.title', { count: eventLog.length })}
                 <span className={styles.historyToggleArrow}>{historyOpen ? '▲' : '▼'}</span>
               </button>
               {historyOpen && (
@@ -1975,7 +1976,11 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                   {[...eventLog].reverse().map((entry) => (
                     <div key={entry.id} className={styles.historyEntry}>
                       <div className={styles.historyEntryHeader}>
-                        <span className={styles.historyEntryName}>{entry.eventName}</span>
+                        <span className={styles.historyEntryName}>
+                          {entry.eventId === 'regular-weekly-event'
+                            ? t('dashboard.eventTypes.regularWeekly')
+                            : entry.eventName}
+                        </span>
                         <span className={styles.historyEntryDay}>
                           {formatGameDateFromDay(startDateIso, entry.day)}
                         </span>
@@ -2008,13 +2013,15 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                                 <span className={styles.historySegType}>
                                   {seg.segmentType === 'promo' && seg.promoSegmentId
                                     ? t(`dashboard.events.setup.promoSegments.${seg.promoSegmentId}`)
-                                    : t(`dashboard.events.setup.segmentTypes.${seg.segmentType}`, seg.segmentType)}
+                                    : t(`dashboard.events.setup.segmentTypes.${seg.segmentType}`, {
+                                        defaultValue: t('dashboard.segments.unknown'),
+                                      })}
                                 </span>
                                 {isMatch && (
                                   <span className={styles.historySegResult}>
                                     {seg.winnerName
-                                      ? t('dashboard.events.setup.history.winner', '→ {{name}}', { name: seg.winnerName })
-                                      : t('dashboard.matchResults.noDecision', 'No Decision')}
+                                      ? t('dashboard.events.setup.history.winner', { name: seg.winnerName })
+                                      : t('dashboard.matchResults.noDecision')}
                                   </span>
                                 )}
                                 {historyParticipants && (
@@ -2045,7 +2052,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
 
           <div className={styles.footer}>
             <button type="button" className={styles.secondaryBtn} onClick={onClose}>
-              {t('dashboard.events.cancel', 'Cancel')}
+              {t('dashboard.events.cancel')}
             </button>
             {activeIndex < totalSegments - 1 ? (
               <button
@@ -2053,11 +2060,11 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                 className={styles.primaryBtn}
                 onClick={() => setActiveIndex((i) => i + 1)}
               >
-                {t('dashboard.events.setup.next', 'Next')} ›
+                {t('dashboard.events.setup.next')} ›
               </button>
             ) : (
               <button type="submit" className={styles.primaryBtn}>
-                {t('dashboard.events.setup.submit', 'Start Matches')}
+                {t('dashboard.events.setup.submit')}
               </button>
             )}
           </div>
@@ -2065,16 +2072,20 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
         ) : (
         <section className={styles.executionSection}>
           <div className={styles.executionHeader}>
-            <h4>{t('dashboard.events.setup.execution.title', 'Match In Progress')}</h4>
+            <h4>{t('dashboard.events.setup.execution.title')}</h4>
             <p>
-              {t('dashboard.events.setup.segmentLabel', 'Segment {{index}}', { index: executionIndex + 1 })}
+              {t('dashboard.events.setup.segmentLabel', { index: executionIndex + 1 })}
               {' · '}
-              {executionSegment ? t(`dashboard.events.setup.segmentTypes.${executionSegment.segmentType}`, executionSegment.segmentType) : ''}
+              {executionSegment
+                ? t(`dashboard.events.setup.segmentTypes.${executionSegment.segmentType}`, {
+                    defaultValue: t('dashboard.segments.unknown'),
+                  })
+                : ''}
             </p>
           </div>
 
           <div className={styles.executionRoster}>
-            <p className={styles.executionRosterLabel}>{t('dashboard.events.setup.execution.wrestlers', 'Wrestlers')}</p>
+            <p className={styles.executionRosterLabel}>{t('dashboard.events.setup.execution.wrestlers')}</p>
             <div className={styles.executionImageGrid}>
               {executionWrestlers.length > 0 ? (
                 executionWrestlers.map((employee) => (
@@ -2090,13 +2101,13 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                       }}
                     />
                     {executionSegment?.cashInByEmployeeId === employee.employeeId && (
-                      <span className={styles.mitbBadgeExecution}>💰 Cash In</span>
+                      <span className={styles.mitbBadgeExecution}>{t('dashboard.events.setup.cashInBadge')}</span>
                     )}
                     {(
                       executionResults[executionIndex]?.winnerEmployeeId === employee.employeeId
                       || (executionResults[executionIndex]?.winnerTeamIds || []).includes(employee.employeeId)
                     ) && (
-                      <span className={styles.winnerBadgeExecution}>Winner</span>
+                      <span className={styles.winnerBadgeExecution}>{t('dashboard.employees.winnerBadge')}</span>
                     )}
                     <p>{employee.name}</p>
                     {employee.role === 'wrestler' && (
@@ -2106,7 +2117,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                     )}
                     {Number(executionResults[executionIndex]?.staminaLossById?.[employee.employeeId] || 0) > 0 && (
                       <span className={styles.executionStaminaLoss}>
-                        {t('dashboard.events.setup.execution.staminaLoss', 'Stamina Loss: -{{amount}}', {
+                        {t('dashboard.events.setup.execution.staminaLoss', {
                           amount: Number(executionResults[executionIndex].staminaLossById[employee.employeeId] || 0),
                         })}
                       </span>
@@ -2114,14 +2125,14 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                   </article>
                 ))
               ) : (
-                <p className={styles.emptyHint}>{t('dashboard.events.setup.execution.noWrestlers', 'No wrestlers assigned in this segment.')}</p>
+                <p className={styles.emptyHint}>{t('dashboard.events.setup.execution.noWrestlers')}</p>
               )}
             </div>
           </div>
 
           {executionParticipants.length > 0 ? (
             <div className={styles.executionParticipantsRow}>
-              <p className={styles.executionRosterLabel}>{t('dashboard.events.setup.execution.allParticipants', 'All Participants')}</p>
+              <p className={styles.executionRosterLabel}>{t('dashboard.events.setup.execution.allParticipants')}</p>
               <div className={styles.executionParticipantsChips}>
                 {executionParticipants.map((employee) => (
                   <span key={employee.employeeId}>{employee.name}</span>
@@ -2138,12 +2149,12 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
             <div className={styles.executionInsightsCard}>
               <div className={styles.executionInsightsHeader}>
                 <strong>
-                  {t('dashboard.events.setup.execution.matchRating', 'Match Rating')}: {Number(executionResults[executionIndex].matchRating).toFixed(1)} / 10
+                  {t('dashboard.events.setup.execution.matchRating')}: {Number(executionResults[executionIndex].matchRating).toFixed(1)} / 10
                 </strong>
               </div>
               {Number.isFinite(Number(executionResults[executionIndex]?.momentumScore)) ? (
                 <div className={styles.executionFeedbackList}>
-                  <p>{t('dashboard.events.setup.execution.momentumResult', 'Momentum')}</p>
+                  <p>{t('dashboard.events.setup.execution.momentumResult')}</p>
                   <div style={{ background: '#2d2d2d', borderRadius: '999px', overflow: 'hidden', height: '8px' }}>
                     <div style={{ width: `${Number(executionResults[executionIndex].momentumScore)}%`, height: '100%', background: '#4ecdc4', transition: 'width 0.2s ease' }} />
                   </div>
@@ -2152,7 +2163,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
               ) : null}
               {(executionResults[executionIndex]?.crowdFeedback || []).length > 0 ? (
                 <div className={styles.executionFeedbackList}>
-                  <p>{t('dashboard.events.setup.execution.peopleFeedback', 'People Feedback')}</p>
+                  <p>{t('dashboard.events.setup.execution.peopleFeedback')}</p>
                   <ul>
                     {executionResults[executionIndex].crowdFeedback.map((line, index) => (
                       <li key={`${executionIndex}-feedback-${index}`}>{line}</li>
@@ -2162,7 +2173,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
               ) : null}
               {(executionResults[executionIndex]?.crowdCommentary || []).length > 0 ? (
                 <div className={styles.executionFeedbackList}>
-                  <p>{t('dashboard.events.setup.execution.crowdCommentary', 'Crowd Commentary')}</p>
+                  <p>{t('dashboard.events.setup.execution.crowdCommentary')}</p>
                   <ul>
                     {executionResults[executionIndex].crowdCommentary.map((line, index) => (
                       <li key={`${executionIndex}-crowd-${index}`}>{line}</li>
@@ -2176,7 +2187,7 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
           {showExecutionChoicePanel && executionSegment && executionMode === 'play' ? (
             <div className={styles.executionInsightsCard}>
               <div className={styles.executionInsightsHeader}>
-                <strong>{t('dashboard.events.setup.execution.playOptionsTitle', 'Play the segment')}</strong>
+                <strong>{t('dashboard.events.setup.execution.playOptionsTitle')}</strong>
               </div>
               <div className={styles.executionFeedbackList}>
                 {getExecutionChoiceNarrative().map((line) => (
@@ -2185,27 +2196,27 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
               </div>
               {executionSegment.matchType === 'tagTeam' ? (
                 <div className={styles.matchTypeRow}>
-                  <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseWinner', 'Choose the winner')}</span>
+                  <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseWinner')}</span>
                   <div className={styles.matchTypeChips}>
                     <button
                       type="button"
                       className={`${styles.typeChip} ${executionChoice.winnerTeam === 'team1' ? styles.typeChipActive : ''}`}
                       onClick={() => setExecutionChoice((current) => ({ ...current, winnerTeam: 'team1' }))}
                     >
-                      {t('dashboard.events.setup.execution.team1', 'Team 1')}
+                      {t('dashboard.events.setup.execution.team1')}
                     </button>
                     <button
                       type="button"
                       className={`${styles.typeChip} ${executionChoice.winnerTeam === 'team2' ? styles.typeChipActive : ''}`}
                       onClick={() => setExecutionChoice((current) => ({ ...current, winnerTeam: 'team2' }))}
                     >
-                      {t('dashboard.events.setup.execution.team2', 'Team 2')}
+                      {t('dashboard.events.setup.execution.team2')}
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className={styles.matchTypeRow}>
-                  <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseWinner', 'Choose the winner')}</span>
+                  <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseWinner')}</span>
                   <div className={styles.matchTypeChips}>
                     {executionWrestlers.length > 0 ? executionWrestlers.map((employee) => (
                       <button
@@ -2217,13 +2228,13 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                         {employee.name}
                       </button>
                     )) : (
-                      <span>{t('dashboard.events.setup.execution.noWrestlers', 'No wrestlers assigned in this segment.')}</span>
+                      <span>{t('dashboard.events.setup.execution.noWrestlers')}</span>
                     )}
                   </div>
                 </div>
               )}
               <div className={styles.matchTypeRow}>
-                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseFinish', 'Choose the finish')}</span>
+                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseFinish')}</span>
                 <div className={styles.matchTypeChips}>
                   {['pin', 'submission', 'countout', 'dq'].map((option) => (
                     <button
@@ -2232,13 +2243,13 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                       className={`${styles.typeChip} ${executionChoice.finishType === option ? styles.typeChipActive : ''}`}
                       onClick={() => setExecutionChoice((current) => ({ ...current, finishType: option }))}
                     >
-                      {t(`dashboard.events.setup.execution.finishes.${option}`, option)}
+                      {t(`dashboard.events.setup.execution.finishes.${option}`)}
                     </button>
                   ))}
                 </div>
               </div>
               <div className={styles.matchTypeRow}>
-                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseRisk', 'Choose the pace')}</span>
+                <span className={styles.matchTypeLabel}>{t('dashboard.events.setup.execution.chooseRisk')}</span>
                 <div className={styles.matchTypeChips}>
                   {['balanced', 'risky', 'chaotic'].map((option) => (
                     <button
@@ -2247,13 +2258,13 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                       className={`${styles.typeChip} ${executionChoice.riskLevel === option ? styles.typeChipActive : ''}`}
                       onClick={() => setExecutionChoice((current) => ({ ...current, riskLevel: option }))}
                     >
-                      {t(`dashboard.events.setup.execution.risks.${option}`, option)}
+                      {t(`dashboard.events.setup.execution.risks.${option}`)}
                     </button>
                   ))}
                 </div>
               </div>
               <button type="button" className={styles.primaryBtn} onClick={resolveExecutionChoice}>
-                {t('dashboard.events.setup.execution.resolve', 'Resolve Segment')}
+                {t('dashboard.events.setup.execution.resolve')}
               </button>
             </div>
           ) : null}
@@ -2261,13 +2272,13 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
           {executionMode === 'play' && playSequenceActive && playSequence[playSequenceIndex] ? (
             <div className={styles.executionInsightsCard}>
               <div className={styles.executionInsightsHeader}>
-                <strong>{t('dashboard.events.setup.execution.playByPlayTitle', 'Play-by-play')}</strong>
+                <strong>{t('dashboard.events.setup.execution.playByPlayTitle')}</strong>
               </div>
               <div className={styles.executionFeedbackList}>
                 <p><strong>{playSequence[playSequenceIndex].title}</strong></p>
                 <p>{playSequence[playSequenceIndex].detail}</p>
                 <p>{playSequence[playSequenceIndex].crowdLine}</p>
-                <p>{t('dashboard.events.setup.execution.playByPlayProgress', 'Beat {{current}} of {{total}}', { current: playSequenceIndex + 1, total: playSequence.length })}</p>
+                <p>{t('dashboard.events.setup.execution.playByPlayProgress', { current: playSequenceIndex + 1, total: playSequence.length })}</p>
                 <div style={{ marginTop: '0.5rem', background: '#2d2d2d', borderRadius: '999px', overflow: 'hidden', height: '8px' }}>
                   <div style={{ width: `${playSequence[playSequenceIndex].momentum}%`, height: '100%', background: '#ff8a00', transition: 'width 0.2s ease' }} />
                 </div>
@@ -2275,15 +2286,15 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
               </div>
               <button type="button" className={styles.primaryBtn} onClick={advancePlaySequence}>
                 {playSequenceIndex < playSequence.length - 1
-                  ? t('dashboard.events.setup.execution.advanceBeat', 'Advance Beat')
-                  : t('dashboard.events.setup.execution.resolveSegment', 'Resolve Segment')}
+                  ? t('dashboard.events.setup.execution.advanceBeat')
+                  : t('dashboard.events.setup.execution.resolveSegment')}
               </button>
             </div>
           ) : null}
 
           <div className={styles.footer}>
             <button type="button" className={styles.secondaryBtn} onClick={() => setPhase('setup')}>
-              {t('dashboard.events.setup.execution.backToSetup', 'Back to Setup')}
+              {t('dashboard.events.setup.execution.backToSetup')}
             </button>
             <button
               type="button"
@@ -2291,13 +2302,13 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
               onClick={() => setExecutionIndex((index) => Math.max(0, index - 1))}
               disabled={executionIndex === 0}
             >
-              {t('dashboard.events.setup.execution.previous', 'Previous Match')}
+              {t('dashboard.events.setup.execution.previous')}
             </button>
             <button type="button" className={styles.primaryBtn} onClick={handlePlaySegmentClick}>
-              {t('dashboard.events.setup.execution.play', 'Play Segment')}
+              {t('dashboard.events.setup.execution.play')}
             </button>
             <button type="button" className={styles.secondaryBtn} onClick={handleSimulateSegmentClick}>
-              {t('dashboard.events.setup.execution.simulate', 'Simulate Segment')}
+              {t('dashboard.events.setup.execution.simulate')}
             </button>
             {executionIndex < executionSegments.length - 1 ? (
               <button
@@ -2305,11 +2316,11 @@ function EventSetupModal({ isOpen, eventConfig, employees, onClose, onSubmit }) 
                 className={styles.primaryBtn}
                 onClick={() => setExecutionIndex((index) => Math.min(executionSegments.length - 1, index + 1))}
               >
-                {t('dashboard.events.setup.execution.next', 'Next Match')}
+                {t('dashboard.events.setup.execution.next')}
               </button>
             ) : (
               <button type="button" className={styles.primaryBtn} onClick={finishEventExecution}>
-                {t('dashboard.events.setup.execution.finish', 'Finish Event')}
+                {t('dashboard.events.setup.execution.finish')}
               </button>
             )}
           </div>

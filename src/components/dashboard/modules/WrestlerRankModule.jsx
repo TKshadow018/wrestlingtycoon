@@ -40,7 +40,7 @@ function WrestlerRankModule() {
     && maleRankedTeams.length === 0
     && femaleRankedTeams.length === 0
   ) {
-    return <p className={styles.emptyState}>{t('dashboard.wrestlerRank.empty', 'No wrestlers available.')}</p>
+    return <p className={styles.emptyState}>{t('dashboard.wrestlerRank.empty')}</p>
   }
 
   const activeDivision = selectedDivision === 'female' ? 'female' : 'male'
@@ -50,7 +50,7 @@ function WrestlerRankModule() {
   const renderWrestlerRankingList = (rankedList) => {
     if (!rankedList.length) {
       return (
-        <p className={styles.sectionEmpty}>{t('dashboard.wrestlerRank.empty', 'No wrestlers available.')}</p>
+        <p className={styles.sectionEmpty}>{t('dashboard.wrestlerRank.empty')}</p>
       )
     }
 
@@ -82,19 +82,19 @@ function WrestlerRankModule() {
                 <div className={styles.rankTopRow}>
                   <strong className={styles.rankIndex}>#{wrestler.rank}</strong>
                   <em className={`${styles.rankTrend} ${trendClass}`}>
-                    {t('dashboard.wrestlerRank.rankMove', 'Rank Move: {{value}}', { value: trendLabel })}
+                    {t('dashboard.wrestlerRank.rankMove', { value: trendLabel })}
                   </em>
                 </div>
 
                 <div className={styles.rankBottomRow}>
                   <h5 className={styles.rankName}>{wrestler.name}</h5>
-                  <p className={styles.rankMeta}>{t('dashboard.wrestlerRank.points', 'Points: {{points}}', { points: wrestler.rankPoints })}</p>
-                  <p className={styles.rankMeta}>{t('dashboard.wrestlerRank.record', 'Record: {{wins}}W - {{losses}}L ({{matches}} matches)', {
+                  <p className={styles.rankMeta}>{t('dashboard.wrestlerRank.points', { points: wrestler.rankPoints })}</p>
+                  <p className={styles.rankMeta}>{t('dashboard.wrestlerRank.record', {
                     wins: wrestler.wins,
                     losses: wrestler.losses,
                     matches: wrestler.matches,
                   })}</p>
-                  <p className={styles.rankMeta}>{t('dashboard.wrestlerRank.popularity', 'Popularity: {{value}}', { value: Number(wrestler.popularity || 0) })}</p>
+                  <p className={styles.rankMeta}>{t('dashboard.wrestlerRank.popularity', { value: Number(wrestler.popularity || 0) })}</p>
                 </div>
               </div>
             </article>
@@ -107,7 +107,7 @@ function WrestlerRankModule() {
   const renderTeamRankingList = (rankedList) => {
     if (!rankedList.length) {
       return (
-        <p className={styles.sectionEmpty}>{t('dashboard.wrestlerRank.emptyTeams', 'No teams available.')}</p>
+        <p className={styles.sectionEmpty}>{t('dashboard.wrestlerRank.emptyTeams')}</p>
       )
     }
 
@@ -118,9 +118,9 @@ function WrestlerRankModule() {
             <div className={styles.teamRankHeader}>
               <strong className={styles.rankIndex}>#{team.teamRank}</strong>
               <h5 className={styles.teamRankName}>{team.name}</h5>
-              {team.isMixed ? <span className={styles.teamMixedBadge}>{t('dashboard.wrestlerRank.mixedTeam', 'Mixed')}</span> : null}
+              {team.isMixed ? <span className={styles.teamMixedBadge}>{t('dashboard.wrestlerRank.mixedTeam')}</span> : null}
             </div>
-            <p className={styles.rankMeta}>{t('dashboard.wrestlerRank.teamPoints', 'Points: {{points}}', { points: team.teamRankPoints })}</p>
+            <p className={styles.rankMeta}>{t('dashboard.wrestlerRank.teamPoints', { points: team.teamRankPoints })}</p>
             <div className={styles.teamMembers}>
               {(team.memberEmployees || []).map((member) => (
                 <div key={member.employeeId} className={styles.teamMemberChip}>
@@ -149,8 +149,8 @@ function WrestlerRankModule() {
   return (
     <section className={styles.moduleBody}>
       <div className={styles.headerCard}>
-        <h4>{t('dashboard.wrestlerRank.title', 'Wrestler Rank')}</h4>
-        <p>{t('dashboard.wrestlerRank.description', 'Starts from popularity and shifts by match performance. Beating higher-ranked opponents grants more points.')}</p>
+        <h4>{t('dashboard.wrestlerRank.title')}</h4>
+        <p>{t('dashboard.wrestlerRank.description')}</p>
       </div>
 
       <div className={styles.boardTabs}>
@@ -159,14 +159,14 @@ function WrestlerRankModule() {
           className={`${styles.divisionTab} ${boardView === 'wrestlers' ? styles.divisionTabActive : ''}`}
           onClick={() => setBoardView('wrestlers')}
         >
-          {t('dashboard.wrestlerRank.wrestlersView', 'Wrestlers')}
+          {t('dashboard.wrestlerRank.wrestlersView')}
         </button>
         <button
           type="button"
           className={`${styles.divisionTab} ${boardView === 'teams' ? styles.divisionTabActive : ''}`}
           onClick={() => setBoardView('teams')}
         >
-          {t('dashboard.wrestlerRank.teamsView', 'Teams')}
+          {t('dashboard.wrestlerRank.teamsView')}
         </button>
       </div>
 
@@ -176,14 +176,14 @@ function WrestlerRankModule() {
           className={`${styles.divisionTab} ${activeDivision === 'male' ? styles.divisionTabActive : ''}`}
           onClick={() => setSelectedDivision('male')}
         >
-          {t('dashboard.wrestlerRank.maleDivision', 'Male Division')}
+          {t('dashboard.wrestlerRank.maleDivision')}
         </button>
         <button
           type="button"
           className={`${styles.divisionTab} ${activeDivision === 'female' ? styles.divisionTabActive : ''}`}
           onClick={() => setSelectedDivision('female')}
         >
-          {t('dashboard.wrestlerRank.femaleDivision', 'Female Division')}
+          {t('dashboard.wrestlerRank.femaleDivision')}
         </button>
       </div>
 

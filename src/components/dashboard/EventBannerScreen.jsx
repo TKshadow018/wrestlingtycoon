@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import styles from './EventBannerScreen.module.scss'
 
 const FEMALE_FALLBACK = '/people/girl.png'
@@ -20,11 +21,13 @@ const formatGameDate = (startDateIso, day) => {
   return date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 }
 
-const EVENT_TYPE_LABELS = {
-  ppv: 'Pay-Per-View',
-  megaLive: 'Mega Live Event',
-  oneTime: 'Special Event',
-  regularWeekly: 'Weekly Show',
+const EVENT_TYPE_KEYS = {
+  ppv: 'dashboard.eventTypes.ppv',
+  megaLive: 'dashboard.eventTypes.megaLive',
+  oneTime: 'dashboard.eventTypes.oneTime',
+  regularWeekly: 'dashboard.eventTypes.regularWeekly',
+  houseShow: 'dashboard.eventTypes.houseShow',
+  digitalOnly: 'dashboard.eventTypes.digitalOnly',
 }
 
 function ChampCard({ title, employees }) {
@@ -77,6 +80,7 @@ function ChampCard({ title, employees }) {
 }
 
 function EventBannerScreen({ event, day, startDateIso, sponsors, titles, employees, onSetup }) {
+  const { t } = useTranslation()
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -84,7 +88,10 @@ function EventBannerScreen({ event, day, startDateIso, sponsors, titles, employe
     return () => cancelAnimationFrame(id)
   }, [])
 
-  const eventTypeLabel = EVENT_TYPE_LABELS[event?.type] || 'Event'
+  const eventTypeLabel = t(EVENT_TYPE_KEYS[event?.type] || 'dashboard.eventTypes.unknown')
+  const eventName = event?.isSystem && event.type === 'regularWeekly'
+    ? eventTypeLabel
+    : event?.name || (event?.type ? eventTypeLabel : t('dashboard.eventBanner.tonightEvent'))
   const gameDate = formatGameDate(startDateIso, day)
   const activeSponsors = Array.isArray(sponsors) ? sponsors.filter(Boolean) : []
   const activeTitlesWithHolders = Array.isArray(titles)
@@ -107,7 +114,7 @@ function EventBannerScreen({ event, day, startDateIso, sponsors, titles, employe
 
         {/* Event name */}
         <h1 className={`${styles.eventName} ${visible ? styles.animate2 : ''}`}>
-          {event?.name || 'Tonight\'s Event'}
+          {eventName}
         </h1>
 
         {/* Date */}
@@ -120,7 +127,7 @@ function EventBannerScreen({ event, day, startDateIso, sponsors, titles, employe
         {/* Champions */}
         {activeTitlesWithHolders.length > 0 && (
           <div className={`${styles.champsSection} ${visible ? styles.animate4 : ''}`}>
-            <p className={styles.sectionLabel}>Current Champions</p>
+            <p className={styles.sectionLabel}>{t('dashboard.eventBanner.currentChampions')}</p>
             <div className={styles.champsGrid}>
               {activeTitlesWithHolders.map((title) => (
                 <ChampCard key={title.titleId} title={title} employees={employees} />
@@ -132,11 +139,11 @@ function EventBannerScreen({ event, day, startDateIso, sponsors, titles, employe
         {/* Sponsors */}
         {activeSponsors.length > 0 && (
           <div className={`${styles.sponsorsSection} ${visible ? styles.animate5 : ''}`}>
-            <p className={styles.sectionLabel}>Event Sponsors</p>
+            <p className={styles.sectionLabel}>{t('dashboard.eventBanner.eventSponsors')}</p>
             <div className={styles.sponsorChips}>
               {activeSponsors.map((sponsor, i) => (
                 <span key={sponsor.sponsorId || sponsor.id || i} className={styles.sponsorChip}>
-                  {sponsor.name || sponsor.company_name || 'Sponsor'}
+                  {sponsor.name || sponsor.company_name || t('dashboard.eventBanner.sponsorFallback')}
                 </span>
               ))}
             </div>
@@ -145,8 +152,8 @@ function EventBannerScreen({ event, day, startDateIso, sponsors, titles, employe
 
         {/* CTA */}
         <div className={`${styles.ctaRow} ${visible ? styles.animate6 : ''}`}>
-          <button type="button" className={styles.setupBtn} onClick={onSetup}>
-            Setup Event
+            <button type="button" className={styles.setupBtn} onClick={onSetup}>
+            {t('dashboard.eventBanner.setupEvent')}
           </button>
         </div>
       </div>

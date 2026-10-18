@@ -5,3 +5,9 @@
 - For core functionality, ensure that the essential tests are always up-to-date and passing before making any changes to the implementation.
 - Create MD files for new features or significant changes to document their usage and behavior. also update existing documentation as needed.
 - Ensure that any changes to environment variables or configuration files are reflected in the documentation.
+
+# Localization Requirements
+- Never hardcode user-facing text in application code. Add copy to `src/i18n/locales/*.json` and render it through `react-i18next` translation keys.
+- This applies to all visible and assistive copy, including headings, buttons, labels, placeholders, validation/errors, empty states, tooltips, titles, alt text, and ARIA labels, as well as generated UI messages and fallback text.
+- Keep persisted/game-state values language-neutral (stable IDs or translation keys) and translate them only when displayed; do not store English display labels as application data.
+- Hardcoded strings are acceptable only for non-display technical values (such as IDs, enum keys, CSS classes, URLs, and test fixtures), not as fallbacks for missing translations.

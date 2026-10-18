@@ -2,18 +2,18 @@ const MIN_HEEL_FACE_METER = 0
 const MAX_HEEL_FACE_METER = 100
 const DEFAULT_HEEL_FACE_METER = 50
 
-const HEEL_FACE_STAGE_LABELS = [
-  'Babyface',
-  'Pure Babyface',
-  'Fan Favorite',
-  'Crowd Favorite',
-  'Rising Face',
-  'Neutral',
-  'Tweener Heel',
-  'Heel',
-  'Dirty Heel',
-  'Top Heel',
-  'Super Heel',
+const HEEL_FACE_STAGE_KEYS = [
+  'babyface',
+  'pureBabyface',
+  'fanFavorite',
+  'crowdFavorite',
+  'risingFace',
+  'neutral',
+  'tweenerHeel',
+  'heel',
+  'dirtyHeel',
+  'topHeel',
+  'superHeel',
 ]
 
 export const clampHeelFaceMeter = (value) => {
@@ -28,11 +28,11 @@ export const clampHeelFaceMeter = (value) => {
 
 export const getHeelFaceStageIndex = (value) => {
   const clampedValue = clampHeelFaceMeter(value)
-  return Math.min(HEEL_FACE_STAGE_LABELS.length - 1, Math.floor(clampedValue / 10))
+  return Math.min(HEEL_FACE_STAGE_KEYS.length - 1, Math.floor(clampedValue / 10))
 }
 
-export const getHeelFaceStageLabel = (value) => {
-  return HEEL_FACE_STAGE_LABELS[getHeelFaceStageIndex(value)] || 'Neutral'
+export const getHeelFaceStageKey = (value) => {
+  return HEEL_FACE_STAGE_KEYS[getHeelFaceStageIndex(value)] || 'neutral'
 }
 
 export const DEFAULT_HEEL_FACE_METER_VALUE = DEFAULT_HEEL_FACE_METER

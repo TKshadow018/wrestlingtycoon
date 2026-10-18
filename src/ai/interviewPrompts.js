@@ -25,5 +25,3 @@ export const EVALUATE_SYSTEM_PROMPT_LINES = [
 ]
 
 export const BRIDGE_USER_INSTRUCTION = 'RESPOND TO THEIR ANSWER. Do not re-ask the question. Reply naturally as the journalist.'
-export const FALLBACK_BRIDGE_REPLY = 'I still need a clearer answer for the record.'
-export const FALLBACK_ACCEPT_REPLY = 'Thanks for the clarification.'

@@ -50,6 +50,10 @@ Wrestling Tycoon is a comprehensive sports management simulation game where you 
 
 ## 🚧 Phase Updates
 
+### Phase 14 (2026-10-18)
+
+- **Shared Rival Wrestling World**: Added a 100-wrestler pool shared across three rival promotions, weekly simulated cards, title defenses and changes, persistent match records, and roster intelligence in the Competition Desk.
+
 ### Phase 13 (2026-10-13)
 
 - **Guided Rescue Tutorial**: The existing 21-day challenge now walks players through role-complete staffing, three successful weekly shows, and operating-cash stabilization with dashboard step actions.
@@ -116,7 +120,6 @@ Wrestling Tycoon is a comprehensive sports management simulation game where you 
 ### Phase 5 (2026-08-03)
 
 - **Competitor Intelligence Module**: Added a new dashboard module that tracks competitor pressure history, highlights recent headlines, and summarizes average fan/prestige swings.
-- **Country-Based Management Generation**: Onboarding now includes a Management Base Country selector that guides faker-user generated Owner and General Manager identities.
 - **Competition Balance Knobs**: Competitor pressure is now configurable through `GAME_CONFIG.competition`, including rating baseline, swing scale, random range, rivalry scaling, event volatility, and prestige conversion limits.
 
 ### Phase 4 (2026-08-03)
@@ -124,7 +127,6 @@ Wrestling Tycoon is a comprehensive sports management simulation game where you 
 - **Competitor Pressure System**: Event resolution now simulates a competing promotion each event night, creating momentum swings that can increase or reduce your fan gain.
 - **Prestige Tug-of-War**: Rival company performance now applies a small prestige pressure modifier, making strong cards more important for maintaining brand momentum.
 - **Competitor Explainability**: Event Results now includes a Competitor Pressure panel with headline context plus fan/prestige impact values.
-- **Management Identity Generation**: New games now auto-generate Owner, General Manager, and Home Country profile metadata using faker-user.
 - **Leadership Visibility**: Dashboard header and HUD now display leadership identity and latest competitor pressure snapshot for faster strategic reads.
 
 ### Phase 3 (2026-08-03)
@@ -566,7 +568,6 @@ For detailed system specifications, see the docs folder:
 
 - **[AI Game Guide](docs/AI_GAME_GUIDE.md)**: AI-friendly orientation, source-of-truth rules, core vocabulary, state map, and documentation index
 - **[Game Loop and State](docs/GAME_LOOP_AND_STATE.md)**: Starting a promotion, calendar model, timeline processing, and persistence
-- **[Home Country](docs/HOME_COUNTRY.md)**: Management-country selection, profile persistence, and its current gameplay impact
 - **[Events and Matches](docs/EVENTS_AND_MATCHES.md)**: Event scheduling, segment setup, match execution, results, and simulator boundaries
 - **[Roster and Storylines](docs/ROSTER_AND_STORYLINES.md)**: Hiring, worker attributes, titles, teams, factions, chemistry, and wrestler rivalries
 - **[Progression and Competitor World](docs/PROGRESSION_AND_WORLD.md)**: Guided onboarding, career arcs, unlocks, competitor actions, and related systems

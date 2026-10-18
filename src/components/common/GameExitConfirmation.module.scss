@@ -1,0 +1,83 @@
+.backdrop {
+  align-items: center;
+  background: rgba(2, 8, 15, 0.8);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1rem;
+  position: fixed;
+  z-index: 1100;
+}
+
+.dialog {
+  background: linear-gradient(150deg, rgba(15, 24, 36, 0.99), rgba(6, 12, 20, 0.99));
+  border: 1px solid rgba(243, 159, 97, 0.42);
+  border-radius: 16px;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.58);
+  display: grid;
+  gap: 0.8rem;
+  max-width: 440px;
+  padding: 1.4rem;
+  width: 100%;
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    color: var(--text-main);
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  p {
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: flex-end;
+  margin-top: 0.35rem;
+}
+
+.stayButton,
+.leaveButton {
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  min-height: 38px;
+  padding: 0.55rem 0.95rem;
+  text-transform: uppercase;
+}
+
+.stayButton {
+  background: rgba(12, 21, 31, 0.9);
+  border: 1px solid var(--line-soft);
+  color: var(--text-main);
+}
+
+.leaveButton {
+  background: linear-gradient(135deg, #9d3f37, #d46e59);
+  border: 1px solid rgba(240, 127, 108, 0.58);
+  color: #fff;
+}
+
+@media (max-width: 420px) {
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .stayButton,
+  .leaveButton {
+    width: 100%;
+  }
+}

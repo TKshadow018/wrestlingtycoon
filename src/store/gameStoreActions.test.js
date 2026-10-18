@@ -102,6 +102,14 @@ afterAll(() => {
 })
 
 describe('game store action coverage', () => {
+  it('omits home-country metadata from new games and persisted state', () => {
+    const state = useGameStore.getState()
+    const persistedState = JSON.parse(testStorage.get('wrestling-tycoon-save-v1')).state
+
+    expect(state.profile).not.toHaveProperty('homeCountry')
+    expect(persistedState.profile).not.toHaveProperty('homeCountry')
+  })
+
   it('creates a rivalry from a selected new pairing only when interview heat rises', () => {
     const featuredWrestler = hireCandidate('wrestler')
     const rivalWrestler = hireCandidate('wrestler')
@@ -433,13 +441,13 @@ describe('game store action coverage', () => {
       name: ' ',
       scheduledWeek: 3,
       maxMatches: 9,
-    })).toMatchObject({ ok: false, error: 'Event name is required.' })
+    })).toMatchObject({ ok: false, error: 'dashboard.events.validation.eventNameRequired' })
     expect(create({
       type: 'regularWeekly',
       name: 'Unsupported',
       scheduledWeek: 3,
       maxMatches: 5,
-    })).toMatchObject({ ok: false, error: 'Unsupported event type.' })
+    })).toMatchObject({ ok: false, error: 'dashboard.events.validation.unsupportedType' })
 
     const created = create({
       type: 'houseShow',
@@ -463,13 +471,13 @@ describe('game store action coverage', () => {
       name: '',
       scheduledWeek: 4,
       maxMatches: 7,
-    })).toMatchObject({ ok: false, error: 'Event name is required.' })
+    })).toMatchObject({ ok: false, error: 'dashboard.events.validation.eventNameRequired' })
     expect(update('not-found', {
       type: 'ppv',
       name: 'Missing',
       scheduledWeek: 4,
       maxMatches: 7,
-    })).toMatchObject({ ok: false, error: 'Event not found.' })
+    })).toMatchObject({ ok: false, error: 'dashboard.events.validation.eventNotFound' })
 
     expect(update(event.eventId, {
       type: 'ppv',
@@ -674,8 +682,48 @@ describe('game store action coverage', () => {
         rivalId: companies[0].id,
         strategyId: 'counterProgramming',
         day: 2,
+        headlineKey: 'dashboard.competitorIntel.news.strategyShift',
+        headlineValues: { strategyId: 'counterProgramming' },
       }),
     ]))
+  })
+
+  it('runs weekly cards for all three rivals and persists updated pool and champions', () => {
+    const initialState = useGameStore.getState()
+    expect(initialState.events.competitorCompanies.map(({ id }) => id)).toEqual([
+      'comp-1', 'comp-2', 'comp-3',
+    ])
+    expect(initialState.events.competitorWrestlerPool).toHaveLength(100)
+    useGameStore.setState((state) => ({
+      calendar: {
+        ...state.calendar,
+        day: 6,
+      },
+    }))
+    useGameStore.getState().proceedTimeline()
+
+    const state = useGameStore.getState()
+    expect(state.calendar.day).toBe(7)
+    expect(state.events.competitorCompanies).toHaveLength(3)
+    state.events.competitorCompanies.forEach((competitor) => {
+      expect(competitor.eventsRun).toBe(1)
+      expect(competitor.lastEvent).toMatchObject({ day: 7, week: 1 })
+      expect(competitor.champions).toHaveLength(2)
+      expect(competitor.champions.every(({ lastDefendedDay }) => lastDefendedDay === 7)).toBe(true)
+    })
+    expect(state.events.competitorHeadlines.filter(({ type }) => type === 'rivalWeeklyEvent'))
+      .toHaveLength(3)
+    expect(state.events.competitorHeadlines).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        type: 'rivalWeeklyEvent',
+        rivalId: 'comp-1',
+        day: 7,
+      }),
+    ]))
+
+    const persistedEvents = JSON.parse(testStorage.get('wrestling-tycoon-save-v1')).state.events
+    expect(persistedEvents.competitorWrestlerPool).toHaveLength(100)
+    expect(persistedEvents.competitorCompanies[0].lastEvent.day).toBe(7)
   })
 
   it('activates titles, validates team membership, and updates or removes teams', () => {
@@ -956,6 +1004,15 @@ describe('game store action coverage', () => {
     })
     expect(state.events.lastOutcome.segments).toHaveLength(8)
     expect(state.events.lastOutcome.audienceSegments).toHaveLength(4)
+    const localizedOutcomeLabels = [
+      ...state.events.lastOutcome.postmortem.fanFactors,
+      ...state.events.lastOutcome.postmortem.prestigeFactors,
+      ...state.events.lastOutcome.postmortem.moneyFactors,
+      ...state.events.lastOutcome.audienceSegments,
+    ]
+    expect(localizedOutcomeLabels.every((entry) => (
+      typeof entry.labelKey === 'string' && !Object.hasOwn(entry, 'label')
+    ))).toBe(true)
     expect(state.events.lastOutcome.sponsorTrustReactions).toHaveLength(2)
     expect(state.events.lastOutcome.rivalryHighlights.length).toBeGreaterThan(0)
     expect(state.events.lastOutcome.factionStories.map((story) => story.action)).toEqual([

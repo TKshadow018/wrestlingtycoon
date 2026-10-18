@@ -38,6 +38,8 @@ Zustand persistence uses the local-storage key `wrestling-tycoon-save-v1`. The p
 
 Recent histories are bounded to keep saves manageable: the daily timeline retains 45 entries, the finance ledger 120, completed event log 100, competitor headlines 80, board minutes 24, and career-arc history 16. These limits are implementation details and may change.
 
+While a game is active, browser Back opens a confirmation dialog. Choosing to keep playing stays on the dashboard; confirming exit returns to the previous browser entry, or to the start screen if the dashboard was opened directly. This protects against accidental in-app back navigation and does not replace the game's local-storage persistence.
+
 ## State groups at a glance
 
 | Group | Examples | What it represents |

@@ -4,7 +4,7 @@ import {
   clampHeelFaceMeter,
   computeHeelFaceShift,
   getHeelFaceStageIndex,
-  getHeelFaceStageLabel,
+  getHeelFaceStageKey,
 } from './heelFaceMeter'
 
 describe('heel/face meter', () => {
@@ -18,10 +18,10 @@ describe('heel/face meter', () => {
 
   it('maps the meter to every alignment stage and its boundary values', () => {
     expect(getHeelFaceStageIndex(0)).toBe(0)
-    expect(getHeelFaceStageLabel(9)).toBe('Babyface')
-    expect(getHeelFaceStageLabel(10)).toBe('Pure Babyface')
-    expect(getHeelFaceStageLabel(50)).toBe('Neutral')
-    expect(getHeelFaceStageLabel(100)).toBe('Super Heel')
+    expect(getHeelFaceStageKey(9)).toBe('babyface')
+    expect(getHeelFaceStageKey(10)).toBe('pureBabyface')
+    expect(getHeelFaceStageKey(50)).toBe('neutral')
+    expect(getHeelFaceStageKey(100)).toBe('superHeel')
   })
 
   it('shifts winners and losers according to the opponent alignment', () => {

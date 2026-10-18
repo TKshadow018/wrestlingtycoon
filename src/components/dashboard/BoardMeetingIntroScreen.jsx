@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getBoardMeetingImageUrl } from '../../utils/boardMeetingVisuals'
 import styles from './BoardMeetingIntroScreen.module.scss'
 
 function BoardMeetingIntroScreen({ isJanuary, durationMs = 2600, onComplete }) {
+  const { t } = useTranslation()
   const [visible, setVisible] = useState(false)
   const imageUrl = getBoardMeetingImageUrl(isJanuary)
-  const title = isJanuary ? 'Annual Board Meeting & Election' : 'Monthly Board Meeting'
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setVisible(true))
@@ -25,10 +26,12 @@ function BoardMeetingIntroScreen({ isJanuary, durationMs = 2600, onComplete }) {
       <div className={styles.vignette} aria-hidden="true" />
       <div className={styles.scanlines} aria-hidden="true" />
       <div className={styles.content}>
-        <p className={styles.label}>Board of Directors</p>
-        <h2 className={styles.title}>{title}</h2>
+        <p className={styles.label}>{t('dashboard.boardMeeting.intro.department')}</p>
+        <h2 className={styles.title}>
+          {t(isJanuary ? 'dashboard.boardMeeting.intro.annualTitle' : 'dashboard.boardMeeting.intro.monthlyTitle')}
+        </h2>
         <p className={styles.subline}>
-          {isJanuary ? 'The annual leadership vote is on the agenda.' : 'The board is convening to review the promotion.'}
+          {t(isJanuary ? 'dashboard.boardMeeting.intro.annualDescription' : 'dashboard.boardMeeting.intro.monthlyDescription')}
         </p>
       </div>
     </div>

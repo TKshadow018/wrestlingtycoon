@@ -34,6 +34,20 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
+describe('StartScreenPage management profile setup', () => {
+  it('starts a game without asking for a management country', () => {
+    render(<StartScreenPage />)
+
+    expect(screen.queryByRole('combobox', { name: 'Management Base Country' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Start Game' }))
+
+    expect(mocks.startGame).toHaveBeenCalledWith({
+      playerName: 'Tusar',
+      companyName: 'Dhisum Dhisum Wrestling',
+    })
+  })
+})
+
 describe('StartScreenPage AI setup recovery', () => {
   it('offers retry after setup fails and starts model initialization again', async () => {
     mocks.startAiModelDownload

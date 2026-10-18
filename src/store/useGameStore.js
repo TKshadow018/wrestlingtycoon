@@ -43,8 +43,12 @@ import {
   advanceCompetitorStrategies,
   applyCompetitorGimmickCopy,
   createInitialCompetitorCompanies,
+  createInitialCompetitorWorld,
   getCompetitorStrategyModifiers,
+  normalizeCompetitorHeadlines,
   normalizeCompetitorCompanies,
+  normalizeCompetitorWorld,
+  simulateWeeklyCompetitorEvents,
 } from '../utils/competitorWorld'
 import { computeInterviewImpactPreview, computeInterviewStoryEffects } from '../utils/interviewStoryEffects'
 import { buildEventPostmortemRecommendations } from '../utils/eventPostmortemRecommendations'
@@ -63,7 +67,6 @@ import {
   resolveGameCalendarStartDate,
   toGameDateIso,
 } from '../utils/gameCalendar'
-import { generatePerson } from 'faker-user'
 import preloadedEvents from '../data/preloadedEvents.json'
 import titleCatalog from '../data/titles.json'
 
@@ -494,6 +497,7 @@ const evaluateCandidateOffer = (candidate, offer = {}) => {
 const buildInitialState = () => {
   const startDateIso = GAME_CONFIG.startDateIso || toIsoDateLocal(new Date())
   const seededCustomEvents = createPreloadedCustomEvents(startDateIso)
+  const competitorWorld = createInitialCompetitorWorld()
   const initialRoster = {
     employees: [],
     titles: createInitialTitles(),
@@ -515,7 +519,6 @@ const buildInitialState = () => {
       companyName: '',
       ownerName: '',
       generalManagerName: '',
-      homeCountry: '',
     },
     calendar: {
       day: 1,
@@ -559,7 +562,7 @@ const buildInitialState = () => {
     events: {
       regularWeeklyEvent: {
         eventId: 'regular-weekly-event',
-        name: 'Weekly TV Show',
+        name: '',
         type: 'regularWeekly',
         isSystem: true,
         maxMatches: EVENT_TYPE_CONFIG.regularWeekly.maxMatches,
@@ -569,7 +572,8 @@ const buildInitialState = () => {
       lastOutcome: null,
       eventLog: [],
       rivalries: [],
-      competitorCompanies: createInitialCompetitorCompanies(),
+      competitorCompanies: competitorWorld.companies,
+      competitorWrestlerPool: competitorWorld.wrestlerPool,
       factionRivalries: [],
       competitorHeadlines: [],
       eventPreparation: null,
@@ -606,26 +610,6 @@ const buildInitialState = () => {
       showEnableModal: false,
       lastInterviewImpact: null,
     },
-  }
-}
-
-const buildGeneratedManagementProfile = ({ preferredCountry }) => {
-  const preferredCountryList = preferredCountry ? [preferredCountry] : undefined
-
-  try {
-    const representative = generatePerson({
-      country: preferredCountryList,
-      minAge: 38,
-      maxAge: 68,
-    })
-
-    return {
-      homeCountry: representative?.country || 'UnitedStates',
-    }
-  } catch {
-    return {
-      homeCountry: 'UnitedStates',
-    }
   }
 }
 
@@ -773,18 +757,18 @@ const runCompetitorPressure = ({
     Math.min(competitionConfig.prestigeMax, Math.round(fanImpact / competitionConfig.prestigeDivisor)),
   )
 
-  const headline = fanImpact >= 0
-    ? `${rival.name} failed to outdraw your show this week.`
-    : `${rival.name} stole spotlight momentum with a hot competing card.`
+  const headlineKey = fanImpact >= 0
+    ? 'dashboard.competitorIntel.news.pressureSuccess'
+    : 'dashboard.competitorIntel.news.pressureFailure'
 
   return {
     day,
     rivalId: rival.id,
-    rivalName: rival.name,
     strategyId: rival.strategyId,
     fanImpact,
     prestigeImpact,
-    headline,
+    headlineKey,
+    headlineValues: {},
   }
 }
 
@@ -816,12 +800,12 @@ const runCompetitorWorldSimulation = ({
     newsItems.push({
       day,
       rivalId: rival.id,
-      rivalName: rival.name,
       strategyId: rival.strategyId,
       type: 'talentSigning',
       fanImpact: -prospectImpact,
       prestigeImpact: 0,
-      headline: `${rival.name} signed prospect ${signedCandidate.name} ahead of your talent team.`,
+      headlineKey: 'dashboard.competitorIntel.news.talentSigning',
+      headlineValues: { wrestlerName: signedCandidate.name },
     })
   }
 
@@ -837,25 +821,25 @@ const runCompetitorWorldSimulation = ({
     newsItems.push({
       day,
       rivalId: rival.id,
-      rivalName: rival.name,
       strategyId: rival.strategyId,
       fanImpact: counterSwing,
       prestigeImpact: Math.round(counterSwing / 60),
-      headline: counterSwing >= 0
-        ? `${rival.name} failed to dent your night despite heavy counter-programming.`
-        : `${rival.name} counter-programmed with a strong card and stole momentum.`,
+      headlineKey: counterSwing >= 0
+        ? 'dashboard.competitorIntel.news.pressureSuccess'
+        : 'dashboard.competitorIntel.news.pressureFailure',
+      headlineValues: {},
     })
     if (strategy.gimmickCopyPressure > 0) {
       fanImpact -= strategy.gimmickCopyPressure
       newsItems.push({
         day,
         rivalId: rival.id,
-        rivalName: rival.name,
         strategyId: rival.strategyId,
         type: 'gimmickCopy',
         fanImpact: -strategy.gimmickCopyPressure,
         prestigeImpact: 0,
-        headline: `${rival.name} used copied gimmicks to boost its competing event.`,
+        headlineKey: 'dashboard.competitorIntel.news.gimmickPressure',
+        headlineValues: {},
       })
     }
   }
@@ -866,12 +850,12 @@ const runCompetitorWorldSimulation = ({
     newsItems.push({
       day,
       rivalId: rival.id,
-      rivalName: rival.name,
       strategyId: rival.strategyId,
       type: 'audienceExpansion',
       fanImpact: -pressure,
       prestigeImpact: 0,
-      headline: `${rival.name} expanded its audience reach ahead of your event.`,
+      headlineKey: 'dashboard.competitorIntel.news.audienceExpansion',
+      headlineValues: {},
     })
   }
 
@@ -907,11 +891,11 @@ const runCompetitorWorldSimulation = ({
     newsItems.push({
       day,
       rivalId: rival.id,
-      rivalName: rival.name,
       strategyId: rival.strategyId,
       fanImpact: -poachImpact,
       prestigeImpact: -1,
-      headline: `${rival.name} poached unhappy star ${target.name} from your roster.`,
+      headlineKey: 'dashboard.competitorIntel.news.employeePoached',
+      headlineValues: { wrestlerName: target.name },
     })
   }
 
@@ -1469,7 +1453,6 @@ const getEventMonthYearKey = (event) => {
 
 const EVENT_TYPE_CONFIG = {
   regularWeekly: {
-    label: 'Regular Weekly Event',
     maxMatches: 5,
     reputation: 62,
     popularityWeight: 1.14,
@@ -1479,7 +1462,6 @@ const EVENT_TYPE_CONFIG = {
     setupCost: 0,
   },
   houseShow: {
-    label: 'House Show',
     maxMatches: 3,
     reputation: 48,
     popularityWeight: 1.02,
@@ -1489,7 +1471,6 @@ const EVENT_TYPE_CONFIG = {
     setupCost: 9000,
   },
   ppv: {
-    label: 'PPV',
     maxMatches: 7,
     reputation: 86,
     popularityWeight: 1.48,
@@ -1499,7 +1480,6 @@ const EVENT_TYPE_CONFIG = {
     setupCost: 24000,
   },
   megaLive: {
-    label: 'Mega Live Event',
     maxMatches: 10,
     reputation: 96,
     popularityWeight: 1.7,
@@ -1509,7 +1489,6 @@ const EVENT_TYPE_CONFIG = {
     setupCost: 32000,
   },
   oneTime: {
-    label: 'One Time Event',
     maxMatches: 8,
     reputation: 84,
     popularityWeight: 1.42,
@@ -1519,7 +1498,6 @@ const EVENT_TYPE_CONFIG = {
     setupCost: 20000,
   },
   digitalOnly: {
-    label: 'Digital Only Show',
     maxMatches: 3,
     reputation: 50,
     popularityWeight: 0.98,
@@ -1823,37 +1801,41 @@ const buildEventPostmortem = ({
   const fanFactors = [
     {
       key: 'ratingGate',
-      label: `Event rating gate (${Number.isFinite(overallRating) ? overallRating.toFixed(1) : 'N/A'} vs ${fanGrowthThreshold.toFixed(1)} threshold)`,
+      labelKey: 'dashboard.eventResults.postmortemFactors.ratingGate',
+      labelValues: {
+        rating: Number.isFinite(overallRating) ? overallRating.toFixed(1) : null,
+        threshold: fanGrowthThreshold.toFixed(1),
+      },
       impact: getImpact(fanDelta),
       value: fanDelta,
     },
     {
       key: 'cardVariety',
-      label: 'Card segment variety bonus',
+      labelKey: 'dashboard.eventResults.postmortemFactors.cardVariety',
       impact: getImpact(setupBonus?.fans || 0),
       value: Math.round(setupBonus?.fans || 0),
     },
     {
       key: 'sponsorBuzz',
-      label: 'Sponsor fan boost',
+      labelKey: 'dashboard.eventResults.postmortemFactors.sponsorBuzz',
       impact: getImpact(Math.round(sponsorFanBoost || 0)),
       value: Math.round(sponsorFanBoost || 0),
     },
     {
       key: 'rivalryBuzz',
-      label: 'Rivalry heat crowd reaction',
+      labelKey: 'dashboard.eventResults.postmortemFactors.rivalryBuzz',
       impact: getImpact(Math.round(rivalryFanBoost || 0)),
       value: Math.round(rivalryFanBoost || 0),
     },
     {
       key: 'audienceMix',
-      label: 'Audience segment fit bonus',
+      labelKey: 'dashboard.eventResults.postmortemFactors.audienceMix',
       impact: getImpact(Math.round(audienceSegmentFanImpact || 0)),
       value: Math.round(audienceSegmentFanImpact || 0),
     },
     {
       key: 'competitorHeat',
-      label: 'Competitor pressure swing',
+      labelKey: 'dashboard.eventResults.postmortemFactors.competitorHeat',
       impact: getImpact(Math.round(competitorFanImpact || 0)),
       value: Math.round(competitorFanImpact || 0),
     },
@@ -1862,25 +1844,25 @@ const buildEventPostmortem = ({
   const prestigeFactors = [
     {
       key: 'matchQuality',
-      label: 'Match quality and card execution',
+      labelKey: 'dashboard.eventResults.postmortemFactors.matchQuality',
       impact: getImpact(prestigeDelta),
       value: prestigeDelta,
     },
     {
       key: 'setupPrestige',
-      label: 'Segment setup prestige bonus',
+      labelKey: 'dashboard.eventResults.postmortemFactors.setupPrestige',
       impact: getImpact(Math.round(setupBonus?.prestige || 0)),
       value: Math.round(setupBonus?.prestige || 0),
     },
     {
       key: 'rivalryPrestige',
-      label: 'Rivalry momentum prestige boost',
+      labelKey: 'dashboard.eventResults.postmortemFactors.rivalryPrestige',
       impact: getImpact(Math.round(rivalryPrestigeBoost || 0)),
       value: Math.round(rivalryPrestigeBoost || 0),
     },
     {
       key: 'competitorPrestige',
-      label: 'Competitor prestige pressure',
+      labelKey: 'dashboard.eventResults.postmortemFactors.competitorPrestige',
       impact: getImpact(Math.round(competitorPrestigeImpact || 0)),
       value: Math.round(competitorPrestigeImpact || 0),
     },
@@ -1889,37 +1871,37 @@ const buildEventPostmortem = ({
   const moneyFactors = [
     {
       key: 'eventGate',
-      label: 'Ticket gate and event takings',
+      labelKey: 'dashboard.eventResults.postmortemFactors.eventGate',
       impact: getImpact(incomeBreakdown?.eventGate || 0),
       value: Math.round(incomeBreakdown?.eventGate || 0),
     },
     {
       key: 'sponsorRevenue',
-      label: 'Sponsor revenue',
+      labelKey: 'dashboard.eventResults.postmortemFactors.sponsorRevenue',
       impact: getImpact((incomeBreakdown?.sponsor || 0) + Math.round((sponsorEventBoost || 0) * 1000)),
       value: Math.round(incomeBreakdown?.sponsor || 0),
     },
     {
       key: 'payrollCost',
-      label: 'Wrestler and staff payroll',
+      labelKey: 'dashboard.eventResults.postmortemFactors.payrollCost',
       impact: 'negative',
       value: -Math.round((expenseBreakdown?.wrestlerPayroll || 0) + (expenseBreakdown?.staffCost || 0)),
     },
     {
       key: 'monthlyPayroll',
-      label: 'Recurring monthly payroll',
+      labelKey: 'dashboard.eventResults.postmortemFactors.monthlyPayroll',
       impact: 'negative',
       value: -Math.round(expenseBreakdown?.monthlyPayroll || 0),
     },
     {
       key: 'productionCost',
-      label: 'Production and operating costs',
+      labelKey: 'dashboard.eventResults.postmortemFactors.productionCost',
       impact: 'negative',
       value: -Math.round((expenseBreakdown?.eventCost || 0) + (expenseBreakdown?.operatingCost || 0)),
     },
     {
       key: 'net',
-      label: 'Net event impact',
+      labelKey: 'dashboard.eventResults.postmortemFactors.net',
       impact: getImpact(net),
       value: Math.round(net),
     },
@@ -1960,28 +1942,28 @@ const buildAudienceSegmentsBreakdown = ({
   const segmentBlueprints = [
     {
       key: 'casual',
-      label: 'Casual',
+      labelKey: 'dashboard.eventResults.audienceSegmentLabels.casual',
       spendMultiplier: 1,
       rawScore: 45 + hype * 0.18 + promoShare * 20 + qualityFactor * 12 - risk * 0.08,
       satisfaction: clampPercent(48 + qualityFactor * 28 + promoShare * 18 + riskControl * 8),
     },
     {
       key: 'hardcore',
-      label: 'Hardcore',
+      labelKey: 'dashboard.eventResults.audienceSegmentLabels.hardcore',
       spendMultiplier: 1.2,
       rawScore: 38 + qualityFactor * 30 + titleShare * 36 + mainEventShare * 18 + rivalryHeatScore * 0.12,
       satisfaction: clampPercent(42 + qualityFactor * 34 + titleShare * 20 + rivalryHeatScore * 0.18),
     },
     {
       key: 'family',
-      label: 'Family',
+      labelKey: 'dashboard.eventResults.audienceSegmentLabels.family',
       spendMultiplier: 0.85,
       rawScore: 40 + riskControl * 25 + promoShare * 14 + sponsorFanBoost * 0.28 - rivalryHeatScore * 0.08,
       satisfaction: clampPercent(44 + riskControl * 34 + promoShare * 12 - rivalryHeatScore * 0.1),
     },
     {
       key: 'online',
-      label: 'Online',
+      labelKey: 'dashboard.eventResults.audienceSegmentLabels.online',
       spendMultiplier: 0.7,
       rawScore: 36 + (eventType === 'digitalOnly' ? 24 : 0) + (eventType === 'ppv' ? 8 : 0) + promoShare * 16 + rivalryHeatScore * 0.18,
       satisfaction: clampPercent(40 + qualityFactor * 20 + promoShare * 18 + rivalryHeatScore * 0.15 + (eventType === 'digitalOnly' ? 15 : 0)),
@@ -2003,7 +1985,7 @@ const buildAudienceSegmentsBreakdown = ({
 
     return {
       key: segment.key,
-      label: segment.label,
+      labelKey: segment.labelKey,
       attendance,
       sharePercent: clampPercent(ratio * 100),
       satisfaction: segment.satisfaction,
@@ -2858,7 +2840,7 @@ const buildRegularWeeklyProjection = (day, startDateIso) => {
   return toProductionEvent({
     eventId: 'regular-weekly-event',
     type: 'regularWeekly',
-    name: 'Weekly TV Show',
+    name: '',
     maxMatches: EVENT_TYPE_CONFIG.regularWeekly.maxMatches,
     scheduledDay,
     scheduledWeek,
@@ -2901,11 +2883,11 @@ const buildBookedEventProjection = (day, customEvents, startDateIso) => {
 const validateCustomEventRules = ({ customEvents, draftEvent, currentWeek, currentDay, ignoreEventId = null }) => {
   const typeConfig = EVENT_TYPE_CONFIG[draftEvent.type]
   if (!typeConfig || draftEvent.type === 'regularWeekly') {
-    return { ok: false, error: 'Unsupported event type.' }
+    return { ok: false, error: 'dashboard.events.validation.unsupportedType' }
   }
 
   if (!Number.isInteger(draftEvent.scheduledDay) || draftEvent.scheduledDay < currentDay) {
-    return { ok: false, error: 'Scheduled date must be today or later.' }
+    return { ok: false, error: 'dashboard.events.validation.scheduledDatePast' }
   }
 
   const comparableEvents = customEvents.filter((event) => event.eventId !== ignoreEventId)
@@ -2917,7 +2899,7 @@ const validateCustomEventRules = ({ customEvents, draftEvent, currentWeek, curre
 
   // Allow up to 2 custom events in the same week.
   if (sameWeekCount >= 2) {
-    return { ok: false, error: 'Weekly event cap reached (maximum 2 custom events per week).' }
+    return { ok: false, error: 'dashboard.events.validation.weeklyEventCap' }
   }
 
   const draftEventKeys = getEventMonthYearKey(draftEvent)
@@ -2927,21 +2909,21 @@ const validateCustomEventRules = ({ customEvents, draftEvent, currentWeek, curre
   if (draftEvent.type === 'ppv') {
     const ppvInMonth = sameMonthEvents.filter((event) => event.type === 'ppv').length
     if (ppvInMonth >= 1) {
-      return { ok: false, error: 'Only one PPV is allowed per month.' }
+      return { ok: false, error: 'dashboard.events.validation.ppvMonthlyCap' }
     }
   }
 
   if (draftEvent.type === 'megaLive') {
     const megaInYear = sameYearEvents.filter((event) => event.type === 'megaLive').length
     if (megaInYear >= 1) {
-      return { ok: false, error: 'Only one Mega Live Event is allowed per year.' }
+      return { ok: false, error: 'dashboard.events.validation.megaLiveAnnualCap' }
     }
   }
 
   if (draftEvent.type === 'oneTime') {
     const oneTimeInYear = sameYearEvents.filter((event) => event.type === 'oneTime').length
     if (oneTimeInYear >= 3) {
-      return { ok: false, error: 'Only three One Time Events are allowed per year.' }
+      return { ok: false, error: 'dashboard.events.validation.oneTimeAnnualCap' }
     }
   }
 
@@ -2950,7 +2932,7 @@ const validateCustomEventRules = ({ customEvents, draftEvent, currentWeek, curre
       (event) => event.type === 'digitalOnly' && event.scheduledWeek === draftEvent.scheduledWeek,
     ).length
     if (digitalInWeek >= 1) {
-      return { ok: false, error: 'Only one Digital Only Show is allowed each week.' }
+      return { ok: false, error: 'dashboard.events.validation.digitalWeeklyCap' }
     }
   }
 
@@ -3287,20 +3269,15 @@ export const useGameStore = create(
     (set, get) => ({
       ...buildInitialState(),
 
-      startGame: ({ playerName, companyName, preferredCountry = '' }) => {
+      startGame: ({ playerName, companyName }) => {
         const cleanPlayerName = playerName.trim()
         const cleanCompanyName = companyName.trim()
-        const cleanPreferredCountry = String(preferredCountry || '').trim()
 
         if (!cleanPlayerName || !cleanCompanyName) {
           return { ok: false }
         }
 
         const initialState = buildInitialState()
-        const managementProfile = buildGeneratedManagementProfile({
-          preferredCountry: cleanPreferredCountry || undefined,
-        })
-
         const careerUnlocks = normalizeCareerArcUnlocks(initialState.progression.unlocks)
         const firstCareerArc = buildCareerArc({
           startDay: 1,
@@ -3325,7 +3302,6 @@ export const useGameStore = create(
             companyName: cleanCompanyName,
             ownerName: BOARD_CHAIR.person_name,
             generalManagerName: cleanPlayerName,
-            homeCountry: managementProfile.homeCountry,
           },
           progression: {
             currentArc: firstCareerArc,
@@ -4351,10 +4327,10 @@ export const useGameStore = create(
       createCustomEvent: ({ type, name, scheduledWeek, maxMatches, specificDate, isRecurringAnnually }) => {
         const cleanName = (name || '').trim()
         if (!cleanName) {
-          return { ok: false, error: 'Event name is required.' }
+          return { ok: false, error: 'dashboard.events.validation.eventNameRequired' }
         }
 
-        let result = { ok: false, error: 'Unknown error.' }
+        let result = { ok: false, error: 'dashboard.events.validation.unableToSave' }
 
         set((state) => {
           const scheduledDay = getScheduledDayFromSpecificDate({
@@ -4405,7 +4381,7 @@ export const useGameStore = create(
 
           const bookingCost = getEventSetupCost(createdEvent.type)
           if (state.finances.cash < bookingCost) {
-            result = { ok: false, error: 'Insufficient cash for event setup cost.' }
+            result = { ok: false, error: 'dashboard.events.validation.insufficientCash' }
             return state
           }
 
@@ -4442,15 +4418,15 @@ export const useGameStore = create(
       updateCustomEvent: (eventId, { type, name, scheduledWeek, maxMatches, specificDate, isRecurringAnnually }) => {
         const cleanName = (name || '').trim()
         if (!cleanName) {
-          return { ok: false, error: 'Event name is required.' }
+          return { ok: false, error: 'dashboard.events.validation.eventNameRequired' }
         }
 
-        let result = { ok: false, error: 'Unknown error.' }
+        let result = { ok: false, error: 'dashboard.events.validation.unableToSave' }
 
         set((state) => {
           const currentEvent = state.events.customEvents.find((event) => event.eventId === eventId)
           if (!currentEvent) {
-            result = { ok: false, error: 'Event not found.' }
+            result = { ok: false, error: 'dashboard.events.validation.eventNotFound' }
             return state
           }
 
@@ -4512,7 +4488,7 @@ export const useGameStore = create(
           const setupCostDelta = nextSetupCost - oldSetupCost
 
           if (setupCostDelta > 0 && state.finances.cash < setupCostDelta) {
-            result = { ok: false, error: 'Insufficient cash for updated event setup cost.' }
+            result = { ok: false, error: 'dashboard.events.validation.insufficientCashUpdate' }
             return state
           }
 
@@ -5387,6 +5363,11 @@ export const useGameStore = create(
             state.events.competitorCompanies || COMPETITOR_COMPANIES,
             nextCalendar.day,
           )
+          const competitorEventSimulation = simulateWeeklyCompetitorEvents(
+            competitorStrategyAdvance.companies,
+            state.events.competitorWrestlerPool,
+            nextCalendar.day,
+          )
           const nextActiveEmployees = filterActiveEmployees(state.roster.employees, nextCalendar.day)
           const normalizedSponsors = normalizeSponsors(state.roster.sponsors)
           const dueCustomEvent = getDueCustomEventForDay(state.calendar.day, state.events.customEvents)
@@ -5791,7 +5772,7 @@ export const useGameStore = create(
               rivalryHeatScore,
               eventType,
               day: state.calendar.day,
-              competitorCompanies: competitorStrategyAdvance.companies,
+              competitorCompanies: competitorEventSimulation.companies,
             })
             competitorHeadline = competitorPressure
             competitorFanImpactForPostmortem = competitorPressure.fanImpact
@@ -5932,7 +5913,7 @@ export const useGameStore = create(
             lastOutcome,
             employees: nextActiveEmployeesWithDecay,
             marketCandidates: state.market.employeeCandidates,
-            competitorCompanies: competitorStrategyAdvance.companies,
+            competitorCompanies: competitorEventSimulation.companies,
             wrestlerArchetypes: state.market.wrestlerArchetypes,
           })
           competitorWorldNewsForOutcome = competitorWorldResult.newsItems
@@ -6430,6 +6411,10 @@ export const useGameStore = create(
               ...entry,
               id: `competitor-strategy-${state.calendar.day}-${index}-${Date.now()}`,
             })),
+            ...competitorEventSimulation.newsItems.map((entry, index) => ({
+              ...entry,
+              id: `competitor-event-${state.calendar.day}-${index}-${Date.now()}`,
+            })),
             ...(lastOutcome?.competitorPressure
               ? [{ ...lastOutcome.competitorPressure, id: `competitor-pressure-${state.calendar.day}-${Date.now()}` }]
               : []),
@@ -6439,9 +6424,10 @@ export const useGameStore = create(
             }))),
           ]
 
-          const nextCompetitorHeadlines = competitorFeedEntries.length > 0
-            ? [...state.events.competitorHeadlines, ...competitorFeedEntries].slice(-80)
-            : state.events.competitorHeadlines
+          const nextCompetitorHeadlines = normalizeCompetitorHeadlines([
+            ...state.events.competitorHeadlines,
+            ...competitorFeedEntries,
+          ]).slice(-80)
 
           const syncedCandidates = syncEmployeeCandidates({
             employees: nextActiveEmployeesFinal,
@@ -6477,6 +6463,7 @@ export const useGameStore = create(
                 : state.events.eventLog,
               competitorHeadlines: nextCompetitorHeadlines,
               competitorCompanies: competitorWorldResult.competitorCompanies,
+              competitorWrestlerPool: competitorEventSimulation.wrestlerPool,
               eventPreparation: (shouldRunEvent && prep?.eventId === prepEventId) ? null : state.events.eventPreparation,
             },
             history: {
@@ -6527,6 +6514,11 @@ export const useGameStore = create(
       merge: (persistedState, currentState) => {
         const typedPersistedState = persistedState || {}
         const restoredDay = Number(typedPersistedState?.calendar?.day) || currentState.calendar.day
+        const restoredCompetitorWorld = normalizeCompetitorWorld(
+          typedPersistedState?.events?.competitorCompanies || currentState.events.competitorCompanies,
+          typedPersistedState?.events?.competitorWrestlerPool || currentState.events.competitorWrestlerPool,
+          restoredDay,
+        )
         const restoredStartDateIso = resolveGameCalendarStartDate({
           configuredStartDateIso: GAME_CONFIG.startDateIso,
           persistedStartDateIso: typedPersistedState?.calendar?.startDateIso,
@@ -6548,16 +6540,17 @@ export const useGameStore = create(
           ).map((title) => normalizeTitleRecord(title)),
         ]
         const normalizedPersistedSponsors = normalizeSponsors(typedPersistedState?.roster?.sponsors)
+        const persistedProfile = { ...(typedPersistedState?.profile || {}) }
+        delete persistedProfile.homeCountry
         const normalizedPersistedProfile = {
           ...currentState.profile,
-          ...(typedPersistedState?.profile || {}),
+          ...persistedProfile,
           ownerName: BOARD_CHAIR.person_name,
           generalManagerName: String(
             typedPersistedState?.profile?.playerName
             || currentState.profile.playerName
             || '',
           ),
-          homeCountry: String(typedPersistedState?.profile?.homeCountry || 'UnitedStates'),
         }
         const persistedCustomEvents = Array.isArray(typedPersistedState?.events?.customEvents)
           ? typedPersistedState.events.customEvents
@@ -6594,7 +6587,7 @@ export const useGameStore = create(
             return {
               eventId: event.eventId || `custom-event-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
               type: event.type,
-              name: (event.name || EVENT_TYPE_CONFIG[event.type].label).trim(),
+              name: String(event.name || '').trim(),
               imageUrl: typeof event.imageUrl === 'string' ? event.imageUrl : '',
               maxMatches: clampMatchesByType(event.type, Number(event.maxMatches)),
               scheduledWeek,
@@ -6742,13 +6735,11 @@ export const useGameStore = create(
               typedPersistedState?.events?.factionRivalries || currentState.events.factionRivalries,
               normalizedPersistedFactions,
             ),
-            competitorHeadlines: Array.isArray(typedPersistedState?.events?.competitorHeadlines)
-              ? typedPersistedState.events.competitorHeadlines.slice(-60)
-              : currentState.events.competitorHeadlines,
-            competitorCompanies: normalizeCompetitorCompanies(
-              typedPersistedState?.events?.competitorCompanies
-                || currentState.events.competitorCompanies,
-            ),
+            competitorHeadlines: normalizeCompetitorHeadlines(
+              typedPersistedState?.events?.competitorHeadlines || currentState.events.competitorHeadlines,
+            ).slice(-60),
+            competitorCompanies: restoredCompetitorWorld.companies,
+            competitorWrestlerPool: restoredCompetitorWorld.wrestlerPool,
           },
           ai: {
             ...currentState.ai,

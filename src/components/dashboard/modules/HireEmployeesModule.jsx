@@ -434,7 +434,7 @@ function HireEmployeesModule() {
                 <h4>{t('dashboard.hiring.yourOffer')}</h4>
 
                 <label className={styles.offerField}>
-                  <span>{t('dashboard.hiring.offerAdjustPercent', 'Offer adjustment')}</span>
+                  <span>{t('dashboard.hiring.offerAdjustPercent')}</span>
                   <input
                     type="range"
                     min="-30"
@@ -445,20 +445,20 @@ function HireEmployeesModule() {
                   />
                   <small>
                     {(Number(offerForm.priceAdjustPercent) || 0) >= 0
-                      ? t('dashboard.hiring.offerAdjustHigh', '+{{amount}}% above demand', { amount: Number(offerForm.priceAdjustPercent) || 0 })
-                      : t('dashboard.hiring.offerAdjustLow', '{{amount}}% below demand', { amount: Math.abs(Number(offerForm.priceAdjustPercent) || 0) })}
+                      ? t('dashboard.hiring.offerAdjustHigh', { amount: Number(offerForm.priceAdjustPercent) || 0 })
+                      : t('dashboard.hiring.offerAdjustLow', { amount: Math.abs(Number(offerForm.priceAdjustPercent) || 0) })}
                   </small>
                 </label>
 
                 <fieldset className={styles.benefitsFieldset}>
-                  <legend>{t('dashboard.hiring.benefitsTitle', 'Extra benefits')}</legend>
+                  <legend>{t('dashboard.hiring.benefitsTitle')}</legend>
                   <label>
                     <input
                       type="checkbox"
                       checked={offerForm.benefits.healthCare}
                       onChange={handleBenefitChange('healthCare')}
                     />
-                    <span>{t('dashboard.hiring.benefitHealthCare', 'Cover health care')}</span>
+                    <span>{t('dashboard.hiring.benefitHealthCare')}</span>
                   </label>
                   <label>
                     <input
@@ -466,7 +466,7 @@ function HireEmployeesModule() {
                       checked={offerForm.benefits.travel}
                       onChange={handleBenefitChange('travel')}
                     />
-                    <span>{t('dashboard.hiring.benefitTravel', 'Cover travel')}</span>
+                    <span>{t('dashboard.hiring.benefitTravel')}</span>
                   </label>
                   <label>
                     <input
@@ -474,7 +474,7 @@ function HireEmployeesModule() {
                       checked={offerForm.benefits.accommodation}
                       onChange={handleBenefitChange('accommodation')}
                     />
-                    <span>{t('dashboard.hiring.benefitAccommodation', 'Cover accommodation')}</span>
+                    <span>{t('dashboard.hiring.benefitAccommodation')}</span>
                   </label>
                 </fieldset>
 

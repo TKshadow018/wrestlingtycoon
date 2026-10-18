@@ -3,6 +3,10 @@ import { afterAll, describe, expect, it, vi } from 'vitest'
 const persistedSave = {
   state: {
     gameStatus: { hasStarted: true },
+    profile: {
+      playerName: 'Legacy Player',
+      homeCountry: 'Japan',
+    },
     calendar: {
       day: 14,
       week: 2,
@@ -189,6 +193,7 @@ describe('career arc unlock save migration', () => {
   it('preserves a legacy selected venue and supplies default unlocks and rewards', () => {
     const state = useGameStore.getState()
 
+    expect(state.profile).not.toHaveProperty('homeCountry')
     expect(state.market.wrestlerArchetypes).toEqual(expect.arrayContaining([
       expect.objectContaining({ archetypeId: 'technical', name: 'Imported Technical Ace' }),
     ]))
@@ -228,9 +233,25 @@ describe('career arc unlock save migration', () => {
     expect(state.events.factionRivalries).toEqual([])
     expect(state.events.competitorCompanies[0]).toMatchObject({
       id: 'comp-1',
-      name: 'Saved Federation',
+      nameKey: 'dashboard.competitorIntel.rivals.titanRingFederation',
       strategyId: 'audienceExpansion',
       copiedGimmicks: [expect.objectContaining({ archetypeId: 'technical' })],
+    })
+    expect(state.events.competitorCompanies[0]).not.toHaveProperty('name')
+    expect(state.events.competitorCompanies.map(({ id }) => id)).toEqual([
+      'comp-1', 'comp-2', 'comp-3',
+    ])
+    expect(state.events.competitorWrestlerPool).toHaveLength(100)
+    expect(new Set(state.events.competitorCompanies.flatMap(({ rosterIds }) => rosterIds)).size)
+      .toBe(state.events.competitorCompanies.reduce((total, { rosterIds }) => total + rosterIds.length, 0))
+    state.events.competitorCompanies.forEach((competitor) => {
+      expect(competitor).not.toHaveProperty('name')
+      expect(competitor.rosterIds.length).toBeGreaterThanOrEqual(20)
+      expect(competitor.rosterIds.length).toBeLessThanOrEqual(30)
+      expect(competitor.champions).toEqual(expect.arrayContaining([
+        expect.objectContaining({ titleKey: 'dashboard.competitorIntel.rivalTitles.world' }),
+        expect.objectContaining({ titleKey: 'dashboard.competitorIntel.rivalTitles.tagTeam' }),
+      ]))
     })
     expect(state.onboardingChallenge).toMatchObject({
       tutorialVersion: 2,

@@ -13,22 +13,26 @@ const getInitials = (name) => String(name || '')
   .map((part) => part[0].toUpperCase())
   .join('')
 
-function PortraitCard({ name, position, imageUrl, className, company, shareholding, unavailableLabel }) {
+function PortraitCard({ name, position, imageUrl, className, company, shareholding, t }) {
   const [imageFailed, setImageFailed] = useState(false)
   const showPlaceholder = !imageUrl || imageFailed
 
   return (
     <article className={`${styles.portraitCard} ${className}`}>
       {showPlaceholder ? (
-        <div className={styles.photoPlaceholder} role="img" aria-label={`${unavailableLabel}: ${name}`}>
+        <div
+          className={styles.photoPlaceholder}
+          role="img"
+          aria-label={t('dashboard.board.photoUnavailable', { name })}
+        >
           <span>{getInitials(name)}</span>
-          <small>{unavailableLabel}</small>
+          <small>{t('dashboard.board.photoUnavailable', { name })}</small>
         </div>
       ) : (
         <img
           className={styles.portrait}
           src={imageUrl}
-          alt={`${name}, ${position}`}
+          alt={t('dashboard.board.portraitAlt', { name, role: position })}
           onError={() => setImageFailed(true)}
         />
       )}
@@ -36,7 +40,7 @@ function PortraitCard({ name, position, imageUrl, className, company, shareholdi
         <p>{position}</p>
         <h3>{name}</h3>
         {company && <small>{company}</small>}
-        {shareholding != null && <small>{shareholding}% ownership</small>}
+        {shareholding != null && <small>{t('dashboard.board.ownership', { percent: shareholding })}</small>}
       </div>
     </article>
   )
@@ -113,20 +117,20 @@ function BoardModule() {
         <PortraitCard
           key={chair.key}
           {...chair}
-          unavailableLabel={t('dashboard.modules.board.photoUnavailable')}
+          t={t}
         />
         <div className={styles.boardSecondColumn}>
           <PortraitCard
             key={viceChair.key}
             {...viceChair}
-            unavailableLabel={t('dashboard.modules.board.photoUnavailable')}
+            t={t}
           />
           <div className={styles.supportingMembers}>
             {supportingMembers.map((member) => (
               <PortraitCard
                 key={member.key}
                 {...member}
-                unavailableLabel={t('dashboard.modules.board.photoUnavailable')}
+                t={t}
               />
             ))}
           </div>

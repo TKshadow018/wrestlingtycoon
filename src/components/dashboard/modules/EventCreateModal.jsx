@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 import styles from './EventCreateModal.module.scss'
 
 const EVENT_TYPES = [
-  { value: 'houseShow', label: 'House Show' },
-  { value: 'ppv', label: 'PPV' },
-  { value: 'megaLive', label: 'Mega Live Event' },
-  { value: 'oneTime', label: 'One Time Event' },
-  { value: 'digitalOnly', label: 'Digital Only Show' },
+   { value: 'houseShow', labelKey: 'dashboard.eventTypes.houseShow' },
+   { value: 'ppv', labelKey: 'dashboard.eventTypes.ppv' },
+   { value: 'megaLive', labelKey: 'dashboard.eventTypes.megaLive' },
+   { value: 'oneTime', labelKey: 'dashboard.eventTypes.oneTime' },
+   { value: 'digitalOnly', labelKey: 'dashboard.eventTypes.digitalOnly' },
 ]
 
 function EventCreateModal({ isOpen, eventToEdit, initialSpecificDate, currentWeek, currentDay, startDateIso, onClose, onSubmit, onDelete }) {
@@ -65,11 +65,10 @@ function EventCreateModal({ isOpen, eventToEdit, initialSpecificDate, currentWee
   }
 
   const handleTypeChange = (typeValue) => {
-    const typeMeta = EVENT_TYPES.find((item) => item.value === typeValue)
     setFormState((current) => ({
       ...current,
       type: typeValue,
-      name: current.name || (typeMeta ? typeMeta.label : current.name),
+      name: current.name || t(`dashboard.eventTypes.${typeValue}`),
     }))
   }
 
@@ -91,12 +90,12 @@ function EventCreateModal({ isOpen, eventToEdit, initialSpecificDate, currentWee
     event.preventDefault()
 
     if (!formState.name.trim()) {
-      setErrorMessage(t('dashboard.events.validation.eventNameRequired', 'Event name is required.'))
+      setErrorMessage(t('dashboard.events.validation.eventNameRequired'))
       return
     }
 
     if (!formState.specificDate) {
-      setErrorMessage(t('dashboard.events.validation.dateRequired', 'Event date is required.'))
+      setErrorMessage(t('dashboard.events.validation.dateRequired'))
       return
     }
 
@@ -108,7 +107,11 @@ function EventCreateModal({ isOpen, eventToEdit, initialSpecificDate, currentWee
     const result = onSubmit(payload)
 
     if (!result?.ok) {
-      setErrorMessage(result?.error || t('dashboard.events.validation.unableToSave', 'Unable to save event.'))
+      const errorKey = typeof result?.error === 'string'
+        && result.error.startsWith('dashboard.events.validation.')
+        ? result.error
+        : 'dashboard.events.validation.unableToSave'
+      setErrorMessage(t(errorKey))
       return
     }
 
@@ -134,35 +137,35 @@ function EventCreateModal({ isOpen, eventToEdit, initialSpecificDate, currentWee
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <h3>{eventToEdit ? t('dashboard.events.editEvent', 'Edit Event') : t('dashboard.events.createEvent', 'Create Event')}</h3>
-          <button className={styles.closeButton} onClick={onClose} aria-label="Close modal">×</button>
+          <h3>{eventToEdit ? t('dashboard.events.editEvent') : t('dashboard.events.createEvent')}</h3>
+          <button className={styles.closeButton} onClick={onClose} aria-label={t('dashboard.accessibility.closeModal')}>×</button>
         </div>
 
         <form className={styles.modalBody} onSubmit={handleSubmit}>
           <label className={styles.formGroup}>
-            <span className={styles.label}>{t('dashboard.events.eventType', 'Event Type')}</span>
+            <span className={styles.label}>{t('dashboard.events.eventType')}</span>
             <select value={formState.type} onChange={(e) => handleTypeChange(e.target.value)}>
               {EVENT_TYPES.map((typeOption) => (
                 <option key={typeOption.value} value={typeOption.value}>
-                  {typeOption.label}
+                  {t(typeOption.labelKey)}
                 </option>
               ))}
             </select>
           </label>
 
           <label className={styles.formGroup}>
-            <span className={styles.label}>{t('dashboard.events.eventName', 'Event Name')}</span>
+            <span className={styles.label}>{t('dashboard.events.eventName')}</span>
             <input
               type="text"
               value={formState.name}
               onChange={(e) => setFormState((current) => ({ ...current, name: e.target.value }))}
               maxLength={70}
-              placeholder={t('dashboard.events.eventNamePlaceholder', 'Enter event name')}
+              placeholder={t('dashboard.events.eventNamePlaceholder')}
             />
           </label>
 
           <label className={styles.formGroup}>
-            <span className={styles.label}>{t('dashboard.events.specificDate', 'Event Date')}</span>
+            <span className={styles.label}>{t('dashboard.events.specificDate')}</span>
             <div className={styles.dateInputRow}>
               <input
                 ref={specificDateInputRef}
@@ -171,7 +174,7 @@ function EventCreateModal({ isOpen, eventToEdit, initialSpecificDate, currentWee
                 onChange={(e) => setFormState((current) => ({ ...current, specificDate: e.target.value }))}
               />
               <button type="button" className={styles.datePickerButton} onClick={openNativeDatePicker}>
-                Pick
+                {t('dashboard.events.pickDate')}
               </button>
             </div>
           </label>
@@ -182,7 +185,7 @@ function EventCreateModal({ isOpen, eventToEdit, initialSpecificDate, currentWee
               checked={formState.isRecurringAnnually}
               onChange={(e) => setFormState((current) => ({ ...current, isRecurringAnnually: e.target.checked }))}
             />
-            <span>{t('dashboard.events.recurringAnnually', 'Happens every year on this date')}</span>
+            <span>{t('dashboard.events.recurringAnnually')}</span>
           </label>
 
           {errorMessage && <p className={styles.error}>{errorMessage}</p>}
@@ -192,23 +195,23 @@ function EventCreateModal({ isOpen, eventToEdit, initialSpecificDate, currentWee
               showDeleteConfirm ? (
                 <>
                   <button type="button" className={styles.confirmDeleteButton} onClick={handleConfirmDelete}>
-                    Confirm Delete
+                    {t('dashboard.events.confirmDelete')}
                   </button>
                   <button type="button" className={styles.secondaryButton} onClick={() => setShowDeleteConfirm(false)}>
-                    Keep Event
+                    {t('dashboard.events.keepEvent')}
                   </button>
                 </>
               ) : (
                 <button type="button" className={styles.dangerButton} onClick={handleDeleteClick}>
-                  Delete Event
+                  {t('dashboard.events.deleteEvent')}
                 </button>
               )
             ) : null}
             <button type="button" className={styles.secondaryButton} onClick={() => { resetForm(); onClose(); }}>
-              {t('dashboard.events.cancel', 'Cancel')}
+              {t('dashboard.events.cancel')}
             </button>
             <button type="submit" className={styles.primaryButton}>
-              {eventToEdit ? t('dashboard.events.updateEvent', 'Update Event') : t('dashboard.events.createEvent', 'Create Event')}
+              {eventToEdit ? t('dashboard.events.updateEvent') : t('dashboard.events.createEvent')}
             </button>
           </div>
         </form>

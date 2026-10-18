@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
 import { calculateRanking, calculateTeamRanking } from '../../../utils/wrestlerRank'
 import { DEFAULT_WRESTLER_ARCHETYPES } from '../../../data/wrestlerArchetypes'
-import { clampHeelFaceMeter, getHeelFaceStageLabel } from '../../../utils/heelFaceMeter'
+import { clampHeelFaceMeter, getHeelFaceStageKey } from '../../../utils/heelFaceMeter'
 import styles from './ManageEmployeesModule.module.scss'
 
 const formatMoney = (value) => value.toLocaleString()
@@ -47,11 +47,17 @@ const getWrestlerRecentStats = (employee) => {
 
 function HeelFaceMeter({ employee }) {
   const meter = clampHeelFaceMeter(employee?.heelFaceMeter)
-  const stageLabel = getHeelFaceStageLabel(meter)
+  const stageKey = getHeelFaceStageKey(meter)
+  const { t } = useTranslation()
 
   return (
     <div className={styles.heelFaceMeter}>
-      <span className={styles.heelFaceMeterStage}>{`Ring Personality: ${stageLabel}(${meter})`}</span>
+      <span className={styles.heelFaceMeterStage}>
+        {t('dashboard.employees.ringPersonality', {
+          stage: t(`dashboard.employees.heelFaceStages.${stageKey}`),
+          meter,
+        })}
+      </span>
     </div>
   )
 }
@@ -89,7 +95,7 @@ const getGameDate = (startDateIso, day) => {
   return gameDate
 }
 
-const formatDobWithAge = (dob, gameDate) => {
+const formatDobWithAge = (dob, gameDate, t) => {
   const dobDate = parseIsoDateLocal(dob)
   if (!dobDate || Number.isNaN(dobDate.getTime())) {
     return dob || '-'
@@ -110,7 +116,7 @@ const formatDobWithAge = (dob, gameDate) => {
   const lastBirthday = new Date(normalizedDob.getFullYear() + years, normalizedDob.getMonth(), normalizedDob.getDate())
   const days = Math.floor((normalizedGameDate.getTime() - lastBirthday.getTime()) / (1000 * 60 * 60 * 24))
 
-  return `${dob} (${years} years ${days} days)`
+  return t('dashboard.employees.dobWithAge', { dob, years, days })
 }
 
 function ManagerSelectionModal({ employee, managers, onSelect, onClose }) {
@@ -391,7 +397,7 @@ function TeamDnDForm({ availableEmployees, initialValues = EMPTY_TEAM_FORM, onSa
             onDrop={handleDropToTeam}
           >
             {selectedMembers.length === 0 ? (
-              <p className={styles.teamFormEmpty}>{t('dashboard.teams.dragMembersHint', 'Drag wrestlers here')}</p>
+              <p className={styles.teamFormEmpty}>{t('dashboard.teams.dragMembersHint')}</p>
             ) : (
               selectedMembers.map((wrestler) => (
                 <article
@@ -412,7 +418,7 @@ function TeamDnDForm({ availableEmployees, initialValues = EMPTY_TEAM_FORM, onSa
                     className={styles.removeSelectedMember}
                     onClick={() => setMemberIds((prev) => prev.filter((id) => id !== wrestler.employeeId))}
                   >
-                    {t('dashboard.teams.removeMember', 'Remove')}
+                    {t('dashboard.teams.removeMember')}
                   </button>
                 </article>
               ))
@@ -537,14 +543,14 @@ function ManageTeamsSubsection({ employees, teams, createTeam, updateTeam, delet
             className={`${styles.teamDivisionButton} ${divisionView === 'male' ? styles.teamDivisionButtonActive : ''}`}
             onClick={() => setDivisionView('male')}
           >
-            {t('dashboard.teams.maleTeams', 'Male Teams')}
+            {t('dashboard.teams.maleTeams')}
           </button>
           <button
             type="button"
             className={`${styles.teamDivisionButton} ${divisionView === 'female' ? styles.teamDivisionButtonActive : ''}`}
             onClick={() => setDivisionView('female')}
           >
-            {t('dashboard.teams.femaleTeams', 'Female Teams')}
+            {t('dashboard.teams.femaleTeams')}
           </button>
         </div>
         {!creating && (
@@ -573,7 +579,7 @@ function ManageTeamsSubsection({ employees, teams, createTeam, updateTeam, delet
       {(teams || []).length === 0 && !creating ? (
         <p className={styles.teamsEmpty}>{t('dashboard.teams.empty')}</p>
       ) : rankedTeams.length === 0 && !creating ? (
-        <p className={styles.teamsEmpty}>{t('dashboard.teams.emptyDivision', 'No teams in this division yet.')}</p>
+        <p className={styles.teamsEmpty}>{t('dashboard.teams.emptyDivision')}</p>
       ) : (
         <div className={styles.teamsList}>
           {rankedTeams.map((team) => {
@@ -599,13 +605,13 @@ function ManageTeamsSubsection({ employees, teams, createTeam, updateTeam, delet
                       <div className={styles.teamRowNameWrap}>
                         <h4 className={styles.teamCardName}>{team.name}</h4>
                         <p className={styles.teamRankPoints}>
-                          {t('dashboard.teams.teamPoints', 'Points: {{points}}', { points: team.teamRankPoints })}
+                          {t('dashboard.teams.teamPoints', { points: team.teamRankPoints })}
                         </p>
                       </div>
                       <span className={team.autoFormed ? styles.teamBadgeAuto : styles.teamBadgeManual}>
                         {team.autoFormed ? t('dashboard.teams.autoFormed') : t('dashboard.teams.manualTeam')}
                       </span>
-                      {team.isMixed ? <span className={styles.teamMixedBadge}>{t('dashboard.teams.mixedTeam', 'Mixed')}</span> : null}
+                      {team.isMixed ? <span className={styles.teamMixedBadge}>{t('dashboard.teams.mixedTeam')}</span> : null}
                     </div>
 
                     {team.autoFormed && team.autoReason && (
@@ -1152,7 +1158,7 @@ function ManageEmployeesModule() {
           <div className={styles.identityRow}>
             <div>
               <h4>{employee.name}</h4>
-              <p>{t('dashboard.employees.identity', { gender: employee.gender, dob: formatDobWithAge(employee.dob, gameDate) })}</p>
+              <p>{t('dashboard.employees.identity', { gender: employee.gender, dob: formatDobWithAge(employee.dob, gameDate, t) })}</p>
             </div>
             <span className={styles.tierBadge}>{employee.tier}</span>
           </div>
@@ -1185,7 +1191,7 @@ function ManageEmployeesModule() {
             return (
               <div className={styles.recentMatchStats}>
                 <span className={styles.recentMatchStatsLabel}>
-                  {t('dashboard.employees.last20Label', 'Last {{count}} matches', { count: stats.count })}
+                  {t('dashboard.employees.last20Label', { count: stats.count })}
                 </span>
                 <div className={styles.recentMatchStatsPills}>
                   {stats.avgRating !== null && (
@@ -1207,7 +1213,7 @@ function ManageEmployeesModule() {
           <p>{t('dashboard.employees.perMatchSalary', { amount: formatMoney(employee.contract?.perMatchSalary || 0) })}</p>
           <p>{t('dashboard.employees.signingBonus', { amount: formatMoney(employee.contract?.signingBonus || 0) })}</p>
           <p>
-            {t('dashboard.employees.contractEndDayLabel', 'Contract ends')}: {employee.contract?.endDay ? formatGameDateFromDay(startDateIso, employee.contract.endDay) : '-'}
+            {t('dashboard.employees.contractEndDayLabel')}: {employee.contract?.endDay ? formatGameDateFromDay(startDateIso, employee.contract.endDay) : '-'}
           </p>
           <p>
             {t('dashboard.employees.contractDaysLeft', {
@@ -1350,7 +1356,7 @@ function ManageEmployeesModule() {
               />
               <div>
                 <h4>{selectedEmployee.name}</h4>
-                <p>{t('dashboard.employees.identity', { gender: selectedEmployee.gender, dob: formatDobWithAge(selectedEmployee.dob, gameDate) })}</p>
+                <p>{t('dashboard.employees.identity', { gender: selectedEmployee.gender, dob: formatDobWithAge(selectedEmployee.dob, gameDate, t) })}</p>
                 <p>{t('dashboard.employees.role', { role: selectedEmployee.role })}</p>
                 <p>{t('dashboard.employees.skill', { skill: selectedEmployee.skill })}</p>
                 {['wrestler', 'staff'].includes(selectedEmployee.role) && (

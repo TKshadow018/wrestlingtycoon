@@ -4,15 +4,12 @@ import styles from './StartGameForm.module.scss'
 function StartGameForm({
   playerName,
   companyName,
-  preferredCountry,
-  countryOptions,
   startWithAi,
   validation,
   startingCash,
   onStartWithAiChange,
   onPlayerNameChange,
   onCompanyNameChange,
-  onPreferredCountryChange,
   onSubmit,
 }) {
   const { t } = useTranslation()
@@ -39,21 +36,6 @@ function StartGameForm({
           autoComplete="off"
           name="companyName"
         />
-      </label>
-
-      <label>
-        <span>{t('onboarding.managementCountry')}</span>
-        <select
-          value={preferredCountry}
-          onChange={(event) => onPreferredCountryChange(event.target.value)}
-          name="preferredCountry"
-        >
-          {countryOptions.map((countryCode) => (
-            <option key={countryCode} value={countryCode}>
-              {t(`onboarding.countryOptions.${countryCode}`, countryCode)}
-            </option>
-          ))}
-        </select>
       </label>
 
       <p className={styles.cashLabel}>{t('onboarding.startingCashLabel')}</p>

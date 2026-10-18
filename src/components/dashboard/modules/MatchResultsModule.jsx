@@ -22,14 +22,7 @@ const formatGameDateFromDay = (startDateIso, day) => {
 
 const FEMALE_FALLBACK_IMAGE = '/people/girl.png'
 const MALE_FALLBACK_IMAGE = '/people/boy.png'
-
-const SEGMENT_TYPE_LABELS = {
-  match: 'Match',
-  mainEvent: 'Main Event',
-  titleMatch: 'Title Match',
-  interview: 'Interview',
-  promo: 'Promo',
-}
+const SEGMENT_TYPE_IDS = new Set(['match', 'mainEvent', 'titleMatch', 'interview', 'promo'])
 
 function ParticipantImageCard({ participant, isWinner, winnerBadgeLabel }) {
   const imageSrc = participant.imageUrl || (participant.gender === 'female' ? FEMALE_FALLBACK_IMAGE : MALE_FALLBACK_IMAGE)
@@ -93,7 +86,9 @@ function SegmentRow({ segment, index }) {
       <div className={styles.segmentIndex}>{index + 1}</div>
       <div className={styles.segmentContent}>
         <span className={`${styles.segmentType} ${styles[`type_${segment.segmentType}`]}`}>
-          {SEGMENT_TYPE_LABELS[segment.segmentType] || segment.segmentType}
+          {t(SEGMENT_TYPE_IDS.has(segment.segmentType)
+            ? `dashboard.events.setup.segmentTypes.${segment.segmentType}`
+            : 'dashboard.matchResults.unknownSegmentType')}
         </span>
 
         {wrestlerParticipants.length > 0 ? (

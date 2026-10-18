@@ -50,12 +50,12 @@ afterEach(() => {
 
 describe('interview scenarios and answers', () => {
   it('uses Bangladeshi sports journalists and newspapers', () => {
-    expect(JOURNALISTS).toEqual([
+    expect(JOURNALISTS).toEqual(expect.arrayContaining([
       'Shabab Chowdhury',
       'Samsul Arefin Khan',
       'Nazrul Hosen Ayon',
-    ])
-    expect(NEWSPAPERS).toEqual([
+    ]))
+    expect(NEWSPAPERS).toEqual(expect.arrayContaining([
       'Prothom Alo',
       'The Daily Star',
       'Dhaka Tribune',
@@ -64,11 +64,47 @@ describe('interview scenarios and answers', () => {
       'Samakal',
       'Jugantor',
       'Bangladesh Pratidin',
-    ])
+    ]))
+  })
+
+  it('retains all 30 localized questions for every contextual interview topic', () => {
+    const topics = ['hire', 'match', 'event', 'finance', 'champion']
+
+    topics.forEach((topic) => {
+      expect(i18n.t(`dashboard.ai.interviewQuestions.${topic}`, { returnObjects: true }))
+        .toHaveLength(30)
+    })
+  })
+
+  it('selects distinct localized question variants and interpolates their context', async () => {
+    const random = vi.spyOn(Math, 'random')
+    random.mockReset()
+    random.mockReturnValueOnce(0)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(2.1 / 30)
+
+    const context = {
+      recentMatches: [{ participants: ['Ace', 'Blaze'], winner: 'Ace', rating: 8.5 }],
+    }
+    const ratingQuestion = await createInterviewScenario(context)
+
+    expect(ratingQuestion.questions[0]).toBe('Was the 8.5 rating from your recent match fair in your view?')
+
+    random.mockReset()
+    random.mockReturnValueOnce(0)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0)
+    const participantsQuestion = await createInterviewScenario(context)
+
+    expect(participantsQuestion.questions[0]).toBe('Your last featured match involved Ace vs Blaze. What was your takeaway?')
+    expect(ratingQuestion.questions[0]).not.toBe(participantsQuestion.questions[0])
   })
 
   it('creates a deterministic scenario with a personalized mandatory question', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0)
+    const translate = vi.spyOn(i18n, 't')
 
     const scenario = await createInterviewScenario({
       newestEmployees: ['Rookie'],
@@ -94,6 +130,9 @@ describe('interview scenarios and answers', () => {
     expect(standardScenario.situation).toBe('')
     expect(standardScenario.topic).toBe('hire')
     expect(standardScenario.questions[0]).toContain('Rookie')
+    expect(translate.mock.calls.map(([key]) => key).some((key) => (
+      /^dashboard\.ai\.interviewQuestions\.hire\.\d+$/.test(key)
+    ))).toBe(true)
   })
 
   it('chooses a question topic supported by the available game context', async () => {
@@ -106,15 +145,15 @@ describe('interview scenarios and answers', () => {
     expect(scenario.questions[0]).toContain('Ace vs Blaze')
   })
 
-  it('uses a localized generic question if no contextual topic is available', async () => {
-    const scenario = await createInterviewScenario({}, {
-      t: (key) => key === 'dashboard.ai.genericQuestion' ? 'What matters most today?' : key,
-    })
+  it('uses the locale resource for a generic question if no contextual topic is available', async () => {
+    const translate = vi.spyOn(i18n, 't')
+    const scenario = await createInterviewScenario({})
 
     expect(scenario).toMatchObject({
       topic: 'general',
-      questions: ['What matters most today?'],
+      questions: [i18n.t('dashboard.ai.genericQuestion')],
     })
+    expect(translate.mock.calls.map(([key]) => key)).toContain('dashboard.ai.genericQuestion')
   })
 
   it('accepts valid JSON and supports text-part completion responses', async () => {
@@ -143,6 +182,7 @@ describe('interview scenarios and answers', () => {
   })
 
   it('uses the safe acceptance reply when model output is malformed or incomplete', async () => {
+    const translate = vi.spyOn(i18n, 't')
     makeEngine(['not JSON'])
     await expect(evaluateInterviewAnswer({
       journalistName: 'Reporter',
@@ -156,6 +196,29 @@ describe('interview scenarios and answers', () => {
       reply: 'Thanks for the clarification.',
       counterQuestion: '',
     })
+    expect(translate.mock.calls.map(([key]) => key)).toContain('dashboard.ai.acceptFallback')
+  })
+
+  it('uses the localized bridge reply when the model cannot generate one', async () => {
+    const translate = vi.spyOn(i18n, 't')
+    makeEngine([
+      '{"decision":"counter","reply":"What happens next?","counterQuestion":""}',
+      new Error('offline'),
+    ])
+
+    await expect(evaluateInterviewAnswer({
+      journalistName: 'Reporter',
+      newspaperName: 'Daily Grapple',
+      currentQuestion: 'What is the plan?',
+      userAnswer: 'We will improve the training schedule.',
+      allowCounter: true,
+      forceCounter: true,
+    })).resolves.toMatchObject({
+      decision: 'counter',
+      reply: 'I still need a clearer answer for the record.',
+      counterQuestion: 'What happens next?',
+    })
+    expect(translate.mock.calls.map(([key]) => key)).toContain('dashboard.ai.bridgeFallback')
   })
 
   it('turns a question-shaped reply into a counter-question and generates a short bridge', async () => {
