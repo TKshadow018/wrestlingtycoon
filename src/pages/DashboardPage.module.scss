@@ -19,17 +19,13 @@
 }
 
 .topBar {
-  align-items: flex-start;
+  align-items: center;
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
   justify-content: space-between;
-
-  @media (min-width: 860px) {
-    align-items: center;
-    flex-direction: row;
-    gap: 1rem;
-  }
+  min-width: 0;
+  position: relative;
+  flex-wrap: nowrap;
 
   h1,
   p,
@@ -39,13 +35,19 @@
 
   h1 {
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+    font-size: clamp(1.2rem, 2.5vw, 2.2rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
   p {
     color: var(--text-muted);
     margin-top: 0.2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   small {
@@ -56,17 +58,109 @@
   }
 }
 
+.topBarIdentity {
+  align-items: baseline;
+  display: flex;
+  flex: 1 1 auto;
+  gap: clamp(0.45rem, 1vw, 1rem);
+  min-width: 0;
+
+  h1,
+  p {
+    min-width: 0;
+  }
+
+  h1 {
+    flex: 0 1 auto;
+  }
+
+  p {
+    flex: 1 1 auto;
+    margin-top: 0;
+  }
+}
+
 .topBarActions {
   align-items: center;
   display: flex;
-  flex-direction: column;
+  flex: 0 1 auto;
+  flex-direction: row;
+  flex-wrap: nowrap;
   gap: 0.65rem;
   min-width: 0;
+  position: relative;
 
-  @media (min-width: 1100px) {
-    align-items: center;
-    flex-direction: row;
-    gap: 1rem;
+  @media (max-width: 1099px) {
+    align-items: stretch;
+    background: linear-gradient(150deg, #0b111b, #060c14);
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.35);
+    display: none;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 0.8rem;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.6rem);
+    max-height: calc(100dvh - 5rem);
+    overflow-y: auto;
+    width: min(24rem, calc(100vw - 2rem));
+    z-index: 20;
+
+    &.topBarActionsOpen {
+      display: flex;
+    }
+
+    .challengeButton {
+      align-self: flex-start;
+    }
+  }
+}
+
+.dashboardMenuToggle {
+  align-items: center;
+  background: rgba(12, 21, 31, 0.8);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  color: var(--text-main);
+  cursor: pointer;
+  display: none;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-height: 38px;
+  min-width: 42px;
+  padding: 0.45rem;
+
+  @media (max-width: 1099px) {
+    display: flex;
+  }
+}
+
+@media (max-width: 1099px) {
+  .topBarIdentity {
+    gap: 0.45rem;
+
+    h1 {
+      font-size: clamp(0.88rem, 4.8vw, 1.25rem);
+    }
+
+    p {
+      font-size: clamp(0.72rem, 3.4vw, 0.95rem);
+    }
+  }
+}
+
+.dashboardMenuIcon {
+  display: grid;
+  gap: 4px;
+
+  span {
+    background: currentColor;
+    border-radius: 999px;
+    display: block;
+    height: 2px;
+    width: 18px;
   }
 }
 

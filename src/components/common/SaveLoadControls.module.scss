@@ -1,26 +1,59 @@
 .wrap {
-  align-items: flex-end;
+  align-items: center;
   display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  flex-direction: row;
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  gap: 0.65rem;
+  min-width: 0;
 }
 
 .controlsRow {
   align-items: center;
   display: flex;
-  flex-wrap: wrap;
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
   gap: 0.45rem;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
-@media (min-width: 1100px) {
+@media (max-width: 1099px) {
   .wrap {
-    align-items: flex-end;
+    align-items: stretch;
     flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
   }
 
   .controlsRow {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    justify-content: stretch;
+    width: 100%;
+  }
+
+  .controlsRow:first-child {
+    .targetLabel,
+    .slotLabel {
+      flex: 1 1 100%;
+      justify-content: space-between;
+
+      select,
+      input {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+    }
+  }
+
+  .actionButton,
+  .modButton {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1100px) {
+  .controlsRow {
     min-height: 34px;
   }
 }
@@ -69,6 +102,7 @@
   min-height: 34px;
   padding: 0.35rem 0.7rem;
   text-transform: uppercase;
+  white-space: nowrap;
 
   &:hover {
     background: linear-gradient(135deg, #0d9986, #2db3a3);
@@ -87,6 +121,7 @@
   min-height: 34px;
   padding: 0.3rem 0.62rem;
   text-transform: uppercase;
+  white-space: nowrap;
 
   &:hover {
     background: linear-gradient(135deg, #8b5b17, #d08d2e);
@@ -97,12 +132,20 @@
   color: var(--text-muted);
   font-size: 0.7rem;
   margin: 0;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .aiStatus {
   color: #8de6df;
   font-size: 0.7rem;
   margin: 0;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .aiEnabled {

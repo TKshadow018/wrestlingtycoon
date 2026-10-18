@@ -31,6 +31,10 @@
     "welcome": "Welcome back, {{playerName}}",
     "company": "Promotion: {{companyName}}",
     "managementUnknown": "TBD",
+    "header": {
+      "openMenu": "Open dashboard menu",
+      "closeMenu": "Close dashboard menu"
+    },
     "navigationGuard": {
       "title": "Leave the game?",
       "message": "Are you sure you want to leave your current game? You can stay here and continue playing.",

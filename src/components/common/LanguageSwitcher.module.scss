@@ -5,6 +5,7 @@
   font-size: 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
 
   select {
     background: rgba(11, 18, 27, 0.85);
@@ -16,5 +17,12 @@
     outline: none;
     padding: 0.45rem 0.95rem;
     text-transform: uppercase;
+  }
+}
+
+@media (max-width: 1099px) {
+  .languageSwitcher {
+    justify-content: space-between;
+    width: 100%;
   }
 }

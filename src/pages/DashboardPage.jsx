@@ -4,13 +4,12 @@ import { FirebaseError } from 'firebase/app'
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
 import { buildInterviewTurnResult, createInterviewScenario } from '../ai/interviewService'
 import GameExitConfirmation from '../components/common/GameExitConfirmation'
-import LanguageSwitcher from '../components/common/LanguageSwitcher'
 import AiInterviewModal from '../components/dashboard/AiInterviewModal'
 import InterviewFocusModal from '../components/dashboard/InterviewFocusModal'
 import BoardMeetingModal from '../components/dashboard/BoardMeetingModal'
 import BoardMeetingIntroScreen from '../components/dashboard/BoardMeetingIntroScreen'
+import DashboardHeader from '../components/dashboard/DashboardHeader'
 import OnboardingTutorialGuide from '../components/dashboard/OnboardingTutorialGuide'
-import SaveLoadControls from '../components/common/SaveLoadControls'
 import ControlPanel from '../components/dashboard/ControlPanel'
 import HudBar from '../components/dashboard/HudBar'
 import ModuleNav from '../components/dashboard/ModuleNav'
@@ -1068,36 +1067,23 @@ function DashboardPage() {
         </section>
       )}
       <section className={styles.shell}>
-        <header className={styles.topBar}>
-          <div>
-            <h1>{t('dashboard.welcome', { playerName: profile.playerName })}</h1>
-            <p>{t('dashboard.company', { companyName: profile.companyName })}</p>
-          </div>
-          <div className={styles.topBarActions}>
-            {onboardingSummary && (
-              <button
-                type="button"
-                className={styles.challengeButton}
-                onClick={() => setShowChallengeModal(true)}
-              >
-                {t('dashboard.onboardingChallenge.openButton')}
-              </button>
-            )}
-            <SaveLoadControls
-              onSaveLocal={handleSaveLocal}
-              onLoadLocal={handleLoadLocal}
-              onSaveFirebase={handleSaveFirebase}
-              onLoadFirebase={handleLoadFirebase}
-              onExportMods={handleExportMods}
-              onImportMods={handleImportMods}
-              firebaseEnabled={isFirebaseConfigured}
-              statusMessage={saveLoadStatus}
-              aiStatusMessage={aiStatusMessage}
-              aiEnabled={aiEnabled}
-            />
-            <LanguageSwitcher />
-          </div>
-        </header>
+        <DashboardHeader
+          profile={profile}
+          onboardingSummary={onboardingSummary}
+          onOpenChallenge={() => setShowChallengeModal(true)}
+          saveLoadProps={{
+            onSaveLocal: handleSaveLocal,
+            onLoadLocal: handleLoadLocal,
+            onSaveFirebase: handleSaveFirebase,
+            onLoadFirebase: handleLoadFirebase,
+            onExportMods: handleExportMods,
+            onImportMods: handleImportMods,
+            firebaseEnabled: isFirebaseConfigured,
+            statusMessage: saveLoadStatus,
+          }}
+          aiStatusMessage={aiStatusMessage}
+          aiEnabled={aiEnabled}
+        />
 
         <HudBar
           snapshot={{
