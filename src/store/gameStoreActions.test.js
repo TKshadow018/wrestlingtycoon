@@ -1064,6 +1064,54 @@ describe('game store action coverage', () => {
     expect(state.finances.ledger.some((entry) => entry.category === 'matchPayroll')).toBe(true)
     expect(state.finances.ledger.some((entry) => entry.category === 'staffPayroll')).toBe(true)
     expect(state.history.timeline.at(-1).eventOutcomeType).toBeTruthy()
+    const eventGateBreakdown = state.events.lastOutcome.eventGateBreakdown
+    expect(eventGateBreakdown).toMatchObject({
+      eventId: 'test-ppv',
+      eventName: expect.stringContaining('Test Pay Per View'),
+      eventType: 'ppv',
+      attendance: state.events.lastOutcome.audience,
+      ticketPrice: 45,
+      total: state.events.lastOutcome.incomeBreakdown.eventGate,
+    })
+    expect(eventGateBreakdown.attendanceCalculation).toMatchObject({
+      minAudience: expect.any(Number),
+      maxAudience: expect.any(Number),
+      fanFactor: expect.any(Number),
+      prestigeFactor: expect.any(Number),
+      fansWeight: expect.any(Number),
+      prestigeWeight: expect.any(Number),
+      crowdFactor: expect.any(Number),
+    })
+    expect(eventGateBreakdown.attendance).toBe(Math.round(Math.max(
+      eventGateBreakdown.attendanceCalculation.minAudience,
+      Math.min(
+        eventGateBreakdown.attendanceCalculation.maxAudience,
+        eventGateBreakdown.attendanceCalculation.minAudience
+          + (eventGateBreakdown.attendanceCalculation.maxAudience - eventGateBreakdown.attendanceCalculation.minAudience)
+            * eventGateBreakdown.attendanceCalculation.audienceNorm
+            * eventGateBreakdown.attendanceCalculation.crowdFactor,
+      ),
+    )))
+    expect(eventGateBreakdown.sponsorBreakdown).toEqual(expect.arrayContaining([
+      expect.objectContaining({ sponsorId: 'event-sponsor', scope: 'event', trustFactor: expect.any(Number) }),
+      expect.objectContaining({ sponsorId: 'daily-sponsor', scope: 'recurring', trustFactor: expect.any(Number) }),
+    ]))
+    expect(eventGateBreakdown.segmentBonuses).toHaveLength(8)
+    expect(eventGateBreakdown.segmentBonuses.reduce((sum, segment) => sum + segment.totalIncome, 0))
+      .toBe(eventGateBreakdown.segmentBonusTotal)
+    expect(eventGateBreakdown.audienceSegments).toHaveLength(4)
+    expect(eventGateBreakdown.ticketRevenue + eventGateBreakdown.sponsorBoostAmount)
+      .toBe(eventGateBreakdown.baseGateRevenue)
+    expect(eventGateBreakdown.sponsorBreakdown.reduce((sum, sponsor) => sum + sponsor.gateBoostAmount, 0))
+      .toBe(eventGateBreakdown.sponsorBoostAmount)
+    expect(
+      eventGateBreakdown.baseGateRevenue
+      + eventGateBreakdown.boardBonusAmount
+      + eventGateBreakdown.segmentBonusTotal
+      + eventGateBreakdown.audienceSpendAdjustment,
+    ).toBe(eventGateBreakdown.total)
+    expect(state.history.timeline.at(-1).eventGateBreakdown).toEqual(eventGateBreakdown)
+    expect(state.events.eventLog.at(-1).eventGateBreakdown).toEqual(eventGateBreakdown)
 
     useGameStore.setState((current) => ({
       events: {

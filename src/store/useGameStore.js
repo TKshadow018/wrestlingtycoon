@@ -2008,6 +2008,7 @@ const buildAudienceSegmentsBreakdown = ({
     segments,
     fanImpactTotal,
     incomeAdjustment,
+    weightedSpendMultiplier,
   }
 }
 
@@ -5379,12 +5380,26 @@ export const useGameStore = create(
           const productionWithSponsor = shouldRunEvent ? withEventSponsorName(production, normalizedSponsors) : production
           const executedCustomEventId = dueCustomEvent?.eventId || null
           const isSponsorableEventType = Boolean(productionWithSponsor && SPONSORABLE_EVENT_TYPES.includes(productionWithSponsor.type))
-          const sponsorEventBoost = isSponsorableEventType
-            ? normalizedSponsors.reduce((sum, sponsor) => {
+          const sponsorEventBreakdown = isSponsorableEventType
+            ? normalizedSponsors.map((sponsor) => {
                 const trustFactor = getSponsorTrustFactor(sponsor.trust)
-                return sum + (sponsor.eventMultiplier * trustFactor)
-              }, 0)
-            : 0
+                const eventMultiplier = Number(sponsor.eventMultiplier) || 0
+                return {
+                  sponsorId: sponsor.sponsorId,
+                  name: sponsor.name,
+                  sponsorType: sponsor.sponsorType,
+                  scope: sponsor.eventScoped ? 'event' : 'recurring',
+                  trust: sponsor.trust,
+                  trustFactor,
+                  eventMultiplier,
+                  effectiveMultiplier: eventMultiplier * trustFactor,
+                }
+              })
+            : []
+          const sponsorEventBoost = sponsorEventBreakdown.reduce(
+            (sum, sponsor) => sum + sponsor.effectiveMultiplier,
+            0,
+          )
           const sponsorFanBoost = isSponsorableEventType
             ? normalizedSponsors.reduce((sum, sponsor) => {
                 const trustFactor = getSponsorTrustFactor(sponsor.trust)
@@ -5392,6 +5407,7 @@ export const useGameStore = create(
               }, 0)
             : 0
           let eventIncome = 0
+          let eventGateBreakdown = null
           let perMatchSalaryExpenses = 0
           let perMatchPayoutCount = 0
           let titleHolderMatchBonus = 0
@@ -5643,18 +5659,30 @@ export const useGameStore = create(
             const setupParticipantCount = new Set(
               configuredSegments.flatMap((segment) => segment.participantIds),
             ).size
-            const setupBonus = configuredSegments.reduce(
-              (totals, segment) => {
-                const typeBonus = SEGMENT_TYPE_BONUS[segment.segmentType] || SEGMENT_TYPE_BONUS.match
-                const promoSegmentBonus = segment.segmentType === 'promo'
-                  ? getCareerArcUnlockItem('promoSegments', segment.promoSegmentId)
-                  : null
-                return {
-                  income: totals.income + typeBonus.income + (Number(promoSegmentBonus?.incomeBonus) || 0),
-                  fans: totals.fans + typeBonus.fans + (Number(promoSegmentBonus?.fanBonus) || 0),
-                  prestige: totals.prestige + typeBonus.prestige,
-                }
-              },
+            const setupBonusDetails = configuredSegments.map((segment, index) => {
+              const typeBonus = SEGMENT_TYPE_BONUS[segment.segmentType] || SEGMENT_TYPE_BONUS.match
+              const promoSegmentBonus = segment.segmentType === 'promo'
+                ? getCareerArcUnlockItem('promoSegments', segment.promoSegmentId)
+                : null
+              const segmentTypeIncome = Number(typeBonus.income) || 0
+              const promoBonusIncome = Number(promoSegmentBonus?.incomeBonus) || 0
+              return {
+                segmentNumber: index + 1,
+                segmentType: segment.segmentType,
+                promoSegmentId: segment.segmentType === 'promo' ? segment.promoSegmentId : null,
+                segmentTypeIncome,
+                promoBonusIncome,
+                totalIncome: segmentTypeIncome + promoBonusIncome,
+                fans: typeBonus.fans + (Number(promoSegmentBonus?.fanBonus) || 0),
+                prestige: typeBonus.prestige,
+              }
+            })
+            const setupBonus = setupBonusDetails.reduce(
+              (totals, segment) => ({
+                income: totals.income + segment.totalIncome,
+                fans: totals.fans + segment.fans,
+                prestige: totals.prestige + segment.prestige,
+              }),
               { income: 0, fans: 0, prestige: 0 },
             )
             setupBonusForPostmortem = setupBonus
@@ -5708,9 +5736,24 @@ export const useGameStore = create(
             audienceSegmentsForOutcome = audienceSegmentBreakdown.segments
             audienceSegmentFanImpactForPostmortem = audienceSegmentBreakdown.fanImpactTotal
 
+            const ticketRevenue = Math.round(audienceCount * ticketPrice)
             const baseEventGateIncome = Math.round(
               audienceCount * ticketPrice * (1 + sponsorEventBoost),
             )
+            let appliedSponsorMultiplier = 0
+            const sponsorGateBreakdown = sponsorEventBreakdown.map((sponsor) => {
+              const gateBeforeSponsor = Math.round(
+                audienceCount * ticketPrice * (1 + appliedSponsorMultiplier),
+              )
+              appliedSponsorMultiplier += sponsor.effectiveMultiplier
+              const gateAfterSponsor = Math.round(
+                audienceCount * ticketPrice * (1 + appliedSponsorMultiplier),
+              )
+              return {
+                ...sponsor,
+                gateBoostAmount: gateAfterSponsor - gateBeforeSponsor,
+              }
+            })
             boardAttendanceForOutcome = getBoardEventAttendance({
               eventType,
               boardMembers: BOARD_MEMBERS,
@@ -5718,12 +5761,49 @@ export const useGameStore = create(
               boardVicePresidentName: state.boardMeeting?.boardVicePresidentName || BOARD_VICE_CHAIR.person_name,
               baseGateRevenue: baseEventGateIncome,
             })
+            const boardBonusAmount = Number(boardAttendanceForOutcome?.gateBonusAmount) || 0
+            const audienceSpendAdjustment = audienceSegmentBreakdown.incomeAdjustment
             eventIncome = Math.round(
               baseEventGateIncome
-              + (boardAttendanceForOutcome?.gateBonusAmount || 0)
+              + boardBonusAmount
               + setupBonus.income
-              + audienceSegmentBreakdown.incomeAdjustment,
+              + audienceSpendAdjustment,
             )
+            eventGateBreakdown = {
+              eventId: productionWithSponsor.eventId,
+              eventName: productionWithSponsor.name,
+              eventType,
+              day: nextCalendar.day,
+              attendance: audienceCount,
+              attendanceCalculation: {
+                minAudience: audienceMin,
+                maxAudience: audienceMax,
+                fans: state.stats.fans,
+                prestige: state.stats.prestige,
+                fanScaleMax: GAME_CONFIG.economy.audience.fanScaleMax,
+                prestigeScaleMax: GAME_CONFIG.economy.audience.prestigeScaleMax,
+                fanFactor,
+                prestigeFactor,
+                fansWeight: GAME_CONFIG.economy.audience.fansWeight,
+                prestigeWeight: GAME_CONFIG.economy.audience.prestigeWeight,
+                audienceNorm,
+                crowdFactor: crowdRand,
+              },
+              ticketPrice,
+              ticketRevenue,
+              sponsorMultiplier: sponsorEventBoost,
+              sponsorBoostAmount: baseEventGateIncome - ticketRevenue,
+              baseGateRevenue: baseEventGateIncome,
+              sponsorBreakdown: sponsorGateBreakdown,
+              boardAttendance: boardAttendanceForOutcome,
+              boardBonusAmount,
+              segmentBonuses: setupBonusDetails,
+              segmentBonusTotal: setupBonus.income,
+              audienceSegments: audienceSegmentBreakdown.segments,
+              weightedSpendMultiplier: audienceSegmentBreakdown.weightedSpendMultiplier,
+              audienceSpendAdjustment,
+              total: eventIncome,
+            }
 
             const baseFanDelta = Math.round(
               130 + productionWithSponsor.hype * 0.9 - productionWithSponsor.risk * 0.45
@@ -5806,6 +5886,7 @@ export const useGameStore = create(
               audience: audienceCount,
               audienceSegments: audienceSegmentsForOutcome,
               boardAttendance: boardAttendanceForOutcome,
+              eventGateBreakdown,
               income: eventIncome,
               fanDelta,
               prestigeDelta,
@@ -6191,6 +6272,7 @@ export const useGameStore = create(
             prestige: nextPrestige,
             employees: nextActiveEmployees.length,
             eventOutcomeType: lastOutcome?.type || null,
+            eventGateBreakdown,
             totalIncome: income,
             totalExpenses: expenses,
             incomeBreakdown: {

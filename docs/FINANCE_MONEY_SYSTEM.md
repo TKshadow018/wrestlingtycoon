@@ -32,6 +32,21 @@ Event attendance is selected from the configured range for the event type, using
 - Configured segment income bonuses.
 - Audience-segment spending adjustments.
 
+The Event Gate total is calculated as:
+
+```text
+audience score = min(fans / fan scale, 1) * fans weight + min(prestige / prestige scale, 1) * prestige weight
+attendance = round(clamp(min audience, max audience, min audience + (max audience - min audience) * audience score * random crowd factor))
+ticket revenue = round(attendance * ticket price)
+sponsor-adjusted base gate = round(attendance * ticket price * (1 + total trust-adjusted sponsor multiplier))
+board bonus = round(sponsor-adjusted base gate * attending board member bonus percent)
+segment bonuses = sum(segment-type income bonuses + promo-format income bonuses)
+audience spending adjustment = round(attendance * ticket price * (weighted audience spend multiplier - 1) * 0.08)
+event gate = round(sponsor-adjusted base gate + board bonus + segment bonuses + audience spending adjustment)
+```
+
+The breakdown records the audience range and the fans/prestige/random inputs used to calculate attendance, the ticket price, each sponsor's trust and effective gate impact, any attending board member, every card segment's income bonus, and audience-segment attendance, share, satisfaction, and spending multiplier. In **Financial Control**, select **Income** and click an Event Gate amount to open this breakdown. Daily rows show their event; monthly and yearly amounts show each contributing event, with the period total below. The overview's retained-timeline Event Gate total is also clickable. Older timeline records created before gate details were saved appear as an archived amount rather than a reconstructed breakdown.
+
 Audience satisfaction and attendance shares also affect the event's fan impact. An event date by itself does not produce event income; event setup must be supplied when the event is run.
 
 ### Expenses

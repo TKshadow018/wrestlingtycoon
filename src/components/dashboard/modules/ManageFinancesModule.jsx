@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Area,
@@ -17,6 +17,7 @@ import {
 } from 'recharts'
 import { GAME_CONFIG, GAME_DAYS_PER_MONTH } from '../../../config/gameConfig'
 import { useGameStore } from '../../../store/useGameStore'
+import EventGateDetailsModal from './EventGateDetailsModal'
 import styles from './ManageFinancesModule.module.scss'
 
 // ─── Color palettes ────────────────────────────────────────────────────────────
@@ -119,12 +120,20 @@ const aggregateTimeline = (timeline, startDateIso, period) => {
         expenses: zeroExpense(),
         totalIncome: 0,
         totalExpenses: 0,
+        eventGateBreakdowns: [],
+        eventGateUntrackedAmount: 0,
       })
     }
 
     const g = groups.get(key)
     const ib = entry.incomeBreakdown || {}
     const eb = entry.expenseBreakdown || {}
+
+    if (entry.eventGateBreakdown) {
+      g.eventGateBreakdowns.push(entry.eventGateBreakdown)
+    } else {
+      g.eventGateUntrackedAmount += Number(ib.event) || 0
+    }
 
     INCOME_KEYS.forEach((k) => { g.income[k] += ib[k] || 0 })
     EXPENSE_KEYS.forEach((k) => { g.expenses[k] += eb[k] || 0 })
@@ -197,6 +206,7 @@ function ManageFinancesModule() {
 
   const [feeInput, setFeeInput] = useState('')
   const [ticketFeeInputs, setTicketFeeInputs] = useState({})
+  const [selectedGateDetails, setSelectedGateDetails] = useState(null)
 
   // Period-aware aggregation
   const aggregated = useMemo(
@@ -231,6 +241,15 @@ function ManageFinancesModule() {
     })
     return { income: inc, expenses: exp }
   }, [timeline])
+
+  const allTimeGateDetails = useMemo(() => timeline.reduce((details, entry) => {
+    if (entry.eventGateBreakdown) {
+      details.breakdowns.push(entry.eventGateBreakdown)
+    } else {
+      details.untrackedAmount += Number(entry.incomeBreakdown?.event) || 0
+    }
+    return details
+  }, { breakdowns: [], untrackedAmount: 0 }), [timeline])
 
   const runwayEstimate = useMemo(() => {
     const sample = timeline.slice(-7)
@@ -286,6 +305,36 @@ function ManageFinancesModule() {
   }, [ledger])
 
   const recentEntries = ledger.slice(-10).reverse()
+
+  const openGateDetails = ({ breakdowns, untrackedAmount = 0, periodLabel, amount, returnFocusTo }) => {
+    setSelectedGateDetails({ breakdowns, untrackedAmount, periodLabel, amount, returnFocusTo })
+  }
+
+  const closeGateDetails = useCallback(() => setSelectedGateDetails(null), [])
+
+  const renderGateAmount = ({ breakdowns = [], untrackedAmount = 0, periodLabel, amount }) => {
+    if (breakdowns.length === 0 && untrackedAmount === 0) return formatAmt(amount)
+
+    return (
+      <button
+        className={styles.gateAmountButton}
+        type="button"
+        aria-label={t('dashboard.finances.gateDetails.viewAmount', {
+          period: periodLabel,
+          amount: formatAmt(amount),
+        })}
+        onClick={(event) => openGateDetails({
+          breakdowns,
+          untrackedAmount,
+          periodLabel,
+          amount,
+          returnFocusTo: event.currentTarget,
+        })}
+      >
+        {formatAmt(amount)}
+      </button>
+    )
+  }
 
   const subscriberEstimate = useMemo(() => {
     const { minFee, maxFee, maxRate, minRate } = GAME_CONFIG.economy.webSubscription
@@ -403,7 +452,15 @@ function ManageFinancesModule() {
                 <div key={k} className={styles.breakdownRow}>
                   <span className={styles.dot} style={{ background: INCOME_COLORS[k] }} />
                   <span>{t(`dashboard.finances.income.${k}`)}</span>
-                  <span className={styles.breakdownAmt}>{formatAmt(allTimeTotals.income[k])}</span>
+                  <span className={styles.breakdownAmt}>
+                    {k === 'event'
+                      ? renderGateAmount({
+                          ...allTimeGateDetails,
+                          periodLabel: t('dashboard.finances.gateDetails.overviewTotal'),
+                          amount: allTimeTotals.income[k],
+                        })
+                      : formatAmt(allTimeTotals.income[k])}
+                  </span>
                 </div>
               ))}
               <div className={`${styles.breakdownRow} ${styles.breakdownTotal}`}>
@@ -468,7 +525,16 @@ function ManageFinancesModule() {
                   <tr key={row.key}>
                     <td>{row.label}</td>
                     {INCOME_KEYS.map((k) => (
-                      <td key={k}>{formatAmt(row.income[k])}</td>
+                      <td key={k}>
+                        {k === 'event'
+                          ? renderGateAmount({
+                              breakdowns: row.eventGateBreakdowns,
+                              untrackedAmount: row.eventGateUntrackedAmount,
+                              periodLabel: row.label,
+                              amount: row.income[k],
+                            })
+                          : formatAmt(row.income[k])}
+                      </td>
                     ))}
                     <td className={styles.positive}>{formatAmt(row.totalIncome)}</td>
                   </tr>
@@ -478,7 +544,18 @@ function ManageFinancesModule() {
                 <tr>
                   <td>{t('dashboard.finances.total')}</td>
                   {INCOME_KEYS.map((k) => (
-                    <td key={k}>{formatAmt(grandTotals.income[k])}</td>
+                    <td key={k}>
+                      {k === 'event'
+                        ? renderGateAmount({
+                            breakdowns: aggregated.flatMap((row) => row.eventGateBreakdowns),
+                            untrackedAmount: aggregated.reduce((sum, row) => sum + row.eventGateUntrackedAmount, 0),
+                            periodLabel: t('dashboard.finances.gateDetails.periodTotal', {
+                              period: t(`dashboard.finances.period.${period}`),
+                            }),
+                            amount: grandTotals.income[k],
+                          })
+                        : formatAmt(grandTotals.income[k])}
+                    </td>
                   ))}
                   <td className={styles.positive}>
                     {formatAmt(INCOME_KEYS.reduce((s, k) => s + grandTotals.income[k], 0))}
@@ -759,6 +836,12 @@ function ManageFinancesModule() {
           )}
         </>
       )}
+
+      <EventGateDetailsModal
+        selection={selectedGateDetails}
+        startDateIso={startDateIso}
+        onClose={closeGateDetails}
+      />
     </section>
   )
 }
