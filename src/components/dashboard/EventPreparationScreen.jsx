@@ -47,6 +47,7 @@ function EventPreparationScreen({
   titles,
   sponsors,
   ticketFees,
+  ticketPricingRecommendation,
   eventPreparation,
   unlocks,
   modVenues = [],
@@ -80,7 +81,9 @@ function EventPreparationScreen({
   const [promotedWrestlerIds, setPromotedWrestlerIds] = useState(
     Array.isArray(eventPreparation?.promotedWrestlerIds) ? eventPreparation.promotedWrestlerIds : [],
   )
-  const [ticketPrice, setTicketPrice] = useState(String(ticketFees?.[eventType] ?? ''))
+  const [ticketPrice, setTicketPrice] = useState(String(
+    eventPreparation?.ticketPrice ?? ticketFees?.[eventType] ?? ticketPricingRecommendation?.recommendedTicketPrice ?? '',
+  ))
   const [ticketError, setTicketError] = useState('')
   const [venueSearch, setVenueSearch] = useState('')
 
@@ -244,6 +247,28 @@ function EventPreparationScreen({
                   {t('dashboard.eventPreparation.ticketLabel')}
                 </label>
               </div>
+              {ticketPricingRecommendation && (
+                <div className={styles.ticketRecommendation}>
+                  <p>
+                    {t('dashboard.eventPreparation.ticketRecommendation', {
+                      price: ticketPricingRecommendation.recommendedTicketPrice.toLocaleString(),
+                    })}
+                  </p>
+                  <p>
+                    {t('dashboard.eventPreparation.ticketRange', {
+                      min: ticketPricingRecommendation.priceLowerBound.toLocaleString(),
+                      max: ticketPricingRecommendation.priceUpperBound.toLocaleString(),
+                    })}
+                  </p>
+                  <button
+                    type="button"
+                    className={styles.useRecommendationButton}
+                    onClick={() => setTicketPrice(String(ticketPricingRecommendation.recommendedTicketPrice))}
+                  >
+                    {t('dashboard.eventPreparation.useTicketRecommendation')}
+                  </button>
+                </div>
+              )}
               {ticketError && <p className={styles.ticketError}>{ticketError}</p>}
             </section>
 

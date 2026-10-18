@@ -768,7 +768,10 @@ function ManageFinancesModule() {
             </div>
             <div className={styles.ticketFeeList}>
               {ticketTypeOrder.map((eventType) => {
-                const currentFee = Number(ticketFees[eventType]) || GAME_CONFIG.economy.audience.byEventType[eventType].ticketPrice
+                const configuredFee = Number(ticketFees[eventType])
+                const currentFee = Number.isFinite(configuredFee) && configuredFee >= 0
+                  ? configuredFee
+                  : GAME_CONFIG.economy.audience.byEventType[eventType].ticketPrice
                 return (
                   <div key={eventType} className={styles.ticketFeeRow}>
                     <div>

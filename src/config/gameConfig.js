@@ -79,6 +79,23 @@ export const GAME_CONFIG = {
         },
       },
     },
+    ticketPricing: {
+      enabled: asBoolean(import.meta.env.VITE_TICKET_PRICE_DYNAMIC_ENABLED, true),
+      ratingReference: asNumber(import.meta.env.VITE_TICKET_PRICE_RATING_REFERENCE, 8),
+      ratingSensitivity: asNumber(import.meta.env.VITE_TICKET_PRICE_RATING_SENSITIVITY, 0.1),
+      minMultiplier: asNumber(import.meta.env.VITE_TICKET_PRICE_MIN_MULTIPLIER, 0.5),
+      maxMultiplier: asNumber(import.meta.env.VITE_TICKET_PRICE_MAX_MULTIPLIER, 1.5),
+      randomRange: asNumber(import.meta.env.VITE_TICKET_PRICE_RANDOM_RANGE, 0.1),
+      regularRepeatPenalty: asNumber(import.meta.env.VITE_TICKET_PRICE_REGULAR_REPEAT_PENALTY, 0.1),
+      lowerPriceElasticity: asNumber(import.meta.env.VITE_TICKET_PRICE_LOWER_ELASTICITY, 0.5),
+      higherPriceElasticity: asNumber(import.meta.env.VITE_TICKET_PRICE_HIGHER_ELASTICITY, 2.5),
+      rankAdjustments: {
+        first: 0.2,
+        second: 0.1,
+        third: -0.1,
+        last: -0.2,
+      },
+    },
     income: {
       thirdPartyChance: asNumber(import.meta.env.VITE_THIRD_PARTY_INCOME_CHANCE, 0.03),
       thirdPartyMin: asNumber(import.meta.env.VITE_THIRD_PARTY_INCOME_MIN, 1000),

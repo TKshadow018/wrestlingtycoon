@@ -1,4 +1,5 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { GAME_CONFIG } from '../config/gameConfig'
 
 const testStorage = new Map()
 vi.stubGlobal('localStorage', {
@@ -619,8 +620,19 @@ describe('game store action coverage', () => {
     expect(useGameStore.getState().finances.subscriptionFee).toBe(50)
     useGameStore.getState().setEventTicketFee('unknown', 100)
     useGameStore.getState().setEventTicketFee('ppv', -1)
+    useGameStore.getState().setEventTicketFee('ppv', 0)
+    expect(useGameStore.getState().finances.ticketFees.ppv).toBe(0)
     useGameStore.getState().setEventTicketFee('ppv', 32.6)
     expect(useGameStore.getState().finances.ticketFees.ppv).toBe(33)
+
+    const ticketPricingRecommendation = useGameStore.getState().getTicketPricingRecommendation({
+      eventType: 'ppv',
+      eventDay: 61,
+    })
+    expect(ticketPricingRecommendation).toMatchObject({
+      baseTicketPrice: GAME_CONFIG.economy.audience.byEventType.ppv.ticketPrice,
+      recommendedTicketPrice: GAME_CONFIG.economy.audience.byEventType.ppv.ticketPrice,
+    })
 
     useGameStore.getState().setEventPreparation({
       eventId: 'event-prep',
@@ -1070,7 +1082,7 @@ describe('game store action coverage', () => {
       eventName: expect.stringContaining('Test Pay Per View'),
       eventType: 'ppv',
       attendance: state.events.lastOutcome.audience,
-      ticketPrice: 45,
+      ticketPrice: GAME_CONFIG.economy.audience.byEventType.ppv.ticketPrice,
       total: state.events.lastOutcome.incomeBreakdown.eventGate,
     })
     expect(eventGateBreakdown.attendanceCalculation).toMatchObject({
@@ -1092,6 +1104,15 @@ describe('game store action coverage', () => {
             * eventGateBreakdown.attendanceCalculation.crowdFactor,
       ),
     )))
+    expect(eventGateBreakdown).toMatchObject({
+      baseAttendance: eventGateBreakdown.attendance,
+      priceDemandFactor: 1,
+      selectedTicketPrice: GAME_CONFIG.economy.audience.byEventType.ppv.ticketPrice,
+      ticketPricingRecommendation: expect.objectContaining({
+        baseTicketPrice: GAME_CONFIG.economy.audience.byEventType.ppv.ticketPrice,
+        recommendedTicketPrice: GAME_CONFIG.economy.audience.byEventType.ppv.ticketPrice,
+      }),
+    })
     expect(eventGateBreakdown.sponsorBreakdown).toEqual(expect.arrayContaining([
       expect.objectContaining({ sponsorId: 'event-sponsor', scope: 'event', trustFactor: expect.any(Number) }),
       expect.objectContaining({ sponsorId: 'daily-sponsor', scope: 'recurring', trustFactor: expect.any(Number) }),

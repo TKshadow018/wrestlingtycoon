@@ -23,7 +23,6 @@ import EventRequirementsOverlay, { checkEventRequirements } from '../components/
 import EventResultsScreen from '../components/dashboard/EventResultsScreen'
 import EventSetupModal from '../components/dashboard/modules/EventSetupModal'
 import app, { isFirebaseConfigured } from '../config/firebase'
-import { GAME_CONFIG } from '../config/gameConfig'
 import { useGameStore } from '../store/useGameStore'
 import { getBoardMeetingSchedule } from '../utils/boardMeetings'
 import { getOnboardingTutorialShowProgress, getOnboardingTutorialStage } from '../utils/onboardingTutorial'
@@ -219,6 +218,7 @@ function DashboardPage() {
   const careerArcUnlocks = useGameStore((state) => state.progression.unlocks)
   const setEventPreparation = useGameStore((state) => state.setEventPreparation)
   const setEventTicketFee = useGameStore((state) => state.setEventTicketFee)
+  const getTicketPricingRecommendation = useGameStore((state) => state.getTicketPricingRecommendation)
   const aiStatus = useGameStore((state) => state.ai.status)
   const aiProgress = useGameStore((state) => state.ai.progress)
   const aiProgressText = useGameStore((state) => state.ai.progressText)
@@ -275,6 +275,19 @@ function DashboardPage() {
   ), [boardMeeting.activeMeeting, boardMeeting.lastMeetingDay, customEvents, day, isGameOver, startDateIso])
   const preparationEvent = !isEventStep ? getPreparationEvent({ day, customEvents }) : null
   const isPreparationDay = Boolean(preparationEvent)
+  const preparationEventId = preparationEvent?.eventId
+  const preparationEventType = preparationEvent?.type
+  const preparationEventDay = preparationEvent?.scheduledDay
+  const ticketPricingRecommendation = useMemo(() => {
+    if (!preparationEventId) {
+      return null
+    }
+
+    return getTicketPricingRecommendation({
+      eventType: preparationEventType,
+      eventDay: preparationEventDay || day,
+    })
+  }, [day, getTicketPricingRecommendation, preparationEventDay, preparationEventId, preparationEventType])
   const preShowInterviewEvent = !isEventStep ? getPreShowInterviewEvent({ day, customEvents }) : null
   const isForcedPreShowInterviewDay = Boolean(preShowInterviewEvent)
   const shouldShowAiProgress = aiOptedInAtStart && aiStatus === 'downloading'
@@ -688,7 +701,13 @@ function DashboardPage() {
     continueEventFlow()
   }
 
-  const handleEventPrepSave = ({ venueId, promotedWrestlerIds, promoStyleId, presentationId, ticketPrice }) => {
+  const handleEventPrepSave = ({
+    venueId,
+    promotedWrestlerIds,
+    promoStyleId,
+    presentationId,
+    ticketPrice,
+  }) => {
     if (preparationEvent) {
       setEventPreparation({
         eventId: preparationEvent.eventId,
@@ -696,6 +715,8 @@ function DashboardPage() {
         promotedWrestlerIds,
         promoStyleId,
         presentationId,
+        ticketPrice,
+        ticketPricingRecommendation,
       })
     }
     if (preparationEvent && ticketPrice >= 0) {
@@ -963,6 +984,7 @@ function DashboardPage() {
           titles={titles}
           sponsors={sponsors}
           ticketFees={ticketFees}
+          ticketPricingRecommendation={ticketPricingRecommendation}
           eventPreparation={eventPreparation}
           unlocks={careerArcUnlocks}
           modVenues={modVenues}

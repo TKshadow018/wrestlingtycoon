@@ -164,6 +164,49 @@ function EventGateDetailsModal({ selection, startDateIso, onClose }) {
                 </section>
               )}
 
+              {breakdown.ticketPricingRecommendation && (
+                <section className={styles.gateAttendanceSection}>
+                  <h5>{t('dashboard.finances.gateDetails.ticketPricingTitle')}</h5>
+                  <p className={styles.gateAttendanceFormula}>
+                    {t('dashboard.finances.gateDetails.ticketPricingSummary', {
+                      base: formatAmt(breakdown.ticketPricingRecommendation.baseTicketPrice),
+                      recommended: formatAmt(breakdown.ticketPricingRecommendation.recommendedTicketPrice),
+                      selected: formatAmt(breakdown.selectedTicketPrice),
+                    })}
+                  </p>
+                  <div className={styles.gateAttendanceGrid}>
+                    <p>
+                      <span>{t('dashboard.finances.gateDetails.ticketPriceRange')}</span>
+                      <strong>
+                        {formatAmt(breakdown.ticketPricingRecommendation.priceLowerBound)}
+                        {' – '}
+                        {formatAmt(breakdown.ticketPricingRecommendation.priceUpperBound)}
+                      </strong>
+                    </p>
+                    <p>
+                      <span>{t('dashboard.finances.gateDetails.ticketDemandFactor')}</span>
+                      <strong>{formatMultiplier(breakdown.priceDemandFactor)}</strong>
+                    </p>
+                    <p>
+                      <span>{t('dashboard.finances.gateDetails.recentRatingAdjustment')}</span>
+                      <strong>{formatAmt(breakdown.ticketPricingRecommendation.ratingAdjustment)}</strong>
+                    </p>
+                    <p>
+                      <span>{t('dashboard.finances.gateDetails.rivalAdjustment')}</span>
+                      <strong>{formatAmt(breakdown.ticketPricingRecommendation.rivalAdjustment)}</strong>
+                    </p>
+                    <p>
+                      <span>{t('dashboard.finances.gateDetails.randomPriceAdjustment')}</span>
+                      <strong>{formatAmt(breakdown.ticketPricingRecommendation.randomAdjustment)}</strong>
+                    </p>
+                    <p>
+                      <span>{t('dashboard.finances.gateDetails.sameWeekPenalty')}</span>
+                      <strong>{formatAmt(breakdown.ticketPricingRecommendation.sameWeekPenalty)}</strong>
+                    </p>
+                  </div>
+                </section>
+              )}
+
               <div className={styles.gateFormulaList}>
                 <div className={styles.gateFormulaRow}>
                   <span>{t('dashboard.finances.gateDetails.ticketRevenue')}</span>

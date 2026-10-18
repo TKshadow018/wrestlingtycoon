@@ -353,6 +353,36 @@
   color: var(--text-faint);
 }
 
+.ticketRecommendation {
+  margin: 0 1.4rem 1rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.ticketRecommendation p {
+  margin: 0.2rem 0;
+}
+
+.useRecommendationButton {
+  margin-top: 0.45rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--accent-copper);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent-copper);
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.useRecommendationButton:hover,
+.useRecommendationButton:focus-visible {
+  background: rgba(194, 133, 72, 0.12);
+}
+
 .ticketError {
   margin: 0 1.4rem 1rem;
   font-size: 0.82rem;

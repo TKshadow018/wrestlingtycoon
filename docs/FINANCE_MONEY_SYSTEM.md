@@ -31,12 +31,15 @@ Event attendance is selected from the configured range for the event type, using
 - Any board-member attendance bonus.
 - Configured segment income bonuses.
 - Audience-segment spending adjustments.
+- The selected ticket price's demand response relative to the dynamic recommended price.
 
 The Event Gate total is calculated as:
 
 ```text
 audience score = min(fans / fan scale, 1) * fans weight + min(prestige / prestige scale, 1) * prestige weight
-attendance = round(clamp(min audience, max audience, min audience + (max audience - min audience) * audience score * random crowd factor))
+base attendance = round(clamp(min audience, max audience, min audience + (max audience - min audience) * audience score * random crowd factor))
+price demand factor = selected ticket price demand response relative to the dynamic recommended price
+attendance = round(clamp(min audience, max audience, base attendance * price demand factor))
 ticket revenue = round(attendance * ticket price)
 sponsor-adjusted base gate = round(attendance * ticket price * (1 + total trust-adjusted sponsor multiplier))
 board bonus = round(sponsor-adjusted base gate * attending board member bonus percent)
@@ -47,7 +50,9 @@ event gate = round(sponsor-adjusted base gate + board bonus + segment bonuses + 
 
 The breakdown records the audience range and the fans/prestige/random inputs used to calculate attendance, the ticket price, each sponsor's trust and effective gate impact, any attending board member, every card segment's income bonus, and audience-segment attendance, share, satisfaction, and spending multiplier. In **Financial Control**, select **Income** and click an Event Gate amount to open this breakdown. Daily rows show their event; monthly and yearly amounts show each contributing event, with the period total below. The overview's retained-timeline Event Gate total is also clickable. Older timeline records created before gate details were saved appear as an archived amount rather than a reconstructed breakdown.
 
-Audience satisfaction and attendance shares also affect the event's fan impact. An event date by itself does not produce event income; event setup must be supplied when the event is run.
+The dynamic recommended ticket price starts from the event type's configured base price and adjusts it using the previous 30-day game-month average rating, rival-brand performance, a bounded random adjustment, and a repeated-regular-weekly penalty. The recommendation is clamped to 50%–150% of the event-type base price and can be overridden by the player. Selected prices are compared with that recommendation when calculating the price demand factor. The recommendation details are retained in the Event Gate breakdown.
+
+Audience satisfaction and attendance shares also affect the event's fan impact. An event date by itself does not produce event income; event setup must be supplied when the event is run. See [DYNAMIC_TICKET_PRICE_PLAN.md](DYNAMIC_TICKET_PRICE_PLAN.md) for the input definitions, fallback behavior, and configuration variables.
 
 ### Expenses
 

@@ -30,6 +30,10 @@ describe('game configuration', () => {
     vi.stubEnv('VITE_GAME_STARTING_FANS', '4321')
     vi.stubEnv('VITE_ALLOW_LEGENDS', ' YES ')
     vi.stubEnv('VITE_EVENT_CYCLE_DAYS', 'off')
+    vi.stubEnv('VITE_TICKET_PRICE_DYNAMIC_ENABLED', 'no')
+    vi.stubEnv('VITE_TICKET_PRICE_RATING_SENSITIVITY', '0.25')
+    vi.stubEnv('VITE_TICKET_PRICE_MIN_MULTIPLIER', '0.6')
+    vi.stubEnv('VITE_TICKET_PRICE_MAX_MULTIPLIER', '1.4')
     const { GAME_CONFIG } = await loadGameConfig()
 
     expect(GAME_CONFIG).toMatchObject({
@@ -39,6 +43,12 @@ describe('game configuration', () => {
       startingFans: 4321,
       allowLegends: true,
       eventCycleDays: 7,
+    })
+    expect(GAME_CONFIG.economy.ticketPricing).toMatchObject({
+      enabled: false,
+      ratingSensitivity: 0.25,
+      minMultiplier: 0.6,
+      maxMultiplier: 1.4,
     })
   })
 

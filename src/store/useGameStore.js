@@ -53,6 +53,10 @@ import {
 import { computeInterviewImpactPreview, computeInterviewStoryEffects } from '../utils/interviewStoryEffects'
 import { buildEventPostmortemRecommendations } from '../utils/eventPostmortemRecommendations'
 import {
+  calculateDynamicTicketPrice,
+  calculateTicketDemandFactor,
+} from '../utils/dynamicTicketPricing'
+import {
   FACTION_STORY_BEATS,
   normalizeBackstageChemistry,
   normalizeFactions,
@@ -997,7 +1001,13 @@ const normalizeEventPreparation = (eventPreparation, unlocks, modVenues = []) =>
   )
   const isVenueAvailable = (id) => isUnlocked('venues', id) || modVenueIds.has(id)
 
-  return {
+  const normalizedTicketPrice = Number(eventPreparation.ticketPrice)
+  const ticketPricingRecommendation = eventPreparation.ticketPricingRecommendation
+    && typeof eventPreparation.ticketPricingRecommendation === 'object'
+    ? eventPreparation.ticketPricingRecommendation
+    : null
+
+  const normalized = {
     eventId: typeof eventPreparation.eventId === 'string' ? eventPreparation.eventId : null,
     venueId: isVenueAvailable(eventPreparation.venueId) ? eventPreparation.venueId : null,
     promotedWrestlerIds: Array.isArray(eventPreparation.promotedWrestlerIds)
@@ -1010,6 +1020,15 @@ const normalizeEventPreparation = (eventPreparation, unlocks, modVenues = []) =>
       ? eventPreparation.presentationId
       : DEFAULT_CAREER_ARC_UNLOCKS.presentations[0],
   }
+
+  if (Number.isFinite(normalizedTicketPrice) && normalizedTicketPrice >= 0) {
+    normalized.ticketPrice = Math.round(normalizedTicketPrice)
+  }
+  if (ticketPricingRecommendation) {
+    normalized.ticketPricingRecommendation = ticketPricingRecommendation
+  }
+
+  return normalized
 }
 
 const computeCareerArcProgress = (arc, nextStats, nextCash) => {
@@ -5080,6 +5099,26 @@ export const useGameStore = create(
         })
       },
 
+      getTicketPricingRecommendation: ({ eventType, eventDay } = {}) => {
+        const state = get()
+        const audienceConfig = GAME_CONFIG.economy.audience.byEventType[eventType]
+          || GAME_CONFIG.economy.audience.byEventType.regularWeekly
+        const pricingConfig = GAME_CONFIG.economy.ticketPricing
+        const safeEventType = GAME_CONFIG.economy.audience.byEventType[eventType]
+          ? eventType
+          : 'regularWeekly'
+
+        return calculateDynamicTicketPrice({
+          eventType: safeEventType,
+          eventDay: eventDay || state.calendar.day,
+          baseTicketPrice: audienceConfig.ticketPrice,
+          eventLog: state.events.eventLog,
+          competitorCompanies: state.events.competitorCompanies,
+          random: Math.random,
+          config: pricingConfig,
+        })
+      },
+
       setEventPreparation: (data) => {
         set((state) => ({
           events: {
@@ -5710,7 +5749,20 @@ export const useGameStore = create(
               || GAME_CONFIG.economy.audience.byEventType.regularWeekly
             const audienceMin = audienceConfig.min
             const audienceMax = audienceConfig.max
-            const ticketPrice = Number(state.finances.ticketFees?.[eventType]) || audienceConfig.ticketPrice
+            const ticketPricingRecommendation = matchedPreparation?.ticketPricingRecommendation
+              || calculateDynamicTicketPrice({
+                eventType,
+                eventDay: productionWithSponsor.scheduledDay || nextCalendar.day,
+                baseTicketPrice: audienceConfig.ticketPrice,
+                eventLog: state.events.eventLog,
+                competitorCompanies: state.events.competitorCompanies,
+                random: Math.random,
+                config: GAME_CONFIG.economy.ticketPricing,
+              })
+            const savedTicketPrice = Number(state.finances.ticketFees?.[eventType])
+            const ticketPrice = Number.isFinite(savedTicketPrice) && savedTicketPrice >= 0
+              ? savedTicketPrice
+              : ticketPricingRecommendation.recommendedTicketPrice
             const fanFactor = Math.min(state.stats.fans / GAME_CONFIG.economy.audience.fanScaleMax, 1)
             const prestigeFactor = Math.min(state.stats.prestige / GAME_CONFIG.economy.audience.prestigeScaleMax, 1)
             const audienceNorm =
@@ -5719,8 +5771,19 @@ export const useGameStore = create(
             const crowdRand =
               GAME_CONFIG.economy.audience.randomMin
               + Math.random() * (GAME_CONFIG.economy.audience.randomMax - GAME_CONFIG.economy.audience.randomMin)
-            const audienceCount = Math.round(
+            const baseAudienceCount = Math.round(
               Math.max(audienceMin, Math.min(audienceMax, audienceMin + (audienceMax - audienceMin) * audienceNorm * crowdRand)),
+            )
+            const priceDemandFactor = calculateTicketDemandFactor({
+              selectedTicketPrice: ticketPrice,
+              recommendedTicketPrice: ticketPricingRecommendation.recommendedTicketPrice,
+              config: GAME_CONFIG.economy.ticketPricing,
+            })
+            const audienceCount = Math.round(
+              Math.max(
+                audienceMin,
+                Math.min(audienceMax, baseAudienceCount * priceDemandFactor),
+              ),
             )
             const audienceSegmentBreakdown = buildAudienceSegmentsBreakdown({
               eventType,
@@ -5775,6 +5838,10 @@ export const useGameStore = create(
               eventType,
               day: nextCalendar.day,
               attendance: audienceCount,
+              baseAttendance: baseAudienceCount,
+              priceDemandFactor,
+              ticketPricingRecommendation,
+              selectedTicketPrice: ticketPrice,
               attendanceCalculation: {
                 minAudience: audienceMin,
                 maxAudience: audienceMax,

@@ -24,6 +24,11 @@ describe('career arc event-preparation unlocks', () => {
       titles: [],
       sponsors: [],
       ticketFees: { ppv: 45 },
+      ticketPricingRecommendation: {
+        recommendedTicketPrice: 50,
+        priceLowerBound: 22.5,
+        priceUpperBound: 67.5,
+      },
       eventPreparation: null,
       unlocks: unlockedContent,
       modVenues: [{
@@ -44,6 +49,8 @@ describe('career arc event-preparation unlocks', () => {
     expect(html).not.toContain('value="nationalSpotlight"')
     expect(html).toContain('value="championship"')
     expect(html).not.toContain('value="retro"')
+    expect(html).toContain('Recommended ticket price: $50')
+    expect(html).toContain('Safe pricing range: $22.5–$67.5')
   })
 
   it('applies the selected presentation theme to the event intro', () => {
