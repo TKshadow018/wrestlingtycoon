@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const aiRuntime = vi.hoisted(() => ({
-  getAiModelEngine: vi.fn(),
+  getAiCompletionClient: vi.fn(),
   getAiModelId: vi.fn(),
   isRecoverableAiError: vi.fn(),
-  recoverAiModelFromRuntimeError: vi.fn(),
-  startAiModelDownload: vi.fn(),
+  recoverAiClientFromRuntimeError: vi.fn(),
+  initializeAiAssistant: vi.fn(),
 }))
 
-vi.mock('./webllmManager', () => aiRuntime)
+vi.mock('./openRouterManager', () => aiRuntime)
 
 import {
   buildInterviewTurnResult,
@@ -34,7 +34,7 @@ const makeEngine = (responses) => {
     }
   })
   const engine = { chat: { completions: { create } } }
-  aiRuntime.getAiModelEngine.mockReturnValue(engine)
+  aiRuntime.getAiCompletionClient.mockReturnValue(engine)
   aiRuntime.getAiModelId.mockReturnValue('test-model')
   return { engine, create }
 }
@@ -312,7 +312,7 @@ describe('interview scenarios and answers', () => {
       allowCounter: false,
       forceCounter: false,
     })).resolves.toMatchObject({ decision: 'accept', reply: 'Ready.' })
-    expect(aiRuntime.recoverAiModelFromRuntimeError).toHaveBeenCalledWith(runtimeError)
+    expect(aiRuntime.recoverAiClientFromRuntimeError).toHaveBeenCalledWith(runtimeError)
     expect(create).toHaveBeenCalledTimes(2)
   })
 
