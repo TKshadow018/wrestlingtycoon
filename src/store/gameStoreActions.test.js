@@ -235,7 +235,7 @@ describe('game store action coverage', () => {
     expect(useGameStore.getState().ai).toMatchObject({
       status: 'ready',
       progress: 100,
-      progressText: 'AI ready',
+      progressText: '',
     })
     useGameStore.getState().setAiError('')
     expect(useGameStore.getState().ai.error).toBe('onboarding.aiSetupError')

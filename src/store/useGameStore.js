@@ -4013,7 +4013,7 @@ export const useGameStore = create(
             ...state.ai,
             status: 'ready',
             progress: 100,
-            progressText: 'AI ready',
+            progressText: '',
             error: '',
             showEnableModal: !state.ai.enabled,
           },

@@ -88,10 +88,12 @@ const clearClient = () => {
 export const isRecoverableAiError = (error) => {
   const status = Number(error?.status)
   const message = String(error?.message || '').toLowerCase()
+  const messageStatus = Number(message.match(/\b([45]\d{2})\b/)?.[1])
+  const effectiveStatus = status || messageStatus
 
   return (
-    [408, 409, 425, 429].includes(status)
-    || status >= 500
+    [408, 409, 425, 429].includes(effectiveStatus)
+    || effectiveStatus >= 500
     || message.includes('failed to fetch')
     || message.includes('network')
     || message.includes('timeout')
@@ -100,7 +102,6 @@ export const isRecoverableAiError = (error) => {
 
 export const initializeAiAssistant = async () => {
   if (client) {
-    useGameStore.getState().setAiReady()
     return client
   }
 

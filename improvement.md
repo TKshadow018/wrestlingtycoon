@@ -30,14 +30,14 @@ This document separates systems already present in the game from ideas that are 
 
 ## AI Interview Improvement Plan
 
-The interview uses local WebLLM for journalist dialogue, while deterministic JavaScript heuristics determine answer quality and game effects. This plan prioritizes reliable gameplay and meaningful choices before expanding the AI's role. Items are proposed unless marked complete in the progress note below.
+The interview uses OpenRouter for journalist dialogue, while deterministic JavaScript heuristics determine answer quality and game effects. This plan prioritizes reliable gameplay and meaningful choices before expanding the AI's role. Items are proposed unless marked complete in the progress note below.
 
 **Progress (October 16, 2026): All four AI interview phases are implemented.** Turns commit atomically and retry safely; exhausted model setup can be retried; questions use available game context and localization; deterministic relevance/clarity scoring and conservative contradiction checks control optional follow-ups; players can skip or finish early; wrestler/rival effects are disclosed; consequence previews share the store formula; both dialogs support keyboard focus management and live announcements; tests and [docs/AI_INTERVIEWS.md](docs/AI_INTERVIEWS.md) cover the behavior. The current rubric remains lexical and English-only, so future language support should add locale resources and language-aware scoring rather than treating keyword overlap as semantic understanding.
 
 ### Phase 1 — Make interviews reliable
 
 - Treat submitting an answer as one atomic turn: preserve the draft while inference runs, and only add the player answer, journalist response, and score after the turn succeeds. On failure, show a recoverable error and let the player retry without duplicated or unscored transcript entries.
-- Reconcile interview model names shown in game state with the actual WebLLM candidate list. Make model download, initialization, fallback, and retry states understandable to players.
+- Reconcile interview model names shown in game state with the configured OpenRouter model. Make connection, fallback, and retry states understandable to players.
 - Ensure every service outcome satisfies the UI contract. In particular, fallback responses must not silently claim a counter-question exists when none was generated; provide a clear retry, continue, or end-interview path.
 - Add focused regression tests for failed inference, retry, transcript consistency, fallback response shape, and model fallback/name consistency.
 
@@ -67,7 +67,7 @@ The interview uses local WebLLM for journalist dialogue, while deterministic Jav
 - Give the interview modal dialog semantics, connect the answer label to its input, announce new journalist turns and errors accessibly, and verify keyboard-only completion.
 - Move interview prompts, controls, model-status messages, error messages, and debrief text into localization keys before adding additional supported locales.
 - Add component or flow-level tests for the complete interview lifecycle, including eligibility, focus selection, inference loading/failure, retry, completion, skip, and pre-show behavior.
-- Add a short interview guide documenting eligibility, local model requirements, fallback behavior, scoring/effects, and known limitations; update it alongside future configuration changes.
+- Add a short interview guide documenting eligibility, OpenRouter configuration, fallback behavior, scoring/effects, and known limitations; update it alongside future configuration changes.
 
 **Exit criteria:** core actions are accessible by keyboard and assistive technology, user-facing strings are localizable, and the principal success and failure paths have automated coverage.
 

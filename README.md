@@ -420,7 +420,7 @@ WrestlingTycoon/
 │   │   └── staff/              # Staff portraits
 │   └── Promo/                  # Marketing/promotional images
 ├── src/
-│   ├── ai/                     # AI integration (WebLLM, interview system)
+│   ├── ai/                     # AI integration (OpenRouter, interview system)
 │   ├── app/                    # App routing and structure
 │   ├── components/             # React components
 │   │   ├── common/             # Shared components (language switcher, save/load)
@@ -496,7 +496,7 @@ WrestlingTycoon/
 - **react-i18next**: React binding for i18n
 
 ### AI & ML
-- **WebLLM 0.2.79**: Local AI model inference for media interviews
+- **OpenRouter**: Cloud AI model inference for media interviews
 
 ### Data & Backend
 - **Firebase 12.12.1**: Cloud database and authentication
@@ -578,7 +578,14 @@ For detailed system specifications, see the docs folder:
 - **[Ranking System](docs/RANKING_POINTS.md)**: Wrestler ranking points, match impact calculations, and team rankings
 - **[Heel/Face System](docs/HEEL_FACE_SYSTEM.md)**: Alignment shifts, labels, and event-run decay
 - **[Board Meeting System](docs/BOARD_MEETING_PLAN.md)**: Monthly finance review, agendas, votes, mandates, and dismissal rules
-- **[AI Media Interviews](docs/AI_INTERVIEWS.md)**: Local model setup, eligibility, answer evaluation, story effects, retry, and finish behavior
+- **[AI Media Interviews](docs/AI_INTERVIEWS.md)**: OpenRouter setup, eligibility, answer evaluation, story effects, retry, and finish behavior
+
+### OpenRouter setup
+
+AI interviews use the OpenRouter API. Copy `.env.example` to a local environment file and set
+`VITE_OPENROUTER_API_KEY` before running the app. The default model is `openrouter/free`; set
+`VITE_OPENROUTER_MODEL` to override it. Vite embeds `VITE_*` values in the browser build, so use
+a restricted OpenRouter key and configure usage limits.
 
 ---
 
@@ -614,7 +621,7 @@ This is a personal project. For suggestions or issues, please create an issue in
 ## 🎓 Learning Resources
 
 The game integrates:
-- **WebLLM for AI**: Local model inference without external API calls
+- **OpenRouter for AI**: Free-model inference through the OpenRouter API
 - **Firebase for Backend**: Real-time database with secure rules
 - **Zustand for State**: Lightweight, scalable state management
 - **React Router for Navigation**: Modern client-side routing
