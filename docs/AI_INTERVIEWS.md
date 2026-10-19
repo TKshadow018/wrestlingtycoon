@@ -2,7 +2,7 @@
 
 ## Overview
 
-Media interviews are optional dashboard activities powered by local WebLLM dialogue. Interview text is generated in the player's browser; answer evaluation and game effects are deterministic JavaScript and do not depend on model claims.
+Media interviews are optional dashboard activities powered by OpenRouter dialogue. Interview text is generated through the configured OpenRouter API; answer evaluation and game effects are deterministic JavaScript and do not depend on model claims.
 
 ## Eligibility and opening question
 
@@ -10,11 +10,11 @@ An interview can be offered when AI is enabled and ready, on a non-event day, ou
 
 The opening question is selected from currently available game context: recent match results, an upcoming event, a held championship, a recent wrestler hire, or finances. The selector chooses among available topics; if none has context, it asks a general promotion question. A selected featured wrestler (and optional rival) overrides the company topic with a story question.
 
-## Model setup and fallback
+## OpenRouter setup and fallback
 
-The interview uses browser-local WebLLM inference. The configured candidate order is Qwen2.5 1.5B, Gemma 3 1B, and Llama 3.2 1B. The manager tries the next candidate if setup fails and may rotate candidates after recoverable GPU/runtime failures. The active model is shown during onboarding setup, with a retry action if all model candidates fail. Inference failures do not count as completed answers: the transcript, rubric totals, and game state remain unchanged, and the player can retry or finish with previously accepted answers.
+The interview uses the OpenRouter-compatible chat completions endpoint with the free-model router by default (`openrouter/free`). Set `VITE_OPENROUTER_API_KEY` in the environment before building or running the app. Set `VITE_OPENROUTER_MODEL` to use another OpenRouter model. The active model is shown during onboarding setup, with a retry action if the connection cannot be initialized.
 
-No interview answers are sent to a game backend for evaluation. Players still need a compatible browser/device and enough local memory for a supported model; model downloads can be large.
+Interview dialogue requests, including the current transcript and player answer, are sent to OpenRouter for generation. The game does not send answers to its Firebase backend for evaluation, and all gameplay scoring remains local deterministic JavaScript. Because `VITE_*` variables are embedded in a browser build, use a restricted OpenRouter key with appropriate usage limits. Inference failures do not count as completed answers: the transcript, rubric totals, and game state remain unchanged, and the player can retry or finish with previously accepted answers.
 
 ## Answer evaluation and dialogue
 
@@ -38,7 +38,7 @@ The interview and focus selectors are named modal dialogs. The answer has a visi
 ## Key implementation and tests
 
 - Context selection, evaluation, and atomic turn proposal: `src/ai/interviewService.js`
-- Local model candidates and recovery: `src/ai/webllmManager.js`
+- OpenRouter client, model selection, and recovery: `src/ai/openRouterManager.js` and `src/config/ai.js`
 - Dashboard flow and consequence application: `src/pages/DashboardPage.jsx`, `src/store/useGameStore.js`
 - Shared impact and story-effect calculations: `src/utils/interviewStoryEffects.js`
 - Service, modal, focus, and store coverage: `src/ai/interviewService.test.js`, `src/components/dashboard/AiInterviewModal.test.jsx`, `src/components/dashboard/InterviewFocusModal.test.jsx`, `src/store/gameStoreActions.test.js`, `src/utils/interviewStoryEffects.test.js`

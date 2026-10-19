@@ -7,11 +7,11 @@ const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
   startGame: vi.fn(() => ({ ok: true })),
   setAiOptedInAtStart: vi.fn(),
-  startAiModelDownload: vi.fn(),
+  initializeAiAssistant: vi.fn(),
 }))
 
 vi.mock('react-router-dom', () => ({ useNavigate: () => mocks.navigate }))
-vi.mock('../ai/webllmManager', () => ({ startAiModelDownload: mocks.startAiModelDownload }))
+vi.mock('../ai/openRouterManager', () => ({ initializeAiAssistant: mocks.initializeAiAssistant }))
 vi.mock('../components/common/LanguageSwitcher', () => ({ default: () => null }))
 vi.mock('../store/useGameStore', () => ({
   useGameStore: (selector) => selector({
@@ -21,8 +21,8 @@ vi.mock('../store/useGameStore', () => ({
       status: 'error',
       progress: 100,
       progressText: '',
-      error: 'All supported models failed to initialize.',
-      modelId: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
+      error: 'onboarding.aiSetupError',
+      modelId: 'openrouter/free',
     },
   }),
 }))
@@ -50,16 +50,16 @@ describe('StartScreenPage management profile setup', () => {
 
 describe('StartScreenPage AI setup recovery', () => {
   it('offers retry after setup fails and starts model initialization again', async () => {
-    mocks.startAiModelDownload
+    mocks.initializeAiAssistant
       .mockRejectedValueOnce(new Error('all candidates failed'))
       .mockResolvedValueOnce({ chat: {} })
     render(<StartScreenPage />)
 
     fireEvent.click(screen.getByRole('radio', { name: 'Start with AI enabled setup' }))
     fireEvent.click(screen.getByRole('button', { name: 'Start Game' }))
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Retry AI setup' })).toBeTruthy())
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Retry AI connection' })).toBeTruthy())
 
-    fireEvent.click(screen.getByRole('button', { name: 'Retry AI setup' }))
-    await waitFor(() => expect(mocks.startAiModelDownload).toHaveBeenCalledTimes(2))
+    fireEvent.click(screen.getByRole('button', { name: 'Retry AI connection' }))
+    await waitFor(() => expect(mocks.initializeAiAssistant).toHaveBeenCalledTimes(2))
   })
 })

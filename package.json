@@ -13,7 +13,6 @@
     "deploy:hosting": "FIREBASE_HOSTING_UPLOAD_CONCURRENCY=8 npx -y firebase-tools@latest deploy --only hosting"
   },
   "dependencies": {
-    "@mlc-ai/web-llm": "^0.2.79",
     "faker-user": "^0.3.1",
     "firebase": "^12.12.1",
     "i18next": "^26.0.8",

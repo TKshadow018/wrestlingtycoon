@@ -17,7 +17,7 @@ When researching a rule, prefer these sources in this order:
 
 Configuration defaults and environment-variable overrides live in [src/config/gameConfig.js](../src/config/gameConfig.js). Assume a value is a default, not a universal constant, unless it is hard-coded in the relevant rule. Some outcomes use randomness; describe ranges and conditions rather than promising a specific result.
 
-The local interview model is separate from the gameplay simulator: it generates dialogue in the browser, while answer evaluation and its gameplay consequences are applied by JavaScript rules. See [AI_INTERVIEWS.md](AI_INTERVIEWS.md).
+The OpenRouter interview model is separate from the gameplay simulator: it generates dialogue through the configured API, while answer evaluation and its gameplay consequences are applied by JavaScript rules. See [AI_INTERVIEWS.md](AI_INTERVIEWS.md).
 
 ## Core vocabulary
 

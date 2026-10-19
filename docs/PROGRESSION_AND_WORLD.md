@@ -43,4 +43,4 @@ Persistent strategy rules are in [src/utils/competitorWorld.js](../src/utils/com
 
 Monthly Board Meetings, weighted votes, mandates, relation, and dismissal risks are described in [BOARD_MEETING_PLAN.md](BOARD_MEETING_PLAN.md). Board state advances through the same calendar but is resolved through its dedicated meeting flow.
 
-AI Media Interviews are optional browser-local activities. Their answer scoring and game consequences are deterministic code, not instructions the local model can invent. See [AI_INTERVIEWS.md](AI_INTERVIEWS.md) for eligibility, retries, consequence bounds, and story-focus effects.
+AI Media Interviews are optional OpenRouter-backed activities. Their answer scoring and game consequences are deterministic code, not instructions the remote model can invent. See [AI_INTERVIEWS.md](AI_INTERVIEWS.md) for eligibility, retries, consequence bounds, and story-focus effects.

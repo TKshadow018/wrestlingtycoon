@@ -213,7 +213,7 @@ describe('game store action coverage', () => {
     expect(useGameStore.getState().onboardingChallenge.objectives.firstShow.currentSuccessfulEvents).toBe(1)
   })
 
-  it('validates game startup and keeps AI download, consent, and interview state consistent', () => {
+  it('validates game startup and keeps AI initialization, consent, and interview state consistent', () => {
     expect(useGameStore.getState().startGame({ playerName: ' ', companyName: 'Promotion' }))
       .toEqual({ ok: false })
     expect(useGameStore.getState().startGame({ playerName: 'Player', companyName: '' }))
@@ -221,24 +221,24 @@ describe('game store action coverage', () => {
 
     useGameStore.getState().setActiveModule('manageSponsors')
     useGameStore.getState().setAiOptedInAtStart(true)
-    useGameStore.getState().setAiDownloadStarted()
-    expect(useGameStore.getState().ai.status).toBe('downloading')
-    expect(useGameStore.getState().ai.modelId).toBe('Qwen2.5-1.5B-Instruct-q4f16_1-MLC')
+    useGameStore.getState().setAiInitializationStarted()
+    expect(useGameStore.getState().ai.status).toBe('initializing')
+    expect(useGameStore.getState().ai.modelId).toBe('openrouter/free')
 
-    useGameStore.getState().setAiDownloadProgress({ progress: 140, text: 'Almost done' })
+    useGameStore.getState().setAiInitializationProgress({ progress: 40, text: 'Connecting' })
     expect(useGameStore.getState().ai).toMatchObject({
-      progress: 100,
-      progressText: 'Almost done',
+      progress: 40,
+      progressText: 'Connecting',
     })
-    useGameStore.getState().setAiDownloadReady()
-    useGameStore.getState().setAiDownloadProgress({ progress: 20, text: 'ignored after ready' })
+    useGameStore.getState().setAiReady()
+    useGameStore.getState().setAiInitializationProgress({ progress: 20, text: 'ignored after ready' })
     expect(useGameStore.getState().ai).toMatchObject({
       status: 'ready',
       progress: 100,
-      progressText: 'Model ready',
+      progressText: '',
     })
-    useGameStore.getState().setAiDownloadError('')
-    expect(useGameStore.getState().ai.error).toBe('Model download failed')
+    useGameStore.getState().setAiError('')
+    expect(useGameStore.getState().ai.error).toBe('onboarding.aiSetupError')
     useGameStore.getState().enableAi()
     useGameStore.getState().closeAiEnableModal()
     expect(useGameStore.getState().ai).toMatchObject({
