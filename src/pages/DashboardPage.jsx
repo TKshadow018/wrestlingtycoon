@@ -20,6 +20,7 @@ import MegaEventVideoScreen from '../components/dashboard/MegaEventVideoScreen'
 import EventPreparationScreen from '../components/dashboard/EventPreparationScreen'
 import EventRequirementsOverlay, { checkEventRequirements } from '../components/dashboard/EventRequirementsOverlay'
 import EventResultsScreen from '../components/dashboard/EventResultsScreen'
+import BackstageInjuryModal from '../components/dashboard/BackstageInjuryModal'
 import EventSetupModal from '../components/dashboard/modules/EventSetupModal'
 import app, { isFirebaseConfigured } from '../config/firebase'
 import { useGameStore } from '../store/useGameStore'
@@ -28,6 +29,7 @@ import { getOnboardingTutorialShowProgress, getOnboardingTutorialStage } from '.
 import { parseGameDate } from '../utils/gameCalendar'
 import { buildModDataPackageFromState, validateModDataPackage } from '../utils/modDataPackage'
 import { computeInterviewImpactPreview } from '../utils/interviewStoryEffects'
+import { getEventTypeKey } from '../utils/eventDisplay'
 import { applyInterviewConsequencesOnce, getInterviewFollowUpLimit, isAiInterviewEligible } from '../utils/interviewFlow'
 import styles from './DashboardPage.module.scss'
 
@@ -193,6 +195,7 @@ function DashboardPage() {
   const profile = useGameStore((state) => state.profile)
   const bookedEvent = useGameStore((state) => state.events.bookedEvent)
   const lastOutcome = useGameStore((state) => state.events.lastOutcome)
+  const pendingBackstageInjury = useGameStore((state) => state.events.backstageInjury?.pending || null)
   const customEvents = useGameStore((state) => state.events.customEvents)
   const employees = useGameStore((state) => state.roster.employees)
   const rivalries = useGameStore((state) => state.events.rivalries)
@@ -201,6 +204,7 @@ function DashboardPage() {
   const activeModule = useGameStore((state) => state.ui.activeModule)
   const setActiveModule = useGameStore((state) => state.setActiveModule)
   const proceedTimeline = useGameStore((state) => state.proceedTimeline)
+  const dismissBackstageInjury = useGameStore((state) => state.dismissBackstageInjury)
   const boardMeeting = useGameStore((state) => state.boardMeeting)
   const openBoardMeeting = useGameStore((state) => state.openBoardMeeting)
   const resolveBoardAgenda = useGameStore((state) => state.resolveBoardAgenda)
@@ -224,6 +228,7 @@ function DashboardPage() {
   const aiShowEnableModal = useGameStore((state) => state.ai.showEnableModal)
   const aiOptedInAtStart = useGameStore((state) => state.ai.optedInAtStart)
   const onboardingChallenge = useGameStore((state) => state.onboardingChallenge)
+  const dismissOnboardingTutorial = useGameStore((state) => state.dismissOnboardingTutorial)
   const applyModDataPackage = useGameStore((state) => state.applyModDataPackage)
   const enableAi = useGameStore((state) => state.enableAi)
   const closeAiEnableModal = useGameStore((state) => state.closeAiEnableModal)
@@ -373,7 +378,7 @@ function DashboardPage() {
 
     const recentMatches = Array.isArray(lastOutcome?.segments)
       ? lastOutcome.segments
-          .filter((segment) => segment?.segmentType === 'match')
+          .filter((segment) => segment?.segmentType === 'match' && !segment.cancelled)
           .slice(0, 3)
           .map((segment) => ({
             participants: segment.participants || [],
@@ -412,12 +417,14 @@ function DashboardPage() {
     return {
       status: onboardingChallenge.status || 'active',
       remainingDays,
-      tutorial: {
-        ...getOnboardingTutorialStage(onboardingChallenge),
-        successfulEvents: firstShowProgress.successfulEvents,
-        targetSuccessfulEvents: firstShowProgress.targetSuccessfulEvents,
-        rosterProgress: `${Number(rosterObjective.currentWrestlers || 0)}/${Number(rosterObjective.targetWrestlers || 0)} wrestlers · ${Number(rosterObjective.currentStaff || 0)}/${Number(rosterObjective.targetStaff || 0)} staff · ${Number(rosterObjective.currentReferees || 0)}/${Number(rosterObjective.targetReferees || 0)} referees · ${Number(rosterObjective.currentAnnouncers || 0)}/${Number(rosterObjective.targetAnnouncers || 0)} announcers`,
-      },
+      tutorial: onboardingChallenge.tutorialDismissed
+        ? null
+        : {
+            ...getOnboardingTutorialStage(onboardingChallenge),
+            successfulEvents: firstShowProgress.successfulEvents,
+            targetSuccessfulEvents: firstShowProgress.targetSuccessfulEvents,
+            rosterProgress: `${Number(rosterObjective.currentWrestlers || 0)}/${Number(rosterObjective.targetWrestlers || 0)} wrestlers · ${Number(rosterObjective.currentStaff || 0)}/${Number(rosterObjective.targetStaff || 0)} staff · ${Number(rosterObjective.currentReferees || 0)}/${Number(rosterObjective.targetReferees || 0)} referees · ${Number(rosterObjective.currentAnnouncers || 0)}/${Number(rosterObjective.targetAnnouncers || 0)} announcers`,
+          },
       reward: onboardingChallenge.reward || { cash: 0, prestige: 0 },
       penalty: onboardingChallenge.penalty || { fans: 0, prestige: 0 },
       objectives: [
@@ -743,18 +750,20 @@ function DashboardPage() {
   }
 
   const handleSubmitEventSetup = ({ segments }) => {
-    proceedTimeline({
+    const result = proceedTimeline({
       eventId: todayEvent?.eventId,
       eventType: todayEvent?.type,
       totalSegments: todayEvent?.maxMatches || 1,
       segments,
     })
+    if (result?.ok === false) return result
     // Capture the outcome immediately after the synchronous store update
     const outcome = useGameStore.getState().events.lastOutcome
     setIsSetupModalOpen(false)
     if (outcome && outcome.type === 'success') {
       setPendingEventResult(outcome)
     }
+    return result
   }
 
   const handleDismissEventResult = () => {
@@ -995,6 +1004,10 @@ function DashboardPage() {
           onContinue={handleDismissEventResult}
         />
       )}
+      <BackstageInjuryModal
+        injury={pendingBackstageInjury}
+        onDismiss={dismissBackstageInjury}
+      />
       {showBoardMeetingIntro && (
         <BoardMeetingIntroScreen
           isJanuary={getGameDateFromDay(startDateIso, day).getMonth() === 0}
@@ -1102,6 +1115,7 @@ function DashboardPage() {
           <OnboardingTutorialGuide
             tutorial={onboardingSummary.tutorial}
             onOpenModule={setActiveModule}
+            onDismissForever={dismissOnboardingTutorial}
           />
         )}
 
@@ -1192,8 +1206,8 @@ function DashboardPage() {
               eventConfig={{
                 eventName: todayEvent?.name
                   || (bookedEvent?.eventId === 'regular-weekly-event' ? '' : bookedEvent?.name)
-                  || t(`dashboard.eventTypes.${todayEvent?.type || bookedEvent?.type || 'unknown'}`),
-                eventType: t(`dashboard.eventTypes.${todayEvent?.type || bookedEvent?.type || 'regularWeekly'}`),
+                  || t(`dashboard.eventTypes.${getEventTypeKey(todayEvent || bookedEvent) || 'unknown'}`),
+                eventType: t(`dashboard.eventTypes.${getEventTypeKey(todayEvent || bookedEvent) || 'regularWeekly'}`),
                 totalSegments: todayEvent?.maxMatches || bookedEvent?.maxMatches || 1,
               }}
               employees={employees}

@@ -20,11 +20,28 @@ import {
   normalizeWrestlerArchetypes,
 } from '../data/wrestlerArchetypes'
 import { createEventTemplates } from '../data/eventTemplates'
-import { clampMatchLengthMinutes, normalizePlannedMoments } from '../data/matchPlanning'
+import { clampMatchLengthMinutes, MATCH_PLAN_DIAGNOSTIC_CODES, normalizeMatchPlan } from '../data/matchPlanning'
+import { buildSimulatedMatchPlan, rateMatch, sanitizeRatingBreakdown } from '../utils/matchRating'
+import { applyMatchHealth, isInjured, normalizeInjury, recoverWrestlerHealth, MAX_MATCH_STAMINA_LOSS } from '../utils/matchHealth'
+import {
+  advanceBackstageInjury,
+  createBackstageInjuryState,
+  normalizeBackstageInjuryState,
+} from '../utils/backstageInjury'
+import {
+  getSegmentStaffEffects,
+  getStaffDepartmentEffects,
+  normalizeStaffDepartment,
+} from '../utils/staffOperations'
 import { createSponsorOffers, SPONSOR_TYPE_CONFIG } from '../data/sponsorOffers'
 import { clampHeelFaceMeter, DEFAULT_HEEL_FACE_METER_VALUE, computeHeelFaceShift, applyHeelFaceNeutralDecay } from '../utils/heelFaceMeter'
 import { validateModDataPackage } from '../utils/modDataPackage'
 import { getOnboardingTutorialStage } from '../utils/onboardingTutorial'
+import {
+  annotateWrestlerUnlockTiers,
+  getNextWrestlerGoalUnlock,
+  getWrestlerPrestigeRequirement,
+} from '../utils/wrestlerUnlocks'
 import { buildBoardMeetingAgendaPool } from '../utils/boardMeetingAgendas'
 import {
   applyBoardRelationChange,
@@ -97,12 +114,14 @@ const normalizeTitleRecord = (title) => {
   const normalizedStartDay = Number.isInteger(title?.currentHolderStartDay)
     ? title.currentHolderStartDay
     : (hasHolder ? 1 : null)
+  const currentHolderDefenses = Math.max(0, Math.floor(Number(title?.currentHolderDefenses) || 0))
 
   return {
     ...title,
     holderEmployeeId: holderIds[0] || null,
     holderEmployeeIds: title?.division === 'doubles' ? holderIds : [],
     currentHolderStartDay: normalizedStartDay,
+    currentHolderDefenses: hasHolder ? currentHolderDefenses : 0,
     holderHistory: Array.isArray(title?.holderHistory) ? title.holderHistory : [],
   }
 }
@@ -290,7 +309,11 @@ const normalizePersistedEmployees = (employees = [], day = 1) => {
       stamina: employee?.role === 'wrestler'
         ? clampStamina(employee?.stamina ?? MAX_STAMINA)
         : employee?.stamina,
+      injury: employee?.role === 'wrestler' ? normalizeInjury(employee.injury) : null,
       managerId: employee?.managerId || null,
+      staffDepartment: employee?.role === 'staff'
+        ? normalizeStaffDepartment(employee?.staffDepartment)
+        : null,
       activeMoraleDemand: employee?.activeMoraleDemand && typeof employee.activeMoraleDemand === 'object'
         ? employee.activeMoraleDemand
         : null,
@@ -345,20 +368,33 @@ const syncEmployeeCandidates = ({
   wrestlerArchetypes = DEFAULT_WRESTLER_ARCHETYPES,
 }) => {
   const unlockedLocks = pruneExpiredHiringLocks(hiringLocks, currentDay)
+  const allBuiltInCandidates = createEmployeeCandidates({
+    previousCandidates: currentCandidates,
+  })
   const builtInCandidates = createEmployeeCandidates({
     hiredEmployees: employees,
     previousCandidates: currentCandidates,
   })
+  const allBuiltInPersonIds = new Set(allBuiltInCandidates.map((candidate) => candidate.id))
   const builtInPersonIds = new Set(builtInCandidates.map((candidate) => candidate.id))
-  const modCandidates = createModWrestlerCandidates({
+  const allModCandidates = createModWrestlerCandidates({
     rosterData: modWrestlers,
     previousCandidates: currentCandidates,
     archetypes: wrestlerArchetypes,
-  }).filter((candidate) => (
+  }).filter((candidate) => !allBuiltInPersonIds.has(candidate.id))
+  const modCandidates = allModCandidates.filter((candidate) => (
     !builtInPersonIds.has(candidate.id)
     && !(employees || []).some((employee) => employee.personId === candidate.id)
   ))
+  const unlockTiers = new Map(
+    annotateWrestlerUnlockTiers([...allBuiltInCandidates, ...allModCandidates])
+      .filter((candidate) => candidate.role === 'wrestler')
+      .map((candidate) => [candidate.id, candidate.wrestlerUnlockTier]),
+  )
   const candidates = [...builtInCandidates, ...modCandidates]
+    .map((candidate) => candidate.role === 'wrestler'
+      ? { ...candidate, wrestlerUnlockTier: unlockTiers.get(candidate.id) || 0 }
+      : candidate)
     .sort((left, right) => left.role.localeCompare(right.role) || left.name.localeCompare(right.name))
 
   return candidates.filter((candidate) => {
@@ -590,6 +626,7 @@ const buildInitialState = () => {
       factionRivalries: [],
       competitorHeadlines: [],
       eventPreparation: null,
+      backstageInjury: createBackstageInjuryState(),
     },
     history: {
       timeline: [],
@@ -598,6 +635,7 @@ const buildInitialState = () => {
       currentArc: null,
       history: [],
       unlocks: normalizeCareerArcUnlocks(),
+      unlockedWrestlerIds: [],
     },
     boardMeeting: createInitialBoardState({
       boardPresidentName: BOARD_CHAIR.person_name,
@@ -998,6 +1036,9 @@ const ensureProgressionShape = (progression, { legacyVenueId = null } = {}) => {
       : null,
     history: Array.isArray(progression?.history) ? progression.history : [],
     unlocks,
+    unlockedWrestlerIds: Array.isArray(progression?.unlockedWrestlerIds)
+      ? [...new Set(progression.unlockedWrestlerIds.filter((id) => typeof id === 'string'))]
+      : [],
   }
 }
 
@@ -1236,6 +1277,7 @@ const ensureOnboardingChallengeShape = (challenge, timeline = [], currentDay = 1
   const normalized = {
     ...defaults,
     ...challenge,
+    tutorialDismissed: Boolean(challenge.tutorialDismissed),
     financeObjectiveVersion: 2,
     tutorialVersion: 2,
     objectives: {
@@ -1570,9 +1612,6 @@ const MORALE_DEMAND_SALARY_RAISE_MIN = 1000
 const MORALE_TITLE_PROMISE_WINDOW_DAYS = 21
 const MORALE_TITLE_PROMISE_SUCCESS_BOOST = 6
 const MORALE_TITLE_PROMISE_FAIL_PENALTY = -12
-const DAILY_STAMINA_REGEN = 10
-const MIN_MATCH_STAMINA_LOSS = 20
-const MAX_MATCH_STAMINA_LOSS = 50
 const MAX_MALE_WRESTLERS = Number(import.meta.env.VITE_ROSTER_MAX_SIZE_MALE)
 const MAX_FEMALE_WRESTLERS = Number(import.meta.env.VITE_ROSTER_MAX_SIZE_FEMALE)
 
@@ -2043,51 +2082,34 @@ const buildAudienceSegmentsBreakdown = ({
   }
 }
 
-const rollStaminaLoss = () => {
-  return Math.floor(Math.random() * (MAX_MATCH_STAMINA_LOSS - MIN_MATCH_STAMINA_LOSS + 1)) + MIN_MATCH_STAMINA_LOSS
-}
-
 const calculateMatchRating = (wrestlers = []) => {
   if (wrestlers.length === 0) {
     return null
   }
 
-  const averageSkill = wrestlers.reduce((sum, wrestler) => sum + (Number(wrestler.skill) || 0), 0) / wrestlers.length
-  const averageStamina = wrestlers.reduce((sum, wrestler) => sum + clampStamina(wrestler.stamina), 0) / wrestlers.length
-  const skillFactor = (averageSkill / 100) * 6.5
-  const staminaFactor = (averageStamina / 100) * 2.5
-  const randomFactor = (Math.random() * 2) - 1
-  const rating = 1 + skillFactor + staminaFactor + randomFactor
-
-  return Math.max(1, Math.min(10, Number(rating.toFixed(1))))
+  const plan = buildSimulatedMatchPlan({ wrestlerIds: wrestlers.map((person) => person.employeeId) })
+  return rateMatch({ wrestlers, plan }).matchRating
 }
 
-const applyDailyPerformanceChanges = (employees = [], configuredSegments = []) => {
-  const withRegen = employees.map((employee) => {
-    if (employee.role !== 'wrestler') {
-      return employee
-    }
-
-    return {
-      ...employee,
-      stamina: clampStamina((employee.stamina ?? MAX_STAMINA) + DAILY_STAMINA_REGEN),
-    }
-  })
+const applyDailyPerformanceChanges = (employees = [], configuredSegments = [], day) => {
+  const withRegen = employees.map((employee) => recoverWrestlerHealth(employee, day + 1))
+  const staffDepartmentEffects = getStaffDepartmentEffects(withRegen)
+  const cancelledSegments = []
 
   if (!Array.isArray(configuredSegments) || configuredSegments.length === 0) {
     return {
       employees: withRegen,
       configuredSegments,
+      cancelledSegments,
     }
   }
 
   const employeesById = new Map(withRegen.map((employee) => [employee.employeeId, employee]))
-  const staminaLossById = new Map()
   const popularityDeltaById = new Map()
 
-  const segmentsWithPerformance = configuredSegments.map((segment) => {
+  const segmentsWithPerformance = configuredSegments.map((segment, cardIndex) => {
     const providedMatchRating = Number(segment?.matchRating)
-    const hasProvidedMatchRating = Number.isFinite(providedMatchRating)
+    const hasProvidedMatchRating = segment?.matchRating != null && Number.isFinite(providedMatchRating)
     const providedStaminaLossById =
       segment?.staminaLossById && typeof segment.staminaLossById === 'object'
         ? segment.staminaLossById
@@ -2095,6 +2117,7 @@ const applyDailyPerformanceChanges = (employees = [], configuredSegments = []) =
 
     const baseSegment = {
       ...segment,
+      cardIndex,
       matchRating: hasProvidedMatchRating
         ? Math.max(1, Math.min(10, Number(providedMatchRating.toFixed(1))))
         : null,
@@ -2108,18 +2131,38 @@ const applyDailyPerformanceChanges = (employees = [], configuredSegments = []) =
       .filter((employee) => employee?.role === 'wrestler')
 
     if (MATCH_SEGMENT_TYPES.has(segment.segmentType)) {
-      if (!hasProvidedMatchRating) {
-        baseSegment.matchRating = calculateMatchRating(wrestlerParticipants)
+      const unavailableWrestlerIds = wrestlerParticipants.filter((person) => isInjured(person, day))
+        .map((person) => person.employeeId)
+      if (unavailableWrestlerIds.length) {
+        cancelledSegments.push({
+          ...baseSegment, cancelled: true, cancellationReason: 'injury', unavailableWrestlerIds,
+          winnerEmployeeId: null, winnerTeamIds: [], matchRating: null, ratingBreakdown: null,
+          staminaLossById: {}, injuries: [],
+        })
+        return null
+      }
+      if (!hasProvidedMatchRating || segment.executionMode) {
+        const plan = segment.executionMode === 'play' || segment.plannedMoments?.length
+          ? normalizeMatchPlan(segment).plan
+          : buildSimulatedMatchPlan({ ...segment, wrestlerIds: segment.wrestlerIds })
+        Object.assign(baseSegment, {
+          props: plan.props,
+          plannedMoments: plan.plannedMoments,
+          matchLengthMinutes: plan.matchLengthMinutes,
+          finishType: plan.finishType,
+          riskLevel: plan.riskLevel,
+        }, rateMatch({ wrestlers: wrestlerParticipants, plan, ...segment }))
+        baseSegment.executionMode = segment.executionMode || 'simulate'
       }
 
-      wrestlerParticipants.forEach((wrestler) => {
-        const current = staminaLossById.get(wrestler.employeeId) || 0
-        const providedLoss = Number(providedStaminaLossById?.[wrestler.employeeId])
-        const staminaLoss = Number.isFinite(providedLoss)
-          ? Math.max(0, Math.round(providedLoss))
-          : rollStaminaLoss()
-        staminaLossById.set(wrestler.employeeId, current + staminaLoss)
+      const health = applyMatchHealth({
+        wrestlers: wrestlerParticipants, plan: baseSegment, day,
+        staminaLossById: segment.executionMode ? {} : providedStaminaLossById || {},
+        medicalInjuryDurationReduction: staffDepartmentEffects.medicalInjuryDurationReduction,
       })
+      health.wrestlers.forEach((person) => employeesById.set(person.employeeId, person))
+      baseSegment.staminaLossById = health.staminaLossById
+      baseSegment.injuries = health.injuries
     }
 
     if (segment.segmentType === 'interview') {
@@ -2156,19 +2199,17 @@ const applyDailyPerformanceChanges = (employees = [], configuredSegments = []) =
     }
 
     return baseSegment
-  })
+  }).filter(Boolean)
 
   const withPerformance = withRegen.map((employee) => {
     if (employee.role !== 'wrestler') {
       return employee
     }
 
-    const staminaLoss = staminaLossById.get(employee.employeeId) || 0
     const popularityDelta = popularityDeltaById.get(employee.employeeId) || 0
 
     return {
-      ...employee,
-      stamina: clampStamina((employee.stamina ?? MAX_STAMINA) - staminaLoss),
+      ...employeesById.get(employee.employeeId),
       popularity: clampPopularity((employee.popularity ?? 0) + popularityDelta),
     }
   })
@@ -2176,6 +2217,7 @@ const applyDailyPerformanceChanges = (employees = [], configuredSegments = []) =
   return {
     employees: withPerformance,
     configuredSegments: segmentsWithPerformance,
+    cancelledSegments,
   }
 }
 
@@ -2189,7 +2231,7 @@ const applyHeelFaceWeeklyDecay = (employees) => {
   })
 }
 
-const applyMatchStats = (employees, configuredSegments, eventDay, eventName) => {
+const applyMatchStats = (employees, configuredSegments, event) => {
   if (!Array.isArray(configuredSegments) || configuredSegments.length === 0) {
     return employees
   }
@@ -2298,8 +2340,10 @@ const applyMatchStats = (employees, configuredSegments, eventDay, eventName) => 
         : []
 
       return {
-        day: eventDay,
-        eventName,
+        day: event.day,
+        eventId: event.eventId,
+        eventType: event.type,
+        eventName: event.name,
         segmentType: seg.segmentType,
         matchType: seg.matchType || null,
         storyBeat: seg.storyBeat || null,
@@ -2399,7 +2443,10 @@ const applyTitleMatchResults = (titles, configuredSegments, employees, eventDay)
 
     const sameHolder = holdersKey(currentHolderIds) === holdersKey(nextHolderIds)
     if (sameHolder) {
-      return normalizeTitleRecord(title)
+      return normalizeTitleRecord({
+        ...title,
+        currentHolderDefenses: (Number(title.currentHolderDefenses) || 0) + 1,
+      })
     }
 
     const currentStartDay = Number.isInteger(title?.currentHolderStartDay)
@@ -2424,6 +2471,7 @@ const applyTitleMatchResults = (titles, configuredSegments, employees, eventDay)
         startDay: currentStartDay,
         endDay: Number(eventDay || currentStartDay),
         daysHeld: Math.max(1, Number(eventDay || currentStartDay) - currentStartDay + 1),
+        defenses: Math.max(0, Number(title.currentHolderDefenses) || 0),
       })
     }
 
@@ -2432,6 +2480,7 @@ const applyTitleMatchResults = (titles, configuredSegments, employees, eventDay)
       holderEmployeeId: nextHolderIds[0] || null,
       holderEmployeeIds: title.division === 'doubles' ? nextHolderIds : [],
       currentHolderStartDay: Number(eventDay || 1),
+      currentHolderDefenses: 0,
       holderHistory: nextHistory.slice(-120),
     })
   })
@@ -2472,6 +2521,7 @@ const applyTitleMatchResults = (titles, configuredSegments, employees, eventDay)
       startDay: currentStartDay,
       endDay: Number(eventDay || currentStartDay),
       daysHeld: Math.max(1, Number(eventDay || currentStartDay) - currentStartDay + 1),
+      defenses: Math.max(0, Number(title.currentHolderDefenses) || 0),
     })
 
     return normalizeTitleRecord({
@@ -2479,6 +2529,7 @@ const applyTitleMatchResults = (titles, configuredSegments, employees, eventDay)
       holderEmployeeId: null,
       holderEmployeeIds: [],
       currentHolderStartDay: Number(eventDay || 1),
+      currentHolderDefenses: 0,
       holderHistory: nextHistory.slice(-120),
     })
   })
@@ -2743,23 +2794,17 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unl
       const team2Ids = rawMatchType === 'tagTeam'
         ? filterIds(segment?.team2Ids).filter((id) => !team1Ids.includes(id))
         : []
+      const cashInByEmployeeId = segmentType === 'titleMatch' ? filterId(segment?.cashInByEmployeeId) : null
       const wrestlerIds = rawMatchType === 'tagTeam'
         ? Array.from(new Set([...team1Ids, ...team2Ids]))
-        : filterIds(segment?.wrestlerIds ?? segment?.participantIds)
+        : Array.from(new Set([...filterIds(segment?.wrestlerIds ?? segment?.participantIds), cashInByEmployeeId].filter(Boolean)))
       const matchLengthMinutes = MATCH_SEGMENT_TYPES.has(segmentType)
         ? clampMatchLengthMinutes(segment?.matchLengthMinutes)
         : null
-      const normalizedMatchPlan = MATCH_SEGMENT_TYPES.has(segmentType)
-        ? normalizePlannedMoments({
-            moments: segment?.plannedMoments,
-            wrestlerIds,
-            props: segment?.props,
-            matchLengthMinutes,
-          })
-        : { props: [], plannedMoments: [] }
+      const validation = normalizeMatchPlan({ ...segment, segmentType, wrestlerIds, matchLengthMinutes })
+      const normalizedMatchPlan = validation.plan
       const refereeId   = filterId(segment?.refereeId)
       const announcerId = filterId(segment?.announcerId)
-      const cashInByEmployeeId = segmentType === 'titleMatch' ? filterId(segment?.cashInByEmployeeId) : null
       const participantIds = Array.from(
         new Set([...wrestlerIds, refereeId, announcerId, cashInByEmployeeId].filter(Boolean)),
       )
@@ -2774,7 +2819,7 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unl
         ? rawWinnerTeamIds
         : []
       const rawMatchRating = Number(segment?.matchRating)
-      const matchRating = Number.isFinite(rawMatchRating)
+      const matchRating = MATCH_SEGMENT_TYPES.has(segmentType) && segment?.matchRating != null && Number.isFinite(rawMatchRating)
         ? Math.max(1, Math.min(10, Number(rawMatchRating.toFixed(1))))
         : null
       const staminaLossById = MATCH_SEGMENT_TYPES.has(segmentType) && segment?.staminaLossById && typeof segment.staminaLossById === 'object'
@@ -2788,7 +2833,7 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unl
               return acc
             }
 
-            acc[employeeId] = Math.max(0, Math.round(numericLoss))
+            acc[employeeId] = Math.min(MAX_MATCH_STAMINA_LOSS, Math.max(0, Math.round(numericLoss)))
             return acc
           }, {})
         : {}
@@ -2847,6 +2892,17 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unl
         winnerEmployeeId,
         winnerTeamIds,
         matchRating,
+        ratingBreakdown: MATCH_SEGMENT_TYPES.has(segmentType) ? sanitizeRatingBreakdown(segment?.ratingBreakdown) : null,
+        executionMode: MATCH_SEGMENT_TYPES.has(segmentType) && ['play', 'simulate'].includes(segment?.executionMode) ? segment.executionMode : null,
+        finishType: normalizedMatchPlan.finishType,
+        riskLevel: normalizedMatchPlan.riskLevel,
+        planWarnings: MATCH_SEGMENT_TYPES.has(segmentType)
+          ? [...validation.warnings, ...validation.adjustments,
+              ...(Array.isArray(segment?.planWarnings) ? segment.planWarnings : [])
+                .filter((entry) => MATCH_PLAN_DIAGNOSTIC_CODES.includes(entry?.code))
+                .slice(0, 120)
+                .map((entry) => ({ code: entry.code })),
+            ] : [],
         staminaLossById,
         interviewPopularityChanges,
       }
@@ -3122,7 +3178,7 @@ const getBrandFitTrustModifier = (brandFit = '', metrics = {}) => {
 }
 
 const getEventSponsorProfile = (eventOutcome) => {
-  const segments = Array.isArray(eventOutcome?.segments) ? eventOutcome.segments : []
+  const segments = Array.isArray(eventOutcome?.segments) ? eventOutcome.segments.filter((segment) => !segment.cancelled) : []
   const audienceSegments = Array.isArray(eventOutcome?.audienceSegments) ? eventOutcome.audienceSegments : []
   const totalSegments = Math.max(1, segments.length)
   const violentSegments = segments.filter((segment) => (
@@ -3353,6 +3409,7 @@ export const useGameStore = create(
             currentArc: firstCareerArc,
             history: [],
             unlocks: careerUnlocks,
+            unlockedWrestlerIds: [],
           },
           onboardingChallenge,
         }))
@@ -3362,6 +3419,23 @@ export const useGameStore = create(
 
       resetGame: () => {
         set(() => buildInitialState())
+      },
+
+      dismissOnboardingTutorial: () => {
+        let result = { ok: false }
+        set((state) => {
+          if (!state.onboardingChallenge || state.onboardingChallenge.status === 'active') {
+            return state
+          }
+          result = { ok: true }
+          return {
+            onboardingChallenge: {
+              ...state.onboardingChallenge,
+              tutorialDismissed: true,
+            },
+          }
+        })
+        return result
       },
 
       openBoardMeeting: () => {
@@ -3596,6 +3670,7 @@ export const useGameStore = create(
                   startDay: Number(title.currentHolderStartDay || state.calendar.day),
                   endDay: state.calendar.day,
                   daysHeld: Math.max(1, state.calendar.day - Number(title.currentHolderStartDay || state.calendar.day) + 1),
+                  defenses: Math.max(0, Number(title.currentHolderDefenses) || 0),
                 })
               }
 
@@ -3604,6 +3679,7 @@ export const useGameStore = create(
                 holderEmployeeId: targetEmployeeId,
                 holderEmployeeIds: [],
                 currentHolderStartDay: state.calendar.day,
+                currentHolderDefenses: 0,
                 holderHistory: holderHistory.slice(-120),
               })
             })
@@ -4644,6 +4720,16 @@ export const useGameStore = create(
             return state
           }
 
+          const prestigeRequired = getWrestlerPrestigeRequirement(
+            candidate,
+            state.stats.prestige,
+            state.progression?.unlockedWrestlerIds || [],
+          )
+          if (prestigeRequired !== null) {
+            hireResult = { ok: false, reason: 'prestigeLocked', prestigeRequired }
+            return state
+          }
+
           if (candidatePersonId && activeHiringLocks[candidatePersonId]) {
             hireResult = { ok: false, reason: 'lockedUntil', unlockDay: activeHiringLocks[candidatePersonId] }
             return {
@@ -4774,6 +4860,21 @@ export const useGameStore = create(
               reason: 'locked',
             }
 
+            return state
+          }
+
+          const prestigeRequired = getWrestlerPrestigeRequirement(
+            candidate,
+            state.stats.prestige,
+            state.progression?.unlockedWrestlerIds || [],
+          )
+          if (prestigeRequired !== null) {
+            result = {
+              ok: false,
+              accepted: false,
+              reason: 'prestigeLocked',
+              prestigeRequired,
+            }
             return state
           }
 
@@ -4927,6 +5028,37 @@ export const useGameStore = create(
             },
           }
         })
+      },
+
+      setStaffDepartment: (employeeId, department) => {
+        const normalizedDepartment = normalizeStaffDepartment(department)
+        if (department !== null && !normalizedDepartment) {
+          return { ok: false, reason: 'invalidDepartment' }
+        }
+
+        let result = { ok: false, reason: 'notFound' }
+        set((state) => {
+          const employee = state.roster.employees.find((item) => item.employeeId === employeeId)
+          if (!employee) {
+            result = { ok: false, reason: 'notFound' }
+            return state
+          }
+          if (employee.role !== 'staff') {
+            result = { ok: false, reason: 'ineligibleRole' }
+            return state
+          }
+
+          result = { ok: true, department: normalizedDepartment }
+          return {
+            roster: {
+              ...state.roster,
+              employees: state.roster.employees.map((item) => item.employeeId === employeeId
+                ? { ...item, staffDepartment: normalizedDepartment }
+                : item),
+            },
+          }
+        })
+        return result
       },
 
       giveEmployeeBonus: (employeeId, amount, rankPosition = 0) => {
@@ -5430,7 +5562,48 @@ export const useGameStore = create(
         })
       },
 
+      dismissBackstageInjury: () => set((state) => {
+        const backstageInjury = state.events.backstageInjury
+        if (!backstageInjury?.pending) return state
+        return {
+          events: {
+            ...state.events,
+            backstageInjury: { ...backstageInjury, pending: null },
+          },
+        }
+      }),
+
       proceedTimeline: (eventSetup = null) => {
+        const currentState = get()
+        if (currentState.gameStatus.isGameOver) {
+          return { ok: false, error: 'matchPlanner.gameOver' }
+        }
+        if (currentState.events.backstageInjury?.pending) {
+          return { ok: false, error: 'backstageInjury.pending' }
+        }
+        if (eventSetup && Array.isArray(eventSetup.segments)) {
+          const activeWrestlerIds = new Set(filterActiveEmployees(
+            currentState.roster.employees, currentState.calendar.day + 1,
+          ).filter((person) => person.role === 'wrestler').map((person) => person.employeeId))
+          for (const segment of eventSetup.segments) {
+            if (!MATCH_SEGMENT_TYPES.has(segment?.segmentType)) continue
+            const ids = segment.matchType === 'tagTeam'
+              ? [...(Array.isArray(segment.team1Ids) ? segment.team1Ids : []),
+                  ...(Array.isArray(segment.team2Ids) ? segment.team2Ids : [])]
+              : (Array.isArray(segment.wrestlerIds) ? segment.wrestlerIds : [])
+            if (segment.segmentType === 'titleMatch' && segment.cashInByEmployeeId) ids.push(segment.cashInByEmployeeId)
+            if (currentState.roster.employees.some((person) => ids.includes(person.employeeId)
+              && isInjured(person, currentState.calendar.day))) {
+              return { ok: false, error: 'matchHealth.unavailable' }
+            }
+            const validation = normalizeMatchPlan({
+              ...segment, wrestlerIds: ids.filter((id) => activeWrestlerIds.has(id)),
+            })
+            if (validation.errors.length) {
+              return { ok: false, error: 'matchPlanner.invalidPlan', errors: validation.errors }
+            }
+          }
+        }
         set((state) => {
           if (state.gameStatus.isGameOver) {
             return state
@@ -5446,7 +5619,13 @@ export const useGameStore = create(
             state.events.competitorWrestlerPool,
             nextCalendar.day,
           )
-          const nextActiveEmployees = filterActiveEmployees(state.roster.employees, nextCalendar.day)
+          const activeEmployees = filterActiveEmployees(state.roster.employees, nextCalendar.day)
+          const backstageInjuryAdvance = advanceBackstageInjury({
+            state: state.events.backstageInjury,
+            employees: activeEmployees,
+            day: state.calendar.day,
+          })
+          const nextActiveEmployees = backstageInjuryAdvance.employees
           const normalizedSponsors = normalizeSponsors(state.roster.sponsors)
           const dueCustomEvent = getDueCustomEventForDay(state.calendar.day, state.events.customEvents)
           const regularEventToday = isRegularWeeklyEventDay(state.calendar.startDateIso, state.calendar.day)
@@ -5526,8 +5705,9 @@ export const useGameStore = create(
                 state.roster?.factions,
               )
             : []
-          const performanceApplied = applyDailyPerformanceChanges(nextActiveEmployees, eventSetupSegments)
+          const performanceApplied = applyDailyPerformanceChanges(nextActiveEmployees, eventSetupSegments, state.calendar.day)
           const nextActiveEmployeesWithPerformance = performanceApplied.employees
+          const staffDepartmentEffects = getStaffDepartmentEffects(nextActiveEmployeesWithPerformance)
           configuredSegments = performanceApplied.configuredSegments || []
 
           // Apply event preparation promotion bonus/penalty
@@ -5651,6 +5831,25 @@ export const useGameStore = create(
               chemistryRatingAdjustment: Number((nextRating - baseRating).toFixed(1)),
             }
           })
+          configuredSegments = configuredSegments.map((segment) => {
+            const supportEffects = getSegmentStaffEffects(segment, nextActiveEmployeesWithPerformance)
+            const baseRating = Number(segment.matchRating)
+            const canAdjustRating = MATCH_SEGMENT_TYPES.has(segment.segmentType)
+              && Number.isFinite(baseRating)
+            const nextRating = canAdjustRating
+              ? Math.max(1, Math.min(10, Number((baseRating + supportEffects.ratingAdjustment).toFixed(1))))
+              : segment.matchRating
+
+            return {
+              ...segment,
+              matchRating: nextRating,
+              staffRatingAdjustment: canAdjustRating
+                ? Number((nextRating - baseRating).toFixed(1))
+                : 0,
+              staffFanImpact: supportEffects.fanImpact,
+              staffContributions: supportEffects.contributions,
+            }
+          })
           const factionStorylineOutcome = shouldRunEvent
             ? resolveFactionStorylines({
                 factions: state.roster.factions,
@@ -5681,39 +5880,37 @@ export const useGameStore = create(
             const staffSegmentCounts = {}
 
             configuredSegments.forEach((segment) => {
-              if (!MATCH_SEGMENT_TYPES.has(segment.segmentType)) {
-                return
+              if (MATCH_SEGMENT_TYPES.has(segment.segmentType)) {
+                const wrestlerIds = Array.from(
+                  new Set(
+                    (segment.participantIds || [])
+                      .map((id) => nextActiveEmployeesWithPerformance.find((employee) => employee.employeeId === id))
+                      .filter((employee) => employee?.role === 'wrestler')
+                      .map((employee) => employee.employeeId),
+                  ),
+                )
+
+                wrestlerIds.forEach((wrestlerId) => {
+                  const wrestler = nextActiveEmployeesWithPerformance.find((employee) => employee.employeeId === wrestlerId)
+                  if (!wrestler) {
+                    return
+                  }
+
+                  const fee = Math.max(0, Number(wrestler.contract?.perMatchSalary || 0))
+                  perMatchSalaryExpenses += fee
+                  perMatchPayoutCount += 1
+
+                  // Title holders get an additional per-match bonus multiplier
+                  if (titleHolderIds.has(wrestlerId)) {
+                    titleHolderMatchBonus += Math.round(fee * GAME_CONFIG.economy.expense.titleHolderMatchBonusMultiplier)
+                  }
+                })
               }
 
-              const wrestlerIds = Array.from(
-                new Set(
-                  (segment.participantIds || [])
-                    .map((id) => nextActiveEmployeesWithPerformance.find((employee) => employee.employeeId === id))
-                    .filter((employee) => employee?.role === 'wrestler')
-                    .map((employee) => employee.employeeId),
-                ),
-              )
-
-              wrestlerIds.forEach((wrestlerId) => {
-                const wrestler = nextActiveEmployeesWithPerformance.find((employee) => employee.employeeId === wrestlerId)
-                if (!wrestler) {
-                  return
-                }
-
-                const fee = Math.max(0, Number(wrestler.contract?.perMatchSalary || 0))
-                perMatchSalaryExpenses += fee
-                perMatchPayoutCount += 1
-
-                // Title holders get an additional per-match bonus multiplier
-                if (titleHolderIds.has(wrestlerId)) {
-                  titleHolderMatchBonus += Math.round(fee * GAME_CONFIG.economy.expense.titleHolderMatchBonusMultiplier)
-                }
-              })
-
-              // Track staff participation per segment
+              // Support employees receive one appearance fee plus any event heavy-usage bonus.
               ;(segment.participantIds || []).forEach((id) => {
                 const emp = nextActiveEmployeesWithPerformance.find((e) => e.employeeId === id)
-                if (emp && (emp.role === 'staff' || emp.role === 'referee' || emp.role === 'announcer')) {
+                if (emp && ['staff', 'referee', 'announcer', 'manager'].includes(emp.role)) {
                   staffSegmentCounts[id] = (staffSegmentCounts[id] || 0) + 1
                 }
               })
@@ -5910,6 +6107,10 @@ export const useGameStore = create(
               total: eventIncome,
             }
 
+            const staffFanImpactTotal = configuredSegments.reduce(
+              (sum, segment) => sum + (Number(segment.staffFanImpact) || 0),
+              0,
+            )
             const baseFanDelta = Math.round(
               130 + productionWithSponsor.hype * 0.9 - productionWithSponsor.risk * 0.45
               + sponsorFanBoost + setupBonus.fans + setupParticipantCount + rivalryFanBoost
@@ -5964,7 +6165,9 @@ export const useGameStore = create(
             competitorPrestigeImpactForPostmortem = competitorPressure.prestigeImpact
             const fansShouldGrow = overallRating !== null && overallRating > fanGrowthThreshold
             const adjustedBaseFanDelta = baseFanDelta + competitorPressure.fanImpact
-            fanDelta = fansShouldGrow ? Math.max(adjustedBaseFanDelta, 0) : -Math.max(adjustedBaseFanDelta, 0)
+            fanDelta = (fansShouldGrow
+              ? Math.max(adjustedBaseFanDelta, 0)
+              : -Math.max(adjustedBaseFanDelta, 0)) + staffFanImpactTotal
             prestigeDelta += competitorPressure.prestigeImpact
             lastOutcome = {
               type: 'success',
@@ -5988,6 +6191,7 @@ export const useGameStore = create(
               hype: productionWithSponsor.hype,
               risk: productionWithSponsor.risk,
               overallRating,
+              staffFanImpact: staffFanImpactTotal,
               audience: audienceCount,
               audienceSegments: audienceSegmentsForOutcome,
               boardAttendance: boardAttendanceForOutcome,
@@ -5999,7 +6203,8 @@ export const useGameStore = create(
               rivalryHeatScore,
               rivalryHighlights: rivalryHighlightsForPostmortem,
               factionStories: factionStorylineOutcome?.storyOutcomes || [],
-              segments: configuredSegments.map((seg) => {
+              segments: [...configuredSegments, ...performanceApplied.cancelledSegments]
+                .sort((left, right) => left.cardIndex - right.cardIndex).map((seg) => {
                 const isTagTeamSeg = seg.matchType === 'tagTeam'
                 const segWinnerTeamIds = Array.isArray(seg.winnerTeamIds) ? seg.winnerTeamIds : []
                 const winnerName = isTagTeamSeg
@@ -6022,6 +6227,16 @@ export const useGameStore = create(
                   winnerTeamIds: isTagTeamSeg ? segWinnerTeamIds : [],
                   winnerName,
                   matchRating: seg.matchRating,
+                  cancelled: Boolean(seg.cancelled),
+                  cancellationReason: seg.cancellationReason || null,
+                  unavailableWrestlerIds: seg.unavailableWrestlerIds || [],
+                  staminaLossById: seg.staminaLossById || {},
+                  injuries: seg.injuries || [],
+                  ratingBreakdown: sanitizeRatingBreakdown(seg.ratingBreakdown),
+                  executionMode: seg.executionMode || null,
+                  finishType: seg.finishType || null,
+                  riskLevel: seg.riskLevel || null,
+                  planWarnings: seg.planWarnings || [],
                   promoRatingAdjustment: Number.isFinite(Number(seg.promoRatingAdjustment))
                     ? Number(seg.promoRatingAdjustment)
                     : null,
@@ -6029,6 +6244,9 @@ export const useGameStore = create(
                   promoRatingAdjustmentRule: seg.promoRatingAdjustmentRule || null,
                   promoRatingCapHit: Boolean(seg.promoRatingCapHit),
                   chemistryRatingAdjustment: Number(seg.chemistryRatingAdjustment) || 0,
+                  staffRatingAdjustment: Number(seg.staffRatingAdjustment) || 0,
+                  staffFanImpact: Number(seg.staffFanImpact) || 0,
+                  staffContributions: Array.isArray(seg.staffContributions) ? seg.staffContributions : [],
                   interviewPopularityChanges: seg.interviewPopularityChanges || [],
                   participantDetails: seg.participantIds
                     .map((id) => nextActiveEmployeesWithPerformance.find((e) => e.employeeId === id))
@@ -6093,7 +6311,12 @@ export const useGameStore = create(
           }
 
           const nextActiveEmployeesWithStats = shouldRunEvent
-            ? applyMatchStats(nextActiveEmployeesWithPerformance, configuredSegments, state.calendar.day, productionWithSponsor.name)
+            ? applyMatchStats(nextActiveEmployeesWithPerformance, configuredSegments, {
+                day: state.calendar.day,
+                eventId: productionWithSponsor.eventId,
+                type: productionWithSponsor.type,
+                name: productionWithSponsor.name,
+              })
             : nextActiveEmployeesWithPerformance
           const nextActiveEmployeesWithDecay = shouldRunEvent
             ? applyHeelFaceWeeklyDecay(nextActiveEmployeesWithStats)
@@ -6130,13 +6353,25 @@ export const useGameStore = create(
               happiness: clampHappiness((employee.happiness ?? DEFAULT_HAPPINESS) + happinessDelta),
             }
           })
+          const supportedEmployeeIds = new Set(
+            chemistryAdjustedEmployees
+              .filter((employee) => employee.role === 'wrestler' && Number(employee.happiness ?? DEFAULT_HAPPINESS) < 100)
+              .sort((left, right) => Number(left.happiness ?? DEFAULT_HAPPINESS) - Number(right.happiness ?? DEFAULT_HAPPINESS))
+              .slice(0, staffDepartmentEffects.talentRelationsCoverage)
+              .map((employee) => employee.employeeId),
+          )
+          const talentRelationsAdjustedEmployees = chemistryAdjustedEmployees.map((employee) => (
+            supportedEmployeeIds.has(employee.employeeId)
+              ? { ...employee, happiness: clampHappiness((employee.happiness ?? DEFAULT_HAPPINESS) + 1) }
+              : employee
+          ))
 
           const nextTitlesBeforeHappiness = shouldRunEvent
             ? applyTitleMatchResults(state.roster.titles, configuredSegments, nextActiveEmployeesWithDecay, state.calendar.day)
             : state.roster.titles
 
           const happinessOutcome = applyHappinessAndDeparture({
-            employees: chemistryAdjustedEmployees,
+            employees: talentRelationsAdjustedEmployees,
             prevTitles: state.roster.titles,
             nextTitles: nextTitlesBeforeHappiness,
             currentDay: state.calendar.day,
@@ -6215,15 +6450,21 @@ export const useGameStore = create(
 
           // --- Expense breakdown ---
           const eventCostExpense = shouldRunEvent
-            ? (GAME_CONFIG.eventCost[productionWithSponsor.type] || 0)
+            ? Math.round((GAME_CONFIG.eventCost[productionWithSponsor.type] || 0)
+              * (1 - staffDepartmentEffects.productionCostReduction))
             : 0
           const costReliefAmount = Number(state.boardMeeting?.costRelief?.throughDay) >= nextCalendar.day
             ? Math.max(0, Number(state.boardMeeting?.costRelief?.amount) || 0)
             : 0
-          const operatingCost = Math.max(0, Math.round(
+          const baseOperatingCost = Math.round(
             GAME_CONFIG.economy.expense.operatingBase
             + state.stats.prestige * GAME_CONFIG.economy.expense.operatingPrestigeMultiplier,
-          ) - costReliefAmount)
+          )
+          const operatingCost = Math.max(
+            0,
+            Math.round(baseOperatingCost * (1 - staffDepartmentEffects.logisticsOperatingCostReduction))
+              - costReliefAmount,
+          )
           const monthlySalaryPayments = getMonthlySalaryPaymentsDue(nextActiveEmployees, nextCalendar.day)
           const monthlyPayrollExpenses = monthlySalaryPayments.reduce((sum, payment) => sum + payment.amount, 0)
           const otherCost = Math.round(
@@ -6303,6 +6544,7 @@ export const useGameStore = create(
           let activeArc = progressionState.currentArc
           let progressionHistory = progressionState.history
           let progressionUnlocks = progressionState.unlocks
+          let unlockedWrestlerIds = progressionState.unlockedWrestlerIds
           const progressionStats = {
             fans: nextFans,
             prestige: nextPrestige,
@@ -6329,6 +6571,17 @@ export const useGameStore = create(
               progressionUnlocks,
               Array.isArray(reward.unlockables) ? reward.unlockables : [],
             )
+            const wrestlerUnlockId = getNextWrestlerGoalUnlock(
+              state.market.employeeCandidates,
+              nextPrestige,
+              unlockedWrestlerIds,
+            )
+            const wrestlerUnlock = state.market.employeeCandidates.find(
+              (candidate) => candidate.id === wrestlerUnlockId,
+            )
+            if (wrestlerUnlockId) {
+              unlockedWrestlerIds = [...unlockedWrestlerIds, wrestlerUnlockId]
+            }
             nextSponsors = nextSponsors.map((sponsor) => ({
               ...sponsor,
               trust: clampSponsorTrust((sponsor.trust ?? sponsor.reputation ?? 55) + Number(reward.sponsorTrust || 0)),
@@ -6340,6 +6593,8 @@ export const useGameStore = create(
                 status: 'completed',
                 completedDay: nextCalendar.day,
                 progress: arcProgress,
+                wrestlerUnlockId,
+                wrestlerUnlockName: wrestlerUnlock?.name || null,
               },
               ...progressionHistory,
             ].slice(0, 16)
@@ -6658,6 +6913,7 @@ export const useGameStore = create(
               competitorCompanies: competitorWorldResult.competitorCompanies,
               competitorWrestlerPool: competitorEventSimulation.wrestlerPool,
               eventPreparation: (shouldRunEvent && prep?.eventId === prepEventId) ? null : state.events.eventPreparation,
+              backstageInjury: backstageInjuryAdvance.state,
             },
             history: {
               timeline,
@@ -6666,6 +6922,7 @@ export const useGameStore = create(
               currentArc: activeArc,
               history: progressionHistory,
               unlocks: progressionUnlocks,
+              unlockedWrestlerIds,
             },
             boardMeeting: boardMandateProgress.boardState,
             onboardingChallenge: nextOnboardingChallenge,
@@ -6699,6 +6956,7 @@ export const useGameStore = create(
             },
           }
         })
+        return { ok: true }
       },
     }),
     {
@@ -6922,6 +7180,9 @@ export const useGameStore = create(
               typedPersistedState?.events?.eventPreparation,
               restoredProgression.unlocks,
               normalizedModVenues,
+            ),
+            backstageInjury: normalizeBackstageInjuryState(
+              typedPersistedState?.events?.backstageInjury,
             ),
             rivalries: normalizeRivalries(typedPersistedState?.events?.rivalries || currentState.events.rivalries),
             factionRivalries: normalizeFactionRivalries(

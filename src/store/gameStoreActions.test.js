@@ -1,5 +1,10 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { GAME_CONFIG } from '../config/gameConfig'
+import { calculateMatchStaminaLoss } from '../utils/matchHealth'
+import {
+  getNextWrestlerGoalUnlock,
+  getWrestlerPrestigeRequirement,
+} from '../utils/wrestlerUnlocks'
 
 const testStorage = new Map()
 vi.stubGlobal('localStorage', {
@@ -36,8 +41,15 @@ const startGame = () => useGameStore.getState().startGame({
 })
 
 const hireCandidate = (role, predicate = () => true) => {
-  const candidate = useGameStore.getState().market.employeeCandidates.find(
-    (employee) => employee.role === role && predicate(employee),
+  const state = useGameStore.getState()
+  const candidate = state.market.employeeCandidates.find(
+    (employee) => employee.role === role
+      && predicate(employee)
+      && getWrestlerPrestigeRequirement(
+        employee,
+        state.stats.prestige,
+        state.progression.unlockedWrestlerIds,
+      ) === null,
   )
   expect(candidate, `Expected an available ${role} candidate`).toBeDefined()
   const result = useGameStore.getState().hireEmployee(candidate.candidateId, { skipNegotiation: true })
@@ -103,6 +115,403 @@ afterAll(() => {
 })
 
 describe('game store action coverage', () => {
+  it('starts the backstage injury timer at 90 days, opens the injury event, and persists it', async () => {
+    expect(useGameStore.getState().events.backstageInjury).toEqual({
+      daysUntilNext: 90,
+      pending: null,
+    })
+
+    hireCandidate('wrestler')
+    useGameStore.getState().proceedTimeline()
+    expect(useGameStore.getState().events.backstageInjury.daysUntilNext).toBe(89)
+
+    useGameStore.setState((state) => ({
+      events: {
+        ...state.events,
+        backstageInjury: { daysUntilNext: 1, pending: null },
+      },
+    }))
+    const injuredBefore = useGameStore.getState().roster.employees
+      .filter((employee) => employee.role === 'wrestler' && employee.injury?.type === 'backstage')
+      .length
+    useGameStore.getState().proceedTimeline()
+
+    const { events, roster, calendar } = useGameStore.getState()
+    const backstageInjury = events.backstageInjury.pending
+    expect(backstageInjury).toMatchObject({
+      employeeId: expect.any(String),
+      employeeName: expect.any(String),
+      reasonId: expect.any(String),
+      occurredDay: 2,
+      returnDay: expect.any(Number),
+    })
+    expect(backstageInjury.returnDay - backstageInjury.occurredDay)
+      .toBeGreaterThanOrEqual(14)
+    expect(backstageInjury.returnDay - backstageInjury.occurredDay)
+      .toBeLessThanOrEqual(60)
+    expect(events.backstageInjury.daysUntilNext).toBeGreaterThanOrEqual(60)
+    expect(events.backstageInjury.daysUntilNext).toBeLessThanOrEqual(120)
+    expect(roster.employees.filter((employee) => employee.role === 'wrestler' && employee.injury?.type === 'backstage'))
+      .toHaveLength(injuredBefore + 1)
+    expect(calendar.day).toBe(3)
+    const savedSnapshot = testStorage.get('wrestling-tycoon-save-v1')
+    expect(JSON.parse(savedSnapshot).state.events.backstageInjury).toEqual(events.backstageInjury)
+    await useGameStore.persist.rehydrate()
+    expect(useGameStore.getState().events.backstageInjury).toEqual(events.backstageInjury)
+    expect(useGameStore.getState().proceedTimeline()).toMatchObject({
+      ok: false,
+      error: 'backstageInjury.pending',
+    })
+    useGameStore.getState().dismissBackstageInjury()
+    expect(useGameStore.getState().events.backstageInjury.pending).toBeNull()
+  })
+
+  const preparePlannerEvent = () => {
+    const first = hireCandidate('wrestler')
+    const second = hireCandidate('wrestler')
+    useGameStore.setState((state) => ({
+      events: {
+        ...state.events,
+        customEvents: [{
+          eventId: 'planner-show', type: 'ppv', name: 'Planner show',
+          scheduledDay: 1, scheduledWeek: 1, maxMatches: 2, isSystem: false,
+        }],
+      },
+    }))
+    return {
+      segmentType: 'match', matchType: 'singles',
+      wrestlerIds: [first.employeeId, second.employeeId],
+      winnerEmployeeId: first.employeeId,
+      matchLengthMinutes: 10, finishType: 'pin', riskLevel: 'balanced',
+      executionMode: 'play',
+      plannedMoments: [{
+        momentId: 'opening', actionType: 'technicalExchange',
+        actorId: first.employeeId, targetId: second.employeeId, atMinute: 1,
+      }, {
+        momentId: 'ending', actionType: 'nearFall',
+        actorId: second.employeeId, targetId: first.employeeId, atMinute: 9,
+      }],
+    }
+  }
+
+  it('rejects invalid authored plans atomically without advancing the day or losing input', () => {
+    const segment = preparePlannerEvent()
+    segment.plannedMoments[0].targetId = segment.plannedMoments[0].actorId
+    const before = useGameStore.getState()
+    const result = before.proceedTimeline({ segments: [segment] })
+    expect(result).toMatchObject({ ok: false, error: 'matchPlanner.invalidPlan' })
+    expect(useGameStore.getState()).toBe(before)
+    expect(segment.plannedMoments[0].targetId).toBe(segment.plannedMoments[0].actorId)
+  })
+
+  it('persists event-based rating factors and plan metadata into outcomes and save data', () => {
+    const segment = preparePlannerEvent()
+    expect(useGameStore.getState().proceedTimeline({ segments: [segment] })).toMatchObject({ ok: true })
+    const outcome = useGameStore.getState().events.lastOutcome.segments[0]
+    expect(outcome).toMatchObject({
+      executionMode: 'play', finishType: 'pin', riskLevel: 'balanced',
+      winnerEmployeeId: segment.winnerEmployeeId,
+      ratingBreakdown: { eventExecution: expect.any(Number), varietyAndPacing: expect.any(Number) },
+    })
+    expect(outcome.matchRating).toBeGreaterThanOrEqual(1)
+    expect(outcome.matchRating).toBeLessThanOrEqual(10)
+    const saved = JSON.parse(testStorage.get('wrestling-tycoon-save-v1')).state
+    expect(saved.events.lastOutcome.segments[0].ratingBreakdown).toEqual(outcome.ratingBreakdown)
+  })
+
+  it('assigns valid departments to general staff and persists the assignment', () => {
+    const staff = hireCandidate('staff')
+
+    expect(useGameStore.getState().setStaffDepartment(staff.employeeId, 'production'))
+      .toEqual({ ok: true, department: 'production' })
+    expect(useGameStore.getState().roster.employees.find(
+      (employee) => employee.employeeId === staff.employeeId,
+    ).staffDepartment).toBe('production')
+    expect(useGameStore.getState().setStaffDepartment(staff.employeeId, 'invalid'))
+      .toMatchObject({ ok: false, reason: 'invalidDepartment' })
+
+    const saved = JSON.parse(testStorage.get('wrestling-tycoon-save-v1')).state
+    expect(saved.roster.employees.find((employee) => employee.employeeId === staff.employeeId).staffDepartment)
+      .toBe('production')
+  })
+
+  it('applies selected referee and announcer skill to event presentation results', () => {
+    const segment = preparePlannerEvent()
+    const referee = hireCandidate('referee')
+    const announcer = hireCandidate('announcer')
+    segment.refereeId = referee.employeeId
+    segment.announcerId = announcer.employeeId
+    useGameStore.setState((state) => ({
+      roster: {
+        ...state.roster,
+        employees: state.roster.employees.map((employee) => {
+          if (employee.employeeId === referee.employeeId) {
+            return {
+              ...employee,
+              officiatingAbility: {
+                rule_knowledge: 100, decision_speed: 100, positioning: 100, composure: 100,
+              },
+            }
+          }
+          if (employee.employeeId === announcer.employeeId) {
+            return {
+              ...employee,
+              broadcastAbility: {
+                voice_quality: 100, hype_delivery: 100, diction: 100, ring_knowledge: 100,
+              },
+            }
+          }
+          return employee
+        }),
+      },
+    }))
+
+    expect(useGameStore.getState().proceedTimeline({ segments: [segment] })).toMatchObject({ ok: true })
+    const result = useGameStore.getState().events.lastOutcome.segments[0]
+    expect(result).toMatchObject({
+      staffRatingAdjustment: expect.any(Number),
+      staffFanImpact: expect.any(Number),
+      staffContributions: expect.arrayContaining([
+        expect.objectContaining({ role: 'referee', employeeId: referee.employeeId }),
+        expect.objectContaining({ role: 'announcer', employeeId: announcer.employeeId }),
+      ]),
+    })
+    expect(result.staffRatingAdjustment).toBeGreaterThan(0)
+    expect(result.staffFanImpact).toBeGreaterThan(0)
+  })
+
+  it('rewards a manager only when booked with their assigned wrestler in a promo', () => {
+    const match = preparePlannerEvent()
+    const wrestlerId = match.wrestlerIds[0]
+    const manager = hireCandidate('manager')
+    useGameStore.getState().setEmployeeManager(wrestlerId, manager.employeeId)
+    useGameStore.setState((state) => ({
+      roster: {
+        ...state.roster,
+        employees: state.roster.employees.map((employee) => employee.employeeId === manager.employeeId
+          ? { ...employee, managementAbility: { charisma: 100, promo_skill: 100 } }
+          : employee),
+      },
+    }))
+
+    expect(useGameStore.getState().proceedTimeline({
+      segments: [{
+        segmentType: 'promo',
+        wrestlerIds: [wrestlerId, manager.employeeId],
+      }],
+    })).toMatchObject({ ok: true })
+    const result = useGameStore.getState().events.lastOutcome.segments[0]
+    expect(result.staffContributions).toEqual([
+      expect.objectContaining({
+        role: 'manager',
+        employeeId: manager.employeeId,
+        fanImpact: 2,
+      }),
+    ])
+    expect(result.staffFanImpact).toBe(2)
+    expect(useGameStore.getState().finances.ledger.some(
+      (entry) => entry.category === 'staffPayroll' && entry.amount > 0,
+    )).toBe(true)
+  })
+
+  it('applies staff department assignments to event costs, injury recovery, and wrestler morale', () => {
+    const segment = preparePlannerEvent()
+    const [firstId, secondId] = segment.wrestlerIds
+    const staffByDepartment = Object.fromEntries(
+      ['production', 'medical', 'talentRelations', 'logistics'].map((department) => {
+        const staff = hireCandidate('staff')
+        expect(useGameStore.getState().setStaffDepartment(staff.employeeId, department).ok).toBe(true)
+        return [department, staff]
+      }),
+    )
+    segment.executionMode = null
+    segment.matchRating = 8
+    segment.staminaLossById = { [firstId]: 21 }
+
+    useGameStore.setState((state) => ({
+      roster: {
+        ...state.roster,
+        employees: state.roster.employees.map((employee) => {
+          if (employee.employeeId === firstId) {
+            return { ...employee, stamina: 30, happiness: 50 }
+          }
+          if (employee.employeeId === secondId) {
+            return { ...employee, happiness: 50 }
+          }
+          const department = Object.keys(staffByDepartment)
+            .find((key) => staffByDepartment[key].employeeId === employee.employeeId)
+          if (department === 'production' || department === 'medical') {
+            return { ...employee, staffAbility: { ...employee.staffAbility, technical_skill: 100 } }
+          }
+          if (department === 'talentRelations') {
+            return { ...employee, staffAbility: { ...employee.staffAbility, teamwork: 100 } }
+          }
+          if (department === 'logistics') {
+            return { ...employee, staffAbility: { ...employee.staffAbility, reliability: 100 } }
+          }
+          return employee
+        }),
+      },
+    }))
+
+    const beforeState = useGameStore.getState()
+    const expectedOperatingCost = Math.round(
+      Math.round(
+        GAME_CONFIG.economy.expense.operatingBase
+        + beforeState.stats.prestige * GAME_CONFIG.economy.expense.operatingPrestigeMultiplier,
+      ) * 0.95,
+    )
+    expect(beforeState.proceedTimeline({ segments: [segment] })).toMatchObject({ ok: true })
+
+    const afterState = useGameStore.getState()
+    expect(afterState.events.lastOutcome.expenseBreakdown).toMatchObject({
+      eventCost: Math.round(GAME_CONFIG.eventCost.ppv * 0.95),
+      operatingCost: expectedOperatingCost,
+    })
+    expect(afterState.events.lastOutcome.segments[0].injuries[0].returnDay).toBe(45)
+    expect(afterState.roster.employees.find((employee) => employee.employeeId === firstId).happiness).toBe(52)
+    expect(afterState.roster.employees.find((employee) => employee.employeeId === secondId).happiness).toBe(49)
+  })
+
+  it('stores stable event identity with wrestler match history for regular weekly shows', () => {
+    const segment = preparePlannerEvent()
+    useGameStore.setState((state) => ({
+      calendar: { ...state.calendar, day: 5, week: 1, isEventDay: true },
+      events: { ...state.events, customEvents: [] },
+    }))
+
+    expect(useGameStore.getState().proceedTimeline({ segments: [segment] })).toMatchObject({ ok: true })
+
+    const employee = useGameStore.getState().roster.employees.find(
+      (entry) => entry.employeeId === segment.wrestlerIds[0],
+    )
+    expect(employee.matchStats.matchHistory.at(-1)).toMatchObject({
+      eventId: 'regular-weekly-event',
+      eventType: 'regularWeekly',
+    })
+  })
+
+  it('handles malformed authored participant lists without throwing or advancing', () => {
+    const segment = preparePlannerEvent()
+    segment.wrestlerIds = { invalid: true }
+    expect(useGameStore.getState().proceedTimeline({ segments: [segment] }))
+      .toMatchObject({ ok: false, error: 'matchPlanner.invalidPlan' })
+    expect(useGameStore.getState().calendar.day).toBe(1)
+  })
+
+  it('validates supplied finish and winner fields even without authored moments', () => {
+    const segment = preparePlannerEvent()
+    delete segment.executionMode
+    delete segment.plannedMoments
+    segment.finishType = 'unsupported'
+    segment.winnerEmployeeId = 'not-in-match'
+    expect(useGameStore.getState().proceedTimeline({ segments: [segment] }))
+      .toMatchObject({ ok: false, error: 'matchPlanner.invalidPlan' })
+    expect(useGameStore.getState().calendar.day).toBe(1)
+  })
+
+  it('caps imported stamina losses at 70, persists injuries and cancels later matches without match credit', async () => {
+    const segment = preparePlannerEvent()
+    delete segment.executionMode
+    segment.matchRating = 8
+    segment.staminaLossById = Object.fromEntries(segment.wrestlerIds.map((id) => [id, 999]))
+    useGameStore.setState((state) => ({
+      roster: { ...state.roster, employees: state.roster.employees.map((person) => (
+        segment.wrestlerIds.includes(person.employeeId) ? { ...person, stamina: 60 } : person
+      )) },
+    }))
+    expect(useGameStore.getState().proceedTimeline({ segments: [segment, { ...segment }] })).toEqual({ ok: true })
+    const state = useGameStore.getState()
+    const [played, cancelled] = state.events.lastOutcome.segments
+    expect(played.staminaLossById).toEqual(Object.fromEntries(segment.wrestlerIds.map((id) => [id, 70])))
+    expect(played.injuries).toHaveLength(2)
+    expect(cancelled).toMatchObject({ cancelled: true, cancellationReason: 'injury', matchRating: null })
+    for (const id of segment.wrestlerIds) {
+      const person = state.roster.employees.find((entry) => entry.employeeId === id)
+      expect(person.stamina).toBe(0)
+      expect(person.injury.returnDay - person.injury.occurredDay).toBeGreaterThanOrEqual(7)
+      expect(person.injury.returnDay - person.injury.occurredDay).toBeLessThanOrEqual(90)
+      expect(person.matchStats.totalMatches).toBe(1)
+    }
+    const persisted = JSON.parse(testStorage.get('wrestling-tycoon-save-v1')).state
+    expect(persisted.roster.employees.find((person) => person.employeeId === segment.wrestlerIds[0]).injury)
+      .toEqual(state.roster.employees.find((person) => person.employeeId === segment.wrestlerIds[0]).injury)
+    const saved = testStorage.get('wrestling-tycoon-save-v1')
+    useGameStore.getState().resetGame()
+    testStorage.set('wrestling-tycoon-save-v1', saved)
+    await useGameStore.persist.rehydrate()
+    expect(useGameStore.getState().roster.employees.find((person) => person.employeeId === segment.wrestlerIds[0]).injury)
+      .toEqual(state.roster.employees.find((person) => person.employeeId === segment.wrestlerIds[0]).injury)
+  })
+
+  it('recomputes new authored stamina costs from events instead of trusting supplied losses', () => {
+    const segment = preparePlannerEvent()
+    segment.staminaLossById = Object.fromEntries(segment.wrestlerIds.map((id) => [id, 0]))
+    const wrestlers = useGameStore.getState().roster.employees.filter((person) => segment.wrestlerIds.includes(person.employeeId))
+    const expected = calculateMatchStaminaLoss({ wrestlers, plan: segment })
+    useGameStore.getState().proceedTimeline({ segments: [segment] })
+    expect(useGameStore.getState().events.lastOutcome.segments[0].staminaLossById).toEqual(expected)
+  })
+  it('blocks booking an injured wrestler until the return day without removing them from the roster', () => {
+    const segment = preparePlannerEvent()
+    const injuredId = segment.wrestlerIds[0]
+    useGameStore.setState((state) => ({
+      roster: { ...state.roster, employees: state.roster.employees.map((person) => person.employeeId === injuredId
+        ? { ...person, stamina: 100, injury: { type: 'exhaustion', occurredDay: 1, returnDay: 8 } } : person) },
+    }))
+    expect(useGameStore.getState().proceedTimeline({ segments: [segment] }))
+      .toMatchObject({ ok: false, error: 'matchHealth.unavailable' })
+    useGameStore.getState().proceedTimeline()
+    expect(useGameStore.getState().roster.employees.find((person) => person.employeeId === injuredId).injury.returnDay).toBe(8)
+    useGameStore.setState((state) => ({ calendar: { ...state.calendar, day: 7 } }))
+    useGameStore.getState().proceedTimeline()
+    expect(useGameStore.getState().roster.employees.find((person) => person.employeeId === injuredId).injury).toBeNull()
+  })
+
+  it('applies the 70-point limit per match rather than to the whole event', () => {
+    const segment = preparePlannerEvent()
+    delete segment.executionMode
+    segment.staminaLossById = Object.fromEntries(segment.wrestlerIds.map((id) => [id, 40]))
+    useGameStore.getState().proceedTimeline({ segments: [segment, { ...segment }] })
+    const state = useGameStore.getState()
+    expect(state.events.lastOutcome.segments.every((match) => !match.cancelled)).toBe(true)
+    for (const id of segment.wrestlerIds) {
+      expect(state.roster.employees.find((person) => person.employeeId === id))
+        .toMatchObject({ stamina: 20, injury: null, matchStats: { totalMatches: 2 } })
+    }
+  })
+
+  it('generates rated simulated moments for legacy segments with a null rating', () => {
+    const segment = preparePlannerEvent()
+    delete segment.executionMode
+    delete segment.plannedMoments
+    segment.matchRating = null
+    useGameStore.getState().proceedTimeline({ segments: [segment] })
+    const outcome = useGameStore.getState().events.lastOutcome.segments[0]
+    expect(outcome.ratingBreakdown).toMatchObject({ eventExecution: expect.any(Number) })
+    expect(outcome.plannedMoments.length).toBeGreaterThan(0)
+    expect(outcome.winnerEmployeeId).toBe(segment.winnerEmployeeId)
+  })
+
+  it('preserves complete authored tag-team winners and safe adjustment diagnostics', () => {
+    const segment = preparePlannerEvent()
+    segment.matchType = 'tagTeam'
+    segment.team1Ids = [segment.wrestlerIds[0]]
+    segment.team2Ids = [segment.wrestlerIds[1]]
+    segment.winnerEmployeeId = null
+    segment.winnerTeamIds = segment.team2Ids
+    segment.planWarnings = [{ code: 'minuteAdjusted', secret: 'not retained' }, { code: 'unknown' }]
+    useGameStore.getState().proceedTimeline({ segments: [segment] })
+    const outcome = useGameStore.getState().events.lastOutcome.segments[0]
+    expect(outcome).toMatchObject({
+      winnerTeamIds: segment.team2Ids, winnerEmployeeId: null,
+      ratingBreakdown: { finishCoherence: expect.any(Number) },
+    })
+    expect(outcome.planWarnings).toContainEqual({ code: 'minuteAdjusted' })
+    expect(outcome.planWarnings).not.toContainEqual({ code: 'unknown' })
+    expect(outcome.planWarnings.every((entry) => !Object.hasOwn(entry, 'secret'))).toBe(true)
+  })
+
   it('omits home-country metadata from new games and persisted state', () => {
     const state = useGameStore.getState()
     const persistedState = JSON.parse(testStorage.get('wrestling-tycoon-save-v1')).state
@@ -166,6 +575,74 @@ describe('game store action coverage', () => {
       expect(nextProgression.unlocks[unlock.category]).toContain(unlock.id)
     }
     expect(nextProgression.currentArc.reward.unlockables).not.toEqual(earnedUnlocks)
+  })
+
+  it('persists the next popularity-gated wrestler unlocked when a career arc completes', async () => {
+    const before = useGameStore.getState()
+    const lockedWrestler = before.market.employeeCandidates.find(
+      (candidate) => candidate.role === 'wrestler' && candidate.wrestlerUnlockTier > 0,
+    )
+    expect(lockedWrestler).toBeDefined()
+    const expectedUnlockId = getNextWrestlerGoalUnlock(
+      before.market.employeeCandidates,
+      before.stats.prestige,
+      before.progression.unlockedWrestlerIds,
+    )
+
+    useGameStore.setState((state) => ({
+      progression: {
+        ...state.progression,
+        currentArc: {
+          ...state.progression.currentArc,
+          goals: { fanGain: -1000000, prestigeGain: -1000000, cashGain: -1000000 },
+        },
+      },
+    }))
+    useGameStore.getState().proceedTimeline()
+
+    const saved = testStorage.get('wrestling-tycoon-save-v1')
+    useGameStore.getState().resetGame()
+    testStorage.set('wrestling-tycoon-save-v1', saved)
+    await useGameStore.persist.rehydrate()
+
+    expect(useGameStore.getState().progression.unlockedWrestlerIds)
+      .toContain(expectedUnlockId)
+    const goalUnlockedWrestler = useGameStore.getState().market.employeeCandidates.find(
+      (candidate) => candidate.id === expectedUnlockId,
+    )
+    expect(useGameStore.getState().hireEmployee(goalUnlockedWrestler.candidateId, { skipNegotiation: true }).ok)
+      .toBe(true)
+  })
+
+  it('blocks locked superstar hiring until prestige or a goal unlock qualifies them', () => {
+    const lockedWrestler = useGameStore.getState().market.employeeCandidates.find(
+      (candidate) => candidate.role === 'wrestler' && candidate.wrestlerUnlockTier === 4,
+    )
+    expect(lockedWrestler).toBeDefined()
+    expect(useGameStore.getState().hireEmployee(lockedWrestler.candidateId, { skipNegotiation: true }))
+      .toMatchObject({ ok: false, reason: 'prestigeLocked', prestigeRequired: 1500 })
+    expect(useGameStore.getState().negotiateEmployeeContract(lockedWrestler.candidateId, {}))
+      .toMatchObject({ ok: false, accepted: false, reason: 'prestigeLocked', prestigeRequired: 1500 })
+
+    useGameStore.setState((state) => ({
+      stats: { ...state.stats, prestige: 1500 },
+    }))
+    expect(useGameStore.getState().hireEmployee(lockedWrestler.candidateId, { skipNegotiation: true }).ok)
+      .toBe(true)
+  })
+
+  it('saves permanent dismissal of the completed Rescue tutorial', async () => {
+    useGameStore.setState((state) => ({
+      onboardingChallenge: { ...state.onboardingChallenge, status: 'completed', active: false },
+    }))
+    expect(useGameStore.getState().dismissOnboardingTutorial()).toEqual({ ok: true })
+    expect(useGameStore.getState().onboardingChallenge.tutorialDismissed).toBe(true)
+
+    const saved = testStorage.get('wrestling-tycoon-save-v1')
+    useGameStore.getState().resetGame()
+    testStorage.set('wrestling-tycoon-save-v1', saved)
+    await useGameStore.persist.rehydrate()
+    expect(useGameStore.getState().onboardingChallenge.tutorialDismissed).toBe(true)
   })
 
   it('counts only successful weekly TV events toward the three-show tutorial', () => {
@@ -371,6 +848,9 @@ describe('game store action coverage', () => {
       candidateId: 'mod-candidate-mod-ace',
       archetypeId: 'technical',
     })
+    useGameStore.setState((state) => ({
+      stats: { ...state.stats, prestige: 1500 },
+    }))
     expect(useGameStore.getState().hireEmployee(modCandidate.candidateId, { skipNegotiation: true }).ok)
       .toBe(true)
     expect(useGameStore.getState().roster.employees.at(-1).archetypeId).toBe('technical')
@@ -509,7 +989,13 @@ describe('game store action coverage', () => {
   it('negotiates employee terms, hires candidates, assigns managers, and handles hiring locks', () => {
     const state = useGameStore.getState()
     const candidate = state.market.employeeCandidates.find(
-      (employee) => employee.role === 'wrestler' && employee.contract.monthlySalary > 0,
+      (employee) => employee.role === 'wrestler'
+        && employee.contract.monthlySalary > 0
+        && getWrestlerPrestigeRequirement(
+          employee,
+          state.stats.prestige,
+          state.progression.unlockedWrestlerIds,
+        ) === null,
     )
     expect(candidate).toBeDefined()
     expect(state.hireEmployee('missing-candidate')).toMatchObject({ ok: false, reason: 'notFound' })
@@ -1058,7 +1544,11 @@ describe('game store action coverage', () => {
     expect(state.events.lastOutcome.segments.find((segment) => segment.segmentType === 'titleMatch')
       .promoRatingAdjustment).toBeCloseTo(0.6)
     expect(state.events.lastOutcome.segments.find((segment) => segment.segmentType === 'titleMatch'))
-      .toMatchObject({ chemistryRatingAdjustment: 0.5, matchRating: 9.6 })
+      .toMatchObject({
+        chemistryRatingAdjustment: 0.5,
+        staffRatingAdjustment: 0.1,
+        matchRating: 9.7,
+      })
     expect(state.events.lastOutcome.segments.find((segment) => segment.segmentType === 'titleMatch'))
       .toMatchObject({
         matchLengthMinutes: 45,
@@ -1188,6 +1678,83 @@ describe('game store action coverage', () => {
     expect(state.events.lastOutcome.segments[0].promoRatingAdjustmentType).toBe('penalty')
     expect(state.events.lastOutcome.segments[0].promoRatingAdjustmentRule).toBe('missedPromotedMatch')
     expect(state.roster.employees.some((employee) => employee.employeeId === staff.employeeId)).toBe(true)
+  })
+
+  it('increments a title reign defense count when the champion retains in a title match', () => {
+    const champion = hireCandidate('wrestler')
+    const challenger = hireCandidate('wrestler')
+    const title = useGameStore.getState().roster.titles.find((item) => item.division === 'singles')
+    const event = {
+      eventId: 'title-defense-test',
+      type: 'ppv',
+      name: 'Title Defense Test',
+      scheduledDay: 1,
+      maxMatches: 1,
+    }
+
+    useGameStore.setState((state) => ({
+      roster: {
+        ...state.roster,
+        titles: state.roster.titles.map((item) => item.titleId === title.titleId
+          ? {
+              ...item,
+              isActive: true,
+              holderEmployeeId: champion.employeeId,
+              holderEmployeeIds: [],
+              currentHolderStartDay: 1,
+              currentHolderDefenses: 0,
+              holderHistory: [],
+            }
+          : item),
+      },
+      events: {
+        ...state.events,
+        customEvents: [event],
+        bookedEvent: event,
+        eventPreparation: null,
+      },
+    }))
+
+    useGameStore.getState().proceedTimeline({
+      totalSegments: 1,
+      segments: [{
+        segmentType: 'titleMatch',
+        titleId: title.titleId,
+        wrestlerIds: [champion.employeeId, challenger.employeeId],
+        winnerEmployeeId: champion.employeeId,
+        matchLengthMinutes: 15,
+      }],
+    })
+
+    expect(useGameStore.getState().roster.titles.find((item) => item.titleId === title.titleId)
+      .currentHolderDefenses).toBe(1)
+
+    const titleChangeEvent = {
+      ...event,
+      eventId: 'title-change-test',
+      name: 'Title Change Test',
+      scheduledDay: useGameStore.getState().calendar.day,
+    }
+    useGameStore.setState((state) => ({
+      events: {
+        ...state.events,
+        customEvents: [titleChangeEvent],
+        bookedEvent: titleChangeEvent,
+      },
+    }))
+    useGameStore.getState().proceedTimeline({
+      totalSegments: 1,
+      segments: [{
+        segmentType: 'titleMatch',
+        titleId: title.titleId,
+        wrestlerIds: [champion.employeeId, challenger.employeeId],
+        winnerEmployeeId: challenger.employeeId,
+        matchLengthMinutes: 15,
+      }],
+    })
+
+    expect(useGameStore.getState().roster.titles.find((item) => item.titleId === title.titleId)
+      .holderHistory.at(-1).defenses).toBe(1)
   })
 
   it('opens board meetings only when the game is active and on a scheduled date', () => {

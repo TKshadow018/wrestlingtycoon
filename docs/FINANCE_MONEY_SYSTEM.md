@@ -59,7 +59,8 @@ Audience satisfaction and attendance shares also affect the event's fan impact. 
 - **Recurring monthly payroll:** each employee's contract salary is charged on the contract's 30-day anniversary, not divided into a daily salary cost.
 - **Match payroll:** each wrestler appearance pays that employee's `perMatchSalary`.
 - **Title-holder match bonus:** active title holders receive an additional appearance bonus using the configured multiplier (default: 50% of the appearance fee).
-- **Staff match payroll:** participating staff, referees, and announcers receive their appearance fees. Heavy use can add a configured bonus when they appear in more than the threshold number of segments.
+- **Support-employee appearance payroll:** participating managers, staff, referees, and announcers receive one appearance fee per event. Heavy use can add a configured bonus when they appear in more than the threshold number of segments. Appearance fees apply to all segment types.
+- **Staff departments:** assigned Production staff reduce event production expense by up to 10%, and Logistics staff reduce operating cost by up to 10%. These discounts are applied before any board cost relief.
 - **Event production:** when an event runs, its type-specific cost is read from `GAME_CONFIG.eventCost` (defaults: regular weekly $2,500, house show $5,000, PPV $15,000, Mega Live $25,000, one-time $12,000, digital-only $3,000).
 - **Operating cost:** defaults to `round(1,500 + prestige * 25)`. Active board cost relief reduces this amount.
 - **Other daily cost:** a random amount from the configured range (default: $300-$1,500).
@@ -74,7 +75,7 @@ The timeline applies:
 income = subscriptions + recurring sponsor income + merchandise
        + third-party income + event income
 expenses = monthly payroll + match payroll + title-holder bonuses
-         + staff match payroll + event production + operating cost + other cost
+         + support-employee appearance payroll + event production + operating cost + other cost
 delta = income - expenses
 cash = previous cash + delta
 ```

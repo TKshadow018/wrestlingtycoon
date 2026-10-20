@@ -17,7 +17,7 @@ const getEventSponsorProfile = (eventOutcome) => {
     }
   }
 
-  const segments = Array.isArray(eventOutcome?.segments) ? eventOutcome.segments : []
+  const segments = Array.isArray(eventOutcome?.segments) ? eventOutcome.segments.filter((segment) => !segment.cancelled) : []
   const audienceSegments = Array.isArray(eventOutcome?.audienceSegments) ? eventOutcome.audienceSegments : []
   const totalSegments = Math.max(1, segments.length)
   const violentSegments = segments.filter((segment) => (

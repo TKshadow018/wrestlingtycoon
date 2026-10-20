@@ -122,6 +122,9 @@ function CareerArcModule() {
                 <div>
                   <p className={styles.historyName}>{t(`dashboard.careerArc.templates.${arc.templateKey}.title`)}</p>
                   <small>{t('dashboard.careerArc.arcWindow', { start: arc.startDay, end: arc.endDay })}</small>
+                  {arc.wrestlerUnlockName && (
+                    <small>{t('dashboard.careerArc.wrestlerUnlocked', { name: arc.wrestlerUnlockName })}</small>
+                  )}
                 </div>
                 <span className={arc.status === 'completed' ? styles.success : styles.fail}>
                   {arc.status === 'completed'

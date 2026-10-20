@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { getEventTypeKey, isRegularWeeklyEvent } from '../../utils/eventDisplay'
 import styles from './EventBannerScreen.module.scss'
 
 const FEMALE_FALLBACK = '/people/girl.png'
@@ -88,10 +89,11 @@ function EventBannerScreen({ event, day, startDateIso, sponsors, titles, employe
     return () => cancelAnimationFrame(id)
   }, [])
 
-  const eventTypeLabel = t(EVENT_TYPE_KEYS[event?.type] || 'dashboard.eventTypes.unknown')
-  const eventName = event?.isSystem && event.type === 'regularWeekly'
+  const eventType = getEventTypeKey(event)
+  const eventTypeLabel = t(EVENT_TYPE_KEYS[eventType] || 'dashboard.eventTypes.unknown')
+  const eventName = isRegularWeeklyEvent(event)
     ? eventTypeLabel
-    : event?.name || (event?.type ? eventTypeLabel : t('dashboard.eventBanner.tonightEvent'))
+    : event?.name || (eventType ? eventTypeLabel : t('dashboard.eventBanner.tonightEvent'))
   const gameDate = formatGameDate(startDateIso, day)
   const activeSponsors = Array.isArray(sponsors) ? sponsors.filter(Boolean) : []
   const activeTitlesWithHolders = Array.isArray(titles)

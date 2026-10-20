@@ -10,6 +10,19 @@ const eventWithMatches = (format, count = 3) => ({
 })
 
 describe('event postmortem recommendations', () => {
+  it('ignores cancelled matches in current and historical format counts', () => {
+    const current = eventWithMatches('singles').segments
+    const cancelled = current.map((segment) => ({ ...segment, cancelled: true }))
+    expect(buildEventPostmortemRecommendations({
+      segments: current,
+      recentEvents: [{ type: 'success', segments: cancelled }, eventWithMatches('singles')],
+    })).toEqual([])
+    expect(buildEventPostmortemRecommendations({
+      segments: cancelled,
+      recentEvents: [eventWithMatches('singles'), eventWithMatches('singles')],
+    })).toEqual([])
+  })
+
   it('recommends rotating a format that dominates the current and recent event cards', () => {
     const recommendations = buildEventPostmortemRecommendations({
       segments: [

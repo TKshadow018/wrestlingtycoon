@@ -6,7 +6,9 @@ Employees are the promotion's bookable people and its largest recurring commitme
 
 The employee market contains wrestlers, managers, referees, announcers, and staff. Candidates become roster employees after a hiring offer is accepted. A wrestler's derived `skill` averages strength, technique, aerial ability, leg stamina, body stamina, head stamina, and popularity. Other roles use role-specific abilities plus popularity. Skill tiers are Rookie below 62, Solid at 62–81, and Elite at 82 or above.
 
-Contracts have monthly salary, per-match salary, signing bonus, and term. New offers default to 12 months; valid contract terms range from 1 to 60 months. Hiring charges one negotiated monthly salary up front. Later monthly salary is charged on 30-day contract anniversaries; appearance fees are charged when an employee participates in a matching event segment. These are different cash flows. See [FINANCE_MONEY_SYSTEM.md](FINANCE_MONEY_SYSTEM.md) for payroll and severance.
+Contracts have monthly salary, per-match salary, signing bonus, and term. New offers default to 12 months; valid contract terms range from 1 to 60 months. Hiring charges one negotiated monthly salary up front. Later monthly salary is charged on 30-day contract anniversaries; appearance fees for managers and support roles are charged when they participate in an event segment. These are different cash flows. See [FINANCE_MONEY_SYSTEM.md](FINANCE_MONEY_SYSTEM.md) for payroll and severance.
+
+General staff can be assigned to Production, Medical, Talent Relations, or Logistics in Manage Employees. Their existing technical skill, teamwork, or reliability abilities drive capped discounts, injury recovery reductions, or daily happiness support. Department effects are described in [STAFF_UTILIZATION_IDEAS.md](STAFF_UTILIZATION_IDEAS.md).
 
 Wrestler-specific state includes popularity (0–100), stamina (0–100), happiness (0–100), `heelFaceMeter` alignment, and match history. Skill is a quality input, popularity is an audience-draw input, and ranking points are calculated from popularity plus match outcomes. Do not treat any one of these as a substitute for the others.
 

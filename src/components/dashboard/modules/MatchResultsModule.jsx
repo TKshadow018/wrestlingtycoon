@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
+import MatchHealthSummary from '../MatchHealthSummary'
+import { getEventDisplayName } from '../../../utils/eventDisplay'
 import styles from './MatchResultsModule.module.scss'
 
 const parseIsoDateLocal = (isoDateString) => {
@@ -45,12 +47,13 @@ function ParticipantImageCard({ participant, isWinner, winnerBadgeLabel }) {
 
 function SegmentRow({ segment, index }) {
   const { t } = useTranslation()
-  const isMatchType = ['match', 'mainEvent', 'titleMatch'].includes(segment.segmentType)
+  const isMatchType = ['match', 'mainEvent', 'titleMatch'].includes(segment.segmentType) && !segment.cancelled
   const isTagTeam = segment.matchType === 'tagTeam'
   const winnerTeamIds = Array.isArray(segment.winnerTeamIds) ? segment.winnerTeamIds : []
   const hasWinnerById = isTagTeam ? winnerTeamIds.length > 0 : Boolean(segment.winnerEmployeeId)
 
   const isParticipantWinner = (participant) => {
+    if (segment.cancelled) return false
     if (isTagTeam) return winnerTeamIds.includes(participant.employeeId)
     if (hasWinnerById) return participant.employeeId === segment.winnerEmployeeId
     return Boolean(segment.winnerName && participant.name === segment.winnerName)
@@ -90,6 +93,7 @@ function SegmentRow({ segment, index }) {
             ? `dashboard.events.setup.segmentTypes.${segment.segmentType}`
             : 'dashboard.matchResults.unknownSegmentType')}
         </span>
+        <MatchHealthSummary segment={segment} />
 
         {wrestlerParticipants.length > 0 ? (
           <>
@@ -229,7 +233,7 @@ function EventCard({ event, isExpanded, onToggle, startDateIso }) {
   const { t } = useTranslation()
   const segmentCount = event.segments?.length || 0
   const matchCount = event.segments?.filter((s) =>
-    ['match', 'mainEvent', 'titleMatch'].includes(s.segmentType),
+    ['match', 'mainEvent', 'titleMatch'].includes(s.segmentType) && !s.cancelled,
   ).length || 0
 
   return (
@@ -240,7 +244,7 @@ function EventCard({ event, isExpanded, onToggle, startDateIso }) {
         onClick={onToggle}
       >
         <div className={styles.eventHeaderLeft}>
-          <span className={styles.eventName}>{event.eventName}</span>
+          <span className={styles.eventName}>{getEventDisplayName(event, t)}</span>
           <span className={styles.eventMeta}>
             {formatGameDateFromDay(startDateIso, event.day)}
           </span>

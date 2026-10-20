@@ -4,6 +4,9 @@ import { MATCH_MOMENT_ACTIONS, MATCH_PROP_OPTIONS } from '../../data/matchPlanni
 import venueCatalog from '../../data/venue.json'
 import { getCareerArcUnlockItem } from '../../data/careerArcUnlocks'
 import { localizeCompetitorHeadline } from '../../utils/competitorNews'
+import MatchRatingBreakdown from './MatchRatingBreakdown'
+import MatchHealthSummary from './MatchHealthSummary'
+import { getEventTypeKey, isRegularWeeklyEvent } from '../../utils/eventDisplay'
 import styles from './EventResultsScreen.module.scss'
 
 const FEMALE_FALLBACK = '/people/girl.png'
@@ -160,7 +163,7 @@ function WrestlerChip({ person, isWinner }) {
 }
 
 function SegmentCard({ segment, index, visible, t }) {
-  const isMatch = MATCH_SEGMENT_TYPES.has(segment.segmentType)
+  const isMatch = MATCH_SEGMENT_TYPES.has(segment.segmentType) && !segment.cancelled
   const isTagTeam = segment.matchType === 'tagTeam'
 
   const wrestlers = (segment.participantDetails || []).filter((p) => p.role === 'wrestler')
@@ -185,6 +188,7 @@ function SegmentCard({ segment, index, visible, t }) {
   const participantNameById = new Map((segment.participantDetails || []).map((person) => [person.employeeId, person.name]))
   const planMoments = Array.isArray(segment.plannedMoments) ? segment.plannedMoments : []
   const planProps = Array.isArray(segment.props) ? segment.props : []
+  const usedProps = [...new Set(planMoments.filter((moment) => moment.actionType === 'usesProp' && moment.propId).map((moment) => moment.propId))]
 
   return (
     <div
@@ -217,6 +221,7 @@ function SegmentCard({ segment, index, visible, t }) {
       </div>
 
       <div className={styles.segBody}>
+        {segment.cancelled ? <MatchHealthSummary segment={segment} className={styles.segmentPlan} /> : null}
         <div className={styles.participantsRow}>
           {wrestlers.map((p) => (
             <WrestlerChip key={p.employeeId} person={p} isWinner={isWinner(p)} />
@@ -228,6 +233,30 @@ function SegmentCard({ segment, index, visible, t }) {
             </div>
           ))}
         </div>
+
+        {Array.isArray(segment.staffContributions) && segment.staffContributions.length > 0 ? (
+          <div className={styles.staffContributions}>
+            {segment.staffContributions.map((contribution) => (
+              <p key={`${contribution.role}-${contribution.employeeId}`}>
+                {contribution.role === 'manager'
+                  ? t('dashboard.eventResults.staffContributions.manager', {
+                      name: contribution.name,
+                      fans: formatSignedValue(contribution.fanImpact),
+                    })
+                  : contribution.role === 'referee'
+                    ? t('dashboard.eventResults.staffContributions.referee', {
+                        name: contribution.name,
+                        rating: formatSignedValue(contribution.ratingAdjustment),
+                      })
+                    : t('dashboard.eventResults.staffContributions.announcer', {
+                        name: contribution.name,
+                        rating: formatSignedValue(contribution.ratingAdjustment),
+                        fans: formatSignedValue(contribution.fanImpact),
+                      })}
+              </p>
+            ))}
+          </div>
+        ) : null}
 
         {isMatch && (
           <div className={styles.segStats}>
@@ -261,18 +290,31 @@ function SegmentCard({ segment, index, visible, t }) {
           </div>
         )}
 
+        {isMatch ? <MatchHealthSummary segment={segment} className={styles.segmentPlan} /> : null}
+        {isMatch ? <MatchRatingBreakdown
+          breakdown={segment.ratingBreakdown}
+          planWarnings={segment.planWarnings}
+          promoAdjustment={segment.promoRatingAdjustment}
+          chemistryAdjustment={segment.chemistryRatingAdjustment}
+        /> : null}
         {isMatch && (planProps.length > 0 || planMoments.length > 0) ? (
           <div className={styles.segmentPlan}>
             <div className={styles.segmentPlanHeader}>
               <strong>{t('dashboard.events.setup.execution.plannerTitle')}</strong>
               {planProps.length > 0 ? (
                 <span>
-                  {t('dashboard.events.setup.execution.chooseProps')}: {planProps.map((propId) => {
+                  {t('matchPlanner.selectedProps')}: {planProps.map((propId) => {
                     const prop = MATCH_PROP_OPTIONS.find((option) => option.id === propId)
                     return prop ? t(prop.labelKey) : t('dashboard.events.setup.execution.unknownProp')
                   }).join(', ')}
                 </span>
               ) : null}
+              <span>
+                {t('matchPlanner.usedProps')}: {usedProps.length
+                  ? usedProps.map((propId) => t(MATCH_PROP_OPTIONS.find((prop) => prop.id === propId)?.labelKey
+                    || 'dashboard.events.setup.execution.unknownProp')).join(', ')
+                  : t('matchPlanner.none')}
+              </span>
             </div>
             {planMoments.length > 0 ? (
               <ul>
@@ -291,6 +333,10 @@ function SegmentCard({ segment, index, visible, t }) {
                           ? t('dashboard.events.setup.execution.resultMomentTargetSuffix', { target: targetName })
                           : '',
                       })}
+                      {moment.propId ? t('matchPlanner.withProp', {
+                        prop: t(MATCH_PROP_OPTIONS.find((prop) => prop.id === moment.propId)?.labelKey
+                          || 'dashboard.events.setup.execution.unknownProp'),
+                      }) : null}
                     </li>
                   )
                 })}
@@ -322,7 +368,6 @@ function EventResultsScreen({ outcome, onContinue }) {
 
   const {
     eventName,
-    eventType,
     venueId,
     promoStyleId,
     hype,
@@ -340,15 +385,16 @@ function EventResultsScreen({ outcome, onContinue }) {
     competitorPressure,
   } = outcome
 
-  const eventTypeLabel = t(EVENT_TYPE_KEYS[eventType] || 'dashboard.eventTypes.unknown')
-  const displayEventName = outcome.eventId === 'regular-weekly-event'
+  const normalizedEventType = getEventTypeKey(outcome)
+  const eventTypeLabel = t(EVENT_TYPE_KEYS[normalizedEventType] || 'dashboard.eventTypes.unknown')
+  const displayEventName = isRegularWeeklyEvent(outcome)
     ? eventTypeLabel
     : eventName || t('dashboard.eventResults.defaultName')
   const venue = venueCatalog.find((entry) => entry.id === venueId)
     || (outcome.venueName ? { name: outcome.venueName, location: outcome.venueLocation } : null)
   const promoStyle = promoStyleId ? getCareerArcUnlockItem('promoStyles', promoStyleId) : null
   const net = (income || 0) - (expenses || 0)
-  const matchSegs = segments.filter((s) => MATCH_SEGMENT_TYPES.has(s.segmentType))
+  const matchSegs = segments.filter((s) => MATCH_SEGMENT_TYPES.has(s.segmentType) && !s.cancelled)
 
   const bestMatch = matchSegs.reduce((best, seg, idx) => {
     if (!Number.isFinite(Number(seg.matchRating))) return best

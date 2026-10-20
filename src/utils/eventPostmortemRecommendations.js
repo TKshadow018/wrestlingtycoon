@@ -5,7 +5,7 @@ const MIN_DOMINANT_SHARE = 0.6
 const MIN_REPEATED_EVENTS = 2
 
 const getMatchFormat = (segment) => {
-  if (!MATCH_SEGMENT_TYPES.has(segment?.segmentType)) {
+  if (!MATCH_SEGMENT_TYPES.has(segment?.segmentType) || segment.cancelled) {
     return null
   }
 

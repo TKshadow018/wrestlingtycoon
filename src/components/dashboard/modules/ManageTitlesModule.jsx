@@ -185,6 +185,11 @@ function ManageTitlesModule() {
                           days: Number(entry.daysHeld) || 0,
                         })}
                       </p>
+                      <p>
+                        {typeof entry.defenses === 'number' && Number.isFinite(entry.defenses)
+                          ? t('dashboard.titles.successfulDefenses', { count: entry.defenses })
+                          : t('dashboard.titles.defensesNotRecorded')}
+                      </p>
                     </article>
                   )
                 })}

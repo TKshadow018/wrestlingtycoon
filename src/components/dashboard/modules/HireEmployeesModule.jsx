@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
 import { DEFAULT_WRESTLER_ARCHETYPES } from '../../../data/wrestlerArchetypes'
+import { getWrestlerPrestigeRequirement } from '../../../utils/wrestlerUnlocks'
+import { sortEmployees } from '../../../utils/employeeSorting'
 import styles from './HireEmployeesModule.module.scss'
 
 const formatMoney = (value) => value.toLocaleString()
@@ -141,7 +143,8 @@ function HireEmployeesModule() {
   const { t } = useTranslation()
   const [roleFilter, setRoleFilter] = useState('all')
   const [genderFilter, setGenderFilter] = useState('all')
-  const [salarySort, setSalarySort] = useState('asc')
+  const [sortField, setSortField] = useState('salary')
+  const [sortOrder, setSortOrder] = useState('asc')
   const [selectedCandidateId, setSelectedCandidateId] = useState(null)
   const [offerForm, setOfferForm] = useState({
     priceAdjustPercent: '0',
@@ -158,6 +161,8 @@ function HireEmployeesModule() {
     (state) => state.market.wrestlerArchetypes || DEFAULT_WRESTLER_ARCHETYPES,
   )
   const cash = useGameStore((state) => state.finances.cash)
+  const prestige = useGameStore((state) => state.stats.prestige)
+  const progression = useGameStore((state) => state.progression)
   const gameDay = useGameStore((state) => state.calendar.day)
   const startDateIso = useGameStore((state) => state.calendar.startDateIso)
   const hireEmployee = useGameStore((state) => state.hireEmployee)
@@ -278,15 +283,13 @@ function HireEmployeesModule() {
   }
 
 
-  const visibleCandidates = candidates
-    .filter((candidate) => roleFilter === 'all' || candidate.role === roleFilter)
-    .filter((candidate) => genderFilter === 'all' || candidate.gender === genderFilter)
-    .sort((left, right) => {
-      const leftSalary = left.contract?.negotiatedMonthlySalary || left.salary || 0
-      const rightSalary = right.contract?.negotiatedMonthlySalary || right.salary || 0
-
-      return salarySort === 'asc' ? leftSalary - rightSalary : rightSalary - leftSalary
-    })
+  const visibleCandidates = sortEmployees(
+    candidates
+      .filter((candidate) => roleFilter === 'all' || candidate.role === roleFilter)
+      .filter((candidate) => genderFilter === 'all' || candidate.gender === genderFilter),
+    sortField,
+    sortOrder,
+  )
 
   return (
     <section className={styles.moduleBody}>
@@ -296,6 +299,7 @@ function HireEmployeesModule() {
         <p>{t('dashboard.hiring.rosterQuotaMale', { count: maleWrestlerCount, max: MAX_MALE })}</p>
         <p>{t('dashboard.hiring.rosterQuotaFemale', { count: femaleWrestlerCount, max: MAX_FEMALE })}</p>
       </header>
+      <p>{t('dashboard.hiring.popularityGateIntro')}</p>
 
       <div className={styles.filterRow}>
         <label className={styles.filterField}>
@@ -310,10 +314,26 @@ function HireEmployeesModule() {
         </label>
 
         <label className={styles.filterField}>
-          <span>{t('dashboard.hiring.salarySort')}</span>
-          <select value={salarySort} onChange={(event) => setSalarySort(event.target.value)}>
-            <option value="asc">{t('dashboard.hiring.salarySortAsc')}</option>
-            <option value="desc">{t('dashboard.hiring.salarySortDesc')}</option>
+          <span>{t('dashboard.hiring.sortBy')}</span>
+          <select
+            value={sortField}
+            onChange={(event) => {
+              const field = event.target.value
+              setSortField(field)
+              setSortOrder(field === 'salary' ? 'asc' : 'desc')
+            }}
+          >
+            <option value="salary">{t('dashboard.hiring.sortSalary')}</option>
+            <option value="popularity">{t('dashboard.hiring.sortPopularity')}</option>
+            <option value="skill">{t('dashboard.hiring.sortSkill')}</option>
+          </select>
+        </label>
+
+        <label className={styles.filterField}>
+          <span>{t('dashboard.hiring.sortOrder')}</span>
+          <select value={sortOrder} onChange={(event) => setSortOrder(event.target.value)}>
+            <option value="asc">{t('dashboard.hiring.sortAsc')}</option>
+            <option value="desc">{t('dashboard.hiring.sortDesc')}</option>
           </select>
         </label>
 
@@ -335,6 +355,11 @@ function HireEmployeesModule() {
           const signingBonus = contract?.negotiatedSigningBonus || candidate.signingBonus
           const monthlySalary = contract?.negotiatedMonthlySalary || candidate.salary
           const perMatchSalary = contract?.negotiatedPerMatchSalary || 0
+          const prestigeRequired = getWrestlerPrestigeRequirement(
+            candidate,
+            prestige,
+            progression?.unlockedWrestlerIds || [],
+          )
 
           return (
             <article key={candidate.candidateId} className={styles.candidateCard}>
@@ -371,15 +396,20 @@ function HireEmployeesModule() {
               {!contract?.offerAccepted && contract?.negotiationAttempted ? <p>{t('dashboard.hiring.offerPending')}</p> : null}
 
               {renderRoleDetails(candidate, t, wrestlerArchetypes)}
+              {prestigeRequired !== null && (
+                <p>{t('dashboard.hiring.popularityLocked', { prestige: prestigeRequired })}</p>
+              )}
 
               <div className={styles.actionRow}>
                 <button
                   type="button"
                   className={styles.quickHireAction}
-                  disabled={cash < monthlySalary || (candidate.role === 'wrestler' && isWrestlerRosterFull(candidate.gender))}
+                  disabled={prestigeRequired !== null || cash < monthlySalary || (candidate.role === 'wrestler' && isWrestlerRosterFull(candidate.gender))}
                   onClick={() => handleQuickHire(candidate.candidateId)}
                 >
-                  {candidate.role === 'wrestler' && isWrestlerRosterFull(candidate.gender)
+                  {prestigeRequired !== null
+                    ? t('dashboard.hiring.popularityLockedButton', { prestige: prestigeRequired })
+                    : candidate.role === 'wrestler' && isWrestlerRosterFull(candidate.gender)
                     ? t('dashboard.hiring.rosterFull')
                     : cash >= monthlySalary
                       ? t('dashboard.hiring.quickHire')
@@ -388,6 +418,7 @@ function HireEmployeesModule() {
                 <button
                   type="button"
                   className={styles.secondaryAction}
+                  disabled={prestigeRequired !== null}
                   onClick={() => openNegotiationModal(candidate)}
                 >
                   {contract?.offerAccepted ? t('dashboard.hiring.reviewOffer') : t('dashboard.hiring.negotiate')}

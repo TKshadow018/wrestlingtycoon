@@ -26,6 +26,12 @@ This document explains how wrestler/staff happiness works in Wrestling Tycoon.
 - If no match participation for 30 days: `-3`
 - Inactivity penalty can apply once every 30 days
 
+### Talent Relations staff support
+
+- Each general staff member assigned to Talent Relations covers `ceil(teamwork / 50)` wrestlers, from zero to two.
+- Coverage is capped at four wrestlers total. At each timeline update, the currently lowest-happiness wrestlers below `100` receive `+1` happiness each, up to the available coverage.
+- This support is applied before demand and departure checks; it does not override those rules or guarantee retention.
+
 ## Morale Demands and Title Promises
 
 When a wrestler or staff member with no active demand reaches happiness `22` or lower, each daily simulation update has a 35% chance to create a demand. A demand is due seven in-game days after it is created.

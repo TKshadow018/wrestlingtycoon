@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
+import { getEventDisplayName } from '../../../utils/eventDisplay'
+import MatchHealthSummary from '../MatchHealthSummary'
 import { getGameDayDifference, parseGameDate } from '../../../utils/gameCalendar'
 import EventCreateModal from './EventCreateModal'
 import EventCalendar from './EventCalendar'
@@ -114,9 +116,7 @@ function ManageEventsModule() {
   }
 
   const recentEvents = [...(eventLog || [])].reverse().slice(0, 5)
-  const lastOutcomeEventName = lastOutcome?.eventId === 'regular-weekly-event'
-    ? t('dashboard.eventTypes.regularWeekly')
-    : lastOutcome?.eventName || t('dashboard.eventTypes.unknown')
+  const lastOutcomeEventName = getEventDisplayName(lastOutcome, t, eventLog)
 
   return (
     <section className={styles.moduleBody}>
@@ -263,7 +263,7 @@ function ManageEventsModule() {
             {recentEvents.map((event) => (
               <article key={event.id} className={styles.recentEventCard}>
                 <div className={styles.recentEventHeader}>
-                  <strong>{event.eventName}</strong>
+                  <strong>{getEventDisplayName(event, t)}</strong>
                   <span>{formatGameDateFromDay(startDateIso, event.day)}</span>
                 </div>
 
@@ -276,6 +276,7 @@ function ManageEventsModule() {
                             defaultValue: t('dashboard.segments.unknown'),
                           })}
                         </p>
+                        {segment.cancelled ? <MatchHealthSummary segment={segment} /> : null}
                         {Array.isArray(segment.participantDetails) && segment.participantDetails.length > 0 ? (
                           <div className={styles.recentParticipantsGrid}>
                             {segment.participantDetails.map((participant) => (

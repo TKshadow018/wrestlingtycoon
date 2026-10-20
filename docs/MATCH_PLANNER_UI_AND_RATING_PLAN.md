@@ -1,10 +1,10 @@
 # Match Planner UI and Event-Based Rating Plan
 
-**Status:** Draft — awaiting approval
+**Status:** Approved and implemented
 
 This plan covers the requested improvements to the match planning/play area, stronger validation and persistence, and a rating system driven by what happens during the match rather than mostly by a flat planning bonus.
 
-> No implementation changes should be made until this plan is approved.
+> Implementation was approved. See [MATCH_PLANNING.md](MATCH_PLANNING.md) for the implemented behavior, rating weights, compatibility rules, and usage.
 
 ## 1. Current state and problems
 
@@ -258,6 +258,6 @@ Following the repository testing workflow, tests should be updated before implem
 - Existing winner, finish, duration, prop, tag-team, simulation, persistence, and localization behavior remains intact.
 - Focused tests, full tests, and the production build pass.
 
-## Approval checkpoint
+## Approval record
 
-Please approve this plan as-is or request changes to the UI structure, validation rules, rating factors, or proposed rating weights. Implementation should begin only after approval.
+The full plan was approved for implementation. The sections above preserve the original design and acceptance criteria; the usage guide records the delivered behavior.

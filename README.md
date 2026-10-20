@@ -37,7 +37,7 @@ Wrestling Tycoon is a comprehensive sports management simulation game where you 
 - **AI Integration**: Local AI-powered interviews that affect promotion reputation, wrestler alignment, and selected rivalries
 - **Ranking System**: Dynamic wrestler ranking based on match performance and popularity
 - **Happiness & Morale**: Manage employee satisfaction and team morale
-- **Career Arcs**: Pursue eight-week objectives and unlock venues, promotional campaigns, promo formats, and event presentations
+- **Career Arcs**: Pursue eight-week objectives and unlock venues, promotional campaigns, promo formats, event presentations, and popularity-gated wrestlers
 - **Faction Stories & Backstage Chemistry**: Build wrestler/manager factions, stage rivalry promos, interference and betrayals, and shape backstage relationships
 - **Competitor Intelligence**: Track rival promotions, talent poaching, counter-programming, and industry news
 - **Board Governance**: Resolve monthly agendas, weighted votes, mandates, and annual elections
@@ -65,7 +65,7 @@ Wrestling Tycoon is a comprehensive sports management simulation game where you 
 - **Monthly Board Meetings**: Added a non-wrestling monthly meeting with an operating-period finance report and three agenda decisions.
 - **Board Governance**: Added weighted votes, Relation, January officer elections, recovery mandates, and manager-dismissal outcomes.
 - **Dashboard Integration**: Added the Board module, meeting room, member portraits, meeting history, mandate status, and next-meeting date.
-- **Career Arc Unlocks**: Completed arcs now award new venues, featured-match campaigns, promo formats, and event-intro presentations.
+- **Career Arc Unlocks**: Completed arcs award new venues, featured-match campaigns, promo formats, event-intro presentations, and popularity-gated wrestlers.
 - **Faction Rivalries and Backstage Chemistry**: Wrestlers and managers can form factions; promo callouts, interference, and betrayals build rivalry heat and crowd response. Shared segment bookings change chemistry, which influences match ratings and tracked-role happiness.
 - **Interview Story Effects**: Choose an interview's featured wrestler and optional rival; controversy, professionalism, and hype shift the wrestler's alignment and rivalry heat.
 - **Match Variety Recommendations**: Postmortems recommend a different stipulation when one format dominates at least 60% of a 3+ match card and appeared in two of the last three successful events.
@@ -547,7 +547,7 @@ WrestlingTycoon/
 - **Manage Happiness**: Address low employee happiness before they quit
 - **Update Ranking**: Monitor wrestler performance and rankings
 - **Board Governance**: Attend monthly meetings, manage mandates, and review the next scheduled meeting
-- **Career Progression**: Track objectives and rewards in the Career Arc module
+- **Career Progression**: Track objectives and rewards in the Career Arc module, including wrestler unlocks and prestige-gated hiring
 - **Competitor Intel**: Respond to rival promotion activity and talent-market pressure
 
 ### Advanced Strategies
@@ -569,6 +569,8 @@ For detailed system specifications, see the docs folder:
 - **[AI Game Guide](docs/AI_GAME_GUIDE.md)**: AI-friendly orientation, source-of-truth rules, core vocabulary, state map, and documentation index
 - **[Game Loop and State](docs/GAME_LOOP_AND_STATE.md)**: Starting a promotion, calendar model, timeline processing, and persistence
 - **[Events and Matches](docs/EVENTS_AND_MATCHES.md)**: Event scheduling, segment setup, match execution, results, and simulator boundaries
+- **[Match Planning](docs/MATCH_PLANNING.md)**: Timeline editing, draft safety, validation, event-based rating weights, and result breakdowns
+- **[Stamina and Injuries](docs/STAMINA_AND_INJURIES.md)**: Event/prop stamina costs, the 70-point per-match limit, injury recovery, and same-card cancellations
 - **[Roster and Storylines](docs/ROSTER_AND_STORYLINES.md)**: Hiring, worker attributes, titles, teams, factions, chemistry, and wrestler rivalries
 - **[Progression and Competitor World](docs/PROGRESSION_AND_WORLD.md)**: Guided onboarding, career arcs, unlocks, competitor actions, and related systems
 - **[Sponsors and Mod Packages](docs/SPONSORS_AND_MOD_PACKAGES.md)**: Sponsor slots, brand fit, trust, churn, package schema, and import behavior

@@ -4,12 +4,41 @@ import { useGameStore } from '../../../store/useGameStore'
 import { calculateRanking, calculateTeamRanking } from '../../../utils/wrestlerRank'
 import { DEFAULT_WRESTLER_ARCHETYPES } from '../../../data/wrestlerArchetypes'
 import { clampHeelFaceMeter, getHeelFaceStageKey } from '../../../utils/heelFaceMeter'
+import { getEventDisplayName } from '../../../utils/eventDisplay'
+import { sortEmployees } from '../../../utils/employeeSorting'
+import { getStaffDepartmentEffects, STAFF_DEPARTMENTS } from '../../../utils/staffOperations'
+import InjuryStatus from '../../common/InjuryStatus'
 import styles from './ManageEmployeesModule.module.scss'
 
 const formatMoney = (value) => value.toLocaleString()
 const getBackupImageByGender = (gender) => (gender === 'female' ? '/people/girl.png' : '/people/boy.png')
 const getStamina = (employee) => Number(employee?.stamina ?? 100)
 const getHappiness = (employee) => Number(employee?.happiness ?? 50)
+
+const getStaffDepartmentPreview = (employee, t) => {
+  const effects = getStaffDepartmentEffects([employee])
+  const percent = (value) => Math.round(value * 100)
+  switch (employee.staffDepartment) {
+    case 'production':
+      return t('dashboard.employees.staffDepartmentEffects.production', {
+        amount: percent(effects.productionCostReduction),
+      })
+    case 'medical':
+      return t('dashboard.employees.staffDepartmentEffects.medical', {
+        amount: percent(effects.medicalInjuryDurationReduction),
+      })
+    case 'talentRelations':
+      return t('dashboard.employees.staffDepartmentEffects.talentRelations', {
+        amount: effects.talentRelationsCoverage,
+      })
+    case 'logistics':
+      return t('dashboard.employees.staffDepartmentEffects.logistics', {
+        amount: percent(effects.logisticsOperatingCostReduction),
+      })
+    default:
+      return t('dashboard.employees.staffDepartmentEffects.unassigned')
+  }
+}
 
 const MATCH_SEGMENT_TYPES = new Set(['match', 'mainEvent', 'titleMatch'])
 
@@ -859,11 +888,14 @@ function ManageEmployeesModule() {
   const factions = useGameStore((state) => state.roster.factions || [])
   const backstageChemistry = useGameStore((state) => state.roster.backstageChemistry || {})
   const factionRivalries = useGameStore((state) => state.events.factionRivalries || [])
+  const eventLog = useGameStore((state) => state.events.eventLog || [])
+  const daysUntilBackstageInjury = useGameStore((state) => state.events.backstageInjury?.daysUntilNext ?? 90)
   const cash = useGameStore((state) => state.finances.cash)
   const day = useGameStore((state) => state.calendar.day)
   const startDateIso = useGameStore((state) => state.calendar.startDateIso)
   const fireEmployee = useGameStore((state) => state.fireEmployee)
   const setEmployeeManager = useGameStore((state) => state.setEmployeeManager)
+  const setStaffDepartment = useGameStore((state) => state.setStaffDepartment)
   const giveEmployeeBonus = useGameStore((state) => state.giveEmployeeBonus)
   const resolveEmployeeMoraleDemand = useGameStore((state) => state.resolveEmployeeMoraleDemand)
   const createTeam = useGameStore((state) => state.createTeam)
@@ -884,6 +916,7 @@ function ManageEmployeesModule() {
   const [sortField, setSortField] = useState('skill')
   const [sortOrder, setSortOrder] = useState('desc')
   const [moraleDemandFeedbackById, setMoraleDemandFeedbackById] = useState({})
+  const [staffDepartmentErrorId, setStaffDepartmentErrorId] = useState(null)
 
   const selectedEmployee = useMemo(
     () => employees.find((employee) => employee.employeeId === selectedEmployeeId) || null,
@@ -952,23 +985,11 @@ function ManageEmployeesModule() {
   }, [lowHappinessEmployees])
 
   const visibleEmployees = useMemo(() => {
-    return [...employees]
+    const filteredEmployees = employees
       .filter((employee) => roleFilter === 'all' || employee.role === roleFilter)
       .filter((employee) => genderFilter === 'all' || employee.gender === genderFilter)
-      .sort((left, right) => {
-        const leftValue = sortField === 'fee'
-          ? Number(left.contract?.monthlySalary || left.salary || 0)
-          : Number(left.skill || 0)
-        const rightValue = sortField === 'fee'
-          ? Number(right.contract?.monthlySalary || right.salary || 0)
-          : Number(right.skill || 0)
 
-        if (leftValue === rightValue) {
-          return left.name.localeCompare(right.name)
-        }
-
-        return sortOrder === 'asc' ? leftValue - rightValue : rightValue - leftValue
-      })
+    return sortEmployees(filteredEmployees, sortField, sortOrder)
   }, [employees, roleFilter, genderFilter, sortField, sortOrder])
 
   const titlesByHolderId = useMemo(() => {
@@ -999,6 +1020,11 @@ function ManageEmployeesModule() {
   const handleAssignManager = (employeeId, managerId) => {
     setEmployeeManager(employeeId, managerId)
     setManagerSelectionEmployeeId(null)
+  }
+
+  const handleSetStaffDepartment = (employeeId, department) => {
+    const result = setStaffDepartment(employeeId, department || null)
+    setStaffDepartmentErrorId(result?.ok ? null : employeeId)
   }
 
   const handleGiveBonus = (employeeId, amount) => {
@@ -1058,6 +1084,11 @@ function ManageEmployeesModule() {
           {t('dashboard.factions.tab')}
         </button>
       </div>
+      <p className={styles.injuryCountdown} role="status">
+        {daysUntilBackstageInjury === 0
+          ? t('dashboard.employees.backstageInjuryDue')
+          : t('dashboard.employees.backstageInjuryCountdown', { days: daysUntilBackstageInjury })}
+      </p>
 
       {activeTab === 'teams' && (
         <ManageTeamsSubsection
@@ -1119,6 +1150,9 @@ function ManageEmployeesModule() {
           <select value={sortField} onChange={(event) => setSortField(event.target.value)}>
             <option value="skill">{t('dashboard.employees.sortSkill')}</option>
             <option value="fee">{t('dashboard.employees.sortFee')}</option>
+            <option value="popularity">{t('dashboard.employees.sortPopularity')}</option>
+            <option value="stamina">{t('dashboard.employees.sortStamina')}</option>
+            <option value="winRate">{t('dashboard.employees.sortWinRate')}</option>
           </select>
         </label>
 
@@ -1185,6 +1219,7 @@ function ManageEmployeesModule() {
             </p>
           )}
           {employee.role === 'wrestler' && <HeelFaceMeter employee={employee} />}
+          <InjuryStatus employee={employee} day={day} className={styles.staminaLow} />
           {employee.role === 'wrestler' && (() => {
             const stats = getWrestlerRecentStats(employee)
             if (!stats) return null
@@ -1211,6 +1246,29 @@ function ManageEmployeesModule() {
           })()}
           <p>{t('dashboard.employees.monthlyWage', { amount: formatMoney(employee.contract?.monthlySalary || employee.salary) })}</p>
           <p>{t('dashboard.employees.perMatchSalary', { amount: formatMoney(employee.contract?.perMatchSalary || 0) })}</p>
+          {employee.role === 'staff' && (
+            <label className={styles.staffDepartmentControl}>
+              <span>{t('dashboard.employees.staffDepartment')}</span>
+              <select
+                aria-label={t('dashboard.employees.staffDepartmentFor', { name: employee.name })}
+                value={employee.staffDepartment || ''}
+                onChange={(event) => handleSetStaffDepartment(employee.employeeId, event.target.value)}
+              >
+                <option value="">{t('dashboard.employees.staffDepartmentOptions.unassigned')}</option>
+                {STAFF_DEPARTMENTS.map((department) => (
+                  <option key={department} value={department}>
+                    {t(`dashboard.employees.staffDepartmentOptions.${department}`)}
+                  </option>
+                ))}
+              </select>
+              <span className={styles.staffDepartmentEffect}>
+                {getStaffDepartmentPreview(employee, t)}
+              </span>
+              {staffDepartmentErrorId === employee.employeeId ? (
+                <span role="alert">{t('dashboard.employees.staffDepartmentUpdateFailed')}</span>
+              ) : null}
+            </label>
+          )}
           <p>{t('dashboard.employees.signingBonus', { amount: formatMoney(employee.contract?.signingBonus || 0) })}</p>
           <p>
             {t('dashboard.employees.contractEndDayLabel')}: {employee.contract?.endDay ? formatGameDateFromDay(startDateIso, employee.contract.endDay) : '-'}
@@ -1370,6 +1428,7 @@ function ManageEmployeesModule() {
                   </p>
                 )}
                 {selectedEmployee.role === 'wrestler' && <HeelFaceMeter employee={selectedEmployee} />}
+                <InjuryStatus employee={selectedEmployee} day={day} className={styles.staminaLow} />
               </div>
             </div>
 
@@ -1386,6 +1445,7 @@ function ManageEmployeesModule() {
                   <div>
                     <span className={styles.managerInfoName}>{assignedManager.name}</span>
                     <p className={styles.managerInfoSkill}>{t('dashboard.employees.skill', { skill: assignedManager.skill })}</p>
+                    <p className={styles.managerInfoSkill}>{t('dashboard.employees.managerBookingEffect')}</p>
                   </div>
                 </div>
               </div>
@@ -1416,7 +1476,15 @@ function ManageEmployeesModule() {
                   {selectedHistory.map((entry, index) => (
                     <article key={`${entry.day}-${entry.eventName}-${entry.segmentType}-${index}`} className={styles.historyRow}>
                       <div className={styles.historyTop}>
-                        <strong>{entry.eventName || t('dashboard.employees.unknownEvent')}</strong>
+                        <strong>
+                          {getEventDisplayName(
+                            entry,
+                            t,
+                            eventLog,
+                            'dashboard.employees.unknownEvent',
+                            startDateIso,
+                          )}
+                        </strong>
                         <span>{entry.day ? formatGameDateFromDay(startDateIso, entry.day) : '-'}</span>
                       </div>
                       <p>

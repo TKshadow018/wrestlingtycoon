@@ -1,6 +1,7 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { GAME_CONFIG, GAME_DAYS_PER_MONTH } from '../config/gameConfig'
 import { getGameDateFromDay, toGameDateIso } from '../utils/gameCalendar'
+import { getWrestlerPrestigeRequirement } from '../utils/wrestlerUnlocks'
 
 const testStorage = new Map()
 vi.stubGlobal('localStorage', {
@@ -103,8 +104,14 @@ describe('promotion finance simulator', () => {
   it('excludes one-time roster hiring costs from the operating cash flow objective', () => {
 
     for (const role of ['wrestler', 'wrestler', 'staff']) {
-      const candidate = useGameStore.getState().market.employeeCandidates.find(
-        (employee) => employee.role === role,
+      const state = useGameStore.getState()
+      const candidate = state.market.employeeCandidates.find(
+        (employee) => employee.role === role
+          && getWrestlerPrestigeRequirement(
+            employee,
+            state.stats.prestige,
+            state.progression.unlockedWrestlerIds,
+          ) === null,
       )
 
       expect(candidate).toBeDefined()
@@ -122,7 +129,13 @@ describe('promotion finance simulator', () => {
   it('charges recurring monthly salary on the 30-day contract anniversary', () => {
     const initialState = useGameStore.getState()
     const candidate = initialState.market.employeeCandidates.find(
-      (employee) => employee.role === 'wrestler' && Number(employee.contract?.monthlySalary || employee.salary) > 0,
+      (employee) => employee.role === 'wrestler'
+        && Number(employee.contract?.monthlySalary || employee.salary) > 0
+        && getWrestlerPrestigeRequirement(
+          employee,
+          initialState.stats.prestige,
+          initialState.progression.unlockedWrestlerIds,
+        ) === null,
     )
 
     expect(candidate).toBeDefined()

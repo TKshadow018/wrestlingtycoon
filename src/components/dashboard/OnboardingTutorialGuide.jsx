@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import styles from './OnboardingTutorialGuide.module.scss'
 
-function OnboardingTutorialGuide({ tutorial, onOpenModule }) {
+function OnboardingTutorialGuide({ tutorial, onOpenModule, onDismissForever }) {
   const { t } = useTranslation()
   if (!tutorial) return null
 
@@ -14,6 +14,13 @@ function OnboardingTutorialGuide({ tutorial, onOpenModule }) {
           <h2>{t(`dashboard.onboardingChallenge.tutorial.${outcome}.title`)}</h2>
           <p>{t(`dashboard.onboardingChallenge.tutorial.${outcome}.body`)}</p>
         </div>
+        <button
+          type="button"
+          className={styles.action}
+          onClick={onDismissForever}
+        >
+          {t('dashboard.onboardingChallenge.tutorial.dismissForever')}
+        </button>
       </section>
     )
   }

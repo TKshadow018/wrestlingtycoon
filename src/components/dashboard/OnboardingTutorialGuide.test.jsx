@@ -32,7 +32,19 @@ describe('OnboardingTutorialGuide', () => {
     const html = renderToStaticMarkup(createElement(OnboardingTutorialGuide, {
       tutorial: { id: 'completed', step: 5, totalSteps: 5 },
       onOpenModule: () => {},
+      onDismissForever: () => {},
     }))
     expect(html).toContain('Rescue tutorial complete')
+    expect(html).toContain('Dismiss forever')
+  })
+
+  it('provides a permanent dismissal option after a failed tutorial too', () => {
+    const html = renderToStaticMarkup(createElement(OnboardingTutorialGuide, {
+      tutorial: { id: 'failed', step: 5, totalSteps: 5 },
+      onDismissForever: () => {},
+    }))
+
+    expect(html).toContain('Rescue tutorial ended')
+    expect(html).toContain('Dismiss forever')
   })
 })
