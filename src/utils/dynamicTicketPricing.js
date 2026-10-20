@@ -1,3 +1,5 @@
+import { clamp } from './utility'
+
 const DEFAULT_DYNAMIC_TICKET_PRICING = {
   enabled: true,
   ratingReference: 8,
@@ -9,8 +11,6 @@ const DEFAULT_DYNAMIC_TICKET_PRICING = {
   lowerPriceElasticity: 0.5,
   higherPriceElasticity: 2.5,
 }
-
-const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value))
 
 const toFiniteNumber = (value, fallback = 0) => {
   const parsed = Number(value)

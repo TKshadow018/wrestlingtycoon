@@ -2,6 +2,7 @@ import {
   DEFAULT_WRESTLER_ARCHETYPES,
   normalizeWrestlerArchetypes,
 } from '../data/wrestlerArchetypes'
+import { clamp } from './utility'
 
 const MOD_PACKAGE_TYPE = 'wrestling-tycoon-mod-package'
 const MOD_PACKAGE_VERSION = 1
@@ -38,7 +39,6 @@ const toNumber = (value, fallback = 0) => {
   return Number.isFinite(numeric) ? numeric : fallback
 }
 
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
 const clampPercent = (value, fallback = 50) => Math.round(clamp(toNumber(value, fallback), 0, 100))
 
 const normalizeWrestlerArchetypeEntry = (entry, index) => {

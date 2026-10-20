@@ -1,4 +1,4 @@
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+import { clamp } from './utility'
 
 const asMetric = (metrics, key) => {
   const value = Number(metrics?.[key])

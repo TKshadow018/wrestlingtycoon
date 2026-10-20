@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
 import { getEventDisplayName } from '../../../utils/eventDisplay'
 import MatchHealthSummary from '../MatchHealthSummary'
-import { getGameDayDifference, parseGameDate } from '../../../utils/gameCalendar'
+import {
+  getGameDateFromDayOrFallback,
+  getGameDayDifference,
+  parseGameDate,
+  toGameDateStartOfDay,
+} from '../../../utils/gameCalendar'
 import EventCreateModal from './EventCreateModal'
 import EventCalendar from './EventCalendar'
 import styles from './ManageEventsModule.module.scss'
@@ -15,16 +20,8 @@ const getFallbackImage = (gender) => (gender === 'female' ? FEMALE_FALLBACK_IMAG
 
 const getWeekFromDay = (day) => Math.floor((day - 1) / 7) + 1
 
-const toStartOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
-
-const parseIsoDateLocal = (isoDateString) => {
-  return parseGameDate(isoDateString)
-}
-
 const formatGameDateFromDay = (startDateIso, day) => {
-  const baseDate = parseIsoDateLocal(startDateIso) || new Date()
-  const gameDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate())
-  gameDate.setDate(gameDate.getDate() + Math.max(0, Number(day || 1) - 1))
+  const gameDate = getGameDateFromDayOrFallback(startDateIso, day)
   return gameDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
@@ -33,10 +30,10 @@ const getScheduledWeekFromSpecificDate = (specificDate, currentGameDay, startDat
     return getWeekFromDay(currentGameDay)
   }
 
-  const parsedDate = parseIsoDateLocal(specificDate)
-  const selectedDate = parsedDate ? toStartOfDay(parsedDate) : null
-  const parsedStartDate = parseIsoDateLocal(startDateIso)
-  const today = parsedStartDate ? toStartOfDay(parsedStartDate) : toStartOfDay(new Date())
+  const parsedDate = parseGameDate(specificDate)
+  const selectedDate = parsedDate ? toGameDateStartOfDay(parsedDate) : null
+  const parsedStartDate = parseGameDate(startDateIso)
+  const today = parsedStartDate ? toGameDateStartOfDay(parsedStartDate) : toGameDateStartOfDay(new Date())
 
   if (!selectedDate || Number.isNaN(selectedDate.getTime())) {
     return getWeekFromDay(currentGameDay)

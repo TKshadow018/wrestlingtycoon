@@ -102,3 +102,14 @@ export const getGameDateFromDay = (startDateIso, gameDay) => {
   gameDate.setDate(gameDate.getDate() + numericGameDay - 1)
   return gameDate
 }
+
+export const toGameDateStartOfDay = (date) => (
+  new Date(date.getFullYear(), date.getMonth(), date.getDate())
+)
+
+export const getGameDateFromDayOrFallback = (startDateIso, gameDay, fallbackDate = new Date()) => {
+  const startDate = parseGameDate(startDateIso) || fallbackDate
+  const numericGameDay = Math.max(1, Math.floor(Number(gameDay || 1)))
+
+  return getGameDateFromDay(toGameDateIso(startDate), numericGameDay)
+}

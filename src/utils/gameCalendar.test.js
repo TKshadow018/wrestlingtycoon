@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
   getGameDateFromDay,
+  getGameDateFromDayOrFallback,
   getGameDayDifference,
   normalizeGameDate,
   parseGameDate,
   resolveGameCalendarStartDate,
+  toGameDateStartOfDay,
   toGameDateIso,
 } from './gameCalendar'
 
@@ -22,6 +24,26 @@ describe('game calendar dates', () => {
   it('uses the configured date as Game Day 1', () => {
     expect(toGameDateIso(getGameDateFromDay('2026-1-30', 1))).toBe('2026-01-30')
     expect(toGameDateIso(getGameDateFromDay('2026-1-30', 2))).toBe('2026-01-31')
+  })
+
+  it('normalizes a date to local midnight', () => {
+    expect(toGameDateStartOfDay(new Date(2026, 5, 1, 15, 30))).toEqual(new Date(2026, 5, 1))
+  })
+
+  it('uses a supplied fallback date when a display date is invalid', () => {
+    expect(toGameDateIso(getGameDateFromDayOrFallback(
+      '2026-2-30',
+      3,
+      new Date(2026, 5, 1, 15),
+    ))).toBe('2026-06-03')
+  })
+
+  it('treats non-positive display days as Game Day 1', () => {
+    expect(toGameDateIso(getGameDateFromDayOrFallback(
+      '2026-06-01',
+      0,
+      new Date(2020, 0, 1),
+    ))).toBe('2026-06-01')
   })
 
   it('continues from the configured start date without shifting the day counter', () => {

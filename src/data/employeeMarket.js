@@ -4,16 +4,9 @@ import {
   inferWrestlerArchetypeId,
   normalizeWrestlerArchetypes,
 } from './wrestlerArchetypes'
+import { average } from '../utils/utility'
 
 const TIERS = ['Rookie', 'Solid', 'Elite']
-
-const average = (values) => {
-  if (!values.length) {
-    return 0
-  }
-
-  return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length)
-}
 
 const getTierBySkill = (skill) => {
   if (skill >= 82) return TIERS[2]
@@ -24,7 +17,7 @@ const getTierBySkill = (skill) => {
 const calculateWrestlerSkill = (person) => {
   const ability = person.wrestling_ability || {}
 
-  return average([
+  return Math.round(average([
     ability.strength || 0,
     ability.technics || 0,
     ability.high_fly_ability || 0,
@@ -32,55 +25,55 @@ const calculateWrestlerSkill = (person) => {
     ability.body_stamina || 0,
     ability.head_stamina || 0,
     person.popularity || 0,
-  ])
+  ]))
 }
 
 const calculateRefereeSkill = (person) => {
   const ability = person.officiating_ability || {}
 
-  return average([
+  return Math.round(average([
     ability.rule_knowledge || 0,
     ability.decision_speed || 0,
     ability.positioning || 0,
     ability.composure || 0,
     person.popularity || 0,
-  ])
+  ]))
 }
 
 const calculateManagerSkill = (person) => {
   const ability = person.management_ability || {}
 
-  return average([
+  return Math.round(average([
     ability.charisma || 0,
     ability.negotiation || 0,
     ability.promo_skill || 0,
     ability.strategy || 0,
     person.popularity || 0,
-  ])
+  ]))
 }
 
 const calculateAnnouncerSkill = (person) => {
   const ability = person.broadcast_ability || {}
 
-  return average([
+  return Math.round(average([
     ability.voice_quality || 0,
     ability.hype_delivery || 0,
     ability.diction || 0,
     ability.ring_knowledge || 0,
     person.popularity || 0,
-  ])
+  ]))
 }
 
 const calculateStaffSkill = (person) => {
   const ability = person.staff_ability || {}
 
-  return average([
+  return Math.round(average([
     ability.reliability || 0,
     ability.pressure_handling || 0,
     ability.teamwork || 0,
     ability.technical_skill || 0,
     person.popularity || 0,
-  ])
+  ]))
 }
 
 const calculateSkill = (person) => {

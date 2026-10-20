@@ -1,3 +1,5 @@
+import { clamp } from './utility'
+
 export const STAFF_DEPARTMENTS = [
   'production',
   'medical',
@@ -5,7 +7,6 @@ export const STAFF_DEPARTMENTS = [
   'logistics',
 ]
 
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
 const roundTo = (value, places = 4) => Number(value.toFixed(places))
 
 export const normalizeStaffDepartment = (department) => (

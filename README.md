@@ -458,9 +458,11 @@ WrestlingTycoon/
 │       └── wrestlerRank.js    # Ranking calculations
 ├── docs/                       # Game documentation
 │   ├── AI_GAME_GUIDE.md         # AI-oriented game overview and reading map
+│   ├── GAMER_GUIDE.md           # Player-facing onboarding and gameplay guide
 │   ├── GAME_LOOP_AND_STATE.md   # Calendar, day advancement, and persisted state
 │   ├── EVENTS_AND_MATCHES.md    # Scheduling, card setup, execution, and outcomes
 │   ├── ROSTER_AND_STORYLINES.md # Employees, titles, teams, factions, and rivalries
+│   ├── people/                  # Role guides for hires and board members
 │   ├── PROGRESSION_AND_WORLD.md # Onboarding, arcs, unlocks, and competitors
 │   ├── SPONSORS_AND_MOD_PACKAGES.md # Sponsor contracts and mod data
 │   ├── BOARD_MEETING_PLAN.md   # Board meeting flow and governance rules
@@ -566,6 +568,8 @@ WrestlingTycoon/
 
 For detailed system specifications, see the docs folder:
 
+- **[Player Guide](docs/GAMER_GUIDE.md)**: New-player objectives, daily play, hiring, show booking, and business tips
+- **[People Guides](docs/people/README.md)**: Separate guides for wrestlers, staff, managers, announcers, referees, and board members
 - **[AI Game Guide](docs/AI_GAME_GUIDE.md)**: AI-friendly orientation, source-of-truth rules, core vocabulary, state map, and documentation index
 - **[Game Loop and State](docs/GAME_LOOP_AND_STATE.md)**: Starting a promotion, calendar model, timeline processing, and persistence
 - **[Events and Matches](docs/EVENTS_AND_MATCHES.md)**: Event scheduling, segment setup, match execution, results, and simulator boundaries

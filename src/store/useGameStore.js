@@ -84,12 +84,15 @@ import {
   updateBackstageChemistry,
 } from '../utils/backstageDynamics'
 import {
+  getGameDateFromDay,
   getGameDayDifference,
   normalizeGameDate,
   parseGameDate,
   resolveGameCalendarStartDate,
+  toGameDateStartOfDay,
   toGameDateIso,
 } from '../utils/gameCalendar'
+import { createStableKey } from '../utils/utility'
 import preloadedEvents from '../data/preloadedEvents.json'
 import titleCatalog from '../data/titles.json'
 
@@ -106,7 +109,7 @@ const normalizeTitleHolderIds = (title) => {
   return ids.length > 0 ? [ids[0]] : []
 }
 
-const holdersKey = (holderIds = []) => [...holderIds].sort().join('::')
+const holdersKey = (holderIds = []) => createStableKey(holderIds)
 
 const normalizeTitleRecord = (title) => {
   const holderIds = normalizeTitleHolderIds(title)
@@ -142,13 +145,6 @@ const parseStartDateIso = (startDateIso) => {
   }
 
   return parsed
-}
-
-const getGameDateFromDay = (startDateIso, day) => {
-  const startDate = parseStartDateIso(startDateIso)
-  const nextDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
-  nextDate.setDate(nextDate.getDate() + Math.max(0, Number(day || 1) - 1))
-  return nextDate
 }
 
 const isRegularWeeklyEventDay = (startDateIso, day) => {
@@ -1402,8 +1398,8 @@ const getNextSpecificDateIsoFromDayMonth = (eventDate, startDateIso) => {
     return ''
   }
 
-  const normalizedThisYearDate = toStartOfDay(thisYearDate)
-  const normalizedStartDate = toStartOfDay(startDate)
+  const normalizedThisYearDate = toGameDateStartOfDay(thisYearDate)
+  const normalizedStartDate = toGameDateStartOfDay(startDate)
   const targetDate = normalizedThisYearDate < normalizedStartDate
     ? parseDayMonthEventDate(eventDate, startYear + 1)
     : normalizedThisYearDate
@@ -1463,19 +1459,13 @@ const createPreloadedCustomEvents = (startDateIso) => {
     })
 }
 
-const parseIsoDateLocal = (isoDateString) => {
-  return parseGameDate(isoDateString)
-}
-
-const toStartOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
-
 const getScheduledDayFromSpecificDate = ({ specificDate, startDateIso, fallbackScheduledWeek }) => {
-  const parsedSpecificDate = parseIsoDateLocal(specificDate)
+  const parsedSpecificDate = parseGameDate(specificDate)
   const parsedStartDate = parseStartDateIso(startDateIso)
   let scheduledDay = getScheduledDayFromWeek(Number(fallbackScheduledWeek) || 1)
 
   if (parsedSpecificDate && !Number.isNaN(parsedSpecificDate.getTime())) {
-    const specificDateStart = toStartOfDay(parsedSpecificDate)
+    const specificDateStart = toGameDateStartOfDay(parsedSpecificDate)
     const diffDays = getGameDayDifference(parsedStartDate, specificDateStart)
     scheduledDay = diffDays + 1
   }
@@ -1496,7 +1486,7 @@ const getCalendarWeekKey = (date) => {
 }
 
 const getEventWeekKey = (event) => {
-  const specificDate = parseIsoDateLocal(event?.specificDate)
+  const specificDate = parseGameDate(event?.specificDate)
   if (specificDate && !Number.isNaN(specificDate.getTime())) {
     return getCalendarWeekKey(specificDate)
   }
@@ -1509,7 +1499,7 @@ const toIsoDateLocal = (date) => {
 }
 
 const getEventMonthYearKey = (event) => {
-  const specificDate = parseIsoDateLocal(event?.specificDate)
+  const specificDate = parseGameDate(event?.specificDate)
   if (specificDate && !Number.isNaN(specificDate.getTime())) {
     return {
       monthKey: `${specificDate.getFullYear()}-${String(specificDate.getMonth() + 1).padStart(2, '0')}`,
@@ -1660,7 +1650,7 @@ const clampPopularity = (value) => {
 }
 
 const buildRivalryPairKey = (leftId, rightId) => {
-  return [leftId, rightId].sort().join('::')
+  return createStableKey([leftId, rightId])
 }
 
 const normalizeRivalries = (rivalries = []) => {
@@ -2993,7 +2983,7 @@ const validateCustomEventRules = ({ customEvents, draftEvent, currentWeek, curre
   }
 
   const comparableEvents = customEvents.filter((event) => event.eventId !== ignoreEventId)
-  const draftSpecificDate = parseIsoDateLocal(draftEvent.specificDate)
+  const draftSpecificDate = parseGameDate(draftEvent.specificDate)
   const draftWeekKey = draftSpecificDate
     ? getCalendarWeekKey(draftSpecificDate)
     : `legacy-${Number(draftEvent.scheduledWeek) || 0}`
@@ -3050,7 +3040,7 @@ const MAX_FACTION_MEMBERS = 10
 const TAG_STREAK_THRESHOLD = 3
 const TAG_STREAK_WINDOW_DAYS = 90
 
-const teamMembersKey = (memberIds = []) => [...memberIds].sort().join('::')
+const teamMembersKey = (memberIds = []) => createStableKey(memberIds)
 
 const teamAlreadyExists = (teams = [], memberIds = []) => {
   const key = teamMembersKey(memberIds)
@@ -7028,7 +7018,7 @@ export const useGameStore = create(
             const fallbackDate = new Date()
             fallbackDate.setDate(fallbackDate.getDate() + weekOffset * 7)
 
-            const persistedSpecificDate = parseIsoDateLocal(event?.specificDate)
+            const persistedSpecificDate = parseGameDate(event?.specificDate)
             const specificDate = isConfiguredStartDate && Number.isInteger(scheduledDay) && scheduledDay >= 1
               ? toIsoDateLocal(getGameDateFromDay(restoredStartDateIso, scheduledDay))
               : persistedSpecificDate && !Number.isNaN(persistedSpecificDate.getTime())

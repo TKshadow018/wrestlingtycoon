@@ -56,11 +56,13 @@ Read the current state rather than inferring it from display text. In particular
 
 ## Read next
 
-1. [GAME_LOOP_AND_STATE.md](GAME_LOOP_AND_STATE.md) — dates, daily advancement, persistence, and onboarding into the loop.
-2. [EVENTS_AND_MATCHES.md](EVENTS_AND_MATCHES.md) — event scheduling, card setup, match execution, and results.
-3. [ROSTER_AND_STORYLINES.md](ROSTER_AND_STORYLINES.md) — contracts, titles, teams, factions, chemistry, and rivalries.
-4. [PROGRESSION_AND_WORLD.md](PROGRESSION_AND_WORLD.md) — onboarding, career arcs, unlocks, and competitor simulation.
-5. [SPONSORS_AND_MOD_PACKAGES.md](SPONSORS_AND_MOD_PACKAGES.md) — sponsor relationships and imported game data.
+1. [GAMER_GUIDE.md](GAMER_GUIDE.md) — player-facing onboarding and gameplay recommendations.
+2. [people/README.md](people/README.md) — role-by-role guides for wrestlers, support employees, and board members.
+3. [GAME_LOOP_AND_STATE.md](GAME_LOOP_AND_STATE.md) — dates, daily advancement, persistence, and onboarding into the loop.
+4. [EVENTS_AND_MATCHES.md](EVENTS_AND_MATCHES.md) — event scheduling, card setup, match execution, and results.
+5. [ROSTER_AND_STORYLINES.md](ROSTER_AND_STORYLINES.md) — contracts, titles, teams, factions, chemistry, and rivalries.
+6. [PROGRESSION_AND_WORLD.md](PROGRESSION_AND_WORLD.md) — onboarding, career arcs, unlocks, and competitor simulation.
+7. [SPONSORS_AND_MOD_PACKAGES.md](SPONSORS_AND_MOD_PACKAGES.md) — sponsor relationships and imported game data.
 
 Existing focused guides cover [finance](FINANCE_MONEY_SYSTEM.md), [board governance](BOARD_MEETING_PLAN.md), [interviews](AI_INTERVIEWS.md), [happiness](HAPPINESS.md), [prestige](prestige.md), [ranking](RANKING_POINTS.md), and [alignment](HEEL_FACE_SYSTEM.md).
 

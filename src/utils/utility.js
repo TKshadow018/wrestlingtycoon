@@ -1,3 +1,17 @@
+export const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+
+export const average = (values) => (
+  values.length
+    ? values.reduce((sum, value) => sum + value, 0) / values.length
+    : 0
+)
+
+export const createStableKey = (values = [], separator = '::') => (
+  [...values].sort().join(separator)
+)
+
+export const formatNumber = (value, locale) => Number(value).toLocaleString(locale)
+
 export const randomInRange = (min, max, modifiers = []) => {
   const items = [];
 

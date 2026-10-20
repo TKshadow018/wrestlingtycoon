@@ -1,13 +1,13 @@
+import { clamp, createStableKey } from './utility'
+
 const FACTION_MEMBER_ROLES = new Set(['wrestler', 'manager'])
 const TRACKED_HAPPINESS_ROLES = new Set(['wrestler', 'staff'])
 const MATCH_SEGMENT_TYPES = new Set(['match', 'mainEvent', 'titleMatch'])
 const STORY_BEATS = new Set(['factionPromo', 'interference', 'betrayal'])
 export const FACTION_STORY_BEATS = [...STORY_BEATS]
 
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
-
 export const buildBackstagePairKey = (leftId, rightId) => (
-  [leftId, rightId].sort().join('::')
+  createStableKey([leftId, rightId])
 )
 
 export const normalizeFactions = (factions = [], employees = []) => {

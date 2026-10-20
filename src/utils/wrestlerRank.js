@@ -1,6 +1,6 @@
-const MATCH_SEGMENT_TYPES = new Set(['match', 'mainEvent', 'titleMatch'])
+import { average, clamp } from './utility'
 
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+const MATCH_SEGMENT_TYPES = new Set(['match', 'mainEvent', 'titleMatch'])
 
 export const getInitialPoints = (wrestler) => {
   const popularity = Number(wrestler?.popularity || 0)
@@ -223,9 +223,7 @@ export const calculateTeamRanking = ({ teams = [], employees = [], division = 'm
       const divisionMembers = members.filter((member) => member.gender === normalizedDivision)
       const scoringMembers = divisionMembers.length > 0 ? divisionMembers : members
       const points = scoringMembers.map((member) => Number(pointsSource.get(member.employeeId)?.rankPoints || 0))
-      const averagePoints = points.length > 0
-        ? points.reduce((sum, value) => sum + value, 0) / points.length
-        : 0
+      const averagePoints = average(points)
 
       return {
         ...team,

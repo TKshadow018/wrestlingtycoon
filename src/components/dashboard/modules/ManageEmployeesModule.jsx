@@ -7,10 +7,13 @@ import { clampHeelFaceMeter, getHeelFaceStageKey } from '../../../utils/heelFace
 import { getEventDisplayName } from '../../../utils/eventDisplay'
 import { sortEmployees } from '../../../utils/employeeSorting'
 import { getStaffDepartmentEffects, STAFF_DEPARTMENTS } from '../../../utils/staffOperations'
+import { getGameDateFromDayOrFallback, parseGameDate } from '../../../utils/gameCalendar'
+import { formatNumber } from '../../../utils/utility'
+import i18n from '../../../i18n'
 import InjuryStatus from '../../common/InjuryStatus'
 import styles from './ManageEmployeesModule.module.scss'
 
-const formatMoney = (value) => value.toLocaleString()
+const formatMoney = (value) => formatNumber(value, i18n.resolvedLanguage || i18n.language)
 const getBackupImageByGender = (gender) => (gender === 'female' ? '/people/girl.png' : '/people/boy.png')
 const getStamina = (employee) => Number(employee?.stamina ?? 100)
 const getHappiness = (employee) => Number(employee?.happiness ?? 50)
@@ -93,39 +96,13 @@ function HeelFaceMeter({ employee }) {
 const ROLE_FILTERS = ['all', 'wrestler', 'referee', 'manager', 'announcer', 'staff']
 const GENDER_FILTERS = ['all', 'male', 'female']
 
-const parseIsoDateLocal = (isoDateString) => {
-  if (!isoDateString) {
-    return null
-  }
-
-  const [yearStr, monthStr, dayStr] = isoDateString.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-  const day = Number(dayStr)
-
-  if (!year || !month || !day) {
-    return null
-  }
-
-  return new Date(year, month - 1, day)
-}
-
 const formatGameDateFromDay = (startDateIso, day) => {
-  const baseDate = parseIsoDateLocal(startDateIso) || new Date()
-  const gameDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate())
-  gameDate.setDate(gameDate.getDate() + Math.max(0, Number(day || 1) - 1))
+  const gameDate = getGameDateFromDayOrFallback(startDateIso, day)
   return gameDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
-const getGameDate = (startDateIso, day) => {
-  const baseDate = parseIsoDateLocal(startDateIso) || new Date()
-  const gameDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate())
-  gameDate.setDate(gameDate.getDate() + Math.max(0, Number(day || 1) - 1))
-  return gameDate
-}
-
 const formatDobWithAge = (dob, gameDate, t) => {
-  const dobDate = parseIsoDateLocal(dob)
+  const dobDate = parseGameDate(dob)
   if (!dobDate || Number.isNaN(dobDate.getTime())) {
     return dob || '-'
   }
@@ -1015,7 +992,10 @@ function ManageEmployeesModule() {
 
     return mapping
   }, [titles])
-  const gameDate = useMemo(() => getGameDate(startDateIso, day), [day, startDateIso])
+  const gameDate = useMemo(
+    () => getGameDateFromDayOrFallback(startDateIso, day),
+    [day, startDateIso],
+  )
 
   const handleAssignManager = (employeeId, managerId) => {
     setEmployeeManager(employeeId, managerId)

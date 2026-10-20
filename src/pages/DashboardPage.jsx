@@ -26,7 +26,7 @@ import app, { isFirebaseConfigured } from '../config/firebase'
 import { useGameStore } from '../store/useGameStore'
 import { getBoardMeetingSchedule } from '../utils/boardMeetings'
 import { getOnboardingTutorialShowProgress, getOnboardingTutorialStage } from '../utils/onboardingTutorial'
-import { parseGameDate } from '../utils/gameCalendar'
+import { getGameDateFromDayOrFallback } from '../utils/gameCalendar'
 import { buildModDataPackageFromState, validateModDataPackage } from '../utils/modDataPackage'
 import { computeInterviewImpactPreview } from '../utils/interviewStoryEffects'
 import { getEventTypeKey } from '../utils/eventDisplay'
@@ -101,19 +101,6 @@ const writeSnapshotAndReload = (snapshot) => {
   window.location.reload()
 }
 
-const toStartOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
-
-const parseIsoDateLocal = (isoDateString) => {
-  return parseGameDate(isoDateString)
-}
-
-const getGameDateFromDay = (startDateIso, day) => {
-  const parsedStartDate = parseIsoDateLocal(startDateIso) || toStartOfDay(new Date())
-  const gameDate = new Date(parsedStartDate.getFullYear(), parsedStartDate.getMonth(), parsedStartDate.getDate())
-  gameDate.setDate(gameDate.getDate() + Math.max(0, Number(day || 1) - 1))
-  return gameDate
-}
-
 // Returns the upcoming PPV/megaLive event if today is a preparation trigger day
 // PPV: 7 days before; megaLive: 14 days before
 const getPreparationEvent = ({ day, customEvents = [] }) => {
@@ -146,7 +133,7 @@ const getTodayEventProjection = ({ day, startDateIso, customEvents = [], sponsor
     return (a.createdAt || 0) - (b.createdAt || 0)
   })
   const dueCustomEvent = sortedCustomEvents.find((event) => event.scheduledDay === day) || null
-  const gameDate = getGameDateFromDay(startDateIso, day)
+  const gameDate = getGameDateFromDayOrFallback(startDateIso, day)
   const isFriday = gameDate.getDay() === 5
 
   const baseEvent = dueCustomEvent
@@ -272,7 +259,7 @@ function DashboardPage() {
     && getBoardMeetingSchedule({
       startDateIso,
       customEvents,
-      throughDate: getGameDateFromDay(startDateIso, day),
+      throughDate: getGameDateFromDayOrFallback(startDateIso, day),
     }).some((meeting) => meeting.scheduledDay === day)
     && (Boolean(boardMeeting.activeMeeting) || boardMeeting.lastMeetingDay !== day)
   ), [boardMeeting.activeMeeting, boardMeeting.lastMeetingDay, customEvents, day, isGameOver, startDateIso])
@@ -1010,7 +997,7 @@ function DashboardPage() {
       />
       {showBoardMeetingIntro && (
         <BoardMeetingIntroScreen
-          isJanuary={getGameDateFromDay(startDateIso, day).getMonth() === 0}
+          isJanuary={getGameDateFromDayOrFallback(startDateIso, day).getMonth() === 0}
           durationMs={2600}
           onComplete={handleBoardMeetingIntroComplete}
         />

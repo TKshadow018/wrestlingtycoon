@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getEventTypeKey, isRegularWeeklyEvent } from '../../utils/eventDisplay'
+import { getGameDateFromDayOrFallback } from '../../utils/gameCalendar'
 import styles from './EventBannerScreen.module.scss'
 
 const FEMALE_FALLBACK = '/people/girl.png'
@@ -8,17 +9,8 @@ const MALE_FALLBACK = '/people/boy.png'
 
 const getFallbackImage = (gender) => (gender === 'female' ? FEMALE_FALLBACK : MALE_FALLBACK)
 
-const parseIsoDateLocal = (isoDateString) => {
-  if (!isoDateString) return null
-  const [y, m, d] = isoDateString.split('-').map(Number)
-  if (!y || !m || !d) return null
-  return new Date(y, m - 1, d)
-}
-
 const formatGameDate = (startDateIso, day) => {
-  const base = parseIsoDateLocal(startDateIso) || new Date()
-  const date = new Date(base.getFullYear(), base.getMonth(), base.getDate())
-  date.setDate(date.getDate() + Math.max(0, Number(day || 1) - 1))
+  const date = getGameDateFromDayOrFallback(startDateIso, day)
   return date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 }
 

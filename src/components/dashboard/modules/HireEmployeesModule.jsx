@@ -4,38 +4,18 @@ import { useGameStore } from '../../../store/useGameStore'
 import { DEFAULT_WRESTLER_ARCHETYPES } from '../../../data/wrestlerArchetypes'
 import { getWrestlerPrestigeRequirement } from '../../../utils/wrestlerUnlocks'
 import { sortEmployees } from '../../../utils/employeeSorting'
+import { getGameDateFromDayOrFallback, parseGameDate } from '../../../utils/gameCalendar'
+import { formatNumber } from '../../../utils/utility'
+import i18n from '../../../i18n'
 import styles from './HireEmployeesModule.module.scss'
 
-const formatMoney = (value) => value.toLocaleString()
 const ROLE_FILTERS = ['all', 'wrestler', 'referee', 'manager', 'announcer', 'staff']
 const GENDER_FILTERS = ['all', 'male', 'female']
 const getBackupImageByGender = (gender) => (gender === 'female' ? '/people/girl.png' : '/people/boy.png')
-const parseIsoDateLocal = (isoDateString) => {
-  if (!isoDateString) {
-    return null
-  }
-
-  const [yearStr, monthStr, dayStr] = isoDateString.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-  const day = Number(dayStr)
-
-  if (!year || !month || !day) {
-    return null
-  }
-
-  return new Date(year, month - 1, day)
-}
-
-const getGameDate = (startDateIso, day) => {
-  const baseDate = parseIsoDateLocal(startDateIso) || new Date()
-  const gameDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate())
-  gameDate.setDate(gameDate.getDate() + Math.max(0, Number(day || 1) - 1))
-  return gameDate
-}
+const formatMoney = (value) => formatNumber(value, i18n.resolvedLanguage || i18n.language)
 
 const formatDobWithAge = (dob, gameDate) => {
-  const dobDate = parseIsoDateLocal(dob)
+  const dobDate = parseGameDate(dob)
   if (!dobDate || Number.isNaN(dobDate.getTime())) {
     return dob || '-'
   }
@@ -179,7 +159,7 @@ function HireEmployeesModule() {
   }
   const selectedCandidate = candidates.find((candidate) => candidate.candidateId === selectedCandidateId) || null
   const selectedContract = selectedCandidate?.contract || null
-  const gameDate = getGameDate(startDateIso, gameDay)
+  const gameDate = getGameDateFromDayOrFallback(startDateIso, gameDay)
 
   const closeNegotiationModal = () => {
     setSelectedCandidateId(null)
@@ -294,7 +274,7 @@ function HireEmployeesModule() {
   return (
     <section className={styles.moduleBody}>
       <header className={styles.headerRow}>
-        <p>{t('dashboard.hiring.availableCash', { amount: cash.toLocaleString() })}</p>
+        <p>{t('dashboard.hiring.availableCash', { amount: formatMoney(cash) })}</p>
         <p>{t('dashboard.hiring.availablePeople', { amount: visibleCandidates.length, total: candidates.length })}</p>
         <p>{t('dashboard.hiring.rosterQuotaMale', { count: maleWrestlerCount, max: MAX_MALE })}</p>
         <p>{t('dashboard.hiring.rosterQuotaFemale', { count: femaleWrestlerCount, max: MAX_FEMALE })}</p>

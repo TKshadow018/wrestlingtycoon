@@ -17,6 +17,7 @@ import {
 } from 'recharts'
 import { GAME_CONFIG, GAME_DAYS_PER_MONTH } from '../../../config/gameConfig'
 import { useGameStore } from '../../../store/useGameStore'
+import { getGameDateFromDay, parseGameDate } from '../../../utils/gameCalendar'
 import EventGateDetailsModal from './EventGateDetailsModal'
 import styles from './ManageFinancesModule.module.scss'
 
@@ -58,19 +59,9 @@ const categoryKeyMap = {
 }
 
 // ─── Date helpers ──────────────────────────────────────────────────────────────
-const parseIsoDateLocal = (iso) => {
-  if (!iso) return null
-  const [y, m, d] = iso.split('-').map(Number)
-  if (!y || !m || !d) return null
-  return new Date(y, m - 1, d)
-}
-
 const getEntryDate = (entry, startDateIso) => {
-  const base = parseIsoDateLocal(startDateIso)
-  if (!base) return null
-  const d = new Date(base.getFullYear(), base.getMonth(), base.getDate())
-  d.setDate(d.getDate() + Math.max(0, (entry.day || 1) - 1))
-  return d
+  if (!parseGameDate(startDateIso)) return null
+  return getGameDateFromDay(startDateIso, Math.max(1, Math.floor(Number(entry.day || 1))))
 }
 
 const formatGameDateFromDay = (startDateIso, day) => {

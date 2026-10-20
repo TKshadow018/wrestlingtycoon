@@ -42,8 +42,6 @@ const buildCalendarGrid = (month, year) => {
   return grid
 }
 
-const parseIsoDateLocal = (isoDateString) => parseGameDate(isoDateString)
-
 const formatGameDateFromDay = (startDateIso, gameDay) => {
   const gameDate = getGameDateFromDay(startDateIso, Math.max(1, Number(gameDay) || 1))
   return gameDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
@@ -93,7 +91,7 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
     // Add custom events by their specific date
     customEvents.forEach((event) => {
       if (event.specificDate) {
-        const eventDate = parseIsoDateLocal(event.specificDate)
+        const eventDate = parseGameDate(event.specificDate)
         if (!eventDate || Number.isNaN(eventDate.getTime())) {
           return
         }
@@ -121,7 +119,7 @@ function EventCalendar({ gameDay, startDateIso, regularWeeklyEvent, customEvents
     })
 
     boardMeetings.forEach((meeting) => {
-      const meetingDate = parseIsoDateLocal(meeting.specificDate)
+      const meetingDate = parseGameDate(meeting.specificDate)
       if (!meetingDate || meetingDate.getMonth() + 1 !== viewMonth || meetingDate.getFullYear() !== viewYear) {
         return
       }

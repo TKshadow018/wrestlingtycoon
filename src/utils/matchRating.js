@@ -4,6 +4,7 @@ import {
   MATCH_RATING_WEIGHTS,
   normalizeMatchPlan,
 } from '../data/matchPlanning'
+import { average, clamp } from './utility'
 
 export const MATCH_RATING_DIAGNOSTIC_CODES = [
   ...MATCH_PLAN_DIAGNOSTIC_CODES,
@@ -13,9 +14,7 @@ export const MATCH_RATING_DIAGNOSTIC_CODES = [
 const DIAGNOSTIC_CODES = new Set(MATCH_RATING_DIAGNOSTIC_CODES)
 const ACTIONS = new Map(MATCH_MOMENT_ACTIONS.map((action) => [action.id, action]))
 const FACTORS = Object.keys(MATCH_RATING_WEIGHTS)
-const clamp = (value, min = 0, max = 10) => Math.max(min, Math.min(max, value))
 const round = (value) => Math.round(value * 100) / 100
-const average = (values) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0
 const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value) ? value : {}
 const attribute = (value, fallback = 0) => {
   const numeric = typeof value === 'number' || typeof value === 'string' ? Number(value) : NaN
@@ -28,7 +27,7 @@ export const sanitizeRatingBreakdown = (raw) => {
     return null
   }
   return {
-    ...Object.fromEntries(FACTORS.map((key) => [key, round(clamp(source[key]))])),
+    ...Object.fromEntries(FACTORS.map((key) => [key, round(clamp(source[key], 0, 10))])),
     contextAdjustment: round(clamp(source.contextAdjustment, -0.5, 0.5)),
     warnings: [...new Set((Array.isArray(source.warnings) ? source.warnings : [])
       .filter((code) => typeof code === 'string' && DIAGNOSTIC_CODES.has(code)))],

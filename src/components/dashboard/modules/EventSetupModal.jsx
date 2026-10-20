@@ -20,6 +20,8 @@ import InjuryStatus from '../../common/InjuryStatus'
 import { calculateMatchStaminaLoss, isInjured, recoverWrestlerHealth, INJURY_STAMINA_THRESHOLD } from '../../../utils/matchHealth'
 import { getEventDisplayName } from '../../../utils/eventDisplay'
 import { calculateRanking } from '../../../utils/wrestlerRank'
+import { getGameDateFromDayOrFallback } from '../../../utils/gameCalendar'
+import { createStableKey } from '../../../utils/utility'
 import styles from './EventSetupModal.module.scss'
 
 // ─── Segment type definitions ─────────────────────────────────────────────────
@@ -169,31 +171,12 @@ const normalizeSegmentsForSubmit = (segments) => {
   }))
 }
 
-const parseIsoDateLocal = (isoDateString) => {
-  if (!isoDateString) {
-    return null
-  }
-
-  const [yearStr, monthStr, dayStr] = isoDateString.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-  const day = Number(dayStr)
-
-  if (!year || !month || !day) {
-    return null
-  }
-
-  return new Date(year, month - 1, day)
-}
-
 const formatGameDateFromDay = (startDateIso, day) => {
-  const baseDate = parseIsoDateLocal(startDateIso) || new Date()
-  const gameDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate())
-  gameDate.setDate(gameDate.getDate() + Math.max(0, Number(day || 1) - 1))
+  const gameDate = getGameDateFromDayOrFallback(startDateIso, day)
   return gameDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
-const buildPairKey = (leftId, rightId) => [leftId, rightId].sort().join('::')
+const buildPairKey = (leftId, rightId) => createStableKey([leftId, rightId])
 
 const normalizeTeamParticipantIds = (participantIds = []) => (
   Array.from(new Set(participantIds.filter(Boolean))).sort()

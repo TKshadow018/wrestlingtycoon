@@ -3,22 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../../store/useGameStore'
 import MatchHealthSummary from '../MatchHealthSummary'
 import { getEventDisplayName } from '../../../utils/eventDisplay'
+import { getGameDateFromDayOrFallback } from '../../../utils/gameCalendar'
 import styles from './MatchResultsModule.module.scss'
 
-const parseIsoDateLocal = (isoDateString) => {
-  if (!isoDateString) return null
-  const [yearStr, monthStr, dayStr] = isoDateString.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-  const day = Number(dayStr)
-  if (!year || !month || !day) return null
-  return new Date(year, month - 1, day)
-}
-
 const formatGameDateFromDay = (startDateIso, day) => {
-  const baseDate = parseIsoDateLocal(startDateIso) || new Date()
-  const gameDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate())
-  gameDate.setDate(gameDate.getDate() + Math.max(0, Number(day || 1) - 1))
+  const gameDate = getGameDateFromDayOrFallback(startDateIso, day)
   return gameDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
