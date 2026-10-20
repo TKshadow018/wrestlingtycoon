@@ -35,11 +35,12 @@ Match slots require at least two wrestlers; tag slots require a participant on b
 
 ## Match execution
 
-For each match segment the player can simulate or play it:
+For each match segment the player can simulate or plan it:
 
 - **Simulate:** the winner is selected randomly. Match rating is based on average participant skill and stamina, plus a small random factor and the default finish/risk bonuses. A higher skill raises expected quality; it does not guarantee victory.
-- **Play:** the player chooses the winner, finish, and risk level and steps through a short presentation sequence. The chosen presentation affects match-rating and stamina modifiers; it is not a separate win-probability contest.
-- Ratings are clamped to 1–10. Each wrestler's match stamina loss is randomized in the 20–50 range, with additional loss for risky/chaotic execution; daily stamina recovery is 10.
+- **Plan:** the player chooses the winner, finish, and pace, then creates an ordered plan of timed moments. Match length can be set from 1 to 60 minutes. Each moment can assign an actor, an optional target, and an action such as strikes, kicks, an outside-the-ring brawl, a comeback, or a near fall.
+- Props are a multi-select option. Supported props include chairs, tables, ladders, kendo sticks, steel steps, and the announce table. A prop must be selected for the match before a `usesProp` moment can use it.
+- Ratings are clamped to 1–10. A more detailed plan and selected props improve the planned-match quality modifier, while match duration and the number of planned moments increase stamina cost. Each wrestler's base match stamina loss is randomized in the 20–50 range, with additional loss for risky/chaotic execution; daily stamina recovery is 10.
 - Tag outcomes record the winning team. Singles outcomes record one winning wrestler. A title match applies the result to the configured title after validation.
 
 The exact execution UI and payload are in [src/components/dashboard/modules/EventSetupModal.jsx](../src/components/dashboard/modules/EventSetupModal.jsx). The store sanitizes that payload against active employee IDs, event slot limits, allowed segment types, and current unlocks before applying results.
@@ -83,6 +84,7 @@ The postmortem can recommend variety when a card has at least three matches, one
 ## Source and tests
 
 - Runtime resolution, sanitization, and event-type rules: [src/store/useGameStore.js](../src/store/useGameStore.js).
+- Planning catalogs and payload normalization: [src/data/matchPlanning.js](../src/data/matchPlanning.js).
 - Card setup and execution: [src/components/dashboard/modules/EventSetupModal.jsx](../src/components/dashboard/modules/EventSetupModal.jsx).
 - Event schedule and player flow: [src/pages/DashboardPage.jsx](../src/pages/DashboardPage.jsx) and [src/components/dashboard/EventRequirementsOverlay.jsx](../src/components/dashboard/EventRequirementsOverlay.jsx).
 - Integration examples: [src/store/gameStoreActions.test.js](../src/store/gameStoreActions.test.js).

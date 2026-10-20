@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { MATCH_MOMENT_ACTIONS, MATCH_PROP_OPTIONS } from '../../data/matchPlanning'
 import venueCatalog from '../../data/venue.json'
 import { getCareerArcUnlockItem } from '../../data/careerArcUnlocks'
 import { localizeCompetitorHeadline } from '../../utils/competitorNews'
@@ -181,6 +182,9 @@ function SegmentCard({ segment, index, visible, t }) {
     : t(SEGMENT_TYPE_KEYS[segment.segmentType] || 'dashboard.segments.unknown')
   const promoAdjustmentText = isMatch ? formatPromoAdjustment({ segment, t }) : null
   const promoAdjustmentType = segment?.promoRatingAdjustmentType
+  const participantNameById = new Map((segment.participantDetails || []).map((person) => [person.employeeId, person.name]))
+  const planMoments = Array.isArray(segment.plannedMoments) ? segment.plannedMoments : []
+  const planProps = Array.isArray(segment.props) ? segment.props : []
 
   return (
     <div
@@ -203,6 +207,11 @@ function SegmentCard({ segment, index, visible, t }) {
         {isMatch && segment.winnerName && (
           <span className={styles.winnerLabel}>
             {t('dashboard.eventResults.winner')} <strong>{segment.winnerName}</strong>
+          </span>
+        )}
+        {isMatch && Number(segment.matchLengthMinutes) > 0 && (
+          <span className={styles.segSubtype}>
+            {t(`dashboard.events.setup.execution.matchLengthOption${Number(segment.matchLengthMinutes) === 1 ? 'Singular' : ''}`, { minutes: segment.matchLengthMinutes })}
           </span>
         )}
       </div>
@@ -251,6 +260,44 @@ function SegmentCard({ segment, index, visible, t }) {
             )}
           </div>
         )}
+
+        {isMatch && (planProps.length > 0 || planMoments.length > 0) ? (
+          <div className={styles.segmentPlan}>
+            <div className={styles.segmentPlanHeader}>
+              <strong>{t('dashboard.events.setup.execution.plannerTitle')}</strong>
+              {planProps.length > 0 ? (
+                <span>
+                  {t('dashboard.events.setup.execution.chooseProps')}: {planProps.map((propId) => {
+                    const prop = MATCH_PROP_OPTIONS.find((option) => option.id === propId)
+                    return prop ? t(prop.labelKey) : t('dashboard.events.setup.execution.unknownProp')
+                  }).join(', ')}
+                </span>
+              ) : null}
+            </div>
+            {planMoments.length > 0 ? (
+              <ul>
+                {planMoments.map((moment) => {
+                  const action = MATCH_MOMENT_ACTIONS.find((option) => option.id === moment.actionType)
+                  const actionLabel = action ? t(action.labelKey) : t('dashboard.events.setup.execution.unknownAction')
+                  const actorName = participantNameById.get(moment.actorId) || t('dashboard.events.setup.execution.unknownCompetitor')
+                  const targetName = moment.targetId ? participantNameById.get(moment.targetId) : ''
+                  return (
+                    <li key={moment.momentId}>
+                      {t('dashboard.events.setup.execution.resultMoment', {
+                        minute: moment.atMinute,
+                        action: actionLabel,
+                        actor: actorName,
+                        targetSuffix: targetName
+                          ? t('dashboard.events.setup.execution.resultMomentTargetSuffix', { target: targetName })
+                          : '',
+                      })}
+                    </li>
+                  )
+                })}
+              </ul>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </div>
   )

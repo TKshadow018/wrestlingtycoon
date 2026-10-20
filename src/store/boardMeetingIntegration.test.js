@@ -337,6 +337,102 @@ describe('board meeting store integration', () => {
     expect(title.holderHistory[0].holders[0].name).toBe('former-champion')
   })
 
+  it('does not propose a male-only title to a woman', () => {
+    useGameStore.setState((state) => ({
+      roster: {
+        ...state.roster,
+        employees: [{
+          employeeId: 'board-woman-1',
+          role: 'wrestler',
+          name: 'Board Woman',
+          popularity: 95,
+          gender: 'female',
+          contract: { startDay: 1, endDay: 361, monthlySalary: 1000 },
+        }],
+        titles: [{
+          ...state.roster.titles[0],
+          titleId: 'male-only-board-title',
+          name: 'Male Only Board Championship',
+          isActive: true,
+          isWomenOnly: false,
+          division: 'singles',
+          holderEmployeeId: 'current-male-champion',
+          holderEmployeeIds: [],
+        }],
+      },
+    }))
+
+    expect(useGameStore.getState().openBoardMeeting().ok).toBe(true)
+    expect(useGameStore.getState().boardMeeting.activeMeeting.agendas.map((agenda) => agenda.id))
+      .not.toContain('championChange')
+  })
+
+  it('rejects a gender-ineligible champion change before applying it', () => {
+    useGameStore.setState((state) => ({
+      roster: {
+        ...state.roster,
+        employees: [{
+          employeeId: 'board-woman-1',
+          role: 'wrestler',
+          name: 'Board Woman',
+          popularity: 95,
+          gender: 'female',
+          contract: { startDay: 1, endDay: 361, monthlySalary: 1000 },
+        }],
+        titles: [{
+          ...state.roster.titles[0],
+          titleId: 'male-only-board-title',
+          name: 'Male Only Board Championship',
+          isActive: true,
+          isWomenOnly: false,
+          division: 'singles',
+          holderEmployeeId: 'current-male-champion',
+          holderEmployeeIds: [],
+        }],
+      },
+    }))
+    expect(useGameStore.getState().openBoardMeeting().ok).toBe(true)
+    const state = useGameStore.getState()
+    const championAgenda = buildBoardMeetingAgendaPool({
+      financialIsNegative: false,
+      financialReport: state.boardMeeting.activeMeeting.financeReport,
+      boardMembers: BOARD_MEMBERS,
+      sponsorOffer: null,
+      upcomingEvent: state.events.bookedEvent,
+      lastOutcome: state.events.lastOutcome,
+      titleChange: {
+        titleId: 'male-only-board-title',
+        titleName: 'Male Only Board Championship',
+        targetEmployeeId: 'board-woman-1',
+        targetName: 'Board Woman',
+      },
+      wrestlerPush: null,
+    }).find((agenda) => agenda.id === 'championChange')
+
+    useGameStore.setState((currentState) => ({
+      boardMeeting: {
+        ...currentState.boardMeeting,
+        activeMeeting: {
+          ...currentState.boardMeeting.activeMeeting,
+          agendas: [championAgenda],
+          currentAgendaIndex: 0,
+          status: 'inProgress',
+        },
+      },
+    }))
+
+    const result = useGameStore.getState().resolveBoardAgenda({
+      agendaId: 'championChange',
+      choiceId: 'approveChampionChange',
+    })
+    const title = useGameStore.getState().roster.titles.find(
+      (entry) => entry.titleId === 'male-only-board-title',
+    )
+
+    expect(result).toMatchObject({ ok: false, reason: 'ineligibleChampion' })
+    expect(title.holderEmployeeId).toBe('current-male-champion')
+  })
+
   it('applies approved marketing spending and records its financial effect', () => {
     expect(useGameStore.getState().openBoardMeeting().ok).toBe(true)
     const state = useGameStore.getState()

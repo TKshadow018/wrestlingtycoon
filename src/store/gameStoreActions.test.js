@@ -941,6 +941,17 @@ describe('game store action coverage', () => {
           titleId: title.titleId,
           wrestlerIds: [first.employeeId, second.employeeId],
           winnerEmployeeId: second.employeeId,
+          matchLengthMinutes: 45,
+          props: ['chair', 'table'],
+          plannedMoments: [
+            {
+              momentId: 'opening-beat',
+              actionType: 'dominateKicks',
+              actorId: first.employeeId,
+              targetId: second.employeeId,
+              atMinute: 12,
+            },
+          ],
           matchRating: 8.5,
           staminaLossById: { [first.employeeId]: 20, [second.employeeId]: 25, unknown: 5 },
           refereeId: referee.employeeId,
@@ -1048,6 +1059,17 @@ describe('game store action coverage', () => {
       .promoRatingAdjustment).toBeCloseTo(0.6)
     expect(state.events.lastOutcome.segments.find((segment) => segment.segmentType === 'titleMatch'))
       .toMatchObject({ chemistryRatingAdjustment: 0.5, matchRating: 9.6 })
+    expect(state.events.lastOutcome.segments.find((segment) => segment.segmentType === 'titleMatch'))
+      .toMatchObject({
+        matchLengthMinutes: 45,
+        props: ['chair', 'table'],
+        plannedMoments: [expect.objectContaining({
+          actionType: 'dominateKicks',
+          actorId: first.employeeId,
+          targetId: second.employeeId,
+          atMinute: 12,
+        })],
+      })
     expect(state.events.lastOutcome.segments.find((segment) => segment.segmentType === 'promo')
       .promoSegmentId).toBe('contractSigning')
     expect(state.roster.backstageChemistry).toHaveProperty(

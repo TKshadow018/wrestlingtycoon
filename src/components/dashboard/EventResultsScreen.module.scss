@@ -842,6 +842,47 @@
   color: #f58f8f;
 }
 
+.segmentPlan {
+  background: rgba(37, 161, 155, 0.06);
+  border: 1px solid rgba(37, 161, 155, 0.24);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.55rem 0.65rem;
+
+  ul {
+    display: grid;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    color: var(--text-main);
+    font-size: 0.74rem;
+    line-height: 1.35;
+  }
+}
+
+.segmentPlanHeader {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+
+  strong {
+    color: #9ee7e2;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  span {
+    color: var(--text-faint);
+    font-size: 0.7rem;
+  }
+}
 // ─── CTA ──────────────────────────────────────────────────────────────────────
 
 .ctaRow {

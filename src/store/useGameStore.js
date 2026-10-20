@@ -20,6 +20,7 @@ import {
   normalizeWrestlerArchetypes,
 } from '../data/wrestlerArchetypes'
 import { createEventTemplates } from '../data/eventTemplates'
+import { clampMatchLengthMinutes, normalizePlannedMoments } from '../data/matchPlanning'
 import { createSponsorOffers, SPONSOR_TYPE_CONFIG } from '../data/sponsorOffers'
 import { clampHeelFaceMeter, DEFAULT_HEEL_FACE_METER_VALUE, computeHeelFaceShift, applyHeelFaceNeutralDecay } from '../utils/heelFaceMeter'
 import { validateModDataPackage } from '../utils/modDataPackage'
@@ -105,6 +106,13 @@ const normalizeTitleRecord = (title) => {
     holderHistory: Array.isArray(title?.holderHistory) ? title.holderHistory : [],
   }
 }
+
+const getTitleRequiredGender = (title) => (title?.isWomenOnly ? 'female' : 'male')
+
+const isEligibleTitleChallenger = (title, employee) => (
+  employee?.role === 'wrestler'
+  && employee.gender === getTitleRequiredGender(title)
+)
 
 const createInitialTitles = () => titleCatalog.map((title) => normalizeTitleRecord(title))
 
@@ -668,7 +676,10 @@ const getBoardMeetingAgendaPool = (state, financialReport, isJanuary) => {
   const currentHolderIds = activeTitle
     ? normalizeTitleHolderIds(activeTitle)
     : []
-  const replacementWrestler = wrestlers.find((wrestler) => !currentHolderIds.includes(wrestler.employeeId))
+  const replacementWrestler = wrestlers.find((wrestler) => (
+    !currentHolderIds.includes(wrestler.employeeId)
+    && isEligibleTitleChallenger(activeTitle, wrestler)
+  ))
   const upcomingEvent = state.events.bookedEvent || null
   const activeSponsors = normalizeSponsors(state.roster.sponsors)
   const sponsorToReview = [...activeSponsors]
@@ -2735,6 +2746,17 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unl
       const wrestlerIds = rawMatchType === 'tagTeam'
         ? Array.from(new Set([...team1Ids, ...team2Ids]))
         : filterIds(segment?.wrestlerIds ?? segment?.participantIds)
+      const matchLengthMinutes = MATCH_SEGMENT_TYPES.has(segmentType)
+        ? clampMatchLengthMinutes(segment?.matchLengthMinutes)
+        : null
+      const normalizedMatchPlan = MATCH_SEGMENT_TYPES.has(segmentType)
+        ? normalizePlannedMoments({
+            moments: segment?.plannedMoments,
+            wrestlerIds,
+            props: segment?.props,
+            matchLengthMinutes,
+          })
+        : { props: [], plannedMoments: [] }
       const refereeId   = filterId(segment?.refereeId)
       const announcerId = filterId(segment?.announcerId)
       const cashInByEmployeeId = segmentType === 'titleMatch' ? filterId(segment?.cashInByEmployeeId) : null
@@ -2811,6 +2833,9 @@ const sanitizeEventSetup = (eventSetup, activeEmployees, defaultMaxSegments, unl
         betrayerId: storyBeat === 'betrayal' ? segment.betrayerId : null,
         matchType: MATCH_SEGMENT_TYPES.has(segmentType) ? rawMatchType : null,
         matchStipulation: MATCH_SEGMENT_TYPES.has(segmentType) ? rawMatchStipulation : null,
+        matchLengthMinutes,
+        props: normalizedMatchPlan.props,
+        plannedMoments: normalizedMatchPlan.plannedMoments,
         titleId: segmentType === 'titleMatch' && typeof segment?.titleId === 'string' ? segment.titleId : null,
         wrestlerIds,
         team1Ids: MATCH_SEGMENT_TYPES.has(segmentType) && rawMatchType === 'tagTeam' ? team1Ids : [],
@@ -3446,6 +3471,18 @@ export const useGameStore = create(
         const choice = agenda.choices.find((candidate) => candidate.id === choiceId)
         if (!choice) {
           return { ok: false, reason: 'invalidChoice' }
+        }
+        if (choice.effect === 'championChange') {
+          const titleChange = agenda.context?.titleChange
+          const title = initialState.roster.titles.find(
+            (candidate) => candidate.titleId === titleChange?.titleId,
+          )
+          const targetEmployee = initialState.roster.employees.find(
+            (employee) => employee.employeeId === titleChange?.targetEmployeeId,
+          )
+          if (!title || !isEligibleTitleChallenger(title, targetEmployee)) {
+            return { ok: false, reason: 'ineligibleChampion' }
+          }
         }
         const isBoardElectionVote = choice.effect === 'boardElectionVote'
         if (
@@ -5977,6 +6014,9 @@ export const useGameStore = create(
                   betrayerId: seg.betrayerId || null,
                   matchType: seg.matchType || null,
                   matchStipulation: seg.matchStipulation || null,
+                  matchLengthMinutes: seg.matchLengthMinutes || null,
+                  props: Array.isArray(seg.props) ? seg.props : [],
+                  plannedMoments: Array.isArray(seg.plannedMoments) ? seg.plannedMoments : [],
                   participantIds: Array.isArray(seg.participantIds) ? seg.participantIds : [],
                   winnerEmployeeId: isTagTeamSeg ? null : (seg.winnerEmployeeId || null),
                   winnerTeamIds: isTagTeamSeg ? segWinnerTeamIds : [],
@@ -6012,6 +6052,9 @@ export const useGameStore = create(
                 segments: configuredSegments.map((segment) => ({
                   segmentType: segment.segmentType,
                   promoSegmentId: segment.segmentType === 'promo' ? segment.promoSegmentId : null,
+                  matchLengthMinutes: segment.matchLengthMinutes || null,
+                  props: Array.isArray(segment.props) ? segment.props : [],
+                  plannedMoments: Array.isArray(segment.plannedMoments) ? segment.plannedMoments : [],
                   participants: segment.participantIds
                     .map((participantId) => nextActiveEmployeesWithPerformance.find((employee) => employee.employeeId === participantId)?.name)
                     .filter(Boolean),
